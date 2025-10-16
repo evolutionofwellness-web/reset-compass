@@ -1,0 +1,68 @@
+<details><summary>Click to copy</summary>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>The Reset Compass</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#1C3B34"/>
+<script async defer data-domain="evolutionofwellness-web.github.io/reset-compass"
+ src="https://plausible.io/js/script.js"></script>
+<style>
+/* simplified styles for clarity */
+body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:#fff;color:#1C3B34}
+header{background:#1C3B34;color:#fff;padding:14px;text-align:center;font-weight:600}
+footer{padding:24px 12px;text-align:center;font-size:12px;color:#666}
+.btn{background:#1C3B34;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:600}
+.card{border:1px solid #e7e7e7;border-radius:12px;padding:14px;margin:10px 0;background:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.pill{display:inline-block;background:#F0E8D9;color:#1C3B34;padding:4px 8px;border-radius:8px;font-size:12px}
+#popup{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:10}
+#popup .box{background:#fff;color:#1C3B34;padding:24px;border-radius:12px;max-width:320px;text-align:center}
+#popup button{margin-top:10px}
+</style>
+</head>
+<body>
+<header>The Reset Compass</header>
+<div id="app"></div>
+<footer>© 2025 Evolution of Wellness LLC • v1.0.0 • For educational purposes only. Not medical advice.</footer>
+
+<script>
+// show welcome popup once
+if(!localStorage.getItem('welcomeSeen')){
+  const popup=document.createElement('div');
+  popup.id='popup';
+  popup.innerHTML=`<div class="box">
+    <h3>Welcome to The Reset Compass</h3>
+    <p>This simple tool helps you take your health into your own hands immediately.<br>
+    Choose your current mode to see quick, realistic steps that match your energy today.</p>
+    <button class="btn" id="startBtn">Let's Start</button>
+    <p style="font-size:12px;color:#666">Your progress is saved locally on this device.</p>
+  </div>`;
+  document.body.appendChild(popup);
+  document.getElementById('startBtn').onclick=()=>{
+    localStorage.setItem('welcomeSeen','true');
+    popup.remove();
+  };
+}
+
+// very small demo content
+document.getElementById('app').innerHTML=
+ `<div class="grid">
+   <div class="card"><div class="pill">🩺 Surviving</div><h3>3-Minute Reset</h3><p>Quick mental & physical reboot.</p><button class="btn" onclick="alert('Logged! ✅')">Did it ✅</button></div>
+   <div class="card"><div class="pill">🧭 Drifting</div><h3>Attention Anchor</h3><p>Pick one word to focus your day.</p><button class="btn" onclick="alert('Logged! ✅')">Did it ✅</button></div>
+   <div class="card"><div class="pill">🌿 Grounded</div><h3>Energy Multiplier</h3><p>Do more of what gives you energy.</p><button class="btn" onclick="alert('Logged! ✅')">Did it ✅</button></div>
+   <div class="card"><div class="pill">🚀 Growing</div><h3>Expansion Map</h3><p>Define what to expand, sustain, rest.</p><button class="btn" onclick="alert('Logged! ✅')">Did it ✅</button></div>
+  </div>`;
+</script>
+<script>
+// service worker registration
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
+}
+</script>
+</body>
+</html>
+</details>
