@@ -7,6 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="theme-color" content="#1C3B34"/>
+<!-- Analytics -->
 <script async defer data-domain="evolutionofwellness-web.github.io/reset-compass" src="https://plausible.io/js/script.js"></script>
 <style>
 :root{--brand:#1C3B34;--beige:#F0E8D9;--ink:#1A1A1A;--muted:#6b6b6b;--border:#e7e7e7;
@@ -52,6 +53,10 @@ svg.compass{width:340px;max-width:92vw;height:auto;display:block}
 .instructions{max-width:520px;margin:12px auto 4px;border-left:4px solid var(--brand);padding:12px 14px;background:#fafafa;border-radius:8px}
 .instructions h2{margin:0 0 6px;font-size:20px;color:var(--brand)}
 .instructions p{margin:4px 0 8px}
+
+/* Stats bar */
+.stats{display:flex;gap:10px;justify-content:center;align-items:center;margin:8px auto 4px}
+.stat{background:#f6f9f8;border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:13px;color:var(--brand)}
 
 /* Welcome popup */
 #popup{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:10}
@@ -130,22 +135,45 @@ const addLog=({mode,tool,note})=>{
   saveLogs(arr);
 };
 const formatTS=(iso)=>new Date(iso).toLocaleString();
+const ymd=(d)=>d.toISOString().slice(0,10);
+function todayCount(){
+  const today=ymd(new Date());
+  return getLogs().filter(l=>l.ts.slice(0,10)===today).length;
+}
+function dailyStreak(){
+  const dates=new Set(getLogs().map(l=>l.ts.slice(0,10)));
+  let streak=0;
+  let d=new Date();
+  while(dates.has(ymd(d))){
+    streak++; d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
 
 /* ---------- VIEWS ---------- */
 function Home(){
   setActive();
+  const tCount=todayCount();
+  const streak=dailyStreak();
+
   app.innerHTML = `
+    <div class="stats">
+      <div class="stat">Today: <strong>${tCount}</strong></div>
+      <div class="stat">Daily streak: <strong>${streak}</strong></div>
+    </div>
+
     <div class="card instructions" style="text-align:left">
       <h2>How are you feeling today?</h2>
       <p style="font-size:15px;color:var(--muted);margin:4px 0 10px">
         Choose the mode that best matches your current energy. Then open one quick tool to reset or refocus.
       </p>
-      <ul style="margin:0;padding-left:18px;list-style:disc">
-        <li style="margin:.35rem 0"><b style="color:var(--surv)">🩺 Surviving</b> — running on empty</li>
-        <li style="margin:.35rem 0"><b style="color:var(--drift)">🧭 Drifting</b> — okay but unfocused</li>
-        <li style="margin:.35rem 0"><b style="color:var(--ground)">🌿 Grounded</b> — steady and consistent</li>
-        <li style="margin:.35rem 0"><b style="color:var(--grow)">🚀 Growing</b> — ready to push a little</li>
-      </ul>
+      <!-- No bullets, no em dashes; using colons -->
+      <div style="display:grid;gap:6px">
+        <div><b style="color:var(--surv)">🩺 Surviving:</b> running on empty</div>
+        <div><b style="color:var(--drift)">🧭 Drifting:</b> okay but unfocused</div>
+        <div><b style="color:var(--ground)">🌿 Grounded:</b> steady and consistent</div>
+        <div><b style="color:var(--grow)">🚀 Growing:</b> ready to push a little</div>
+      </div>
       <p style="margin-top:10px;font-weight:700;color:var(--brand)">
         Not sure? Start with <span style="color:var(--drift)">Drifting</span>.
       </p>
@@ -159,15 +187,17 @@ function Home(){
           </filter>
         </defs>
         <circle cx="100" cy="100" r="96" fill="#fff" stroke="var(--brand)" stroke-width="3" filter="url(#softShadow)"/>
+        <!-- Wedges -->
         <path d="M100,100 L100,4 A96,96 0 0,1 196,100 Z" fill="var(--surv)"  opacity=".18" onclick="location.hash='#/mode/1'"></path>
         <path d="M100,100 L196,100 A96,96 0 0,1 100,196 Z" fill="var(--drift)" opacity=".18" onclick="location.hash='#/mode/2'"></path>
         <path d="M100,100 L100,196 A96,96 0 0,1 4,100 Z"  fill="var(--ground)" opacity=".18" onclick="location.hash='#/mode/3'"></path>
         <path d="M100,100 L4,100 A96,96 0 0,1 100,4 Z"   fill="var(--grow)"  opacity=".18" onclick="location.hash='#/mode/4'"></path>
         <circle cx="100" cy="100" r="7" fill="var(--brand)"></circle>
-        <text x="100" y="18"  text-anchor="middle" fill="var(--surv)"  font-size="12">Surviving</text>
-        <text x="182"  y="104" text-anchor="end"    fill="var(--drift)" font-size="12">Drifting</text>
-        <text x="100" y="188" text-anchor="middle" fill="var(--ground)" font-size="12">Grounded</text>
-        <text x="18"  y="104" text-anchor="start"  fill="var(--grow)"  font-size="12">Growing</text>
+        <!-- Labels INSIDE wedges -->
+        <text x="100" y="42"  text-anchor="middle" fill="var(--surv)"  font-size="12">Surviving</text>
+        <text x="150" y="104" text-anchor="middle" fill="var(--drift)" font-size="12">Drifting</text>
+        <text x="100" y="160" text-anchor="middle" fill="var(--ground)" font-size="12">Grounded</text>
+        <text x="50"  y="104" text-anchor="middle"  fill="var(--grow)"  font-size="12">Growing</text>
       </svg>
       <p class="center-tip">Tap a wedge or use the buttons below.</p>
     </div>
@@ -233,27 +263,59 @@ function ToolView(id){
   document.getElementById('saveAndLog').onclick=()=>{
     addLog({mode:m.name,tool:t.name,note:noteEl.value});
     alert('Saved to History! ✅');
+    go('#/home');
   };
   document.getElementById('logOnly').onclick=()=>{
     addLog({mode:m.name,tool:t.name,note:''});
     alert('Logged! ✅');
+    go('#/home');
   };
 }
 
 function Wins(){
   setActive();
-  const logs=getLogs().slice(-10).reverse();
-  app.innerHTML=`
+  const recent=getLogs().slice(-10).reverse();
+
+  app.innerHTML = `
     <h2>Quick Wins</h2>
     <div class="grid">
-      ${QuickWins.map(w=>`<div class="card"><div class="pill">${w.icon} Quick Win</div><h3>${w.title}</h3><p class="muted">${w.desc}</p></div>`).join('')}
+      ${QuickWins.map((w,i)=>`
+        <div class="card" id="qw-${i}">
+          <div class="pill">${w.icon} Quick Win</div>
+          <h3 style="margin-top:6px">${w.title}</h3>
+          <p class="muted">${w.desc}</p>
+
+          <div style="margin-top:8px">
+            <textarea id="note-${i}" placeholder="Optional: jot a sentence about what you did or noticed."></textarea>
+            <div style="height:8px"></div>
+            <button class="btn" onclick="(function(){
+              const note=(document.getElementById('note-${i}').value||'').trim();
+              addLog({mode:'Quick Win',tool:'${w.title.replace(/'/g,"&#39;")}',note});
+              document.querySelector('#qw-${i} .pill').innerHTML='✅ Logged';
+              alert('Saved to History! ✅');
+            })()">Save note + Done</button>
+            <button class="btn subtle" style="margin-left:8px" onclick="(function(){
+              addLog({mode:'Quick Win',tool:'${w.title.replace(/'/g,"&#39;")}',note:''});
+              document.querySelector('#qw-${i} .pill').innerHTML='✅ Logged';
+              alert('Logged! ✅');
+            })()">Done (no note)</button>
+          </div>
+        </div>
+      `).join('')}
     </div>
+
     <div style="height:12px"></div>
     <div class="card">
       <strong>Recent logs</strong>
-      ${logs.length?`<ul style="margin:8px 0 0 18px">${logs.map(l=>`<li>${formatTS(l.ts)} — <strong>${l.tool}</strong> (${l.mode}) ${l.note?`— ${l.note.replace(/</g,'&lt;')}`:''}</li>`).join('')}</ul>`:`<p class="muted">No logs yet.</p>`}
+      ${recent.length
+        ? `<ul style="margin:8px 0 0 18px">
+             ${recent.map(l=>`<li>${new Date(l.ts).toLocaleString()} — <strong>${l.tool}</strong> (${l.mode}) ${l.note?`— ${l.note.replace(/</g,'&lt;')}`:''}</li>`).join('')}
+           </ul>`
+        : `<p class="muted">No logs yet.</p>`
+      }
       <div style="height:10px"></div>
-      <a class="btn ghost" href="#/home">Back to Compass</a>
+      <a class="btn ghost" href="#/history">Open full History</a>
+      <a class="btn ghost" style="margin-left:8px" href="#/home">Back to Compass</a>
     </div>
   `;
 }
@@ -261,7 +323,7 @@ function Wins(){
 function History(){
   setActive();
   const logs=getLogs().reverse(); // newest first
-  const uniqueModes=['All','Surviving','Drifting','Grounded','Growing'];
+  const uniqueModes=['All','Surviving','Drifting','Grounded','Growing','Quick Win'];
   app.innerHTML=`
     <h2>History</h2>
     <div class="card">
@@ -272,6 +334,10 @@ function History(){
         <input type="text" id="searchBox" placeholder="Search notes or tools"/>
         <span class="badge">${logs.length} entries</span>
         <button class="btn ghost" id="clearLogs">Clear All</button>
+      </div>
+      <div class="stats">
+        <div class="stat">Today: <strong>${todayCount()}</strong></div>
+        <div class="stat">Daily streak: <strong>${dailyStreak()}</strong></div>
       </div>
       <div id="logList">
         ${renderLogs(logs)}
