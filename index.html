@@ -12,7 +12,8 @@
 <style>
 :root{--brand:#1C3B34;--beige:#F0E8D9;--ink:#1A1A1A;--muted:#6b6b6b;--border:#e7e7e7;
  --surv:#A94747; --drift:#E6B450; --ground:#3B755F; --grow:#4C7EDC;}
-*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;background:#fff;color:var(--ink)}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;background:#fff;color:var(--ink)}
 header{position:sticky;top:0;background:var(--brand);color:#fff;padding:12px 16px;z-index:2}
 header h1{margin:0;font-size:16px;text-align:center}
 .nav{display:flex;gap:8px;justify-content:center;margin-top:8px}
@@ -37,17 +38,19 @@ svg.compass{width:340px;max-width:92vw;height:auto;display:block}
 .mode-buttons{display:grid;grid-template-columns:repeat(2,minmax(140px,1fr));gap:10px;max-width:420px;margin:0 auto 8px}
 .mode-btn{display:flex;align-items:center;justify-content:center;border-radius:12px;padding:12px 10px;font-weight:700;border:2px solid transparent;cursor:pointer}
 .mode-btn span{font-size:16px}
-.mode-btn.surv{background: #F7E5E5;border-color: var(--surv);color:var(--surv)}
+.mode-btn.surv{background:#F7E5E5;border-color:var(--surv);color:var(--surv)}
 .mode-btn.drift{background:#FFF0D5;border-color:var(--drift);color:var(--drift)}
 .mode-btn.ground{background:#E6F0EC;border-color:var(--ground);color:var(--ground)}
 .mode-btn.grow{background:#E6EEFF;border-color:var(--grow);color:var(--grow)}
 .mode-btn:active{transform:scale(.98)}
 
 /* Instruction panel */
-.instructions{max-width:520px;margin:12px auto 4px;border-left:4px solid var(--brand);padding:10px 12px;background:#fafafa;border-radius:8px}
-.instructions b{display:block;margin:2px 0 4px}
-.instructions ol{margin:6px 0 0 18px;padding:0}
-.instructions li{margin:.35rem 0}
+.instructions{max-width:520px;margin:12px auto 4px;border-left:4px solid var(--brand);padding:12px 14px;background:#fafafa;border-radius:8px}
+.instructions h2{margin:0 0 6px;font-size:20px;color:var(--brand)}
+.instructions p{margin:4px 0 8px}
+.instructions .rows{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.instructions .row{display:flex;align-items:center;gap:8px}
+.instructions .row b{min-width:90px}
 
 /* Welcome popup */
 #popup{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:10}
@@ -121,29 +124,32 @@ const log=(mode,tool)=>{
 function Home(){
   setActive();
   app.innerHTML=`
-    <div class="card instructions">
-      <b>Step 1:</b> Pick the mode that matches your energy <i>right now</i>.<br/>
-      <b>Step 2:</b> Open one tool and do the simplest step.
-      <ol>
-        <li><strongSurviving</strong> = running on empty</li>
-        <li><strong>Drifting</strong> = okay but unfocused</li>
-        <li><strong>Grounded</strong> = steady and consistent</li>
-        <li><strong>Growing</strong> = ready to push a little</li>
-      </ol>
+    <div class="card instructions" style="text-align:left">
+      <h2>How are you feeling today?</h2>
+      <p style="font-size:15px;color:var(--muted)">
+        Choose the mode that best matches your current energy. Then open one quick tool to reset or refocus.
+      </p>
+      <div class="rows">
+        <div class="row"><span style="font-size:18px">🩺</span><b style="color:var(--surv)">Surviving</b><span style="font-size:14px;color:var(--muted)">= running on empty</span></div>
+        <div class="row"><span style="font-size:18px">🧭</span><b style="color:var(--drift)">Drifting</b><span style="font-size:14px;color:var(--muted)">= okay but unfocused</span></div>
+        <div class="row"><span style="font-size:18px">🌿</span><b style="color:var(--ground)">Grounded</b><span style="font-size:14px;color:var(--muted)">= steady and consistent</span></div>
+        <div class="row"><span style="font-size:18px">🚀</span><b style="color:var(--grow)">Growing</b><span style="font-size:14px;color:var(--muted)">= ready to push a little</span></div>
+      </div>
+      <p style="margin-top:10px;font-weight:700;color:var(--brand)">Not sure? Start with <span style="color:var(--drift)">Drifting</span>.</p>
     </div>
 
     <div class="compass-wrap">
       <svg class="compass" viewBox="0 0 200 200" aria-label="Mode Compass">
         <circle cx="100" cy="100" r="96" fill="#fff" stroke="var(--brand)" stroke-width="3"/>
-        <path d="M100,100 L100,4 A96,96 0 0,1 196,100 Z" fill="var(--surv)" opacity=".18" onclick="location.hash='#/mode/1'"></path>
+        <path d="M100,100 L100,4 A96,96 0 0,1 196,100 Z" fill="var(--surv)"  opacity=".18" onclick="location.hash='#/mode/1'"></path>
         <path d="M100,100 L196,100 A96,96 0 0,1 100,196 Z" fill="var(--drift)" opacity=".18" onclick="location.hash='#/mode/2'"></path>
-        <path d="M100,100 L100,196 A96,96 0 0,1 4,100 Z" fill="var(--ground)" opacity=".18" onclick="location.hash='#/mode/3'"></path>
-        <path d="M100,100 L4,100 A96,96 0 0,1 100,4 Z" fill="var(--grow)" opacity=".18" onclick="location.hash='#/mode/4'"></path>
+        <path d="M100,100 L100,196 A96,96 0 0,1 4,100 Z"  fill="var(--ground)" opacity=".18" onclick="location.hash='#/mode/3'"></path>
+        <path d="M100,100 L4,100 A96,96 0 0,1 100,4 Z"   fill="var(--grow)"  opacity=".18" onclick="location.hash='#/mode/4'"></path>
         <circle cx="100" cy="100" r="7" fill="var(--brand)"></circle>
-        <text x="100" y="18" text-anchor="middle" fill="var(--surv)" font-size="12">Surviving</text>
-        <text x="182" y="104" text-anchor="end" fill="var(--drift)" font-size="12">Drifting</text>
+        <text x="100" y="18" text-anchor="middle" fill="var(--surv)"  font-size="12">Surviving</text>
+        <text x="182" y="104" text-anchor="end"    fill="var(--drift)" font-size="12">Drifting</text>
         <text x="100" y="188" text-anchor="middle" fill="var(--ground)" font-size="12">Grounded</text>
-        <text x="18" y="104" text-anchor="start" fill="var(--grow)" font-size="12">Growing</text>
+        <text x="18"  y="104" text-anchor="start"  fill="var(--grow)"  font-size="12">Growing</text>
       </svg>
       <p class="center-tip">Tap a wedge or use the buttons below.</p>
     </div>
@@ -159,8 +165,8 @@ function Home(){
 
 function ModeView(id){
   setActive();
-  const m=[...Modes].find(x=>x.id==id); if(!m){go('#/home');return}
-  const list=[...Tools].filter(t=>t.mode_id==m.id);
+  const m=Modes.find(x=>x.id==id); if(!m){go('#/home');return}
+  const list=Tools.filter(t=>t.mode_id==m.id);
   app.innerHTML=`
     <div class="pill" style="margin-bottom:8px;background:${m.color}20;color:${m.color}">${m.icon} ${m.name}</div>
     <h2>${m.name}</h2>
