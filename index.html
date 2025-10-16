@@ -48,9 +48,6 @@ svg.compass{width:340px;max-width:92vw;height:auto;display:block}
 .instructions{max-width:520px;margin:12px auto 4px;border-left:4px solid var(--brand);padding:12px 14px;background:#fafafa;border-radius:8px}
 .instructions h2{margin:0 0 6px;font-size:20px;color:var(--brand)}
 .instructions p{margin:4px 0 8px}
-.instructions .rows{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
-.instructions .row{display:flex;align-items:center;gap:8px}
-.instructions .row b{min-width:90px}
 
 /* Welcome popup */
 #popup{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:10}
@@ -123,31 +120,41 @@ const log=(mode,tool)=>{
 /* ---------- VIEWS ---------- */
 function Home(){
   setActive();
-  app.innerHTML=`
+  app.innerHTML = `
     <div class="card instructions" style="text-align:left">
       <h2>How are you feeling today?</h2>
-      <p style="font-size:15px;color:var(--muted)">
+      <p style="font-size:15px;color:var(--muted);margin:4px 0 10px">
         Choose the mode that best matches your current energy. Then open one quick tool to reset or refocus.
       </p>
-      <div class="rows">
-        <div class="row"><span style="font-size:18px">🩺</span><b style="color:var(--surv)">Surviving</b><span style="font-size:14px;color:var(--muted)">= running on empty</span></div>
-        <div class="row"><span style="font-size:18px">🧭</span><b style="color:var(--drift)">Drifting</b><span style="font-size:14px;color:var(--muted)">= okay but unfocused</span></div>
-        <div class="row"><span style="font-size:18px">🌿</span><b style="color:var(--ground)">Grounded</b><span style="font-size:14px;color:var(--muted)">= steady and consistent</span></div>
-        <div class="row"><span style="font-size:18px">🚀</span><b style="color:var(--grow)">Growing</b><span style="font-size:14px;color:var(--muted)">= ready to push a little</span></div>
-      </div>
-      <p style="margin-top:10px;font-weight:700;color:var(--brand)">Not sure? Start with <span style="color:var(--drift)">Drifting</span>.</p>
+      <ul style="margin:0;padding-left:18px;list-style:disc">
+        <li style="margin:.35rem 0"><b style="color:var(--surv)">🩺 Surviving</b> — running on empty</li>
+        <li style="margin:.35rem 0"><b style="color:var(--drift)">🧭 Drifting</b> — okay but unfocused</li>
+        <li style="margin:.35rem 0"><b style="color:var(--ground)">🌿 Grounded</b> — steady and consistent</li>
+        <li style="margin:.35rem 0"><b style="color:var(--grow)">🚀 Growing</b> — ready to push a little</li>
+      </ul>
+      <p style="margin-top:10px;font-weight:700;color:var(--brand)">
+        Not sure? Start with <span style="color:var(--drift)">Drifting</span>.
+      </p>
     </div>
 
     <div class="compass-wrap">
       <svg class="compass" viewBox="0 0 200 200" aria-label="Mode Compass">
         <circle cx="100" cy="100" r="96" fill="#fff" stroke="var(--brand)" stroke-width="3"/>
-        <path d="M100,100 L100,4 A96,96 0 0,1 196,100 Z" fill="var(--surv)"  opacity=".18" onclick="location.hash='#/mode/1'"></path>
-        <path d="M100,100 L196,100 A96,96 0 0,1 100,196 Z" fill="var(--drift)" opacity=".18" onclick="location.hash='#/mode/2'"></path>
-        <path d="M100,100 L100,196 A96,96 0 0,1 4,100 Z"  fill="var(--ground)" opacity=".18" onclick="location.hash='#/mode/3'"></path>
-        <path d="M100,100 L4,100 A96,96 0 0,1 100,4 Z"   fill="var(--grow)"  opacity=".18" onclick="location.hash='#/mode/4'"></path>
+        <!-- Surviving -->
+        <path d="M100,100 L100,4 A96,96 0 0,1 196,100 Z"
+              fill="var(--surv)" opacity=".18" onclick="location.hash='#/mode/1'"></path>
+        <!-- Drifting -->
+        <path d="M100,100 L196,100 A96,96 0 0,1 100,196 Z"
+              fill="var(--drift)" opacity=".18" onclick="location.hash='#/mode/2'"></path>
+        <!-- Grounded -->
+        <path d="M100,100 L100,196 A96,96 0 0,1 4,100 Z"
+              fill="var(--ground)" opacity=".18" onclick="location.hash='#/mode/3'"></path>
+        <!-- Growing -->
+        <path d="M100,100 L4,100 A96,96 0 0,1 100,4 Z"
+              fill="var(--grow)" opacity=".18" onclick="location.hash='#/mode/4'"></path>
         <circle cx="100" cy="100" r="7" fill="var(--brand)"></circle>
-        <text x="100" y="18" text-anchor="middle" fill="var(--surv)"  font-size="12">Surviving</text>
-        <text x="182" y="104" text-anchor="end"    fill="var(--drift)" font-size="12">Drifting</text>
+        <text x="100" y="18"  text-anchor="middle" fill="var(--surv)"  font-size="12">Surviving</text>
+        <text x="182"  y="104" text-anchor="end"    fill="var(--drift)" font-size="12">Drifting</text>
         <text x="100" y="188" text-anchor="middle" fill="var(--ground)" font-size="12">Grounded</text>
         <text x="18"  y="104" text-anchor="start"  fill="var(--grow)"  font-size="12">Growing</text>
       </svg>
