@@ -4,30 +4,48 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>The Reset Compass • v1.0.4</title>
+
+<!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest?v=104">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="theme-color" content="#1C3B34"/>
+
+<!-- Meta -->
 <meta name="description" content="Choose your mode and get quick, realistic steps that match your energy today. Take your health into your own hands immediately.">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="interest-cohort=()">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
 <!-- Social preview -->
 <meta property="og:title" content="The Reset Compass">
 <meta property="og:description" content="Quick, realistic steps that match your energy today.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="icons/icon-512.png">
-<!-- Analytics -->
+
+<!-- Analytics (Plausible) -->
 <script async defer data-domain="reset.evolutionofwellness.com" src="https://plausible.io/js/script.js?v=104"></script>
+
 <style>
 :root{
   --brand:#1C3B34; --beige:#F0E8D9; --ink:#1A1A1A; --muted:#6b6b6b; --border:#e7e7e7;
   --surv:#A94747; --drift:#E6B450; --ground:#3B755F; --grow:#4C7EDC;
 }
 *{box-sizing:border-box}
-html{-webkit-tap-highlight-color:rgba(0,0,0,0)}
+html{-webkit-tap-highlight-color:transparent}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;background:#fff;color:var(--ink)}
+a,button{outline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid #0a7f63}
+
 header{position:sticky;top:0;background:var(--brand);color:#fff;padding:12px 16px;z-index:5}
-header h1{margin:0;font-size:16px;text-align:center}
+header h1{margin:0;font-size:16px;line-height:1;text-align:center}
 .nav{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap}
-.nav a{color:#fff;text-decoration:none;opacity:.9;padding:4px 8px;border-radius:8px;border:1px solid transparent}
+.nav a,.nav button.install-btn{
+  color:#fff;text-decoration:none;opacity:.9;padding:6px 10px;border-radius:999px;border:1px solid transparent;
+  background:transparent;font:inherit;cursor:pointer
+}
 .nav a.active{opacity:1;border-color:#fff}
+.nav button.install-btn{border-color:#fff;opacity:1}
+
 .wrap{max-width:860px;margin:0 auto;padding:16px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
@@ -85,50 +103,51 @@ svg.compass{width:340px;max-width:92vw;height:auto;display:block}
 </style>
 </head>
 <body>
-<header>
+<header role="banner">
   <h1>The Reset Compass</h1>
-  <div class="nav">
+  <div class="nav" role="navigation" aria-label="Primary">
     <a id="nav-home" href="#/home">Compass</a>
     <a id="nav-wins" href="#/wins">Quick Wins</a>
     <a id="nav-history" href="#/history">History</a>
     <a id="nav-about" href="#/about">About</a>
+    <button class="install-btn" id="installBtn" hidden aria-label="Install app">Install</button>
   </div>
 </header>
 
-<div class="wrap" id="app"></div>
+<div class="wrap" id="app" role="main"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <footer>© 2025 Evolution of Wellness LLC • v1.0.4 • For educational purposes only. Not medical advice.</footer>
 
 <script type="module">
 /* ---------- DATA ---------- */
-const Modes=[{id:1,name:'Surviving',desc:"When you’re running on empty. Use the simplest resets that bring you back to life.",color:'#A94747',icon:'🩺'},
-{id:2,name:'Drifting',desc:'You’re okay but unfocused. Gently reconnect with what matters.',color:'#E6B450',icon:'🧭'},
-{id:3,name:'Grounded',desc:'You’re stable and want steady progress without burnout.',color:'#3B755F',icon:'🌿'},
-{id:4,name:'Growing',desc:'You’re ready to expand capacity intentionally and celebrate progress.',color:'#4C7EDC',icon:'🚀'}];
+const Modes=[{id:1,name:'Surviving',desc:"Running on empty. Use the simplest steps to feel better.",color:'#A94747',icon:'🩺'},
+{id:2,name:'Drifting',desc:'Okay but unfocused. Reconnect with what matters.',color:'#E6B450',icon:'🧭'},
+{id:3,name:'Grounded',desc:'Steady. Keep your rhythm without burnout.',color:'#3B755F',icon:'🌿'},
+{id:4,name:'Growing',desc:'High energy. Move forward with intent.',color:'#4C7EDC',icon:'🚀'}];
 
 const Tools=[
-{id:1,mode_id:1,name:'The 3-Minute Reset',tag:'Quick mental + physical reboot',icon:'⏱️',summary:'Interrupt shutdown with one fast, full-body reset.',instructions:'1) Pause. 2) Breathe in 3s / out 6s for 2 minutes. 3) Seated reach + gentle twist for 1 minute.'},
-{id:2,mode_id:1,name:'The Bare Minimum Menu',tag:'Eat simply when energy is low',icon:'🍎',summary:'Choose 1 protein + 1 carb + 1 fruit/veg you already have.',instructions:'Examples: eggs+toast+apple; yogurt+granola+berries; rotisserie chicken+rice+bagged salad. Pick one and eat.'},
-{id:3,mode_id:1,name:'Your Energy Budget',tag:'Spend your energy wisely',icon:'⚡',summary:'Allocate today into Must / Might / No. Protect your limited fuel.',instructions:'Fill “Must” first (max 3 items). If energy rises, do one “Might.” Everything else = “No” today.'},
-{id:4,mode_id:2,name:'The Attention Anchor',tag:'Refocus scattered energy',icon:'🎯',summary:'Pick one word for how you want to feel today.',instructions:'Choose a word (Calm / Clear / Steady / Present / Light). Say it aloud. Return to it when distracted.'},
-{id:5,mode_id:2,name:'The Daily Reconnect',tag:'One prompt, one minute',icon:'📝',summary:'Stay present with a single honest sentence.',instructions:'Pick a prompt: “What gave me energy?” / “What felt easiest?” / “What did I avoid?” Say or write one honest line.'},
-{id:6,mode_id:2,name:'The Weekly Waypoint',tag:'Give your week direction',icon:'📅',summary:'A 5-minute reset on your natural week start.',instructions:'1) Name your current mode. 2) Choose one weekly anchor (e.g., outside 3×). 3) Set a reminder for next check-in.'},
-{id:7,mode_id:3,name:'The Energy Multiplier',tag:'Get more from what you already do',icon:'🔋',summary:'Identify 1–3 actions that give you energy and repeat them.',instructions:'List what already helps (sunlight, short walk, earlier lights). Repeat daily this week.'},
-{id:8,mode_id:3,name:'The Habit Reflector',tag:'Notice what’s working',icon:'🪞',summary:'Weekly 3-min scan to protect helpful routines.',instructions:'Write: 1) What felt good? 2) Pattern to repeat? 3) What throws me off? Add one guardrail.'},
-{id:9,mode_id:3,name:'Keystone Habit Builder',tag:'One small habit, big ripple',icon:'🧱',summary:'Choose one keystone habit and make it automatic.',instructions:'Use: “After I [trigger], I will [habit] in [location].” Check it off each day.'},
-{id:10,mode_id:3,name:'Boundary Booster',tag:'Protect your energy + focus',icon:'🛡️',summary:'Keep growth from getting hijacked by distractions.',instructions:'Pick 3 priorities + 2 mini-boundaries. Write a reminder: “My energy is worth protecting because…” Optional daily check.'},
-{id:11,mode_id:4,name:'The Expansion Map',tag:'Grow with intention',icon:'🌱',summary:'Define one area to expand, one to sustain, one to rest.',instructions:'Choose: Expand (e.g., movement minutes), Sustain (sleep window), Rest (pause an obligation). Review weekly.'},
-{id:12,mode_id:4,name:'Skill Sprint',tag:'10-day micro-upgrade',icon:'🚴',summary:'A tiny, focused sprint that raises your ceiling without burnout.',instructions:'Pick one 10-minute skill or habit (mobility, meal prep, breathwork). Daily: start timer, do 10 min, mark done.'},
-{id:13,mode_id:4,name:'Progress Pulse',tag:'Celebrate and iterate',icon:'📈',summary:'Quick weekly review to lock in gains and decide the next nudge.',instructions:'Log: Best win, Biggest drain, One tweak for next week. End with: “Next nudge = ____.”'},
-{id:14,mode_id:4,name:'Social Support Loop',tag:'Don’t grow alone',icon:'🤝',summary:'Light accountability with one person.',instructions:'Choose a buddy. Agree on one weekly touch (Fri text / Sun walk). Add reminder. Celebrate small wins.'},
+{id:1,mode_id:1,name:'3-Minute Reset',tag:'Quick mental and physical reboot',icon:'⏱️',summary:'Interrupt shutdown with one fast, full-body reset.',instructions:'1) Pause. 2) Breathe in 3s and out 6s for 2 minutes. 3) Seated reach and gentle twist for 1 minute.'},
+{id:2,mode_id:1,name:'Bare Minimum Menu',tag:'Eat simply when energy is low',icon:'🍎',summary:'Choose 1 protein, 1 carb, and 1 fruit or veg you already have.',instructions:'Examples: eggs and toast with an apple. Yogurt and granola with berries. Rotisserie chicken with rice and a bagged salad. Pick one and eat.'},
+{id:3,mode_id:1,name:'Energy Budget',tag:'Spend your energy wisely',icon:'⚡',summary:'Split today into Must, Might, and No. Protect your fuel.',instructions:'Fill Must first with up to three items. If energy rises, do one Might. Everything else is No today.'},
+{id:4,mode_id:2,name:'Attention Anchor',tag:'Refocus scattered energy',icon:'🎯',summary:'Pick one word for how you want to feel today.',instructions:'Choose a word like Calm, Clear, Steady, Present, or Light. Say it out loud. Return to it when distracted.'},
+{id:5,mode_id:2,name:'Daily Reconnect',tag:'One prompt, one minute',icon:'📝',summary:'Stay present with one honest sentence.',instructions:'Pick a prompt like “What gave me energy?” “What felt easiest?” or “What did I avoid?” Say or write one line.'},
+{id:6,mode_id:2,name:'Weekly Waypoint',tag:'Give your week direction',icon:'📅',summary:'A five-minute reset on your natural week start.',instructions:'1) Name your current mode. 2) Choose one weekly anchor like outside three times. 3) Set a reminder for next check-in.'},
+{id:7,mode_id:3,name:'Energy Multiplier',tag:'Get more from what works',icon:'🔋',summary:'Identify one to three actions that give you energy and repeat them.',instructions:'List what already helps like sunlight, a short walk, or earlier lights. Repeat daily this week.'},
+{id:8,mode_id:3,name:'Habit Reflector',tag:'Notice what’s working',icon:'🪞',summary:'A short weekly scan to protect helpful routines.',instructions:'Write: what felt good, a pattern to repeat, and what throws me off. Add one guardrail.'},
+{id:9,mode_id:3,name:'Keystone Builder',tag:'One small habit, big ripple',icon:'🧱',summary:'Choose one keystone habit and make it automatic.',instructions:'Use: After I [trigger], I will [habit] in [location]. Check it off each day.'},
+{id:10,mode_id:3,name:'Boundary Booster',tag:'Protect energy and focus',icon:'🛡️',summary:'Keep growth from getting hijacked by distractions.',instructions:'Pick three priorities and two mini boundaries. Write a reminder: “My energy is worth protecting because…” Optional daily check.'},
+{id:11,mode_id:4,name:'Expansion Map',tag:'Grow with intention',icon:'🌱',summary:'Define one area to expand, one to sustain, and one to rest.',instructions:'Choose: Expand like movement minutes. Sustain like sleep window. Rest like pausing an obligation. Review weekly.'},
+{id:12,mode_id:4,name:'Skill Sprint',tag:'10-day micro-upgrade',icon:'🚴',summary:'A tiny focused sprint that raises your ceiling without burnout.',instructions:'Pick one ten-minute skill or habit like mobility, meal prep, or breathwork. Start a timer, do it, mark done.'},
+{id:13,mode_id:4,name:'Progress Pulse',tag:'Celebrate and iterate',icon:'📈',summary:'A quick weekly review to lock in gains and choose the next nudge.',instructions:'Log your best win, biggest drain, and one tweak for next week. End with “Next nudge = …”'},
+{id:14,mode_id:4,name:'Support Loop',tag:'Grow with a buddy',icon:'🤝',summary:'Light accountability with one person.',instructions:'Choose a buddy. Agree on one weekly touch like a Friday text or Sunday walk. Add a reminder. Celebrate small wins.'},
 ];
 
 const QuickWins=[
  {title:'Drink water',desc:'One full glass now. Feel the shift.',icon:'💧'},
- {title:'Step outside',desc:'3 minutes of daylight or fresh air.',icon:'🌞'},
- {title:'Stretch overhead',desc:'30 seconds. Shoulders down, jaw loose.',icon:'🤸'},
- {title:'Phone-free pause',desc:'Put it in another room for 5 minutes.',icon:'📵'},
+ {title:'Step outside',desc:'Three minutes of daylight or fresh air.',icon:'🌞'},
+ {title:'Stretch overhead',desc:'Thirty seconds. Shoulders down, jaw loose.',icon:'🤸'},
+ {title:'Phone-free pause',desc:'Put it in another room for five minutes.',icon:'📵'},
  {title:'Tidy one surface',desc:'Desk, bag, or car door pocket.',icon:'🧽'},
  {title:'Message a friend',desc:'One genuine check-in.',icon:'💬'}
 ];
@@ -161,12 +180,29 @@ function attachFocusScroll(){
   });
 }
 
+/* PWA install prompt */
+let deferredPrompt=null;
+const installBtn=document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  installBtn.hidden=false;
+});
+installBtn?.addEventListener('click', async ()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  installBtn.hidden=true;
+  showToast('App install started');
+});
+
 /* ---------- VIEWS ---------- */
 function Home(){
   setActive();
   const tCount=todayCount(), streak=dailyStreak();
   app.innerHTML = `
-    <div class="stats">
+    <div class="stats" role="status" aria-live="polite">
       <div class="stat">Today: <strong>${tCount}</strong></div>
       <div class="stat">Daily streak: <strong>${streak}</strong></div>
     </div>
@@ -183,8 +219,8 @@ function Home(){
       </p>
     </div>
 
-    <div class="compass-wrap">
-      <svg class="compass" viewBox="0 0 200 200" aria-label="Mode Compass">
+    <div class="compass-wrap" aria-label="Mode Compass">
+      <svg class="compass" viewBox="0 0 200 200" role="img" aria-label="Choose a mode">
         <defs>
           <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity=".2"/>
@@ -192,7 +228,7 @@ function Home(){
         </defs>
 
         <circle cx="100" cy="100" r="96" fill="#fff" stroke="var(--brand)" stroke-width="3" filter="url(#softShadow)"/>
-        <!-- Quadrants (NE, SE, SW, NW) -->
+        <!-- Quadrants -->
         <path class="wedge" d="M100,100 L100,4 A96,96 0 0,1 196,100 Z" fill="var(--surv)"  opacity=".18" onclick="location.hash='#/mode/1'"></path>
         <path class="wedge" d="M100,100 L196,100 A96,96 0 0,1 100,196 Z" fill="var(--drift)" opacity=".18" onclick="location.hash='#/mode/2'"></path>
         <path class="wedge" d="M100,100 L100,196 A96,96 0 0,1 4,100 Z"  fill="var(--ground)" opacity=".18" onclick="location.hash='#/mode/3'"></path>
@@ -200,7 +236,7 @@ function Home(){
 
         <circle cx="100" cy="100" r="7" fill="var(--brand)"></circle>
 
-        <!-- Labels locked to wedge centers -->
+        <!-- Labels -->
         <text x="135" y="65"  text-anchor="middle" fill="var(--surv)"  font-size="12">Surviving</text>
         <text x="135" y="135" text-anchor="middle" fill="var(--drift)" font-size="12">Drifting</text>
         <text x="65"  y="135" text-anchor="middle" fill="var(--ground)" font-size="12">Grounded</text>
@@ -259,10 +295,10 @@ function ToolView(id){
     <div class="card">
       <h3>Write a quick note (optional)</h3>
       <p class="muted" style="margin-top:-6px">One sentence is enough. You’ll see it in your History.</p>
-      <textarea id="noteBox" placeholder="What did you do or notice? (e.g., ‘2-min breath: felt calmer.’)"></textarea>
+      <textarea id="noteBox" placeholder="What did you do or notice? (e.g., “2-min breath: felt calmer.”)"></textarea>
       <div style="height:10px"></div>
-      <button class="btn" id="saveAndLog">Save note + Did it ✅</button>
-      <button class="btn subtle" id="logOnly" style="margin-left:8px">Did it ✅ (no note)</button>
+      <button class="btn" id="saveAndLog" aria-label="Save note and log completion">Save note + Did it ✅</button>
+      <button class="btn subtle" id="logOnly" style="margin-left:8px" aria-label="Log completion without a note">Did it ✅ (no note)</button>
     </div>
 
     <div class="sticky-back">
@@ -271,8 +307,8 @@ function ToolView(id){
   `;
   attachFocusScroll();
   const noteEl=document.getElementById('noteBox');
-  document.getElementById('saveAndLog').onclick=()=>{ addLog({mode:m.name,tool:t.name,note:noteEl.value}); showToast('Saved to History ✅'); };
-  document.getElementById('logOnly').onclick=()=>{ addLog({mode:m.name,tool:t.name,note:''}); showToast('Logged ✅'); };
+  document.getElementById('saveAndLog').onclick=()=>{ addLog({mode:m.name,tool:t.name,note:noteEl.value}); showToast('Saved to History'); };
+  document.getElementById('logOnly').onclick=()=>{ addLog({mode:m.name,tool:t.name,note:''}); showToast('Logged'); };
 }
 
 function Wins(){
@@ -294,12 +330,12 @@ function Wins(){
               const note=(el.value||'').trim();
               addLog({mode:'Quick Win',tool:'${w.title.replace(/'/g,"&#39;")}',note});
               document.querySelector('#qw-${i} .pill').innerHTML='✅ Logged';
-              showToast('Saved to History ✅');
+              showToast('Saved to History');
             })()">Save note + Done</button>
             <button class="btn subtle" style="margin-left:8px" onclick="(function(){
               addLog({mode:'Quick Win',tool:'${w.title.replace(/'/g,"&#39;")}',note:''});
               document.querySelector('#qw-${i} .pill').innerHTML='✅ Logged';
-              showToast('Logged ✅');
+              showToast('Logged');
             })()">Done (no note)</button>
           </div>
         </div>
@@ -331,8 +367,9 @@ function History(){
     <h2>History</h2>
     <div class="card">
       <div class="filters">
-        <select id="modeFilter">${uniqueModes.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
-        <input type="text" id="searchBox" placeholder="Search notes or tools"/>
+        <label class="visually-hidden" for="modeFilter">Filter by mode</label>
+        <select id="modeFilter" aria-label="Filter by mode">${uniqueModes.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
+        <input type="text" id="searchBox" placeholder="Search notes or tools" aria-label="Search notes or tools"/>
         <span class="badge">${logs.length} entries</span>
         <button class="btn ghost" id="clearLogs">Clear All</button>
       </div>
@@ -382,8 +419,8 @@ function About(){
   app.innerHTML=`
     <h2>About</h2>
     <div class="card">
-      <p><strong>The Reset Compass</strong> helps you take your health into your own hands immediately. Choose your current mode to see quick, realistic steps that match your energy today.</p>
-      <p class="muted" style="font-size:12px">Disclaimer: This companion is for educational purposes only and is not medical advice. Consult a qualified provider before making changes to your wellness routine.</p>
+      <p><strong>The Reset Compass</strong> helps you take your health into your own hands right now. Pick your current mode and get steps that match your energy.</p>
+      <p class="muted" style="font-size:12px">Disclaimer: This companion is for educational purposes only and is not medical advice. Consult a qualified provider before changing your routine.</p>
       <p class="muted" style="font-size:12px">Support: evolutionofwellness8@gmail.com</p>
       <div class="sticky-back">
         <a class="btn ghost" href="#/home">Back to Compass</a>
@@ -405,20 +442,22 @@ function router(){
 window.addEventListener('hashchange',router);
 window.addEventListener('load',()=>{
   router();
+
   // Welcome popup (one-time)
   if(!localStorage.getItem('welcomeSeen')){
     const el=document.createElement('div');
     el.id='popup';
-    el.innerHTML=`<div class="box">
-      <h3>Welcome to The Reset Compass</h3>
-      <p>This simple tool helps you take your health into your own hands immediately.<br>Choose your current mode to see quick, realistic steps that match your energy today.</p>
-      <button class="btn" id="startBtn">Let's Start</button>
-      <p style="font-size:12px;color:#6b6b6b;margin:6px 0 0">Your progress is saved locally on this device.</p>
+    el.innerHTML=`<div class="box" role="dialog" aria-modal="true" aria-label="Welcome">
+      <h3 style="margin-top:0">Welcome</h3>
+      <p>Pick a mode and take one step that fits your day.</p>
+      <button class="btn" id="startBtn" aria-label="Start using the app">Start</button>
+      <p style="font-size:12px;color:#6b6b6b;margin:6px 0 0">Your history saves to this device.</p>
     </div>`;
     document.body.appendChild(el);
     document.getElementById('startBtn').onclick=()=>{localStorage.setItem('welcomeSeen','true');el.remove();};
   }
-  // Service worker (bumped version)
+
+  // Service worker
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=104').catch(()=>{});}
 });
 </script>
