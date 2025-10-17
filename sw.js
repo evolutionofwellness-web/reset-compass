@@ -1,5 +1,5 @@
-// sw.js — The Reset Compass v1.0.5
-const CACHE_NAME = 'reset-compass-cache-v105';
+// sw.js — The Reset Compass v1.0.6
+const CACHE_NAME = 'reset-compass-cache-v106';
 const APP_SHELL = [
   './',
   './index.html',
@@ -17,13 +17,12 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activate: remove old caches
+// Activate: clear out old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys
-        .filter(k => k !== CACHE_NAME)
-        .map(k => caches.delete(k))
+      Promise.all(
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       )
     )
   );
@@ -35,7 +34,7 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Don’t cache analytics, tracking, or extensions
+  // Skip caching for analytics or extensions
   if (
     url.hostname.includes('plausible.io') ||
     url.hostname.includes('googletagmanager.com') ||
@@ -45,20 +44,17 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(req)
       .then(res => {
-        // Cache successful same-origin GETs
         if (req.method === 'GET' && res.status === 200 && res.type === 'basic') {
           const copy = res.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
         }
         return res;
       })
-      .catch(() =>
-        caches.match(req).then(cached => cached || caches.match('./index.html'))
-      )
+      .catch(() => caches.match(req).then(cached => cached || caches.match('./index.html')))
   );
 });
 
-// Optional: allow immediate activation
+// Allow immediate activation when prompted
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
