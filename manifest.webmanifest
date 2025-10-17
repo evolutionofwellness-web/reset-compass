@@ -15,9 +15,9 @@
   ],
   "categories": ["health", "productivity", "lifestyle"],
   "shortcuts": [
-    { "name": "Surviving", "short_name": "Surviving", "url": "/#/mode/1", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "Drifting",  "short_name": "Drifting",  "url": "/#/mode/2", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "Grounded",  "short_name": "Grounded",  "url": "/#/mode/3", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "Growing",   "short_name": "Growing",   "url": "/#/mode/4", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
+    { "name": "Surviving", "short_name": "Surviving", "url": "/#/mode/1", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Drifting",  "short_name": "Drifting",  "url": "/#/mode/2", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Grounded",  "short_name": "Grounded",  "url": "/#/mode/3", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Growing",   "short_name": "Growing",   "url": "/#/mode/4", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }
