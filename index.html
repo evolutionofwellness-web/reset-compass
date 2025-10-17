@@ -3,19 +3,27 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>The Reset Compass • v1.0.2</title>
-<link rel="manifest" href="manifest.webmanifest">
+<title>The Reset Compass • v1.0.4</title>
+<link rel="manifest" href="manifest.webmanifest?v=104">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="theme-color" content="#1C3B34"/>
-<!-- Analytics (cache-busted) -->
-<script async defer data-domain="evolutionofwellness-web.github.io/reset-compass" src="https://plausible.io/js/script.js?v=102"></script>
+<meta name="description" content="Choose your mode and get quick, realistic steps that match your energy today. Take your health into your own hands immediately.">
+<!-- Social preview -->
+<meta property="og:title" content="The Reset Compass">
+<meta property="og:description" content="Quick, realistic steps that match your energy today.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="icons/icon-512.png">
+<!-- Analytics -->
+<script async defer data-domain="reset.evolutionofwellness.com" src="https://plausible.io/js/script.js?v=104"></script>
 <style>
-:root{--brand:#1C3B34;--beige:#F0E8D9;--ink:#1A1A1A;--muted:#6b6b6b;--border:#e7e7e7;
- --surv:#A94747; --drift:#E6B450; --ground:#3B755F; --grow:#4C7EDC;}
+:root{
+  --brand:#1C3B34; --beige:#F0E8D9; --ink:#1A1A1A; --muted:#6b6b6b; --border:#e7e7e7;
+  --surv:#A94747; --drift:#E6B450; --ground:#3B755F; --grow:#4C7EDC;
+}
 *{box-sizing:border-box}
-html{-webkit-tap-highlight-color: rgba(0,0,0,0)}
+html{-webkit-tap-highlight-color:rgba(0,0,0,0)}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;background:#fff;color:var(--ink)}
-header{position:sticky;top:0;background:var(--brand);color:#fff;padding:12px 16px;z-index:2}
+header{position:sticky;top:0;background:var(--brand);color:#fff;padding:12px 16px;z-index:5}
 header h1{margin:0;font-size:16px;text-align:center}
 .nav{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap}
 .nav a{color:#fff;text-decoration:none;opacity:.9;padding:4px 8px;border-radius:8px;border:1px solid transparent}
@@ -25,18 +33,20 @@ header h1{margin:0;font-size:16px;text-align:center}
 .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .card h3{margin:.2rem 0 .3rem}
 .pill{display:inline-flex;align-items:center;gap:6px;background:var(--beige);color:var(--brand);padding:4px 8px;border-radius:999px;font-size:12px}
-.btn{display:inline-block;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:12px 16px;font-weight:700;text-decoration:none;cursor:pointer}
+.btn{display:inline-block;background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;text-decoration:none;cursor:pointer;touch-action:manipulation}
 .btn.ghost{background:transparent;color:var(--brand);border:2px solid var(--brand)}
 .btn.subtle{background:#eef1f0;color:var(--brand)}
 footer{padding:24px;color:#666;text-align:center;font-size:12px}
-textarea,input[type="text"]{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:15px;background:#fff}
-textarea{min-height:84px;resize:vertical}
+textarea,input[type="text"]{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:16px;background:#fff}
+textarea{min-height:92px;resize:vertical}
 
 /* Compass */
 .compass-wrap{display:flex;flex-direction:column;align-items:center}
 svg.compass{width:340px;max-width:92vw;height:auto;display:block}
 .compass text{font-weight:800;letter-spacing:.2px}
 .center-tip{color:var(--muted);text-align:center;font-size:14px;margin:6px 0 12px}
+.wedge{transition:opacity .15s ease, filter .15s ease; cursor:pointer}
+.wedge:active{opacity:.28;filter:saturate(1.2)}
 
 /* Mode buttons */
 .mode-buttons{display:grid;grid-template-columns:repeat(2,minmax(140px,1fr));gap:10px;max-width:420px;margin:0 auto 8px}
@@ -54,18 +64,24 @@ svg.compass{width:340px;max-width:92vw;height:auto;display:block}
 .instructions p{margin:4px 0 8px}
 
 /* Stats bar */
-.stats{display:flex;gap:10px;justify-content:center;align-items:center;margin:8px auto 4px}
+.stats{display:flex;gap:10px;justify-content:center;align-items:center;margin:8px auto 4px;flex-wrap:wrap}
 .stat{background:#f6f9f8;border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:13px;color:var(--brand)}
 
-/* Welcome & History */
+/* Welcome, Toasts, History */
 #popup{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:10}
 #popup .box{background:#fff;color:var(--brand);padding:22px;border-radius:12px;max-width:340px;text-align:center;border:1px solid var(--border)}
 #popup .box p{margin:.5rem 0}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#1c3b34;color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9}
+#toast.show{opacity:1}
+
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .badge{display:inline-block;border:1px solid var(--border);padding:3px 8px;border-radius:999px;font-size:12px;color:var(--muted)}
 .log-item{border-bottom:1px dashed var(--border);padding:10px 0}
 .log-item:last-child{border-bottom:0}
 .note{white-space:pre-wrap}
+
+/* Sticky back bar */
+.sticky-back{position:sticky;bottom:-1px;background:#fff;border-top:1px solid var(--border);padding:10px;display:flex;justify-content:center;z-index:3}
 </style>
 </head>
 <body>
@@ -80,8 +96,9 @@ svg.compass{width:340px;max-width:92vw;height:auto;display:block}
 </header>
 
 <div class="wrap" id="app"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
-<footer>© 2025 Evolution of Wellness LLC • v1.0.2 • For educational purposes only. Not medical advice.</footer>
+<footer>© 2025 Evolution of Wellness LLC • v1.0.4 • For educational purposes only. Not medical advice.</footer>
 
 <script type="module">
 /* ---------- DATA ---------- */
@@ -118,7 +135,8 @@ const QuickWins=[
 
 /* ---------- HELPERS ---------- */
 const app=document.getElementById('app');
-const go=(h)=>location.hash=h;
+const toastEl=document.getElementById('toast');
+const showToast=(msg)=>{toastEl.textContent=msg;toastEl.classList.add('show');setTimeout(()=>toastEl.classList.remove('show'),1400);};
 const setActive=()=>{
   document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
   const map={'#/home':'nav-home','#/wins':'nav-wins','#/about':'nav-about','#/history':'nav-history'};
@@ -134,19 +152,19 @@ const addLog=({mode,tool,note})=>{
 const formatTS=(iso)=>new Date(iso).toLocaleString();
 const ymd=(d)=>d.toISOString().slice(0,10);
 function todayCount(){ const today=ymd(new Date()); return getLogs().filter(l=>l.ts.slice(0,10)===today).length; }
-function dailyStreak(){
-  const dates=new Set(getLogs().map(l=>l.ts.slice(0,10)));
-  let streak=0; let d=new Date();
-  while(dates.has(ymd(d))){ streak++; d.setDate(d.getDate()-1); }
-  return streak;
+function dailyStreak(){ const dates=new Set(getLogs().map(l=>l.ts.slice(0,10))); let s=0; let d=new Date(); while(dates.has(ymd(d))){s++; d.setDate(d.getDate()-1);} return s; }
+
+/* Scroll textareas above keyboard on iOS */
+function attachFocusScroll(){
+  document.querySelectorAll('textarea, input[type="text"]').forEach(el=>{
+    el.addEventListener('focus',()=>{ setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'center'}),150); });
+  });
 }
 
 /* ---------- VIEWS ---------- */
 function Home(){
   setActive();
-  const tCount=todayCount();
-  const streak=dailyStreak();
-
+  const tCount=todayCount(), streak=dailyStreak();
   app.innerHTML = `
     <div class="stats">
       <div class="stat">Today: <strong>${tCount}</strong></div>
@@ -171,31 +189,22 @@ function Home(){
           <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity=".2"/>
           </filter>
-          <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand)" opacity=".25"></path>
-          </marker>
         </defs>
 
         <circle cx="100" cy="100" r="96" fill="#fff" stroke="var(--brand)" stroke-width="3" filter="url(#softShadow)"/>
         <!-- Quadrants (NE, SE, SW, NW) -->
-        <path d="M100,100 L100,4 A96,96 0 0,1 196,100 Z" fill="var(--surv)"  opacity=".18" onclick="location.hash='#/mode/1'"></path>
-        <path d="M100,100 L196,100 A96,96 0 0,1 100,196 Z" fill="var(--drift)" opacity=".18" onclick="location.hash='#/mode/2'"></path>
-        <path d="M100,100 L100,196 A96,96 0 0,1 4,100 Z"  fill="var(--ground)" opacity=".18" onclick="location.hash='#/mode/3'"></path>
-        <path d="M100,100 L4,100 A96,96 0 0,1 100,4 Z"   fill="var(--grow)"  opacity=".18" onclick="location.hash='#/mode/4'"></path>
-
-        <!-- Guide arrows to the label centers -->
-        <line x1="100" y1="100" x2="135" y2="65"  stroke="var(--brand)" stroke-width="1.5" opacity=".20" marker-end="url(#arrow)"></line>
-        <line x1="100" y1="100" x2="135" y2="135" stroke="var(--brand)" stroke-width="1.5" opacity=".20" marker-end="url(#arrow)"></line>
-        <line x1="100" y1="100" x2="65"  y2="135" stroke="var(--brand)" stroke-width="1.5" opacity=".20" marker-end="url(#arrow)"></line>
-        <line x1="100" y1="100" x2="65"  y2="65"  stroke="var(--brand)" stroke-width="1.5" opacity=".20" marker-end="url(#arrow)"></line>
+        <path class="wedge" d="M100,100 L100,4 A96,96 0 0,1 196,100 Z" fill="var(--surv)"  opacity=".18" onclick="location.hash='#/mode/1'"></path>
+        <path class="wedge" d="M100,100 L196,100 A96,96 0 0,1 100,196 Z" fill="var(--drift)" opacity=".18" onclick="location.hash='#/mode/2'"></path>
+        <path class="wedge" d="M100,100 L100,196 A96,96 0 0,1 4,100 Z"  fill="var(--ground)" opacity=".18" onclick="location.hash='#/mode/3'"></path>
+        <path class="wedge" d="M100,100 L4,100 A96,96 0 0,1 100,4 Z"   fill="var(--grow)"  opacity=".18" onclick="location.hash='#/mode/4'"></path>
 
         <circle cx="100" cy="100" r="7" fill="var(--brand)"></circle>
 
         <!-- Labels locked to wedge centers -->
-        <text x="135" y="65"  text-anchor="middle" fill="var(--surv)"  font-size="12">Surviving</text>  <!-- NE -->
-        <text x="135" y="135" text-anchor="middle" fill="var(--drift)" font-size="12">Drifting</text>    <!-- SE -->
-        <text x="65"  y="135" text-anchor="middle" fill="var(--ground)" font-size="12">Grounded</text>    <!-- SW -->
-        <text x="65"  y="65"  text-anchor="middle" fill="var(--grow)"  font-size="12">Growing</text>      <!-- NW -->
+        <text x="135" y="65"  text-anchor="middle" fill="var(--surv)"  font-size="12">Surviving</text>
+        <text x="135" y="135" text-anchor="middle" fill="var(--drift)" font-size="12">Drifting</text>
+        <text x="65"  y="135" text-anchor="middle" fill="var(--ground)" font-size="12">Grounded</text>
+        <text x="65"  y="65"  text-anchor="middle" fill="var(--grow)"  font-size="12">Growing</text>
       </svg>
       <p class="center-tip">Tap a wedge or use the buttons below.</p>
     </div>
@@ -227,8 +236,9 @@ function ModeView(id){
           <a class="btn" href="#/tool/${t.id}">Open</a>
         </div>`).join('')}
     </div>
-    <div style="height:12px"></div>
-    <a class="btn ghost" href="#/home">Back to Compass</a>
+    <div class="sticky-back">
+      <a class="btn ghost" href="#/home">Back to Compass</a>
+    </div>
   `;
 }
 
@@ -253,12 +263,16 @@ function ToolView(id){
       <div style="height:10px"></div>
       <button class="btn" id="saveAndLog">Save note + Did it ✅</button>
       <button class="btn subtle" id="logOnly" style="margin-left:8px">Did it ✅ (no note)</button>
-      <a class="btn ghost" style="margin-left:8px" href="#/mode/${m.id}">Back</a>
+    </div>
+
+    <div class="sticky-back">
+      <a class="btn ghost" href="#/mode/${m.id}">Back to ${m.name}</a>
     </div>
   `;
+  attachFocusScroll();
   const noteEl=document.getElementById('noteBox');
-  document.getElementById('saveAndLog').onclick=()=>{ addLog({mode:m.name,tool:t.name,note:noteEl.value}); alert('Saved to History! ✅'); location.hash='#/home'; };
-  document.getElementById('logOnly').onclick=()=>{ addLog({mode:m.name,tool:t.name,note:''}); alert('Logged! ✅'); location.hash='#/home'; };
+  document.getElementById('saveAndLog').onclick=()=>{ addLog({mode:m.name,tool:t.name,note:noteEl.value}); showToast('Saved to History ✅'); };
+  document.getElementById('logOnly').onclick=()=>{ addLog({mode:m.name,tool:t.name,note:''}); showToast('Logged ✅'); };
 }
 
 function Wins(){
@@ -276,15 +290,16 @@ function Wins(){
             <textarea id="note-${i}" placeholder="Optional: jot a sentence about what you did or noticed."></textarea>
             <div style="height:8px"></div>
             <button class="btn" onclick="(function(){
-              const note=(document.getElementById('note-${i}').value||'').trim();
+              const el=document.getElementById('note-${i}');
+              const note=(el.value||'').trim();
               addLog({mode:'Quick Win',tool:'${w.title.replace(/'/g,"&#39;")}',note});
               document.querySelector('#qw-${i} .pill').innerHTML='✅ Logged';
-              alert('Saved to History! ✅');
+              showToast('Saved to History ✅');
             })()">Save note + Done</button>
             <button class="btn subtle" style="margin-left:8px" onclick="(function(){
               addLog({mode:'Quick Win',tool:'${w.title.replace(/'/g,"&#39;")}',note:''});
               document.querySelector('#qw-${i} .pill').innerHTML='✅ Logged';
-              alert('Logged! ✅');
+              showToast('Logged ✅');
             })()">Done (no note)</button>
           </div>
         </div>
@@ -305,6 +320,7 @@ function Wins(){
       <a class="btn ghost" style="margin-left:8px" href="#/home">Back to Compass</a>
     </div>
   `;
+  attachFocusScroll();
 }
 
 function History(){
@@ -325,11 +341,16 @@ function History(){
         <div class="stat">Daily streak: <strong>${dailyStreak()}</strong></div>
       </div>
       <div id="logList">${renderLogs(logs)}</div>
-      <div style="height:10px"></div>
-      <a class="btn ghost" href="#/home">Back to Compass</a>
+      <div class="sticky-back">
+        <a class="btn ghost" href="#/home">Back to Compass</a>
+      </div>
     </div>
   `;
-  document.getElementById('clearLogs').onclick=()=>{ if(confirm('Clear all local history on this device?')){ saveLogs([]); History(); } };
+  document.getElementById('clearLogs').onclick=()=>{
+    if(confirm('Clear all local history on this device?')){
+      saveLogs([]); showToast('History cleared'); History();
+    }
+  };
   document.getElementById('modeFilter').onchange = applyFilters;
   document.getElementById('searchBox').oninput = applyFilters;
   function applyFilters(){
@@ -362,9 +383,11 @@ function About(){
     <h2>About</h2>
     <div class="card">
       <p><strong>The Reset Compass</strong> helps you take your health into your own hands immediately. Choose your current mode to see quick, realistic steps that match your energy today.</p>
-      <p class="muted" style="font-size:12px">Disclaimer: This companion is for educational purposes only and is not medical advice. Consult a qualified provider before making changes to your health routine.</p>
+      <p class="muted" style="font-size:12px">Disclaimer: This companion is for educational purposes only and is not medical advice. Consult a qualified provider before making changes to your wellness routine.</p>
       <p class="muted" style="font-size:12px">Support: evolutionofwellness8@gmail.com</p>
-      <a class="btn ghost" href="#/home">Back to Compass</a>
+      <div class="sticky-back">
+        <a class="btn ghost" href="#/home">Back to Compass</a>
+      </div>
     </div>
   `;
 }
@@ -382,6 +405,7 @@ function router(){
 window.addEventListener('hashchange',router);
 window.addEventListener('load',()=>{
   router();
+  // Welcome popup (one-time)
   if(!localStorage.getItem('welcomeSeen')){
     const el=document.createElement('div');
     el.id='popup';
@@ -392,9 +416,10 @@ window.addEventListener('load',()=>{
       <p style="font-size:12px;color:#6b6b6b;margin:6px 0 0">Your progress is saved locally on this device.</p>
     </div>`;
     document.body.appendChild(el);
-    document.getElementById('startBtn').onclick=()=>{localStorage.setItem('welcomeSeen','true');el.remove();}
+    document.getElementById('startBtn').onclick=()=>{localStorage.setItem('welcomeSeen','true');el.remove();};
   }
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+  // Service worker (bumped version)
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=104').catch(()=>{});}
 });
 </script>
 </body>
