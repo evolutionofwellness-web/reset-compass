@@ -35,7 +35,7 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Don’t cache analytics, tracking, or external assets
+  // Don’t cache analytics, tracking, or extensions
   if (
     url.hostname.includes('plausible.io') ||
     url.hostname.includes('googletagmanager.com') ||
@@ -45,7 +45,7 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(req)
       .then(res => {
-        // Clone & cache successful GET requests only
+        // Cache successful same-origin GETs
         if (req.method === 'GET' && res.status === 200 && res.type === 'basic') {
           const copy = res.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
@@ -58,7 +58,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Manual skipWaiting (optional trigger)
+// Optional: allow immediate activation
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
