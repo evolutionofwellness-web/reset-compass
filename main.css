@@ -1,28 +1,23 @@
-/* General App Styles */
-:root {
-  --brand: #0B3D2E;
-  --surv: #A94747;
-  --drift: #E6B450;
-  --ground: #3B755F;
-  --grow: #4C7EDC;
-  --muted: #6b6b6b;
-}
+/* --------------------------
+  Global Styles
+--------------------------- */
 body {
   margin: 0;
   padding: 0;
   font-family: system-ui, sans-serif;
-  background-color: #ffffff;
+  background-color: #fefae0; /* TEMP for debug — change to #ffffff after */
   color: #0B3D2E;
   transition: background-color 0.3s, color 0.3s;
 }
 
-h2 {
-  font-size: 1.6em;
-  margin-top: 0;
+h1, h2 {
+  font-weight: 700;
+  margin: 0 0 0.5rem;
 }
 
 p {
-  line-height: 1.5;
+  line-height: 1.6;
+  margin: 0.5rem 0;
 }
 
 button {
@@ -33,150 +28,22 @@ button {
   cursor: pointer;
 }
 
-/* Splash Screen */
+/* --------------------------
+  Splash Screen Animation
+--------------------------- */
 #splashScreen {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: #ffffff;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
 }
 
-#splashScreen img {
-  width: 100px;
-  height: 100px;
-  animation: zoomSpinFade 1.6s ease-in-out forwards;
-}
-
-@keyframes zoomSpinFade {
-  0% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-  50% {
-    transform: scale(1.5) rotate(180deg);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2) rotate(360deg);
-  }
-}
-
-/* App Layout */
-#app {
-  padding: 1.5rem;
-}
-
-/* Compass */
-.compass-wrap {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.compass {
-  width: 200px;
-  height: 200px;
-  margin: 0 auto 1rem;
-}
-
-.center-tip {
-  font-style: italic;
-  margin-bottom: 1.5rem;
-}
-
-/* Mode Buttons */
-.mode-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.mode-btn {
-  padding: 1rem;
-  font-weight: bold;
-  min-width: 120px;
-  border-radius: 8px;
-  color: #fff;
-  text-transform: uppercase;
-  border: none;
-}
-
-.mode-btn span {
-  display: inline-block;
-}
-
-.mode-btn.surv { background-color: #8B0000; }     /* Dark red */
-.mode-btn.drift { background-color: #DAA520; }    /* Goldenrod */
-.mode-btn.ground { background-color: #228B22; }   /* Forest green */
-.mode-btn.grow { background-color: #1E90FF; }     /* Dodger blue */
-
-/* Instructions & Content Blocks */
-.instructions {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-left: 5px solid #0B3D2E;
-  padding: 1rem;
-  margin: 1.5rem 0;
-  border-radius: 6px;
-}
-
-/* History */
-#mode-history {
-  margin-top: 2rem;
-  font-size: 0.95rem;
-}
-
-#mode-history ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-#mode-history li {
-  padding: 0.5rem;
-  border-bottom: 1px solid #ddd;
-}
-
-.mode-surviving { color: #8B0000; }
-.mode-drifting { color: #DAA520; }
-.mode-grounded { color: #228B22; }
-.mode-growing { color: #1E90FF; }
-
-/* Stats */
-.stats {
-  margin-top: 2rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.stats .streak {
-  font-size: 1.6rem;
-  color: #0B3D2E;
-}
-
-.streak .emoji {
-  font-size: 2rem;
-  margin-right: 0.3rem;
-  vertical-align: middle;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .mode-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .mode-btn {
-    width: 100%;
-    max-width: 260px;
-  }
-}
 #splashIcon {
   width: 120px;
   height: 120px;
@@ -194,5 +61,165 @@ button {
   100% {
     opacity: 0;
     transform: scale(2) rotate(360deg);
+  }
+}
+
+/* --------------------------
+  App Layout
+--------------------------- */
+#app {
+  padding: 1.5rem;
+}
+
+.wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* --------------------------
+  Navigation
+--------------------------- */
+.nav {
+  margin: 1rem 0;
+}
+
+.nav a {
+  margin-right: 1rem;
+  text-decoration: none;
+  color: #0B3D2E;
+  font-weight: bold;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+/* --------------------------
+  Compass Graphic
+--------------------------- */
+.compass-wrap {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.compass {
+  width: 220px;
+  height: 220px;
+  margin: 0 auto 1rem;
+}
+
+/* --------------------------
+  Mode Buttons
+--------------------------- */
+.mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.mode-btn {
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  min-width: 120px;
+  border-radius: 8px;
+  color: #fff;
+  text-transform: uppercase;
+  border: none;
+}
+
+.mode-btn span {
+  display: inline-block;
+}
+
+.mode-btn.surv { background-color: #8B0000; }
+.mode-btn.drift { background-color: #DAA520; }
+.mode-btn.ground { background-color: #228B22; }
+.mode-btn.grow { background-color: #1E90FF; }
+
+/* --------------------------
+  Welcome & Instructions
+--------------------------- */
+.instructions {
+  background-color: #f9f9f9;
+  border-left: 5px solid #0B3D2E;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.03);
+}
+
+.instructions strong {
+  color: #0B3D2E;
+}
+
+/* --------------------------
+  Mode Labels
+--------------------------- */
+.mode-surviving { color: #8B0000; }
+.mode-drifting  { color: #DAA520; }
+.mode-grounded  { color: #228B22; }
+.mode-growing   { color: #1E90FF; }
+
+/* --------------------------
+  History + Stats
+--------------------------- */
+#mode-history {
+  margin-top: 2rem;
+  font-size: 0.95rem;
+}
+
+#mode-history ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+#mode-history li {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.stats {
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.stats .streak {
+  font-size: 1.6rem;
+  color: #0B3D2E;
+}
+
+.streak .emoji {
+  font-size: 2rem;
+  margin-right: 0.3rem;
+  vertical-align: middle;
+}
+
+/* --------------------------
+  Footer
+--------------------------- */
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* --------------------------
+  Responsive Design
+--------------------------- */
+@media (max-width: 600px) {
+  .mode-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mode-btn {
+    width: 100%;
+    max-width: 260px;
   }
 }
