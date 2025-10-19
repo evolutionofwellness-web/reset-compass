@@ -583,14 +583,17 @@ const modeBreakdownHTML = `
 // Trigger render when History tab is opened
 window.addEventListener("hashchange", () => {
   if (location.hash === "#/history") {
-    renderModeHistory();
+    // Wait a moment to ensure History HTML is injected
+    setTimeout(renderModeHistory, 150);
   }
 });
 
 // Optional: Call render on page load if already on history tab
-if (location.hash === "#/history") {
-  renderModeHistory();
-}
+window.addEventListener("load", () => {
+  if (location.hash === "#/history") {
+    setTimeout(renderModeHistory, 150);
+  }
+});
 // To use: make sure your mode buttons call saveModeChoice("Grounded"), etc.
 // Example: saveModeChoice("Grounded"); when user selects that mode
 </script>
