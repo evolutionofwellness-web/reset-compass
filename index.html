@@ -519,7 +519,7 @@ function renderModeHistory() {
   const stored = JSON.parse(localStorage.getItem("modeHistory") || "{}");
   let entries = Object.entries(stored)
     .sort((a, b) => new Date(b[0]) - new Date(a[0]))
-    .slice(0, 7); // Show only the last 7 days
+   // .slice(0, 7); // Show only the last 7 entries — now commented out
 
   if (entries.length === 0) {
     historyEl.innerHTML = `<p style='color:var(--muted)'>No mode choices logged yet.</p>`;
@@ -545,9 +545,25 @@ function renderModeHistory() {
 if (streakEL) {
   streakEL.innerHTML = `🔥 <strong style="font-size: 1.8em;">${streak}</strong>`;
 }
-
+// === Mode breakdown ===
+const modeCounts = { "Grounded": 0, "Growing": 0, "Drifting": 0, "Surviving": 0 };
+entries.forEach(([_, mode]) => {
+  if (modeCounts[mode] !== undefined) {
+    modeCounts[mode]++;
+  }
+});
+const total = entries.length;
+const modeBreakdownHTML = `
+  <div style="margin-bottom: 1rem;">
+    <strong>Mode Breakdown:</strong><br>
+    🌿 Grounded – ${Math.round((modeCounts["Grounded"] / total) * 100)}%<br>
+    🚀 Growing – ${Math.round((modeCounts["Growing"] / total) * 100)}%<br>
+    🧭 Drifting – ${Math.round((modeCounts["Drifting"] / total) * 100)}%<br>
+    🩺 Surviving – ${Math.round((modeCounts["Surviving"] / total) * 100)}%
+  </div>
+`;
   // Render entries
-  historyEl.innerHTML = entries.map(([date, mode]) => {
+  historyEl.innerHTML = modeBreakdownHTML + entries.map(([date, mode]) => {
     let color = "#ccc";
     if (mode === "Grounded") color = "#2e8b57";
     if (mode === "Surviving") color = "#d9534f";
