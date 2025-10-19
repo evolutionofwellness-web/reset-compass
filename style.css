@@ -1,4 +1,12 @@
 /* General App Styles */
+:root {
+  --brand: #0B3D2E;
+  --surv: #A94747;
+  --drift: #E6B450;
+  --ground: #3B755F;
+  --grow: #4C7EDC;
+  --muted: #6b6b6b;
+}
 body {
   margin: 0;
   padding: 0;
