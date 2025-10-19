@@ -524,8 +524,16 @@ function renderModeHistory() {
   }
 
   historyEl.innerHTML = entries.map(([date, mode]) => {
-    return `<div class="log-item"><strong>${date}</strong>: ${mode}</div>`;
-  }).join("");
+  let color = "#ccc"; // default gray
+  if (mode === "Grounded") color = "#BEE3C2";
+  if (mode === "Surviving") color = "#FBD38D";
+  if (mode === "Growing") color = "#90CDF4";
+  if (mode === "Drifting") color = "#CBD5E0";
+
+  return `<div class="log-item" style="background-color:${color}; padding: 6px 12px; margin-bottom: 6px; border-radius: 6px;">
+    ${date} — ${mode}
+  </div>`;
+}).join("");
 }
 
 // Trigger render when History tab is opened
