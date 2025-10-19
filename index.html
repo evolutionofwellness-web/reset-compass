@@ -287,11 +287,11 @@ function Home(){
     </div>
 
     <div class="mode-buttons">
-      <div class="mode-btn surv"   onclick="location.hash='#/mode/1'"><span>🩺 Surviving</span></div>
-      <div class="mode-btn drift"  onclick="location.hash='#/mode/2'"><span>🧭 Drifting</span></div>
-      <div class="mode-btn ground" onclick="location.hash='#/mode/3'"><span>🌿 Grounded</span></div>
-      <div class="mode-btn grow"   onclick="location.hash='#/mode/4'"><span>🚀 Growing</span></div>
-    </div>
+  <div class="mode-btn surv" onclick="saveModeChoice('Surviving'); location.hash='#/mode/1'"><span>🩺 Surviving</span></div>
+  <div class="mode-btn drift" onclick="saveModeChoice('Drifting'); location.hash='#/mode/2'"><span>🧭 Drifting</span></div>
+  <div class="mode-btn ground" onclick="saveModeChoice('Grounded'); location.hash='#/mode/3'"><span>🌿 Grounded</span></div>
+  <div class="mode-btn grow" onclick="saveModeChoice('Growing'); location.hash='#/mode/4'"><span>🚀 Growing</span></div>
+</div>
   `;
 }
 
