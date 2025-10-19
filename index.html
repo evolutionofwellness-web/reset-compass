@@ -541,10 +541,10 @@ function renderModeHistory() {
   }
 
   // Show streak if element exists
-  const streakEl = document.getElementById("modeStreak");
-  if (streakEl) {
-    streakEl.textContent = `Current Streak: ${streak} day${streak > 1 ? "s" : ""}`;
-  }
+  const streakEL = document.getElementById("streakCount");
+if (streakEL) {
+  streakEL.innerHTML = `🔥 <strong style="font-size: 1.8em;">${streak}</strong>`;
+}
 
   // Render entries
   historyEl.innerHTML = entries.map(([date, mode]) => {
