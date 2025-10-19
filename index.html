@@ -1,152 +1,226 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Reset Compass</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="icons/icon-192.png" type="image/png" />
-  <meta name="theme-color" content="#0B3D2E" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>The Reset Compass • v1.0.6</title>
+
+  <!-- PWA Meta -->
+  <link rel="manifest" href="manifest.webmanifest?v=106">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <meta name="theme-color" content="#0B3D2E"/>
+  <meta name="description" content="Choose your mode and get quick, realistic steps that match your energy today.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="The Reset Compass">
+  <meta property="og:description" content="Quick, realistic steps that match your energy today.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="icons/icon-512.png">
+
+  <!-- Analytics -->
+  <script async defer data-domain="reset.evolutionofwellness.com" src="https://plausible.io/js/script.js?v=106"></script>
+
+  <!-- Styles -->
   <style>
+    :root {
+      --brand: #0B3D2E;
+      --beige: #F0E8D9;
+      --ink: #1A1A1A;
+      --muted: #6b6b6b;
+      --border: #e7e7e7;
+      --surv: #A94747;
+      --drift: #E6B450;
+      --ground: #3B755F;
+      --grow: #4C7EDC;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background-color: #ffffff;
+      font-family: system-ui, -apple-system, Segoe UI, Inter, Roboto, sans-serif;
+      background: #fff;
+      color: var(--ink);
+    }
+    a, button { outline-offset: 3px; }
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid #0a7f63;
     }
 
-    /* Splash screen */
-    #splash {
-      position: fixed;
-      z-index: 9999;
-      background-color: #ffffff;
-      width: 100vw;
-      height: 100vh;
+    header {
+      position: sticky;
+      top: 0;
+      background: var(--brand);
+      color: #fff;
+      padding: 12px 16px;
+      z-index: 5;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1;
+      text-align: center;
+    }
+    .nav {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .nav a {
+      color: #fff;
+      text-decoration: none;
+      opacity: 0.9;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+    }
+    .nav a.active {
+      opacity: 1;
+      border-color: #fff;
+    }
+
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .compass-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    svg.compass {
+      width: 340px;
+      max-width: 92vw;
+      height: auto;
+      display: block;
+    }
+    .center-tip {
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+      margin: 6px 0 12px;
+    }
+
+    .mode-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(140px, 1fr));
+      gap: 10px;
+      max-width: 420px;
+      margin: 0 auto 8px;
+    }
+    .mode-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 1s ease;
-    }
-
-    #splash img {
-      width: 120px;
-      height: 120px;
-    }
-
-    /* Welcome popup */
-    #intro-popup {
-      display: none;
-      position: fixed;
-      z-index: 9998;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.6);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .popup-content {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      text-align: center;
-      max-width: 90%;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .popup-content h2 {
-      color: #0B3D2E;
-      font-size: 22px;
-      margin-bottom: 12px;
-    }
-
-    .popup-content p {
-      font-size: 16px;
-      color: #0B3D2E;
-      margin-bottom: 20px;
-    }
-
-    .popup-content button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #0B3D2E;
-      color: white;
-      border: none;
-      border-radius: 8px;
+      border-radius: 12px;
+      padding: 12px 10px;
+      font-weight: 700;
+      border: 2px solid transparent;
       cursor: pointer;
-      transition: background 0.3s ease;
+      touch-action: manipulation;
+      font-size: 16px;
+    }
+    .mode-btn.surv {
+      background: #F7E5E5;
+      border-color: var(--surv);
+      color: var(--surv);
+    }
+    .mode-btn.drift {
+      background: #FFF0D5;
+      border-color: var(--drift);
+      color: var(--drift);
+    }
+    .mode-btn.ground {
+      background: #E6F0EC;
+      border-color: var(--ground);
+      color: var(--ground);
+    }
+    .mode-btn.grow {
+      background: #E6EEFF;
+      border-color: var(--grow);
+      color: var(--grow);
+    }
+    .mode-btn:active {
+      transform: scale(0.98);
     }
 
-    .popup-content button:hover {
-      background-color: #155848;
+    .instructions {
+      max-width: 520px;
+      margin: 12px auto 4px;
+      border-left: 4px solid var(--brand);
+      padding: 12px 14px;
+      background: #fafafa;
+      border-radius: 8px;
+    }
+    .instructions h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      color: var(--brand);
+    }
+    .instructions p {
+      margin: 4px 0 8px;
     }
 
-    /* Main app */
-    #app {
-      display: none;
+    .btn {
+      display: inline-block;
+      background: var(--brand);
+      color: #fff;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 12px;
+    }
+
+    footer {
+      padding: 24px;
+      color: #666;
+      text-align: center;
+      font-size: 12px;
     }
   </style>
 </head>
+
 <body>
-  <!-- Splash screen -->
-  <div id="splash">
-    <img src="icons/icon-192.png" alt="Loading..." />
-  </div>
-
-  <!-- Intro popup -->
-  <div id="intro-popup">
-    <div class="popup-content">
-      <h2>Welcome</h2>
-      <p>This tool helps you take action based on your current energy level.</p>
-      <button id="get-started">Get Started</button>
+  <header>
+    <h1>The Reset Compass</h1>
+    <div class="nav">
+      <a id="nav-home" href="#/home">Compass</a>
+      <a id="nav-wins" href="#/wins">Quick Wins</a>
+      <a id="nav-history" href="#/history">History</a>
+      <a id="nav-about" href="#/about">About</a>
     </div>
-  </div>
+  </header>
 
-  <!-- App container -->
-  <div id="app"></div>
+  <div class="wrap" id="app"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
 
-  <!-- JS Scripts -->
+  <footer>© 2025 Evolution of Wellness LLC • v1.0.6 • For educational purposes only. Not medical advice.</footer>
+
+  <!-- Google AdSense Display Ad -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895"
+     crossorigin="anonymous"></script>
+  <ins class="adsbygoogle"
+     style="display:block; text-align:center;"
+     data-ad-client="ca-pub-9323656111800895"
+     data-ad-slot="9545612325"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
   <script>
-    // Handle splash fade
-    window.addEventListener("load", () => {
-      const splash = document.getElementById("splash");
-      setTimeout(() => {
-        splash.style.opacity = 0;
-        setTimeout(() => {
-          splash.style.display = "none";
-
-          // Check if intro popup has been shown
-          if (!localStorage.getItem("introShown")) {
-            document.getElementById("intro-popup").style.display = "flex";
-          } else {
-            document.getElementById("app").style.display = "block";
-            loadApp();
-          }
-        }, 1000);
-      }, 1500);
-    });
-
-    // Intro button
-    document.getElementById("get-started").addEventListener("click", () => {
-      localStorage.setItem("introShown", "true");
-      document.getElementById("intro-popup").style.display = "none";
-      document.getElementById("app").style.display = "block";
-      loadApp();
-    });
-
-    // Load the app.js logic
-    function loadApp() {
-      const script = document.createElement("script");
-      script.src = "app.js";
-      document.body.appendChild(script);
-    }
-
-    // Register service worker
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js");
-    }
+     (adsbygoogle = window.adsbygoogle || []).push({});
   </script>
+
+  <!-- App logic -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
