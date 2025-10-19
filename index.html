@@ -586,15 +586,15 @@ function waitForHistoryElementThenRender(attempts = 20) {
     const splash = document.getElementById('splashScreen');
     const icon = document.getElementById('splashIcon');
 
-    // Start animation slightly after load
+    // Start the icon animation
     setTimeout(() => {
       icon.classList.add('splash-animate');
-    }, 300);
+    }, 100);
 
-    // Remove splash after animation ends
+    // Remove splash screen after animation
     setTimeout(() => {
       splash.remove();
-    }, 2300);
+    }, 1600); // Match the animation duration
   });
 </script>
 
