@@ -406,6 +406,8 @@ function History(){
   const uniqueModes=['All','Surviving','Drifting','Grounded','Growing','Quick Win'];
   app.innerHTML=`
     <h2>History</h2>
+      <h3>Your Daily Mode Log</h3>
+  <div id="mode-history" style="margin-bottom: 1rem;"></div>
     <div class="card">
       <div class="filters">
         <select id="modeFilter">${uniqueModes.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
