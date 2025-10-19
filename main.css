@@ -177,3 +177,22 @@ button {
     max-width: 260px;
   }
 }
+#splashIcon {
+  width: 120px;
+  height: 120px;
+  animation: zoomSpinFade 1.6s ease-in-out forwards;
+}
+
+@keyframes zoomSpinFade {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.5) rotate(180deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2) rotate(360deg);
+  }
+}
