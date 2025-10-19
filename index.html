@@ -580,20 +580,29 @@ const modeBreakdownHTML = `
   function viewModeDetail(date, mode) {
   alert(`On ${new Date(date).toDateString()}, you selected: ${mode}`);
 }
-// Trigger render when History tab is opened
+  // Trigger render when History tab is opened
 window.addEventListener("hashchange", () => {
   if (location.hash === "#/history") {
-    // Wait a moment to ensure History HTML is injected
-    setTimeout(renderModeHistory, 150);
+    waitForHistoryElementThenRender();
   }
 });
 
 // Optional: Call render on page load if already on history tab
 window.addEventListener("load", () => {
   if (location.hash === "#/history") {
-    setTimeout(renderModeHistory, 150);
+    waitForHistoryElementThenRender();
   }
 });
+
+// Wait until the history container is present before rendering
+function waitForHistoryElementThenRender(retries = 10) {
+  const el = document.getElementById("modeHistory");
+  if (el) {
+    renderModeHistory();
+  } else if (retries > 0) {
+    setTimeout(() => waitForHistoryElementThenRender(retries - 1), 100);
+  }
+}
 // To use: make sure your mode buttons call saveModeChoice("Grounded"), etc.
 // Example: saveModeChoice("Grounded"); when user selects that mode
 </script>
