@@ -407,6 +407,7 @@ function History(){
   app.innerHTML=`
     <h2>History</h2>
       <h3>Your Daily Mode Log</h3>
+      <p id="modeStreak" style="font-weight: bold; margin-bottom: 10px;"></p>
   <div id="mode-history" style="margin-bottom: 1rem;"></div>
     <div class="card">
       <div class="filters">
@@ -516,29 +517,53 @@ function renderModeHistory() {
   if (!historyEl) return;
 
   const stored = JSON.parse(localStorage.getItem("modeHistory") || "{}");
-  let entries = Object.entries(stored);
-entries = entries
-  .sort((a, b) => new Date(b[0]) - new Date(a[0])) // newest first
-  .slice(0, 7); // only keep 7 latest days
+  let entries = Object.entries(stored)
+    .sort((a, b) => new Date(b[0]) - new Date(a[0]))
+    .slice(0, 7); // Show only the last 7 days
 
   if (entries.length === 0) {
-    historyEl.innerHTML = "<p style='color:var(--muted)'>No mode choices logged yet.</p>";
+    historyEl.innerHTML = `<p style='color:var(--muted)'>No mode choices logged yet.</p>`;
     return;
   }
 
+  // Streak calculation
+  let streak = 1;
+  let prev = new Date(entries[0][0]);
+  for (let i = 1; i < entries.length; i++) {
+    let current = new Date(entries[i][0]);
+    const diff = Math.floor((prev - current) / (1000 * 60 * 60 * 24));
+    if (diff === 1) {
+      streak++;
+    } else {
+      break;
+    }
+    prev = current;
+  }
+
+  // Show streak if element exists
+  const streakEl = document.getElementById("modeStreak");
+  if (streakEl) {
+    streakEl.textContent = `Current Streak: ${streak} day${streak > 1 ? "s" : ""}`;
+  }
+
+  // Render entries
   historyEl.innerHTML = entries.map(([date, mode]) => {
-  let color = "#ccc"; // default gray
-  if (mode === "Grounded") color = "#BEE3C2";
-  if (mode === "Surviving") color = "#FBD38D";
-  if (mode === "Growing") color = "#90CDF4";
-  if (mode === "Drifting") color = "#CBD5E0";
+    let color = "#ccc";
+    if (mode === "Grounded") color = "#2e8b57";
+    if (mode === "Surviving") color = "#d9534f";
+    if (mode === "Growing") color = "#0275d8";
+    if (mode === "Drifting") color = "#f0ad4e";
 
-  return `<div class="log-item" style="background-color:${color}; padding: 6px 12px; margin-bottom: 6px; border-radius: 6px;">
-    ${date} — ${mode}
-  </div>`;
-}).join("");
+    return `
+      <div class="log-item" style="cursor:pointer; padding:8px; border-bottom:1px solid #ddd;" onclick="viewModeDetail('${date}', '${mode}')">
+        <strong style="color:${color}">${new Date(date).toDateString()}</strong>: ${mode}
+      </div>
+    `;
+  }).join("");
 }
-
+  function viewModeDetail(date, mode) {
+  alert(`On ${new Date(date).toDateString()}, you selected: ${mode}`);
+}
 // Trigger render when History tab is opened
 window.addEventListener("hashchange", () => {
   if (location.hash === "#/history") {
