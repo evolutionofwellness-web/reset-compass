@@ -8,14 +8,17 @@
   --bg: #ffffff;
   --text: #0B3D2E;
 }
+
 /* --------------------------
   Global Styles
 --------------------------- */
 body {
   margin: 0;
+  padding: 0;
   font-family: system-ui, sans-serif;
   background-color: var(--bg);
   color: var(--text);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 a {
@@ -26,6 +29,11 @@ a {
 h1, h2, h3 {
   color: var(--brand);
   margin: 1rem 0 0.5rem;
+}
+
+p {
+  line-height: 1.6;
+  margin: 0.5rem 0;
 }
 
 button, .btn {
@@ -48,31 +56,13 @@ button, .btn {
   background-color: #e0e0e0;
   color: #333;
 }
-body {
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, sans-serif;
-  background-color: #fefae0; /* TEMP for debug — change to #ffffff after */
-  color: #0B3D2E;
-  transition: background-color 0.3s, color 0.3s;
-}
 
-h1, h2 {
-  font-weight: 700;
-  margin: 0 0 0.5rem;
-}
-
-p {
-  line-height: 1.6;
-  margin: 0.5rem 0;
-}
-
-button {
-  font-size: 1rem;
-  padding: 0.5em 1em;
-  border: none;
+a.btn {
+  display: inline-block;
+  text-align: center;
+  padding: 0.6rem 1rem;
   border-radius: 6px;
-  cursor: pointer;
+  font-weight: bold;
 }
 
 /* --------------------------
@@ -84,7 +74,7 @@ button {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #ffffff;
+  background-color: var(--bg);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -134,7 +124,7 @@ button {
 .nav a {
   margin-right: 1rem;
   text-decoration: none;
-  color: #0B3D2E;
+  color: var(--brand);
   font-weight: bold;
 }
 
@@ -176,23 +166,29 @@ button {
   color: #fff;
   text-transform: uppercase;
   border: none;
+  transition: 0.2s ease;
 }
 
 .mode-btn span {
   display: inline-block;
 }
 
-.mode-btn.surv { background-color: #8B0000; }
-.mode-btn.drift { background-color: #DAA520; }
-.mode-btn.ground { background-color: #228B22; }
-.mode-btn.grow { background-color: #1E90FF; }
+.mode-btn.surv { background-color: var(--surv); }
+.mode-btn.drift { background-color: var(--drift); }
+.mode-btn.ground { background-color: var(--ground); }
+.mode-btn.grow { background-color: var(--grow); }
+
+.mode-btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
 
 /* --------------------------
   Welcome & Instructions
 --------------------------- */
 .instructions {
   background-color: #f9f9f9;
-  border-left: 5px solid #0B3D2E;
+  border-left: 5px solid var(--brand);
   border-radius: 6px;
   padding: 1rem;
   margin: 1.5rem 0;
@@ -200,16 +196,16 @@ button {
 }
 
 .instructions strong {
-  color: #0B3D2E;
+  color: var(--brand);
 }
 
 /* --------------------------
   Mode Labels
 --------------------------- */
-.mode-surviving { color: #8B0000; }
-.mode-drifting  { color: #DAA520; }
-.mode-grounded  { color: #228B22; }
-.mode-growing   { color: #1E90FF; }
+.mode-surviving { color: var(--surv); }
+.mode-drifting  { color: var(--drift); }
+.mode-grounded  { color: var(--ground); }
+.mode-growing   { color: var(--grow); }
 
 /* --------------------------
   History + Stats
@@ -237,7 +233,7 @@ button {
 
 .stats .streak {
   font-size: 1.6rem;
-  color: #0B3D2E;
+  color: var(--brand);
 }
 
 .streak .emoji {
@@ -253,7 +249,7 @@ footer {
   text-align: center;
   padding: 2rem 1rem;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--muted);
 }
 
 /* --------------------------
@@ -269,13 +265,4 @@ footer {
     width: 100%;
     max-width: 260px;
   }
-}
-.splash-animate {
-  animation: zoomSpinFade 1.6s ease-in-out forwards;
-}
-
-@keyframes zoomSpinFade {
-  0% { opacity: 1; transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.5) rotate(180deg); }
-  100% { opacity: 0; transform: scale(2) rotate(360deg); }
 }
