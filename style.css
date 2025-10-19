@@ -1,1 +1,124 @@
+/* General Reset & Base */
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background-color: #FFFFFF;
+  color: #0B3D2E;
+  line-height: 1.6;
+}
 
+a {
+  color: #0B3D2E;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Header */
+h1, h2 {
+  text-align: center;
+  color: #0B3D2E;
+  margin-top: 1.5rem;
+}
+
+/* Navigation */
+nav {
+  text-align: center;
+  padding: 1rem;
+  background-color: #F4F4F4;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+nav a {
+  margin: 0 1rem;
+  font-size: 1rem;
+}
+
+/* Compass Wrap */
+.compass-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem auto;
+}
+
+.compass {
+  width: 200px;
+  height: 200px;
+  margin-bottom: 1rem;
+}
+
+.center-tip {
+  font-style: italic;
+  color: #666;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Mode Buttons */
+.mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.mode-btn {
+  padding: 0.75rem 1.25rem;
+  border: 2px solid #0B3D2E;
+  background-color: white;
+  color: #0B3D2E;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.mode-btn:hover {
+  background-color: #0B3D2E;
+  color: white;
+}
+
+/* Instruction Panels */
+.instructions {
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Streak and Today Stats */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
+
+/* Modal Popups (if applicable) */
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 90%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  text-align: center;
+  margin: auto;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 600px) {
+  .mode-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mode-btn {
+    width: 80%;
+  }
+}
