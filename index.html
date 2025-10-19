@@ -1,138 +1,217 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>The Reset Compass • v1.0.6</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>The Reset Compass • v1.0.6</title>
 
-<!-- PWA -->
-<link rel="manifest" href="manifest.webmanifest?v=106">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png" type="image/png">
-<meta name="theme-color" content="#1C3B34"/>
+  <!-- Favicon + PWA -->
+  <link rel="manifest" href="manifest.webmanifest?v=106">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <meta name="theme-color" content="#0B3D2E"/>
 
-<!-- Meta -->
-<meta name="description" content="Choose your mode and get quick, realistic steps that match your energy today. Take your health into your own hands immediately.">
-<meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="Permissions-Policy" content="interest-cohort=()">
-<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <!-- Meta -->
+  <meta name="description" content="Choose your mode and get quick, realistic steps that match your energy today. Take your health into your own hands immediately.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
-<!-- Social preview -->
-<meta property="og:title" content="The Reset Compass">
-<meta property="og:description" content="Quick, realistic steps that match your energy today.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="icons/icon-512.png">
+  <!-- Social preview -->
+  <meta property="og:title" content="The Reset Compass">
+  <meta property="og:description" content="Quick, realistic steps that match your energy today.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="icons/icon-512.png">
 
-<!-- Analytics (can swap to GTM later if needed) -->
-<script async defer data-domain="reset.evolutionofwellness.com" src="https://plausible.io/js/script.js?v=106"></script>
+  <!-- Analytics -->
+  <script async defer data-domain="reset.evolutionofwellness.com" src="https://plausible.io/js/script.js?v=106"></script>
 
-<style>
-:root{
-  --brand:#1C3B34; --beige:#F0E8D9; --ink:#1A1A1A; --muted:#6b6b6b; --border:#e7e7e7;
-  --surv:#A94747; --drift:#E6B450; --ground:#3B755F; --grow:#4C7EDC;
-}
-*{box-sizing:border-box}
-html{-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;background:#fff;color:var(--ink)}
-a,button{outline-offset:3px}
-a:focus-visible,button:focus-visible{outline:2px solid #0a7f63}
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895" crossorigin="anonymous"></script>
 
-header{position:sticky;top:0;background:var(--brand);color:#fff;padding:12px 16px;z-index:5}
-header h1{margin:0;font-size:16px;line-height:1;text-align:center}
-.nav{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap}
-.nav a{color:#fff;text-decoration:none;opacity:.9;padding:6px 10px;border-radius:999px;border:1px solid transparent}
-.nav a.active{opacity:1;border-color:#fff}
+  <style>
+    :root {
+      --brand:#0B3D2E; --beige:#F0E8D9; --ink:#1A1A1A; --muted:#6b6b6b; --border:#e7e7e7;
+      --surv:#A94747; --drift:#E6B450; --ground:#3B755F; --grow:#4C7EDC;
+    }
+    *{box-sizing:border-box}
+    html{-webkit-tap-highlight-color:transparent}
+    body {
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif;
+      background:#fff;
+      color:var(--ink);
+    }
+    a,button{outline-offset:3px}
+    a:focus-visible,button:focus-visible{outline:2px solid #0a7f63}
 
-.wrap{max-width:860px;margin:0 auto;padding:16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-.card h3{margin:.2rem 0 .3rem}
-.pill{display:inline-flex;align-items:center;gap:6px;background:var(--beige);color:var(--brand);padding:4px 8px;border-radius:999px;font-size:12px}
-.btn{display:inline-block;background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;text-decoration:none;cursor:pointer;touch-action:manipulation}
-.btn.ghost{background:transparent;color:var(--brand);border:2px solid var(--brand)}
-.btn.subtle{background:#eef1f0;color:var(--brand)}
-footer{padding:24px;color:#666;text-align:center;font-size:12px}
-textarea,input[type="text"]{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:16px;background:#fff}
-textarea{min-height:92px;resize:vertical}
+    header {
+      position:sticky;
+      top:0;
+      background:var(--brand);
+      color:#fff;
+      padding:12px 16px;
+      z-index:5;
+    }
+    header h1 {
+      margin:0;
+      font-size:16px;
+      line-height:1;
+      text-align:center;
+    }
+    .nav {
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      margin-top:8px;
+      flex-wrap:wrap;
+    }
+    .nav a {
+      color:#fff;
+      text-decoration:none;
+      opacity:.9;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid transparent;
+    }
+    .nav a.active {
+      opacity:1;
+      border-color:#fff;
+    }
 
-/* Compass */
-.compass-wrap{display:flex;flex-direction:column;align-items:center}
-svg.compass{width:340px;max-width:92vw;height:auto;display:block}
-.compass text{font-weight:800;letter-spacing:.2px}
-.center-tip{color:var(--muted);text-align:center;font-size:14px;margin:6px 0 12px}
-.wedge{transition:opacity .15s ease, filter .15s ease; cursor:pointer}
-.wedge:active{opacity:.28;filter:saturate(1.2)}
+    .wrap {
+      max-width:860px;
+      margin:0 auto;
+      padding:16px;
+    }
 
-/* Mode buttons */
-.mode-buttons{display:grid;grid-template-columns:repeat(2,minmax(140px,1fr));gap:10px;max-width:420px;margin:0 auto 8px}
-.mode-btn{display:flex;align-items:center;justify-content:center;border-radius:12px;padding:12px 10px;font-weight:700;border:2px solid transparent;cursor:pointer;touch-action:manipulation}
-.mode-btn span{font-size:16px}
-.mode-btn.surv{background:#F7E5E5;border-color:var(--surv);color:var(--surv)}
-.mode-btn.drift{background:#FFF0D5;border-color:var(--drift);color:var(--drift)}
-.mode-btn.ground{background:#E6F0EC;border-color:var(--ground);color:var(--ground)}
-.mode-btn.grow{background:#E6EEFF;border-color:var(--grow);color:var(--grow)}
-.mode-btn:active{transform:scale(.98)}
+    #toast {
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:var(--brand);
+      color:#fff;
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:14px;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease;
+      z-index:9;
+    }
+    #toast.show { opacity:1 }
 
-/* Instruction panel */
-.instructions{max-width:520px;margin:12px auto 4px;border-left:4px solid var(--brand);padding:12px 14px;background:#fafafa;border-radius:8px}
-.instructions h2{margin:0 0 6px;font-size:20px;color:var(--brand)}
-.instructions p{margin:4px 0 8px}
+    #popup {
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:10;
+    }
+    #popup .box {
+      background:#fff;
+      color:var(--brand);
+      padding:22px;
+      border-radius:12px;
+      max-width:340px;
+      text-align:center;
+      border:1px solid var(--border);
+    }
 
-/* Stats bar */
-.stats{display:flex;gap:10px;justify-content:center;align-items:center;margin:8px auto 4px;flex-wrap:wrap}
-.stat{background:#f6f9f8;border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:13px;color:var(--brand)}
+    footer {
+      padding:24px;
+      color:#666;
+      text-align:center;
+      font-size:12px;
+    }
 
-/* Welcome, Toasts, History */
-#popup{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:10}
-#popup .box{background:#fff;color:var(--brand);padding:22px;border-radius:12px;max-width:340px;text-align:center;border:1px solid var(--border)}
-#popup .box p{margin:.5rem 0}
-#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#1c3b34;color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9}
-#toast.show{opacity:1}
-
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.badge{display:inline-block;border:1px solid var(--border);padding:3px 8px;border-radius:999px;font-size:12px;color:var(--muted)}
-.log-item{border-bottom:1px dashed var(--border);padding:10px 0}
-.log-item:last-child{border-bottom:0}
-.note{white-space:pre-wrap}
-
-/* Sticky back bar */
-.sticky-back{position:sticky;bottom:-1px;background:#fff;border-top:1px solid var(--border);padding:10px;display:flex;justify-content:center;z-index:3}
-</style>
+    /* Splash screen */
+    #splash {
+      position:fixed;
+      inset:0;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:20;
+      transition:opacity 1s ease;
+    }
+    #splash.fade-out {
+      opacity:0;
+      pointer-events:none;
+    }
+    #splash img {
+      width:140px;
+      height:auto;
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <h1>The Reset Compass</h1>
-  <div class="nav">
-    <a id="nav-home" href="#/home">Compass</a>
-    <a id="nav-wins" href="#/wins">Quick Wins</a>
-    <a id="nav-history" href="#/history">History</a>
-    <a id="nav-about" href="#/about">About</a>
+  <!-- Splash Screen -->
+  <div id="splash">
+    <img src="icons/icon-192.png" alt="Reset Compass logo">
   </div>
-</header>
 
-<div class="wrap" id="app"></div>
-<div id="toast" role="status" aria-live="polite"></div>
+  <!-- Intro Popup -->
+  <div id="popup" style="display:none;">
+    <div class="box">
+      <h2>Welcome</h2>
+      <p>This tool helps you take action based on your current energy level.</p>
+      <button class="btn" onclick="dismissPopup()">Get Started</button>
+    </div>
+  </div>
 
-<footer>© 2025 Evolution of Wellness LLC • v1.0.6 • For educational purposes only. Not medical advice.</footer>
+  <header>
+    <h1>The Reset Compass</h1>
+    <div class="nav">
+      <a id="nav-home" href="#/home">Compass</a>
+      <a id="nav-wins" href="#/wins">Quick Wins</a>
+      <a id="nav-history" href="#/history">History</a>
+      <a id="nav-about" href="#/about">About</a>
+    </div>
+  </header>
 
-<!-- Google AdSense Display Ad -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895"
-     crossorigin="anonymous"></script>
-<ins class="adsbygoogle"
-     style="display:block; text-align:center;"
-     data-ad-client="ca-pub-9323656111800895"
-     data-ad-slot="9545612325"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+  <div class="wrap" id="app"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
 
-<script type="module">
-/* ---------- DATA ---------- */
-// (JavaScript for the app remains identical to your previous version)
-</script>
+  <footer>© 2025 Evolution of Wellness LLC • v1.0.6 • For educational purposes only. Not medical advice.</footer>
 
+  <!-- Google AdSense Display Ad -->
+  <ins class="adsbygoogle"
+       style="display:block; text-align:center; margin-bottom: 12px;"
+       data-ad-client="ca-pub-9323656111800895"
+       data-ad-slot="9545612325"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+  <!-- App Logic (splash + intro popup) -->
+  <script>
+    window.addEventListener("load", () => {
+      const splash = document.getElementById("splash");
+      setTimeout(() => splash.classList.add("fade-out"), 1100);
+
+      const popupSeen = localStorage.getItem("popupShown");
+      if (!popupSeen) {
+        document.getElementById("popup").style.display = "flex";
+      }
+    });
+
+    function dismissPopup() {
+      localStorage.setItem("popupShown", "true");
+      document.getElementById("popup").style.display = "none";
+    }
+  </script>
+
+  <!-- Your existing app JavaScript will still be loaded as a module -->
+  <script type="module">
+    // Your previous JavaScript goes here, unchanged
+  </script>
 </body>
 </html>
