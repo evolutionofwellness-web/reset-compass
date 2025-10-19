@@ -201,7 +201,21 @@ const QuickWins=[
 /* ---------- HELPERS ---------- */
 const app=document.getElementById('app');
 const toastEl=document.getElementById('toast');
-const showToast=(msg)=>{toastEl.textContent=msg;toastEl.classList.add('show');setTimeout(()=>toastEl.classList.remove('show'),1400);};
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+
+  // Add blur to the main app area
+  const app = document.getElementById('app');
+  if (app) app.classList.add('blur-active');
+
+  // Remove after 2.5 seconds
+  setTimeout(() => {
+    toast.classList.remove('show');
+    if (app) app.classList.remove('blur-active');
+  }, 2500);
+}
 const setActive=()=>{
   document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
   const map={'#/home':'nav-home','#/wins':'nav-wins','#/about':'nav-about','#/history':'nav-history'};
