@@ -594,6 +594,29 @@ window.addEventListener("load", () => {
   }
 });
 
+  function waitForHistoryElementThenRender(attempts = 20) {
+  const historyEl = document.getElementById("modeHistory");
+  if (historyEl) {
+    renderModeHistory(); // safe to call now
+  } else if (attempts > 0) {
+    setTimeout(() => waitForHistoryElementThenRender(attempts - 1), 100);
+  }
+}
+
+// On hash change (e.g., user clicks "History" tab)
+window.addEventListener("hashchange", () => {
+  if (location.hash === "#/history") {
+    waitForHistoryElementThenRender();
+  }
+});
+
+// On page load (in case user lands directly on History tab)
+window.addEventListener("load", () => {
+  if (location.hash === "#/history") {
+    waitForHistoryElementThenRender();
+  }
+});
+  
 // Wait until the history container is present before rendering
 function waitForHistoryElementThenRender(retries = 10) {
   const el = document.getElementById("modeHistory");
