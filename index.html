@@ -541,7 +541,7 @@ function renderModeHistory() {
   }
 
   // Show streak if element exists
-  const streakEL = document.getElementById("streakCount");
+  const streakEL = document.getElementById("modeStreak");
 if (streakEL) {
   streakEL.innerHTML = `🔥 <strong style="font-size: 1.8em;">${streak}</strong>`;
 }
@@ -593,37 +593,12 @@ window.addEventListener("load", () => {
     waitForHistoryElementThenRender();
   }
 });
-
-  function waitForHistoryElementThenRender(attempts = 20) {
-  const historyEl = document.getElementById("modeHistory");
+function waitForHistoryElementThenRender(attempts = 20) {
+  const historyEl = document.getElementById("mode-history");
   if (historyEl) {
-    renderModeHistory(); // safe to call now
+    renderModeHistory();
   } else if (attempts > 0) {
     setTimeout(() => waitForHistoryElementThenRender(attempts - 1), 100);
-  }
-}
-
-// On hash change (e.g., user clicks "History" tab)
-window.addEventListener("hashchange", () => {
-  if (location.hash === "#/history") {
-    waitForHistoryElementThenRender();
-  }
-});
-
-// On page load (in case user lands directly on History tab)
-window.addEventListener("load", () => {
-  if (location.hash === "#/history") {
-    waitForHistoryElementThenRender();
-  }
-});
-  
-// Wait until the history container is present before rendering
-function waitForHistoryElementThenRender(retries = 10) {
-  const el = document.getElementById("modeHistory");
-  if (el) {
-    renderModeHistory();
-  } else if (retries > 0) {
-    setTimeout(() => waitForHistoryElementThenRender(retries - 1), 100);
   }
 }
 // To use: make sure your mode buttons call saveModeChoice("Grounded"), etc.
