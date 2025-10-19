@@ -115,6 +115,33 @@ svg.compass{width:340px;max-width:92vw;height:auto;display:block}
 
 /* Sticky back bar */
 .sticky-back{position:sticky;bottom:-1px;background:#fff;border-top:1px solid var(--border);padding:10px;display:flex;justify-content:center;z-index:3}
+/* Enhance toast visibility */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  background: var(--brand);
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+  z-index: 999;
+}
+#toast.show {
+  opacity: 1;
+}
+
+/* Blur background when toast is active */
+.blur-active {
+  filter: blur(3px);
+  transition: filter 0.3s ease;
+}
 </style>
 </head>
 <body>
