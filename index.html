@@ -584,31 +584,16 @@ function waitForHistoryElementThenRender(attempts = 20) {
     const splash = document.getElementById('splashScreen');
     const icon = document.getElementById('splashIcon');
 
-    icon.style.transform = 'scale(1.1) rotate(360deg)';
-    icon.style.transition = 'transform 2s ease, opacity 1s ease';
-
+    // Trigger animation via class
     setTimeout(() => {
-      splash.classList.add('splash-animate');
-    }, 2000);
+      icon.classList.add('splash-animate');
+    }, 300); // small delay helps smooth the load-in
 
+    // Remove the splash after animation
     setTimeout(() => {
-      splash.style.display = 'none';
-    }, 3000);
-  });
-</script>
-  <script>
-  window.addEventListener('load', () => {
-    const splashIcon = document.getElementById('splashIcon');
-    const splashScreen = document.getElementById('splashScreen');
-
-    splashIcon.classList.add('splash-animate');
-
-    setTimeout(() => {
-      splashScreen.style.display = 'none';
-    }, 2000); // matches animation time
+      splash.remove();
+    }, 2300);
   });
 </script>
 
-</html>
-  
 </html>
