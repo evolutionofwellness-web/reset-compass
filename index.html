@@ -516,7 +516,10 @@ function renderModeHistory() {
   if (!historyEl) return;
 
   const stored = JSON.parse(localStorage.getItem("modeHistory") || "{}");
-  const entries = Object.entries(stored).sort().reverse();
+  let entries = Object.entries(stored);
+entries = entries
+  .sort((a, b) => new Date(b[0]) - new Date(a[0])) // newest first
+  .slice(0, 7); // only keep 7 latest days
 
   if (entries.length === 0) {
     historyEl.innerHTML = "<p style='color:var(--muted)'>No mode choices logged yet.</p>";
