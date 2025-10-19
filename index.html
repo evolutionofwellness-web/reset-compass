@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>The Reset Compass • v1.0.6</title>
 
-  <!-- PWA -->
+  <!-- Favicon & PWA -->
   <link rel="manifest" href="manifest.webmanifest?v=106">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="icon" href="icons/icon-192.png" type="image/png">
   <meta name="theme-color" content="#0B3D2E"/>
 
-  <!-- Meta -->
-  <meta name="description" content="Choose your mode and get quick, realistic steps that match your energy today. Take your health into your own hands immediately.">
+  <!-- Meta Info -->
+  <meta name="description" content="Choose your mode and get quick, realistic steps that match your energy today.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
-  <!-- Social preview -->
+  <!-- Social Sharing -->
   <meta property="og:title" content="The Reset Compass">
   <meta property="og:description" content="Quick, realistic steps that match your energy today.">
   <meta property="og:type" content="website">
@@ -26,9 +26,7 @@
   <!-- Analytics -->
   <script async defer data-domain="reset.evolutionofwellness.com" src="https://plausible.io/js/script.js?v=106"></script>
 
-  <!-- AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895" crossorigin="anonymous"></script>
-
+  <!-- Styles -->
   <style>
     :root {
       --brand: #0B3D2E;
@@ -42,17 +40,14 @@
       --grow: #4C7EDC;
     }
 
-    * { box-sizing: border-box }
-    html { -webkit-tap-highlight-color: transparent }
+    * { box-sizing: border-box; }
+    html { -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Inter, Roboto, sans-serif;
       background: #fff;
       color: var(--ink);
     }
-
-    a, button { outline-offset: 3px }
-    a:focus-visible, button:focus-visible { outline: 2px solid #0a7f63 }
 
     header {
       position: sticky;
@@ -62,12 +57,14 @@
       padding: 12px 16px;
       z-index: 5;
     }
+
     header h1 {
       margin: 0;
       font-size: 16px;
       line-height: 1;
       text-align: center;
     }
+
     .nav {
       display: flex;
       gap: 8px;
@@ -75,6 +72,7 @@
       margin-top: 8px;
       flex-wrap: wrap;
     }
+
     .nav a {
       color: #fff;
       text-decoration: none;
@@ -83,24 +81,23 @@
       border-radius: 999px;
       border: 1px solid transparent;
     }
+
     .nav a.active {
       opacity: 1;
       border-color: #fff;
     }
 
-    .wrap { max-width: 860px; margin: 0 auto; padding: 16px }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 16px; }
     .btn {
-      display: inline-block;
       background: var(--brand);
-      color: #fff;
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 18px;
-      font-weight: 700;
-      text-decoration: none;
+      color: white;
+      padding: 12px 20px;
       font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
       cursor: pointer;
-      touch-action: manipulation;
+      text-decoration: none;
     }
 
     footer {
@@ -110,11 +107,10 @@
       font-size: 12px;
     }
 
-    /* Intro Popup */
     #popup {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, .55);
+      background: rgba(0,0,0,.55);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -132,107 +128,67 @@
     }
 
     #popup .box h2 {
-      margin-top: 0;
-      font-size: 20px;
+      margin: 0 0 10px;
     }
 
     #popup .box p {
-      margin: .5rem 0 1.2rem;
-    }
-
-    /* Splash screen */
-    #splash {
-      position: fixed;
-      inset: 0;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      transition: opacity 0.8s ease;
-    }
-
-    #splash.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    #splash img {
-      width: 140px;
-      height: auto;
-    }
-
-    /* Ads */
-    .adsbygoogle {
-      display: block;
-      margin: 20px auto;
+      margin: 0 0 16px;
+      color: var(--ink);
     }
   </style>
 </head>
 
 <body>
+  <header>
+    <h1>The Reset Compass</h1>
+    <div class="nav">
+      <a id="nav-home" href="#/home">Compass</a>
+      <a id="nav-wins" href="#/wins">Quick Wins</a>
+      <a id="nav-history" href="#/history">History</a>
+      <a id="nav-about" href="#/about">About</a>
+    </div>
+  </header>
 
-<!-- Splash screen -->
-<div id="splash">
-  <img src="icons/icon-192.png" alt="App Logo">
-</div>
+  <!-- App Container -->
+  <div class="wrap" id="app"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
 
-<header>
-  <h1>The Reset Compass</h1>
-  <div class="nav">
-    <a id="nav-home" href="#/home">Compass</a>
-    <a id="nav-wins" href="#/wins">Quick Wins</a>
-    <a id="nav-history" href="#/history">History</a>
-    <a id="nav-about" href="#/about">About</a>
+  <!-- Welcome Modal -->
+  <div id="popup" style="display:none;">
+    <div class="box">
+      <h2>Welcome</h2>
+      <p>This tool helps you take action based on your current energy level.</p>
+      <button class="btn" onclick="dismissPopup()">Get Started</button>
+    </div>
   </div>
-</header>
 
-<div class="wrap" id="app"></div>
-<div id="toast" role="status" aria-live="polite"></div>
+  <footer>© 2025 Evolution of Wellness LLC • v1.0.6 • For educational purposes only. Not medical advice.</footer>
 
-<footer>© 2025 Evolution of Wellness LLC • v1.0.6 • For educational purposes only. Not medical advice.</footer>
+  <!-- AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895" crossorigin="anonymous"></script>
+  <ins class="adsbygoogle"
+      style="display:block; text-align:center;"
+      data-ad-client="ca-pub-9323656111800895"
+      data-ad-slot="9545612325"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+  <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
 
-<!-- Welcome popup -->
-<div id="popup">
-  <div class="box">
-    <h2>Welcome</h2>
-    <p>This tool helps you take action based on your current energy level.</p>
-    <button class="btn" onclick="dismissPopup()">Get Started</button>
-  </div>
-</div>
+  <!-- App Script -->
+  <script type="module">
+    import '/app.js';
 
-<!-- Google AdSense Display Ad -->
-<ins class="adsbygoogle"
-     style="display:block; text-align:center;"
-     data-ad-client="ca-pub-9323656111800895"
-     data-ad-slot="9545612325"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+    function dismissPopup() {
+      localStorage.setItem('resetCompassSeen', 'yes');
+      document.getElementById('popup').style.display = 'none';
+    }
 
-<script type="module">
-  import { initApp } from './app.js'; // Your actual logic lives in a separate file (if split)
-  function dismissPopup() {
-    localStorage.setItem("hasSeenPopup", "true");
-    document.getElementById("popup").style.display = "none";
-  }
-
-  // Show splash screen briefly
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.getElementById('splash').classList.add('hidden');
-      // Run app logic here if needed
-    }, 1000);
-  });
-
-  // Popup logic
-  window.addEventListener('DOMContentLoaded', () => {
-    const hasSeen = localStorage.getItem("hasSeenPopup");
-    if (hasSeen) document.getElementById("popup").style.display = "none";
-  });
-</script>
-
+    // Show popup if not seen
+    if (!localStorage.getItem('resetCompassSeen')) {
+      document.getElementById('popup').style.display = 'flex';
+    }
+  </script>
 </body>
 </html>
