@@ -576,21 +576,27 @@ function waitForHistoryElementThenRender(attempts = 20) {
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
  
+  <!-- App content ends here -->
+</div>
+
 <script>
-window.addEventListener("load", () => {
-  const icon = document.getElementById("splashIcon");
-  const splash = document.getElementById("splashScreen");
+  window.addEventListener('load', function () {
+    const splash = document.getElementById('splashScreen');
+    const icon = document.getElementById('splashIcon');
 
-  // Start animation
-  setTimeout(() => {
-    icon.classList.add("splash-animate");
-  }, 300); // slight delay
+    icon.style.transform = 'scale(1.1) rotate(360deg)';
+    icon.style.transition = 'transform 2s ease, opacity 1s ease';
 
-  // Remove splash after animation
-  setTimeout(() => {
-    splash.remove();
-  }, 2300); // duration matches the transition
-});
-</script> 
+    setTimeout(() => {
+      splash.classList.add('splash-animate');
+    }, 2000);
+
+    setTimeout(() => {
+      splash.style.display = 'none';
+    }, 3000);
+  });
+</script>
+
+</html>
   
 </html>
