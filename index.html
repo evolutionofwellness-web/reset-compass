@@ -498,6 +498,48 @@ window.addEventListener('load',()=>{
   // Service worker
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=106').catch(()=>{});}
 });
+  // === Mode History Tracker ===
+
+// Save selected mode to localStorage
+function saveModeChoice(mode) {
+  const dateKey = new Date().toISOString().slice(0, 10); // e.g., "2025-10-19"
+  const stored = JSON.parse(localStorage.getItem("modeHistory") || "{}");
+  stored[dateKey] = mode;
+  localStorage.setItem("modeHistory", JSON.stringify(stored));
+}
+
+// Inject the mode history log into the #mode-history div
+function renderModeHistory() {
+  const historyEl = document.getElementById("mode-history");
+  if (!historyEl) return;
+
+  const stored = JSON.parse(localStorage.getItem("modeHistory") || "{}");
+  const entries = Object.entries(stored).sort().reverse();
+
+  if (entries.length === 0) {
+    historyEl.innerHTML = "<p style='color:var(--muted)'>No mode choices logged yet.</p>";
+    return;
+  }
+
+  historyEl.innerHTML = entries.map(([date, mode]) => {
+    return `<div class="log-item"><strong>${date}</strong>: ${mode}</div>`;
+  }).join("");
+}
+
+// Trigger render when History tab is opened
+window.addEventListener("hashchange", () => {
+  if (location.hash === "#/history") {
+    renderModeHistory();
+  }
+});
+
+// Optional: Call render on page load if already on history tab
+if (location.hash === "#/history") {
+  renderModeHistory();
+}
+
+// To use: make sure your mode buttons call saveModeChoice("Grounded"), etc.
+// Example: saveModeChoice("Grounded"); when user selects that mode
 </script>
   <!-- Google AdSense (Minimal Footer Display) -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895"
