@@ -539,7 +539,27 @@ window.addEventListener("hashchange", () => {
 if (location.hash === "#/history") {
   renderModeHistory();
 }
+  renderDailyModeLog();
+function renderDailyModeLog() {
+  const logs = getLogs();
+  const dailyModes = {};
 
+  logs.forEach(log => {
+    const date = new Date(log.timestamp).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+    if (!dailyModes[date]) {
+      dailyModes[date] = log.mode;
+    }
+  });
+
+  const container = document.getElementById('mode-history');
+  if (!container) return;
+
+  const rows = Object.entries(dailyModes).map(([day, mode]) => {
+    return `<div><strong>${day}:</strong> ${mode}</div>`;
+  });
+
+  container.innerHTML = rows.length ? rows.join('') : `<div>No recent modes logged.</div>`;
+}
 // To use: make sure your mode buttons call saveModeChoice("Grounded"), etc.
 // Example: saveModeChoice("Grounded"); when user selects that mode
 </script>
