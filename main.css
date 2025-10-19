@@ -29,6 +29,7 @@ a {
 h1, h2, h3 {
   color: var(--brand);
   margin: 1rem 0 0.5rem;
+  font-weight: 700;
 }
 
 p {
@@ -57,16 +58,8 @@ button, .btn {
   color: #333;
 }
 
-a.btn {
-  display: inline-block;
-  text-align: center;
-  padding: 0.6rem 1rem;
-  border-radius: 6px;
-  font-weight: bold;
-}
-
 /* --------------------------
-  Splash Screen Animation
+  Splash Screen
 --------------------------- */
 #splashScreen {
   position: fixed;
@@ -74,7 +67,7 @@ a.btn {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: var(--bg);
+  background-color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -84,6 +77,9 @@ a.btn {
 #splashIcon {
   width: 120px;
   height: 120px;
+}
+
+.splash-animate {
   animation: zoomSpinFade 1.6s ease-in-out forwards;
 }
 
@@ -123,8 +119,6 @@ a.btn {
 
 .nav a {
   margin-right: 1rem;
-  text-decoration: none;
-  color: var(--brand);
   font-weight: bold;
 }
 
@@ -166,22 +160,16 @@ a.btn {
   color: #fff;
   text-transform: uppercase;
   border: none;
-  transition: 0.2s ease;
 }
 
 .mode-btn span {
   display: inline-block;
 }
 
-.mode-btn.surv { background-color: var(--surv); }
-.mode-btn.drift { background-color: var(--drift); }
-.mode-btn.ground { background-color: var(--ground); }
-.mode-btn.grow { background-color: var(--grow); }
-
-.mode-btn:hover {
-  opacity: 0.9;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
+.mode-btn.surv { background-color: #8B0000; }
+.mode-btn.drift { background-color: #DAA520; }
+.mode-btn.ground { background-color: #228B22; }
+.mode-btn.grow { background-color: #1E90FF; }
 
 /* --------------------------
   Welcome & Instructions
@@ -202,10 +190,10 @@ a.btn {
 /* --------------------------
   Mode Labels
 --------------------------- */
-.mode-surviving { color: var(--surv); }
-.mode-drifting  { color: var(--drift); }
-.mode-grounded  { color: var(--ground); }
-.mode-growing   { color: var(--grow); }
+.mode-surviving { color: #8B0000; }
+.mode-drifting  { color: #DAA520; }
+.mode-grounded  { color: #228B22; }
+.mode-growing   { color: #1E90FF; }
 
 /* --------------------------
   History + Stats
