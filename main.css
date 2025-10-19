@@ -1,6 +1,53 @@
+:root {
+  --brand: #0B3D2E;
+  --surv: #A94747;
+  --drift: #E6B450;
+  --ground: #3B755F;
+  --grow: #4C7EDC;
+  --muted: #666666;
+  --bg: #ffffff;
+  --text: #0B3D2E;
+}
 /* --------------------------
   Global Styles
 --------------------------- */
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+h1, h2, h3 {
+  color: var(--brand);
+  margin: 1rem 0 0.5rem;
+}
+
+button, .btn {
+  background-color: var(--brand);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--brand);
+  border: 1px solid var(--brand);
+}
+
+.btn.subtle {
+  background-color: #e0e0e0;
+  color: #333;
+}
 body {
   margin: 0;
   padding: 0;
@@ -222,4 +269,13 @@ footer {
     width: 100%;
     max-width: 260px;
   }
+}
+.splash-animate {
+  animation: zoomSpinFade 1.6s ease-in-out forwards;
+}
+
+@keyframes zoomSpinFade {
+  0% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.5) rotate(180deg); }
+  100% { opacity: 0; transform: scale(2) rotate(360deg); }
 }
