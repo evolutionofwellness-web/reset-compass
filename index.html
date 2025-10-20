@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="main.css?v=13">
-<script type="module" src="app.js?v=13"></script>
+
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>The Reset Compass • v1.0.6</title>
@@ -512,41 +512,8 @@ function waitForHistoryElementThenRender(attempts = 20) {
 <div id="welcomePopup">
   <h2>Welcome to The Reset Compass</h2>
   <p>Choose your mode and explore realistic actions based on how you're feeling today.</p>
-  <button id="startAppBtn">Let’s Start</button>
+  <button id="startButton">Let’s Start</button>
 </div>
-  <script>
-  window.addEventListener('load', function () {
-    const splash = document.getElementById('splashScreen');
-    const icon = document.getElementById('splashIcon');
-    const app = document.getElementById('app');
-
-    // Start animation
-    icon.classList.add('splash-animate');
-
-    // Wait for animation to end, then hide splash and show app
-    setTimeout(() => {
-      splash.style.display = 'none';
-      app.style.display = 'block';
-
-      // Show welcome popup only on first visit
-      if (!localStorage.getItem('welcomeSeen')) {
-        const popup = document.getElementById('welcomePopup');
-        if (popup) popup.style.display = 'flex';
-      }
-    }, 1600);
-  });
-
-  document.addEventListener('DOMContentLoaded', function () {
-    const startBtn = document.getElementById('startAppBtn');
-    if (startBtn) {
-      startBtn.addEventListener('click', function () {
-        localStorage.setItem('welcomeSeen', 'true');
-        const popup = document.getElementById('welcomePopup');
-        if (popup) popup.remove();
-      });
-    }
-  });
-</script>
 
   <script>
 // === Splash Screen Logic ===
