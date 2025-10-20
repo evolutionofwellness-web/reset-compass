@@ -43,7 +43,7 @@
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-  <div id="app" class="wrap"></div>
+  <div id="app" class="wrap" style="display: none;"></div>
 
 <footer>© 2025 Evolution of Wellness LLC • v1.0.6 • For educational purposes only. Not medical advice.</footer>
 
@@ -521,7 +521,7 @@ function waitForHistoryElementThenRender(attempts = 20) {
 </script>
 <!-- Splash Screen -->
 <div id="splashScreen">
-  <img id="splashIcon" src="splash-icon.png" alt="Loading..." />
+  <img id="splashIcon" src="icons/icon-512.png" alt="App Icon" />
 </div>
 
 <!-- First-Time Welcome Popup -->
@@ -534,13 +534,17 @@ function waitForHistoryElementThenRender(attempts = 20) {
   window.addEventListener('load', function () {
     const splash = document.getElementById('splashScreen');
     const icon = document.getElementById('splashIcon');
+    const app = document.getElementById('app');
 
-    // Animate splash
-    if (icon) icon.classList.add('splash-animate');
+    // Start animation
+    icon.classList.add('splash-animate');
 
+    // Wait for animation to end, then hide splash and show app
     setTimeout(() => {
-      splash?.remove();
+      splash.style.display = 'none';
+      app.style.display = 'block';
 
+      // Show welcome popup only on first visit
       if (!localStorage.getItem('welcomeSeen')) {
         const popup = document.getElementById('welcomePopup');
         if (popup) popup.style.display = 'flex';
@@ -553,7 +557,8 @@ function waitForHistoryElementThenRender(attempts = 20) {
     if (startBtn) {
       startBtn.addEventListener('click', function () {
         localStorage.setItem('welcomeSeen', 'true');
-        document.getElementById('welcomePopup')?.remove();
+        const popup = document.getElementById('welcomePopup');
+        if (popup) popup.remove();
       });
     }
   });
