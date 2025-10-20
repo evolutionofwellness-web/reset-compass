@@ -87,3 +87,25 @@ function renderNotFound() {
     </div>
   `;
 }
+// Splash screen and first-time popup
+window.addEventListener('load', () => {
+  const splash = document.getElementById('splashScreen');
+  const icon = document.getElementById('splashIcon');
+  icon.classList.add('splash-animate');
+
+  setTimeout(() => {
+    splash.style.display = 'none';
+
+    // First-time popup logic
+    const hasVisited = localStorage.getItem('hasVisited');
+    if (!hasVisited) {
+      const popup = document.getElementById('welcomePopup');
+      popup.style.display = 'flex';
+    }
+  }, 1600);
+});
+
+document.getElementById('startAppBtn')?.addEventListener('click', () => {
+  localStorage.setItem('hasVisited', 'true');
+  document.getElementById('welcomePopup').style.display = 'none';
+});
