@@ -87,16 +87,16 @@ function renderNotFound() {
     </div>
   `;
 }
-// Splash screen and first-time popup
+
+// Splash screen + First-time Welcome Popup
 window.addEventListener('load', () => {
   const splash = document.getElementById('splashScreen');
   const icon = document.getElementById('splashIcon');
-  icon.classList.add('splash-animate');
+  icon?.classList.add('splash-animate');
 
   setTimeout(() => {
-    splash.style.display = 'none';
+    splash?.style?.display = 'none';
 
-    // First-time popup logic
     const hasVisited = localStorage.getItem('hasVisited');
     if (!hasVisited) {
       const popup = document.getElementById('welcomePopup');
@@ -105,7 +105,14 @@ window.addEventListener('load', () => {
   }, 1600);
 });
 
-document.getElementById('startAppBtn')?.addEventListener('click', () => {
-  localStorage.setItem('hasVisited', 'true');
-  document.getElementById('welcomePopup').style.display = 'none';
+// Welcome popup dismissal
+document.addEventListener('DOMContentLoaded', () => {
+  const startBtn = document.getElementById('startAppBtn');
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      localStorage.setItem('hasVisited', 'true');
+      const popup = document.getElementById('welcomePopup');
+      if (popup) popup.style.display = 'none';
+    });
+  }
 });
