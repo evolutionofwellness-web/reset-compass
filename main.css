@@ -46,10 +46,19 @@ button, .btn {
   cursor: pointer;
 }
 
+button:focus,
+.btn:focus {
+  outline: 2px dashed var(--brand);
+  outline-offset: 2px;
+}
 .btn.ghost {
   background: transparent;
   color: var(--brand);
   border: 1px solid var(--brand);
+}
+.btn.ghost:hover {
+  background-color: var(--brand);
+  color: white;
 }
 
 footer {
@@ -212,7 +221,7 @@ footer {
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
-  font-size: 1rem;
+  font-size: 1.05rem;
 }
 
 /* Stats */
@@ -232,7 +241,7 @@ footer {
   padding: 0.5rem;
   border-left: 4px solid var(--brand);
   margin-bottom: 0.5rem;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
 }
 
 /* Clean Up */
@@ -297,5 +306,12 @@ html, body {
   100% {
     opacity: 0;
     visibility: hidden;
+  }
+}
+
+@media (max-width: 480px) {
+  .wedge {
+    padding: 1.2rem 0.6rem;
+    font-size: 1rem;
   }
 }
