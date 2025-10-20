@@ -199,3 +199,46 @@ header {
 .wrap {
   padding: 0 1rem;
 }
+.wedge-surviving {
+  background-color: #A94442; /* Dark red */
+  color: #FFFFFF;
+  border-radius: 0 0 100% 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.wedge-surviving:hover {
+  transform: scale(1.03);
+}
+
+.wedge-drifting {
+  background-color: #F0AD4E; /* Amber */
+  color: #0B3D2E;
+  border-radius: 0 0 100% 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.wedge-drifting:hover {
+  transform: scale(1.03);
+}
+
+.wedge-grounded {
+  background-color: #5CB85C; /* Green */
+  color: #0B3D2E;
+  border-radius: 0 0 100% 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.wedge-grounded:hover {
+  transform: scale(1.03);
+}
+
+.wedge-growing {
+  background-color: #5BC0DE; /* Teal */
+  color: #0B3D2E;
+  border-radius: 0 0 100% 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.wedge-growing:hover {
+  transform: scale(1.03);
+}
