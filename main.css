@@ -18,7 +18,6 @@ body {
   transition: background-color 0.3s, color 0.3s;
   min-height: 100vh;
   overflow-x: hidden;
-  text-align: center;
 }
 
 a {
@@ -60,7 +59,9 @@ footer {
   color: var(--muted);
 }
 
-/* Splash screen */
+/* --------------------------
+  Splash Screen + Animation
+--------------------------- */
 #splashScreen {
   position: fixed;
   top: 0;
@@ -73,20 +74,33 @@ footer {
   align-items: center;
   z-index: 9999;
 }
+
 #splashIcon {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
 }
+
 .splash-animate {
   animation: zoomSpinFade 1.6s ease-in-out forwards;
 }
+
 @keyframes zoomSpinFade {
-  0% { opacity: 1; transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.5) rotate(180deg); }
-  100% { opacity: 0; transform: scale(2) rotate(360deg); }
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.4) rotate(180deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2) rotate(360deg);
+  }
 }
 
-/* Welcome popup */
+/* --------------------------
+  Welcome Popup
+--------------------------- */
 #welcomePopup {
   display: none;
   position: fixed;
@@ -96,23 +110,27 @@ footer {
   height: 100vh;
   background: rgba(255, 255, 255, 0.96);
   z-index: 10000;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 2rem;
   text-align: center;
+  font-size: 1rem;
 }
-#welcomePopup.active {
-  display: flex;
-}
+
 #welcomePopup h2 {
   font-size: 1.8rem;
+  color: var(--brand);
   margin-bottom: 1rem;
 }
+
 #welcomePopup p {
   max-width: 400px;
   margin: 0 auto 1.5rem;
+  color: var(--text);
 }
+
 #welcomePopup button {
   background-color: var(--brand);
   color: #fff;
@@ -123,122 +141,202 @@ footer {
   cursor: pointer;
 }
 
-/* Compass + Mode Buttons */
+/* --------------------------
+  Compass Visuals
+--------------------------- */
 #compass {
-  display: flex;
-  flex-wrap: wrap;
-  max-width: 400px;
+  position: relative;
+  width: 280px;
+  height: 280px;
   margin: 2rem auto;
-  padding: 1rem;
   border-radius: 50%;
   overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
-#compass button {
-  flex: 1 0 50%;
-  height: 150px;
+
+.wedge {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0% 0%;
+  clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
+  opacity: 0.9;
+}
+
+.surv-wedge {
+  background-color: var(--surv);
+  transform: rotate(0deg);
+}
+
+.drift-wedge {
+  background-color: var(--drift);
+  transform: rotate(90deg);
+}
+
+.ground-wedge {
+  background-color: var(--ground);
+  transform: rotate(180deg);
+}
+
+.grow-wedge {
+  background-color: var(--grow);
+  transform: rotate(270deg);
+}
+
+/* Center circle */
+#compass::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  background-color: #fff;
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 0 0 2px var(--brand);
+}
+
+/* --------------------------
+  Buttons + Modes
+--------------------------- */
+.compass-wrap {
+  text-align: center;
+  margin: 2rem 1rem;
+}
+
+.mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.2rem;
+  margin: 2rem 0;
+}
+
+.mode-btn {
+  padding: 1rem;
   font-size: 1.1rem;
   font-weight: bold;
-  border: none;
+  min-width: 140px;
+  border-radius: 8px;
+  color: #fff;
+  text-transform: uppercase;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mode-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.mode-btn.surv {
+  background-color: var(--surv);
+  border-color: var(--surv);
+}
+
+.mode-btn.drift {
+  background-color: var(--drift);
+  border-color: var(--drift);
+  color: #222;
+}
+
+.mode-btn.ground {
+  background-color: var(--ground);
+  border-color: var(--ground);
+}
+
+.mode-btn.grow {
+  background-color: var(--grow);
+  border-color: var(--grow);
+}
+
+.mode-activity {
+  background: #f7f7f7;
+  border-left: 4px solid var(--brand);
   padding: 1rem;
-  color: white;
-}
-#compass .surviving { background-color: var(--surv); }
-#compass .drifting { background-color: var(--drift); }
-#compass .grounded { background-color: var(--ground); }
-#compass .growing { background-color: var(--grow); }
-
-.mode-description {
-  margin-top: 1rem;
-}
-.mode-description span {
-  font-weight: bold;
+  margin: 1rem 0;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
-#mode-content {
-  margin-top: 2rem;
-  padding: 1rem;
-  text-align: left;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-#mode-content ul {
-  list-style-type: disc;
-  padding-left: 1.5rem;
-  text-align: left;
-}
-
-/* History + Stats */
-#history-log {
-  margin-top: 2rem;
-  text-align: left;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.mode-entry.surviving { color: var(--surv); }
-.mode-entry.drifting { color: var(--drift); }
-.mode-entry.grounded { color: var(--ground); }
-.mode-entry.growing { color: var(--grow); }
-
-.stats {
-  font-size: 1.2rem;
-  margin-top: 1rem;
-}
-
-/* Nav + spacing fixes */
-header {
-  padding: 1rem 0;
-}
-.nav {
+/* --------------------------
+  Horizontal Navigation
+--------------------------- */
+nav ul {
   display: flex;
   justify-content: center;
-  gap: 2rem;
-  margin-bottom: 1rem;
-}
-.wrap {
-  padding: 0 1rem;
-}
-.wedge-surviving {
-  background-color: #A94442; /* Dark red */
-  color: #FFFFFF;
-  border-radius: 0 0 100% 0;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-.wedge-surviving:hover {
-  transform: scale(1.03);
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+  background: var(--brand);
+  margin: 0;
 }
 
-.wedge-drifting {
-  background-color: #F0AD4E; /* Amber */
-  color: #0B3D2E;
-  border-radius: 0 0 100% 0;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-.wedge-drifting:hover {
-  transform: scale(1.03);
+nav ul li {
+  display: inline-block;
 }
 
-.wedge-grounded {
-  background-color: #5CB85C; /* Green */
-  color: #0B3D2E;
-  border-radius: 0 0 100% 0;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-.wedge-grounded:hover {
-  transform: scale(1.03);
+nav ul li a {
+  color: #fff;
+  padding: 1rem;
+  display: block;
+  font-weight: 600;
 }
 
-.wedge-growing {
-  background-color: #5BC0DE; /* Teal */
-  color: #0B3D2E;
-  border-radius: 0 0 100% 0;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+/* --------------------------
+  History + Streak
+--------------------------- */
+#history, #streak, #mode-breakdown {
+  max-width: 600px;
+  margin: 1rem auto;
+  padding: 1rem;
+  background: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 6px;
 }
-.wedge-growing:hover {
-  transform: scale(1.03);
+
+.mode-log-entry {
+  padding: 0.5rem;
+  border-left: 4px solid var(--brand);
+  margin-bottom: 0.5rem;
+  background: #f8f8f8;
+}
+
+/* --------------------------
+  Cleanup Fixes
+--------------------------- */
+#welcomeContainer,
+#welcomeMessage,
+#letsStartSection {
+  display: none !important;
+}
+
+html, body {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .mode-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #splashIcon {
+    width: 100px;
+    height: 100px;
+  }
+
+  .mode-btn {
+    min-width: 80%;
+  }
+
+  #compass {
+    width: 220px;
+    height: 220px;
+  }
 }
