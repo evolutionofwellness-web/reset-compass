@@ -528,6 +528,34 @@ function waitForHistoryElementThenRender(attempts = 20) {
   <p>Choose your mode and explore realistic actions based on how you're feeling today.</p>
   <button id="startAppBtn">Let’s Start</button>
 </div>
+  <script>
+  window.addEventListener('load', function () {
+    const splash = document.getElementById('splashScreen');
+    const icon = document.getElementById('splashIcon');
+
+    // Animate splash
+    if (icon) icon.classList.add('splash-animate');
+
+    setTimeout(() => {
+      splash?.remove();
+
+      if (!localStorage.getItem('welcomeSeen')) {
+        const popup = document.getElementById('welcomePopup');
+        if (popup) popup.style.display = 'flex';
+      }
+    }, 1600);
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const startBtn = document.getElementById('startAppBtn');
+    if (startBtn) {
+      startBtn.addEventListener('click', function () {
+        localStorage.setItem('welcomeSeen', 'true');
+        document.getElementById('welcomePopup')?.remove();
+      });
+    }
+  });
+</script>
   </body>
   
 </html>
