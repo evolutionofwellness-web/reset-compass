@@ -1,5 +1,3 @@
-/* main.css v11 – Fully Updated */
-
 :root {
   --brand: #0B3D2E;
   --surv: #A94747;
@@ -20,6 +18,7 @@ body {
   transition: background-color 0.3s, color 0.3s;
   min-height: 100vh;
   overflow-x: hidden;
+  text-align: center;
 }
 
 a {
@@ -61,48 +60,33 @@ footer {
   color: var(--muted);
 }
 
-/* --------------------------
-  Splash Screen + Animation
---------------------------- */
+/* Splash screen */
 #splashScreen {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #ffffff;
+  background-color: var(--bg);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
 }
-
 #splashIcon {
   width: 120px;
   height: 120px;
 }
-
 .splash-animate {
   animation: zoomSpinFade 1.6s ease-in-out forwards;
 }
-
 @keyframes zoomSpinFade {
-  0% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-  50% {
-    transform: scale(1.5) rotate(180deg);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2) rotate(360deg);
-  }
+  0% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.5) rotate(180deg); }
+  100% { opacity: 0; transform: scale(2) rotate(360deg); }
 }
 
-/* --------------------------
-  Welcome Popup
---------------------------- */
+/* Welcome popup */
 #welcomePopup {
   display: none;
   position: fixed;
@@ -118,19 +102,17 @@ footer {
   padding: 2rem;
   text-align: center;
 }
-
+#welcomePopup.active {
+  display: flex;
+}
 #welcomePopup h2 {
-  font-size: 2rem;
-  color: var(--brand);
+  font-size: 1.8rem;
   margin-bottom: 1rem;
 }
-
 #welcomePopup p {
   max-width: 400px;
   margin: 0 auto 1.5rem;
-  color: var(--text);
 }
-
 #welcomePopup button {
   background-color: var(--brand);
   color: #fff;
@@ -141,133 +123,79 @@ footer {
   cursor: pointer;
 }
 
-/* --------------------------
-  Layout and App Components
---------------------------- */
-header {
-  text-align: center;
-  padding: 2rem 1rem 0;
+/* Compass + Mode Buttons */
+#compass {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 1rem;
+  border-radius: 50%;
+  overflow: hidden;
+}
+#compass button {
+  flex: 1 0 50%;
+  height: 150px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  padding: 1rem;
+  color: white;
+}
+#compass .surviving { background-color: var(--surv); }
+#compass .drifting { background-color: var(--drift); }
+#compass .grounded { background-color: var(--ground); }
+#compass .growing { background-color: var(--grow); }
+
+.mode-description {
+  margin-top: 1rem;
+}
+.mode-description span {
+  font-weight: bold;
 }
 
+#mode-content {
+  margin-top: 2rem;
+  padding: 1rem;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#mode-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  text-align: left;
+}
+
+/* History + Stats */
+#history-log {
+  margin-top: 2rem;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.mode-entry.surviving { color: var(--surv); }
+.mode-entry.drifting { color: var(--drift); }
+.mode-entry.grounded { color: var(--ground); }
+.mode-entry.growing { color: var(--grow); }
+
+.stats {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
+
+/* Nav + spacing fixes */
+header {
+  padding: 1rem 0;
+}
 .nav {
   display: flex;
   justify-content: center;
   gap: 2rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
-
-.stats {
-  text-align: center;
-  font-size: 1.1rem;
-  margin: 1.5rem 0 1rem;
-}
-
-.compass-wrap {
-  text-align: center;
-  margin: 2rem auto;
-  max-width: 500px;
-}
-
-.mode-description {
-  margin: 0 auto 2rem;
-  max-width: 600px;
-  text-align: center;
-  font-size: 1.1rem;
-}
-
-.mode-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.mode-btn {
-  padding: 1rem;
-  font-size: 1rem;
-  font-weight: bold;
-  min-width: 120px;
-  border-radius: 8px;
-  color: #fff;
-  text-transform: uppercase;
-  border: none;
-  flex: 1 1 120px;
-  max-width: 200px;
-}
-
-.mode-btn.surv { background-color: var(--surv); }
-.mode-btn.drift { background-color: var(--drift); }
-.mode-btn.ground { background-color: var(--ground); }
-.mode-btn.grow { background-color: var(--grow); }
-
-.compass {
-  width: 100%;
-  max-width: 400px;
-  margin: 2rem auto;
-}
-
-.compass svg {
-  width: 100%;
-  height: auto;
-  cursor: pointer;
-}
-
-/* Toast notifications */
-#toast {
-  position: fixed;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--brand);
-  color: #fff;
-  padding: 0.75rem 1.25rem;
-  border-radius: 6px;
-  display: none;
-  z-index: 9999;
-  font-size: 0.9rem;
-}
-
-/* History page */
-.history-entry {
-  border-bottom: 1px solid #ccc;
-  padding: 1rem 0;
-}
-
-.mode-log {
-  font-weight: bold;
-  font-size: 1rem;
-  margin-top: 1rem;
-}
-
-/* --------------------------
-  Mobile Responsiveness
---------------------------- */
-@media (max-width: 600px) {
-  h1 {
-    font-size: 1.8rem;
-  }
-
-  .nav {
-    gap: 1rem;
-  }
-
-  .mode-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .mode-btn {
-    width: 90%;
-    max-width: 300px;
-  }
-
-  #welcomePopup h2 {
-    font-size: 1.5rem;
-  }
-
-  .stats {
-    font-size: 1rem;
-  }
+.wrap {
+  padding: 0 1rem;
 }
