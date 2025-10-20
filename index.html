@@ -503,22 +503,6 @@ function waitForHistoryElementThenRender(attempts = 20) {
  
   <!-- App content ends here -->
 
-<script>
-  window.addEventListener('load', function () {
-    const splash = document.getElementById('splashScreen');
-    const icon = document.getElementById('splashIcon');
-
-    // Start the icon animation
-    setTimeout(() => {
-      icon.classList.add('splash-animate');
-    }, 100);
-
-    // Remove splash screen after animation
-    setTimeout(() => {
-      splash.remove();
-    }, 1600); // Match the animation duration
-  });
-</script>
 <!-- Splash Screen -->
 <div id="splashScreen">
   <img id="splashIcon" src="icons/icon-512.png" alt="App Icon" />
