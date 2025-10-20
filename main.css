@@ -16,6 +16,8 @@ body {
   background-color: var(--bg);
   color: var(--text);
   transition: background-color 0.3s, color 0.3s;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 a {
@@ -50,6 +52,16 @@ button, .btn {
   border: 1px solid var(--brand);
 }
 
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* --------------------------
+  Splash Screen + Animation
+--------------------------- */
 #splashScreen {
   position: fixed;
   top: 0;
@@ -86,6 +98,52 @@ button, .btn {
   }
 }
 
+/* --------------------------
+  First-Time Welcome Popup
+--------------------------- */
+#welcomePopup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.96);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+#welcomePopup h2 {
+  font-size: 1.8rem;
+  color: var(--brand);
+  margin-bottom: 1rem;
+}
+
+#welcomePopup p {
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+  color: var(--text);
+}
+
+#welcomePopup button {
+  background-color: var(--brand);
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* --------------------------
+  Main App Layout
+--------------------------- */
 .compass-wrap {
   text-align: center;
   margin: 2rem 0;
@@ -115,52 +173,19 @@ button, .btn {
 .mode-btn.ground { background-color: #228B22; }
 .mode-btn.grow { background-color: #1E90FF; }
 
-footer {
-  text-align: center;
-  padding: 2rem 1rem;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
 /* --------------------------
-  Splash Screen + Welcome Popup
+  Cleanup/Overrides
 --------------------------- */
-#welcomePopup {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.96);
-  z-index: 10000;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-  text-align: center;
-  font-size: 1rem;
+
+/* Prevent duplicate CTAs */
+#welcomeContainer,
+#welcomeMessage,
+#letsStartSection {
+  display: none !important;
 }
 
-#welcomePopup h2 {
-  font-size: 1.5rem;
-  color: var(--brand);
-  margin-bottom: 1rem;
-}
-
-#welcomePopup p {
-  max-width: 400px;
-  margin: 0 auto 1.5rem;
-  color: var(--text);
-}
-
-#welcomePopup button {
-  background-color: var(--brand);
-  color: #fff;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+/* Ensure no extra white space */
+html, body {
+  padding-bottom: 0;
+  margin-bottom: 0;
 }
