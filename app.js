@@ -1,5 +1,3 @@
-// app.js
-
 const routes = {
   "#/home": renderHome,
   "#/wins": renderWins,
@@ -11,10 +9,8 @@ const routes = {
   "#/mode/4": () => renderMode("Growing"),
 };
 
-// Default to home if no hash
 if (!location.hash) location.hash = "#/home";
 
-// Load the route
 window.addEventListener("hashchange", router);
 window.addEventListener("DOMContentLoaded", router);
 
@@ -88,31 +84,25 @@ function renderNotFound() {
   `;
 }
 
-// Splash screen + First-time Welcome Popup
-window.addEventListener('load', () => {
-  const splash = document.getElementById('splashScreen');
-  const icon = document.getElementById('splashIcon');
-  icon?.classList.add('splash-animate');
+// Splash + Welcome popup logic
+window.addEventListener("load", () => {
+  const splash = document.getElementById("splashScreen");
+  const icon = document.getElementById("splashIcon");
+  icon?.classList.add("splash-animate");
 
   setTimeout(() => {
-    splash?.style?.display = 'none';
+    splash?.style?.display = "none";
 
-    const hasVisited = localStorage.getItem('hasVisited');
+    const hasVisited = localStorage.getItem("hasVisited");
     if (!hasVisited) {
-      const popup = document.getElementById('welcomePopup');
-      popup.style.display = 'flex';
+      const popup = document.getElementById("welcomePopup");
+      popup.style.display = "flex";
     }
   }, 1600);
 });
 
-// Welcome popup dismissal
-document.addEventListener('DOMContentLoaded', () => {
-  const startBtn = document.getElementById('startAppBtn');
-  if (startBtn) {
-    startBtn.addEventListener('click', () => {
-      localStorage.setItem('hasVisited', 'true');
-      const popup = document.getElementById('welcomePopup');
-      if (popup) popup.style.display = 'none';
-    });
-  }
+document.getElementById("startAppBtn")?.addEventListener("click", () => {
+  localStorage.setItem("hasVisited", "true");
+  const popup = document.getElementById("welcomePopup");
+  if (popup) popup.style.display = "none";
 });
