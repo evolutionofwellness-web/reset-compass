@@ -156,3 +156,36 @@ footer {
   color: #888;
   padding: 2rem 1rem 4rem;
 }
+/* Color each wedge with branded tones */
+.wedge:nth-child(1) {
+  fill: #0B3D2E; /* Grounded - dark green */
+}
+.wedge:nth-child(2) {
+  fill: #E67300; /* Drifting - orange */
+}
+.wedge:nth-child(3) {
+  fill: #990000; /* Surviving - red */
+}
+.wedge:nth-child(4) {
+  fill: #0055CC; /* Growing - blue */
+}
+
+/* Compass padding */
+#compass {
+  margin: 20px auto;
+  display: block;
+  max-width: 90vw;
+  height: auto;
+}
+
+/* Center and size welcome popup better */
+#popup {
+  max-width: 90%;
+  width: 350px;
+  padding: 24px;
+  font-size: 1rem;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  line-height: 1.5;
+}
