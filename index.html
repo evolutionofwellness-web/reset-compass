@@ -1,563 +1,292 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <link rel="stylesheet" href="main.css?v=10">
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>The Reset Compass • v1.0.6</title>
-
-<!-- PWA -->
-<link rel="manifest" href="manifest.webmanifest?v=106">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<meta name="theme-color" content="#1C3B34"/>
-
-<!-- Meta -->
-<meta name="description" content="Choose your mode and get quick, realistic steps that match your energy today. Take your health into your own hands immediately.">
-<meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="Permissions-Policy" content="interest-cohort=()">
-<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-
-<!-- Social preview -->
-<meta property="og:title" content="The Reset Compass">
-<meta property="og:description" content="Quick, realistic steps that match your energy today.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="icons/icon-512.png">
-
-<!-- Analytics (can swap to GTM later if needed) -->
-<script async defer data-domain="reset.evolutionofwellness.com" src="https://plausible.io/js/script.js?v=106"></script>
-
-</head>
- 
-<body>
-  
-<header>
-  <h1>The Reset Compass</h1>
-  <div class="nav">
-    <a id="nav-home" href="#/home">Compass</a>
-    <a id="nav-wins" href="#/wins">Quick Wins</a>
-    <a id="nav-history" href="#/history">History</a>
-    <a id="nav-about" href="#/about">About</a>
-  </div>
-</header>
-
-<div class="wrap" id="app"></div>
-<div id="toast" role="status" aria-live="polite"></div>
-
-  <div id="app" class="wrap"></div>
-
-<footer>© 2025 Evolution of Wellness LLC • v1.0.6 • For educational purposes only. Not medical advice.</footer>
-
-<script type="module">
-/* ---------- DATA ---------- */
-const Modes=[
-  {id:1,name:'Surviving',desc:"Running on empty. Use the simplest steps to feel better.",color:'#A94747',icon:'🩺'},
-  {id:2,name:'Drifting',desc:'Okay but unfocused. Reconnect with what matters.',color:'#E6B450',icon:'🧭'},
-  {id:3,name:'Grounded',desc:'Steady. Keep your rhythm without burnout.',color:'#3B755F',icon:'🌿'},
-  {id:4,name:'Growing',desc:'High energy. Move forward with intent.',color:'#4C7EDC',icon:'🚀'}
-];
-
-const Tools=[
- {id:1,mode_id:1,name:'3-Minute Reset',tag:'Quick mental and physical reboot',icon:'⏱️',summary:'Interrupt shutdown with one fast, full-body reset.',instructions:'1) Pause. 2) Breathe in 3s and out 6s for 2 minutes. 3) Seated reach and gentle twist for 1 minute.'},
- {id:2,mode_id:1,name:'Bare Minimum Menu',tag:'Eat simply when energy is low',icon:'🍎',summary:'Choose 1 protein, 1 carb, and 1 fruit or veg you already have.',instructions:'Examples: eggs and toast with an apple. Yogurt and granola with berries. Rotisserie chicken with rice and a bagged salad. Pick one and eat.'},
- {id:3,mode_id:1,name:'Energy Budget',tag:'Spend your energy wisely',icon:'⚡',summary:'Split today into Must, Might, and No. Protect your fuel.',instructions:'Fill Must first with up to three items. If energy rises, do one Might. Everything else is No today.'},
- {id:4,mode_id:2,name:'Attention Anchor',tag:'Refocus scattered energy',icon:'🎯',summary:'Pick one word for how you want to feel today.',instructions:'Choose a word like Calm, Clear, Steady, Present, or Light. Say it out loud. Return to it when distracted.'},
- {id:5,mode_id:2,name:'Daily Reconnect',tag:'One prompt, one minute',icon:'📝',summary:'Stay present with one honest sentence.',instructions:'Pick a prompt like “What gave me energy?” “What felt easiest?” or “What did I avoid?” Say or write one line.'},
- {id:6,mode_id:2,name:'Weekly Waypoint',tag:'Give your week direction',icon:'📅',summary:'A five-minute reset on your natural week start.',instructions:'1) Name your current mode. 2) Choose one weekly anchor like outside three times. 3) Set a reminder for next check-in.'},
- {id:7,mode_id:3,name:'Energy Multiplier',tag:'Get more from what works',icon:'🔋',summary:'Identify one to three actions that give you energy and repeat them.',instructions:'List what already helps like sunlight, a short walk, or earlier lights. Repeat daily this week.'},
- {id:8,mode_id:3,name:'Habit Reflector',tag:'Notice what’s working',icon:'🪞',summary:'A short weekly scan to protect helpful routines.',instructions:'Write: what felt good, a pattern to repeat, and what throws me off. Add one guardrail.'},
- {id:9,mode_id:3,name:'Keystone Builder',tag:'One small habit, big ripple',icon:'🧱',summary:'Choose one keystone habit and make it automatic.',instructions:'Use: After I [trigger], I will [habit] in [location]. Check it off each day.'},
- {id:10,mode_id:3,name:'Boundary Booster',tag:'Protect energy and focus',icon:'🛡️',summary:'Keep growth from getting hijacked by distractions.',instructions:'Pick three priorities and two mini boundaries. Write a reminder: “My energy is worth protecting because…” Optional daily check.'},
- {id:11,mode_id:4,name:'Expansion Map',tag:'Grow with intention',icon:'🌱',summary:'Define one area to expand, one to sustain, and one to rest.',instructions:'Choose: Expand like movement minutes. Sustain like sleep window. Rest like pausing an obligation. Review weekly.'},
- {id:12,mode_id:4,name:'Skill Sprint',tag:'10-day micro-upgrade',icon:'🚴',summary:'A tiny focused sprint that raises your ceiling without burnout.',instructions:'Pick one ten-minute skill or habit like mobility, meal prep, or breathwork. Start a timer, do it, mark done.'},
- {id:13,mode_id:4,name:'Progress Pulse',tag:'Celebrate and iterate',icon:'📈',summary:'A quick weekly review to lock in gains and choose the next nudge.',instructions:'Log your best win, biggest drain, and one tweak for next week. End with “Next nudge = …”'},
- {id:14,mode_id:4,name:'Support Loop',tag:'Grow with a buddy',icon:'🤝',summary:'Light accountability with one person.',instructions:'Choose a buddy. Agree on one weekly touch like a Friday text or Sunday walk. Add a reminder. Celebrate small wins.'},
-];
-
-const QuickWins=[
- {title:'Drink water',desc:'One full glass now. Feel the shift.',icon:'💧'},
- {title:'Step outside',desc:'Three minutes of daylight or fresh air.',icon:'🌞'},
- {title:'Stretch overhead',desc:'Thirty seconds. Shoulders down, jaw loose.',icon:'🤸'},
- {title:'Phone-free pause',desc:'Put it in another room for five minutes.',icon:'📵'},
- {title:'Tidy one surface',desc:'Desk, bag, or car door pocket.',icon:'🧽'},
- {title:'Message a friend',desc:'One genuine check-in.',icon:'💬'}
-];
-
-/* ---------- HELPERS ---------- */
-const app=document.getElementById('app');
-const toastEl=document.getElementById('toast');
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-
-  // Add blur to the main app area
-  const app = document.getElementById('app');
-  if (app) app.classList.add('blur-active');
-
-  // Remove after 2.5 seconds
-  setTimeout(() => {
-    toast.classList.remove('show');
-    if (app) app.classList.remove('blur-active');
-  }, 2500);
-}
-const setActive=()=>{
-  document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
-  const map={'#/home':'nav-home','#/wins':'nav-wins','#/about':'nav-about','#/history':'nav-history'};
-  (document.getElementById(map[location.hash]||'nav-home')||{}).classList?.add('active');
-};
-const getLogs=()=>JSON.parse(localStorage.getItem('rc_logs')||'[]');
-const saveLogs=(arr)=>localStorage.setItem('rc_logs',JSON.stringify(arr));
-const addLog=({mode,tool,note})=>{
-  const arr=getLogs();
-  arr.push({ts:new Date().toISOString(),mode,tool,note:(note||'').trim()});
-  saveLogs(arr);
-};
-const formatTS=(iso)=>new Date(iso).toLocaleString();
-const ymd=(d)=>d.toISOString().slice(0,10);
-function todayCount(){ const today=ymd(new Date()); return getLogs().filter(l=>l.ts.slice(0,10)===today).length; }
-function dailyStreak(){ const dates=new Set(getLogs().map(l=>l.ts.slice(0,10))); let s=0; let d=new Date(); while(dates.has(ymd(d))){s++; d.setDate(d.getDate()-1);} return s; }
-
-/* Scroll textareas above keyboard on iOS */
-function attachFocusScroll(){
-  document.querySelectorAll('textarea, input[type="text"]').forEach(el=>{
-    el.addEventListener('focus',()=>{ setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'center'}),150); });
-  });
+:root {
+  --brand: #0B3D2E;
+  --surv: #A94747;
+  --drift: #E6B450;
+  --ground: #3B755F;
+  --grow: #4C7EDC;
+  --muted: #666666;
+  --bg: #ffffff;
+  --text: #0B3D2E;
 }
 
-/* ---------- VIEWS ---------- */
-function Home(){
-  setActive();
-  const tCount=todayCount(), streak=dailyStreak();
-  app.innerHTML = `
-    <div class="stats">
-      <div class="stat">Today: <strong>${tCount}</strong></div>
-      <div class="stat">Daily streak: <strong>${streak}</strong></div>
-    </div>
-
-    <div class="card instructions" style="text-align:left">
-      <div style="display:grid;gap:6px">
-        <div><b style="color:var(--surv)">🩺 Surviving:</b> running on empty</div>
-        <div><b style="color:var(--drift)">🧭 Drifting:</b> okay but unfocused</div>
-        <div><b style="color:var(--ground)">🌿 Grounded:</b> steady and consistent</div>
-        <div><b style="color:var(--grow)">🚀 Growing:</b> ready to push a little</div>
-      </div>
-      <p style="margin-top:10px;font-weight:700;color:var(--brand)">
-        Not sure? Start with <span style="color:var(--drift)">Drifting</span>.
-      </p>
-    </div>
-
-    <div class="compass-wrap">
-      <svg class="compass" viewBox="0 0 200 200" aria-label="Mode Compass">
-        <defs>
-          <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity=".2"/>
-          </filter>
-        </defs>
-
-        <circle cx="100" cy="100" r="96" fill="#fff" stroke="var(--brand)" stroke-width="3" filter="url(#softShadow)"/>
-        <!-- Quadrants -->
-        <path class="wedge" d="M100,100 L100,4 A96,96 0 0,1 196,100 Z" fill="var(--surv)"  opacity=".18" onclick="location.hash='#/mode/1'"></path>
-        <path class="wedge" d="M100,100 L196,100 A96,96 0 0,1 100,196 Z" fill="var(--drift)" opacity=".18" onclick="location.hash='#/mode/2'"></path>
-        <path class="wedge" d="M100,100 L100,196 A96,96 0 0,1 4,100 Z"  fill="var(--ground)" opacity=".18" onclick="location.hash='#/mode/3'"></path>
-        <path class="wedge" d="M100,100 L4,100 A96,96 0 0,1 100,4 Z"   fill="var(--grow)"  opacity=".18" onclick="location.hash='#/mode/4'"></path>
-
-        <circle cx="100" cy="100" r="7" fill="var(--brand)"></circle>
-        <text x="135" y="65"  text-anchor="middle" fill="var(--surv)"  font-size="12">Surviving</text>
-        <text x="135" y="135" text-anchor="middle" fill="var(--drift)" font-size="12">Drifting</text>
-        <text x="65"  y="135" text-anchor="middle" fill="var(--ground)" font-size="12">Grounded</text>
-        <text x="65"  y="65"  text-anchor="middle" fill="var(--grow)"  font-size="12">Growing</text>
-      </svg>
-      <p class="center-tip">Tap a wedge or use the buttons below.</p>
-    </div>
-
-    <div class="mode-buttons">
-  <div class="mode-btn surv" onclick="saveModeChoice('Surviving'); location.hash='#/mode/1'"><span>🩺 Surviving</span></div>
-  <div class="mode-btn drift" onclick="saveModeChoice('Drifting'); location.hash='#/mode/2'"><span>🧭 Drifting</span></div>
-  <div class="mode-btn ground" onclick="saveModeChoice('Grounded'); location.hash='#/mode/3'"><span>🌿 Grounded</span></div>
-  <div class="mode-btn grow" onclick="saveModeChoice('Growing'); location.hash='#/mode/4'"><span>🚀 Growing</span></div>
-</div>
-  `;
+/* --------------------------
+  Base Styles
+--------------------------- */
+* {
+  box-sizing: border-box;
 }
 
-function ModeView(id){
-  setActive();
-  const m=Modes.find(x=>x.id==id); if(!m){location.hash='#/home';return}
-  const list=Tools.filter(t=>t.mode_id==m.id);
-  app.innerHTML=`
-    <div class="pill" style="margin-bottom:8px;background:${m.color}20;color:${m.color}">${m.icon} ${m.name}</div>
-    <h2>${m.name}</h2>
-    <p class="muted" style="margin-top:-6px">${m.desc}</p>
-    <div class="grid">
-      ${list.map(t=>`
-        <div class="card">
-          <div class="pill">${t.icon} ${t.tag}</div>
-          <h3>${t.name}</h3>
-          <p class="muted">${t.summary}</p>
-          <div style="height:8px"></div>
-          <a class="btn" href="#/tool/${t.id}">Open</a>
-        </div>`).join('')}
-    </div>
-    <div class="sticky-back">
-      <a class="btn ghost" href="#/home">Back to Compass</a>
-    </div>
-  `;
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-function ToolView(id){
-  setActive();
-  const t=Tools.find(x=>x.id==id); if(!t){location.hash='#/home';return}
-  const m=Modes.find(x=>x.id==t.mode_id);
-  app.innerHTML=`
-    <div class="pill" style="margin-bottom:8px;background:${m.color}20;color:${m.color}">${m.icon} ${m.name}</div>
-    <h2>${t.icon} ${t.name}</h2>
-    <div class="card"><p class="muted">${t.summary}</p></div>
-
-    <div class="card">
-      <h3>How to use</h3>
-      <ul style="margin:0;padding-left:18px">${t.instructions.split('. ').map(s=>s.trim()).filter(Boolean).map(s=>`<li>${s.replace(/\.$/,'')}.</li>`).join('')}</ul>
-    </div>
-
-    <div class="card">
-      <h3>Write a note (optional)</h3>
-      <p class="muted" style="margin-top:-6px">Write a short note. You’ll see it in your History.</p>
-      <textarea id="noteBox" placeholder="Write a note about what you did or noticed."></textarea>
-      <div style="height:10px"></div>
-      <button class="btn" id="saveAndLog">Save note + Did it ✅</button>
-      <button class="btn subtle" id="logOnly" style="margin-left:8px">Did it ✅ (no note)</button>
-    </div>
-
-    <div class="sticky-back">
-      <a class="btn ghost" href="#/mode/${m.id}">Back to ${m.name}</a>
-    </div>
-  `;
-  attachFocusScroll();
-  const noteEl=document.getElementById('noteBox');
-  document.getElementById('saveAndLog').onclick=()=>{ addLog({mode:m.name,tool:t.name,note:noteEl.value}); showToast('Saved to History ✅'); };
-  document.getElementById('logOnly').onclick=()=>{ addLog({mode:m.name,tool:t.name,note:''}); showToast('Logged ✅'); };
+a {
+  color: var(--brand);
+  text-decoration: none;
 }
 
-function Wins(){
-  setActive();
-  const recent=getLogs().slice(-10).reverse();
-  app.innerHTML = `
-    <h2>Quick Wins</h2>
-    <div class="grid">
-      ${QuickWins.map((w,i)=>`
-        <div class="card" id="qw-${i}">
-          <div class="pill">${w.icon} Quick Win</div>
-          <h3 style="margin-top:6px">${w.title}</h3>
-          <p class="muted">${w.desc}</p>
-          <div style="margin-top:8px">
-            <textarea id="note-${i}" placeholder="Write a note about what you did or noticed."></textarea>
-            <div style="height:8px"></div>
-            <button class="btn" onclick="(function(){
-              const el=document.getElementById('note-${i}');
-              const note=(el.value||'').trim();
-              addLog({mode:'Quick Win',tool:'${w.title.replace(/'/g,"&#39;")}',note});
-              document.querySelector('#qw-${i} .pill').innerHTML='✅ Logged';
-              showToast('Saved to History ✅');
-            })()">Save note + Done</button>
-            <button class="btn subtle" style="margin-left:8px" onclick="(function(){
-              addLog({mode:'Quick Win',tool:'${w.title.replace(/'/g,"&#39;")}',note:''});
-              document.querySelector('#qw-${i} .pill').innerHTML='✅ Logged';
-              showToast('Logged ✅');
-            })()">Done (no note)</button>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-
-    <div style="height:12px"></div>
-    <div class="card">
-      <strong>Recent logs</strong>
-      ${recent.length
-        ? `<ul style="margin:8px 0 0 18px">
-             ${recent.map(l=>`<li>${new Date(l.ts).toLocaleString()} — <strong>${l.tool}</strong> (${l.mode}) ${l.note?`— ${l.note.replace(/</g,'&lt;')}`:''}</li>`).join('')}
-           </ul>`
-        : `<p class="muted">No logs yet.</p>`
-      }
-      <div style="height:10px"></div>
-      <a class="btn ghost" href="#/history">Open full History</a>
-      <a class="btn ghost" style="margin-left:8px" href="#/home">Back to Compass</a>
-    </div>
-  `;
-  attachFocusScroll();
+h1, h2, h3 {
+  color: var(--brand);
+  margin: 1rem 0 0.5rem;
+  font-weight: 700;
 }
 
-function History(){
-  setActive();
-  const logs=getLogs().reverse();
-  const uniqueModes=['All','Surviving','Drifting','Grounded','Growing','Quick Win'];
-  app.innerHTML=`
-    <h2>History</h2>
-      <h3>Your Daily Mode Log</h3>
-      <p id="modeStreak" style="font-weight: bold; margin-bottom: 10px;"></p>
-  <div id="mode-history" style="margin-bottom: 1rem;"></div>
-    <div class="card">
-      <div class="filters">
-        <select id="modeFilter">${uniqueModes.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
-        <input type="text" id="searchBox" placeholder="Search notes or tools"/>
-        <span class="badge">${logs.length} entries</span>
-        <button class="btn ghost" id="clearLogs">Clear All</button>
-      </div>
-      <div class="stats">
-        <div class="stat">Today: <strong>${todayCount()}</strong></div>
-        <div class="stat">Daily streak: <strong>${dailyStreak()}</strong></div>
-      </div>
-      <div id="logList">${renderLogs(logs)}</div>
-      <div class="sticky-back">
-        <a class="btn ghost" href="#/home">Back to Compass</a>
-      </div>
-    </div>
-  `;
-  document.getElementById('clearLogs').onclick=()=>{
-    if(confirm('Clear all local history on this device?')){
-      saveLogs([]); showToast('History cleared'); History();
-    }
-  };
-  document.getElementById('modeFilter').onchange = applyFilters;
-  document.getElementById('searchBox').oninput = applyFilters;
-  function applyFilters(){
-    const mf=document.getElementById('modeFilter').value;
-    const q=(document.getElementById('searchBox').value||'').toLowerCase();
-    const filtered=logs.filter(l=>{
-      const mOk=(mf==='All'||l.mode===mf);
-      const qOk=(!q || (l.tool.toLowerCase().includes(q) || (l.note||'').toLowerCase().includes(q)));
-      return mOk && qOk;
-    });
-    document.getElementById('logList').innerHTML=renderLogs(filtered);
-  }
-}
-function renderLogs(list){
-  if(!list.length) return `<p class="muted">No entries yet.</p>`;
-  return list.map(l=>`
-    <div class="log-item">
-      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <div><strong>${l.tool}</strong> <span class="badge">${l.mode}</span></div>
-        <div class="muted" style="font-size:12px">${formatTS(l.ts)}</div>
-      </div>
-      ${l.note?`<div class="note" style="margin-top:6px">${(l.note||'').replace(/</g,'&lt;')}</div>`:''}
-    </div>
-  `).join('');
+p {
+  line-height: 1.6;
+  margin: 0.5rem 0;
 }
 
-function About(){
-  setActive();
-  app.innerHTML=`
-    <h2>About</h2>
-    <div class="card">
-      <p><strong>The Reset Compass</strong> helps you take your health into your own hands immediately. Choose your current mode to see quick, realistic steps that match your energy today.</p>
-      <p class="muted" style="font-size:12px">Disclaimer: This companion is for educational purposes only and is not medical advice. Consult a qualified provider before making changes to your wellness routine.</p>
-      <p class="muted" style="font-size:12px">Support: evolutionofwellness8@gmail.com</p>
-      <div class="sticky-back">
-        <a class="btn ghost" href="#/home">Back to Compass</a>
-      </div>
-    </div>
-  `;
+/* --------------------------
+  Layout + Wrap
+--------------------------- */
+.wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
 }
 
-/* ---------- ROUTER & INIT ---------- */
-function router(){
-  const r=location.hash.replace('#','')||'/home';
-  if(r.startsWith('/mode/')) return ModeView(r.split('/')[2]);
-  if(r.startsWith('/tool/')) return ToolView(r.split('/')[2]);
-  if(r==='/wins') return Wins();
-  if(r==='/history') return History();
-  if(r==='/about') return About();
-  return Home();
-}
-window.addEventListener('hashchange',router);
-window.addEventListener('load',()=>{
-  router();
-  // Welcome popup (one-time)
-  if(!localStorage.getItem('welcomeSeen')){
-    const el=document.createElement('div');
-    el.id='popup';
-    el.innerHTML=`<div class="box">
-      <h3>Welcome to The Reset Compass</h3>
-      <p>This simple tool helps you take your health into your own hands immediately.<br>Choose your current mode to see quick, realistic steps that match your energy today.</p>
-      <button class="btn" id="startBtn">Let's Start</button>
-      <p style="font-size:12px;color:#6b6b6b;margin:6px 0 0">Your progress is saved locally on this device.</p>
-    </div>`;
-    document.body.appendChild(el);
-    document.getElementById('startBtn').onclick=()=>{localStorage.setItem('welcomeSeen','true');el.remove();};
-  }
-  // Service worker
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=106').catch(()=>{});}
-});
-  // === Mode History Tracker ===
-
-// Save selected mode to localStorage
-function saveModeChoice(mode) {
-  const dateKey = new Date().toISOString().slice(0, 10); // e.g., "2025-10-19"
-  const stored = JSON.parse(localStorage.getItem("modeHistory") || "{}");
-  stored[dateKey] = mode;
-  localStorage.setItem("modeHistory", JSON.stringify(stored));
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
-// Inject the mode history log into the #mode-history div
-function renderModeHistory() {
-  const historyEl = document.getElementById("mode-history");
-  if (!historyEl) return;
+.card {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.05);
+}
 
-  const stored = JSON.parse(localStorage.getItem("modeHistory") || "{}");
-  let entries = Object.entries(stored)
-    .sort((a, b) => new Date(b[0]) - new Date(a[0]))
-   // .slice(0, 7); // Show only the last 7 entries — now commented out
+/* --------------------------
+  Buttons
+--------------------------- */
+button, .btn {
+  background-color: var(--brand);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
 
-  if (entries.length === 0) {
-    historyEl.innerHTML = `<p style='color:var(--muted)'>No mode choices logged yet.</p>`;
-    return;
+.btn.ghost {
+  background: transparent;
+  color: var(--brand);
+  border: 1px solid var(--brand);
+}
+
+.btn.subtle {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+/* --------------------------
+  Navigation
+--------------------------- */
+.nav {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.nav a.active {
+  text-decoration: underline;
+}
+
+/* --------------------------
+  Compass Graphic
+--------------------------- */
+.compass-wrap {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.compass {
+  width: 220px;
+  height: 220px;
+  margin: 0 auto;
+}
+
+/* --------------------------
+  Mode Buttons
+--------------------------- */
+.mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.mode-btn {
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  min-width: 120px;
+  border-radius: 8px;
+  color: #fff;
+  text-transform: uppercase;
+  border: none;
+  text-align: center;
+}
+
+.mode-btn.surv { background-color: #8B0000; }
+.mode-btn.drift { background-color: #DAA520; }
+.mode-btn.ground { background-color: #228B22; }
+.mode-btn.grow { background-color: #1E90FF; }
+
+/* --------------------------
+  Footer
+--------------------------- */
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* --------------------------
+  Splash Screen
+--------------------------- */
+#splashScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#splashIcon {
+  width: 120px;
+  height: 120px;
+}
+
+.splash-animate {
+  animation: zoomSpinFade 1.6s ease-in-out forwards;
+}
+
+@keyframes zoomSpinFade {
+  0% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.5) rotate(180deg); }
+  100% { opacity: 0; transform: scale(2) rotate(360deg); }
+}
+
+/* --------------------------
+  Welcome Popup
+--------------------------- */
+#welcomePopup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.96);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+#welcomePopup h2 {
+  font-size: 1.8rem;
+  color: var(--brand);
+  margin-bottom: 1rem;
+}
+
+#welcomePopup p {
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+  color: var(--text);
+}
+
+#welcomePopup button {
+  background-color: var(--brand);
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* --------------------------
+  History & Log Styling
+--------------------------- */
+.stats {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  gap: 1rem;
+}
+
+.log-item {
+  background: #fff;
+  padding: 0.75rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.badge {
+  display: inline-block;
+  background: var(--brand);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  margin-left: 6px;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  margin-top: 0.5rem;
+}
+
+/* --------------------------
+  Responsive Layout
+--------------------------- */
+@media (max-width: 600px) {
+  .nav {
+    flex-direction: column;
+    align-items: center;
   }
 
-  // Streak calculation
-  let streak = 1;
-  let prev = new Date(entries[0][0]);
-  for (let i = 1; i < entries.length; i++) {
-    let current = new Date(entries[i][0]);
-    const diff = Math.floor((prev - current) / (1000 * 60 * 60 * 24));
-    if (diff === 1) {
-      streak++;
-    } else {
-      break;
-    }
-    prev = current;
+  .mode-buttons {
+    flex-direction: column;
+    align-items: center;
   }
 
-  // Show streak if element exists
-  const streakEL = document.getElementById("modeStreak");
-if (streakEL) {
-  streakEL.innerHTML = `🔥 <strong style="font-size: 1.8em;">${streak}</strong>`;
-}
-// === Mode breakdown ===
-const modeCounts = { "Grounded": 0, "Growing": 0, "Drifting": 0, "Surviving": 0 };
-entries.forEach(([_, mode]) => {
-  if (modeCounts[mode] !== undefined) {
-    modeCounts[mode]++;
+  .mode-btn {
+    width: 100%;
+    max-width: 260px;
   }
-});
-const total = entries.length;
-const modeBreakdownHTML = `
-  <div style="margin-bottom: 1rem;">
-    <strong>Mode Breakdown:</strong><br>
-    🌿 Grounded – ${Math.round((modeCounts["Grounded"] / total) * 100)}%<br>
-    🚀 Growing – ${Math.round((modeCounts["Growing"] / total) * 100)}%<br>
-    🧭 Drifting – ${Math.round((modeCounts["Drifting"] / total) * 100)}%<br>
-    🩺 Surviving – ${Math.round((modeCounts["Surviving"] / total) * 100)}%
-  </div>
-`;
-  // Render entries
-  historyEl.innerHTML = modeBreakdownHTML + entries.map(([date, mode]) => {
-    let color = "#ccc";
-    if (mode === "Grounded") color = "#2e8b57";
-    if (mode === "Surviving") color = "#d9534f";
-    if (mode === "Growing") color = "#0275d8";
-    if (mode === "Drifting") color = "#f0ad4e";
 
-    return `
-      <div class="log-item" style="cursor:pointer; padding:8px; border-bottom:1px solid #ddd;" onclick="viewModeDetail('${date}', '${mode}')">
-        <strong style="color:${color}">${new Date(date).toDateString()}</strong>: ${mode}
-      </div>
-    `;
-  }).join("");
-}
-  function viewModeDetail(date, mode) {
-  alert(`On ${new Date(date).toDateString()}, you selected: ${mode}`);
-}
-  // Trigger render when History tab is opened
-window.addEventListener("hashchange", () => {
-  if (location.hash === "#/history") {
-    waitForHistoryElementThenRender();
-  }
-});
-
-// Optional: Call render on page load if already on history tab
-window.addEventListener("load", () => {
-  if (location.hash === "#/history") {
-    waitForHistoryElementThenRender();
-  }
-});
-function waitForHistoryElementThenRender(attempts = 20) {
-  const historyEl = document.getElementById("mode-history");
-  if (historyEl) {
-    renderModeHistory();
-  } else if (attempts > 0) {
-    setTimeout(() => waitForHistoryElementThenRender(attempts - 1), 100);
+  .stats {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
-// To use: make sure your mode buttons call saveModeChoice("Grounded"), etc.
-// Example: saveModeChoice("Grounded"); when user selects that mode
-</script>
-  <!-- Google AdSense (Minimal Footer Display) -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895"
-     crossorigin="anonymous"></script>
-<ins class="adsbygoogle"
-     style="display:block; text-align:center; margin:20px auto;"
-     data-ad-client="ca-pub-9323656111800895"
-     data-ad-slot="9545612325"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
- 
-  <!-- App content ends here -->
-
-<script>
-  window.addEventListener('load', function () {
-    const splash = document.getElementById('splashScreen');
-    const icon = document.getElementById('splashIcon');
-
-    // Start the icon animation
-    setTimeout(() => {
-      icon.classList.add('splash-animate');
-    }, 100);
-
-    // Remove splash screen after animation
-    setTimeout(() => {
-      splash.remove();
-    }, 1600); // Match the animation duration
-  });
-</script>
-<!-- Splash Screen -->
-<div id="splashScreen">
-  <img id="splashIcon" src="splash-icon.png" alt="Loading..." />
-</div>
-
-<!-- First-Time Welcome Popup -->
-<div id="welcomePopup">
-  <h2>Welcome to The Reset Compass</h2>
-  <p>Choose your mode and explore realistic actions based on how you're feeling today.</p>
-  <button id="startAppBtn">Let’s Start</button>
-</div>
-  <script>
-  window.addEventListener('load', function () {
-    const splash = document.getElementById('splashScreen');
-    const icon = document.getElementById('splashIcon');
-
-    // Animate splash
-    if (icon) icon.classList.add('splash-animate');
-
-    setTimeout(() => {
-      splash?.remove();
-
-      if (!localStorage.getItem('welcomeSeen')) {
-        const popup = document.getElementById('welcomePopup');
-        if (popup) popup.style.display = 'flex';
-      }
-    }, 1600);
-  });
-
-  document.addEventListener('DOMContentLoaded', function () {
-    const startBtn = document.getElementById('startAppBtn');
-    if (startBtn) {
-      startBtn.addEventListener('click', function () {
-        localStorage.setItem('welcomeSeen', 'true');
-        document.getElementById('welcomePopup')?.remove();
-      });
-    }
-  });
-</script>
-  </body>
-  
-</html>
