@@ -9,13 +9,19 @@
   --text: #0B3D2E;
 }
 
-body {
+/* --------------------------
+  Base Styles
+--------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
   margin: 0;
   padding: 0;
-  font-family: system-ui, sans-serif;
-  background-color: var(--bg);
+  background: var(--bg);
   color: var(--text);
-  transition: background-color 0.3s, color 0.3s;
+  font-family: system-ui, sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -36,6 +42,31 @@ p {
   margin: 0.5rem 0;
 }
 
+/* --------------------------
+  Layout + Wrap
+--------------------------- */
+.wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.card {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.05);
+}
+
+/* --------------------------
+  Buttons
+--------------------------- */
 button, .btn {
   background-color: var(--brand);
   color: white;
@@ -52,6 +83,69 @@ button, .btn {
   border: 1px solid var(--brand);
 }
 
+.btn.subtle {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+/* --------------------------
+  Navigation
+--------------------------- */
+.nav {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.nav a.active {
+  text-decoration: underline;
+}
+
+/* --------------------------
+  Compass Graphic
+--------------------------- */
+.compass-wrap {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.compass {
+  width: 220px;
+  height: 220px;
+  margin: 0 auto;
+}
+
+/* --------------------------
+  Mode Buttons
+--------------------------- */
+.mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.mode-btn {
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  min-width: 120px;
+  border-radius: 8px;
+  color: #fff;
+  text-transform: uppercase;
+  border: none;
+  text-align: center;
+}
+
+.mode-btn.surv { background-color: #8B0000; }
+.mode-btn.drift { background-color: #DAA520; }
+.mode-btn.ground { background-color: #228B22; }
+.mode-btn.grow { background-color: #1E90FF; }
+
+/* --------------------------
+  Footer
+--------------------------- */
 footer {
   text-align: center;
   padding: 2rem 1rem;
@@ -60,7 +154,7 @@ footer {
 }
 
 /* --------------------------
-  Splash Screen + Animation
+  Splash Screen
 --------------------------- */
 #splashScreen {
   position: fixed;
@@ -85,21 +179,13 @@ footer {
 }
 
 @keyframes zoomSpinFade {
-  0% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-  50% {
-    transform: scale(1.5) rotate(180deg);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2) rotate(360deg);
-  }
+  0% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.5) rotate(180deg); }
+  100% { opacity: 0; transform: scale(2) rotate(360deg); }
 }
 
 /* --------------------------
-  First-Time Welcome Popup
+  Welcome Popup
 --------------------------- */
 #welcomePopup {
   display: none;
@@ -116,7 +202,6 @@ footer {
   align-items: center;
   padding: 2rem;
   text-align: center;
-  font-size: 1rem;
 }
 
 #welcomePopup h2 {
@@ -142,68 +227,66 @@ footer {
 }
 
 /* --------------------------
-  Main App Layout
+  History & Log Styling
 --------------------------- */
-.compass-wrap {
-  text-align: center;
-  margin: 2rem 0;
-}
-
-.mode-buttons {
+.stats {
   display: flex;
+  justify-content: space-between;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.mode-btn {
-  padding: 1rem;
-  font-size: 1.1rem;
+  margin-bottom: 1rem;
   font-weight: bold;
-  min-width: 120px;
-  border-radius: 8px;
-  color: #fff;
-  text-transform: uppercase;
-  border: none;
+  gap: 1rem;
 }
 
-.mode-btn.surv { background-color: #8B0000; }
-.mode-btn.drift { background-color: #DAA520; }
-.mode-btn.ground { background-color: #228B22; }
-.mode-btn.grow { background-color: #1E90FF; }
+.log-item {
+  background: #fff;
+  padding: 0.75rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.badge {
+  display: inline-block;
+  background: var(--brand);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  margin-left: 6px;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  margin-top: 0.5rem;
+}
 
 /* --------------------------
-  Cleanup/Overrides
+  Responsive Layout
 --------------------------- */
+@media (max-width: 600px) {
+  .nav {
+    flex-direction: column;
+    align-items: center;
+  }
 
-/* Prevent duplicate CTAs */
-#welcomeContainer,
-#welcomeMessage,
-#letsStartSection {
-  display: none !important;
-}
-
-/* Ensure no extra white space */
-html, body {
-  padding-bottom: 0;
-  margin-bottom: 0;
-}
-
-.wrap {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-/* --------------------------
-  Responsive Cleanup
---------------------------- */
-@media (max-width: 480px) {
   .mode-buttons {
     flex-direction: column;
-    gap: 0.75rem;
+    align-items: center;
   }
 
-  .wrap {
-    padding: 1rem 1rem 2rem;
+  .mode-btn {
+    width: 100%;
+    max-width: 260px;
   }
+
+  .stats {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
