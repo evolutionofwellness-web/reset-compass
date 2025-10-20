@@ -1,342 +1,158 @@
 :root {
-  --brand: #0B3D2E;
-  --surv: #A94747;
-  --drift: #E6B450;
-  --ground: #3B755F;
-  --grow: #4C7EDC;
-  --muted: #666666;
-  --bg: #ffffff;
-  --text: #0B3D2E;
+  --green: #0B3D2E;
+  --light-green: #DFF3EB;
+  --dark-red: #9B2C2C;
+  --yellow: #DAA520;
+  --blue: #2F80ED;
+  --gray: #f9f9f9;
+  --font-family: 'Segoe UI', 'Roboto', sans-serif;
 }
 
 body {
+  font-family: var(--font-family);
   margin: 0;
   padding: 0;
-  font-family: system-ui, sans-serif;
-  background-color: var(--bg);
-  color: var(--text);
-  transition: background-color 0.3s, color 0.3s;
-  min-height: 100vh;
+  background: white;
+  color: var(--green);
   overflow-x: hidden;
 }
 
-a {
-  color: var(--brand);
-  text-decoration: none;
-}
-
-h1, h2, h3 {
-  color: var(--brand);
-  margin: 1rem 0 0.5rem;
-  font-weight: 700;
-}
-
-p {
-  line-height: 1.6;
-  margin: 0.5rem 0;
-}
-
-button, .btn {
-  background-color: var(--brand);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.btn.ghost {
-  background: transparent;
-  color: var(--brand);
-  border: 1px solid var(--brand);
-}
-
-footer {
-  text-align: center;
-  padding: 2rem 1rem;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-/* --------------------------
-  Splash Screen + Animation
---------------------------- */
+/* Splash screen full page */
 #splashScreen {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: var(--bg);
+  background: white;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 9999;
+  animation: fadeOut 1.8s ease-out 1.8s forwards;
 }
 
-#splashIcon {
-  width: 140px;
-  height: 140px;
+#splashScreen img {
+  width: 90px;
+  height: 90px;
+  animation: spinZoomFade 1.8s ease-in-out forwards;
 }
 
-.splash-animate {
-  animation: zoomSpinFade 1.6s ease-in-out forwards;
-}
-
-@keyframes zoomSpinFade {
+@keyframes spinZoomFade {
   0% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
+    transform: scale(0.5) rotate(0deg);
+    opacity: 0;
   }
   50% {
-    transform: scale(1.4) rotate(180deg);
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
   }
   100% {
+    transform: scale(1) rotate(360deg);
     opacity: 0;
-    transform: scale(2) rotate(360deg);
   }
 }
 
-/* --------------------------
-  Welcome Popup
---------------------------- */
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Welcome popup */
 #welcomePopup {
-  display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.96);
-  z-index: 10000;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
   padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 9998;
   text-align: center;
-  font-size: 1rem;
+  max-width: 90vw;
+  display: none;
 }
 
 #welcomePopup h2 {
-  font-size: 1.8rem;
-  color: var(--brand);
-  margin-bottom: 1rem;
-}
-
-#welcomePopup p {
-  max-width: 400px;
-  margin: 0 auto 1.5rem;
-  color: var(--text);
+  margin-top: 0;
+  color: var(--green);
 }
 
 #welcomePopup button {
-  background-color: var(--brand);
-  color: #fff;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
+  background: var(--green);
+  color: white;
   border: none;
-  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
   cursor: pointer;
 }
 
-/* --------------------------
-  Compass Visuals
---------------------------- */
-#compass {
-  position: relative;
-  width: 280px;
-  height: 280px;
-  margin: 2rem auto;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
+/* Compass wedges */
 .wedge {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  top: 50%;
-  left: 50%;
-  transform-origin: 0% 0%;
-  clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
-  opacity: 0.9;
+  fill-opacity: 0.8;
 }
 
-.surv-wedge {
-  background-color: var(--surv);
-  transform: rotate(0deg);
-}
+.surviving { fill: var(--dark-red); }
+.drifting { fill: var(--yellow); }
+.grounded { fill: var(--green); }
+.growing { fill: var(--blue); }
 
-.drift-wedge {
-  background-color: var(--drift);
-  transform: rotate(90deg);
-}
-
-.ground-wedge {
-  background-color: var(--ground);
-  transform: rotate(180deg);
-}
-
-.grow-wedge {
-  background-color: var(--grow);
-  transform: rotate(270deg);
-}
-
-/* Center circle */
-#compass::after {
-  content: '';
-  position: absolute;
-  top: 25%;
-  left: 25%;
-  width: 50%;
-  height: 50%;
-  background-color: #fff;
-  border-radius: 50%;
-  z-index: 2;
-  box-shadow: 0 0 0 2px var(--brand);
-}
-
-/* --------------------------
-  Buttons + Modes
---------------------------- */
-.compass-wrap {
-  text-align: center;
-  margin: 2rem 1rem;
-}
-
-.mode-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1.2rem;
-  margin: 2rem 0;
-}
-
-.mode-btn {
-  padding: 1rem;
+.compass-label {
   font-size: 1.1rem;
+  fill: white;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
+
+/* Navigation and layout */
+nav {
+  padding: 1rem;
   font-weight: bold;
-  min-width: 140px;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+nav a {
+  margin: 0 1rem;
+  color: var(--green);
+  text-decoration: none;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+.mode-button {
+  padding: 1rem;
+  margin: 0.75rem auto;
+  width: 85%;
   border-radius: 8px;
-  color: #fff;
-  text-transform: uppercase;
-  border: 2px solid transparent;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.mode-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.mode-btn.surv {
-  background-color: var(--surv);
-  border-color: var(--surv);
-}
-
-.mode-btn.drift {
-  background-color: var(--drift);
-  border-color: var(--drift);
-  color: #222;
-}
-
-.mode-btn.ground {
-  background-color: var(--ground);
-  border-color: var(--ground);
-}
-
-.mode-btn.grow {
-  background-color: var(--grow);
-  border-color: var(--grow);
-}
-
-.mode-activity {
-  background: #f7f7f7;
-  border-left: 4px solid var(--brand);
-  padding: 1rem;
-  margin: 1rem 0;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-}
-
-/* --------------------------
-  Horizontal Navigation
---------------------------- */
-nav ul {
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: none;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 1rem;
-  padding: 0;
-  list-style: none;
-  background: var(--brand);
-  margin: 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-nav ul li {
-  display: inline-block;
-}
+.mode-button.surviving { background: var(--dark-red); }
+.mode-button.drifting { background: var(--yellow); color: black; }
+.mode-button.grounded { background: var(--green); }
+.mode-button.growing { background: var(--blue); }
 
-nav ul li a {
-  color: #fff;
-  padding: 1rem;
-  display: block;
-  font-weight: 600;
-}
-
-/* --------------------------
-  History + Streak
---------------------------- */
-#history, #streak, #mode-breakdown {
-  max-width: 600px;
-  margin: 1rem auto;
-  padding: 1rem;
-  background: #fdfdfd;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-}
-
-.mode-log-entry {
-  padding: 0.5rem;
-  border-left: 4px solid var(--brand);
-  margin-bottom: 0.5rem;
-  background: #f8f8f8;
-}
-
-/* --------------------------
-  Cleanup Fixes
---------------------------- */
-#welcomeContainer,
-#welcomeMessage,
-#letsStartSection {
-  display: none !important;
-}
-
-html, body {
-  padding-bottom: 0;
-  margin-bottom: 0;
-}
-
-@media (max-width: 600px) {
-  .mode-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  #splashIcon {
-    width: 100px;
-    height: 100px;
-  }
-
-  .mode-btn {
-    min-width: 80%;
-  }
-
-  #compass {
-    width: 220px;
-    height: 220px;
-  }
+footer {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #888;
+  padding: 2rem 1rem 4rem;
 }
