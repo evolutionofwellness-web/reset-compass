@@ -9,9 +9,6 @@
   --text: #0B3D2E;
 }
 
-/* --------------------------
-  Global Styles
---------------------------- */
 body {
   margin: 0;
   padding: 0;
@@ -53,14 +50,6 @@ button, .btn {
   border: 1px solid var(--brand);
 }
 
-.btn.subtle {
-  background-color: #e0e0e0;
-  color: #333;
-}
-
-/* --------------------------
-  Splash Screen
---------------------------- */
 #splashScreen {
   position: fixed;
   top: 0;
@@ -97,52 +86,11 @@ button, .btn {
   }
 }
 
-/* --------------------------
-  App Layout
---------------------------- */
-#app {
-  padding: 1.5rem;
-}
-
-.wrap {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-/* --------------------------
-  Navigation
---------------------------- */
-.nav {
-  margin: 1rem 0;
-}
-
-.nav a {
-  margin-right: 1rem;
-  font-weight: bold;
-}
-
-.nav a:hover {
-  text-decoration: underline;
-}
-
-/* --------------------------
-  Compass Graphic
---------------------------- */
 .compass-wrap {
   text-align: center;
   margin: 2rem 0;
 }
 
-.compass {
-  width: 220px;
-  height: 220px;
-  margin: 0 auto 1rem;
-}
-
-/* --------------------------
-  Mode Buttons
---------------------------- */
 .mode-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -162,95 +110,14 @@ button, .btn {
   border: none;
 }
 
-.mode-btn span {
-  display: inline-block;
-}
-
 .mode-btn.surv { background-color: #8B0000; }
 .mode-btn.drift { background-color: #DAA520; }
 .mode-btn.ground { background-color: #228B22; }
 .mode-btn.grow { background-color: #1E90FF; }
 
-/* --------------------------
-  Welcome & Instructions
---------------------------- */
-.instructions {
-  background-color: #f9f9f9;
-  border-left: 5px solid var(--brand);
-  border-radius: 6px;
-  padding: 1rem;
-  margin: 1.5rem 0;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.03);
-}
-
-.instructions strong {
-  color: var(--brand);
-}
-
-/* --------------------------
-  Mode Labels
---------------------------- */
-.mode-surviving { color: #8B0000; }
-.mode-drifting  { color: #DAA520; }
-.mode-grounded  { color: #228B22; }
-.mode-growing   { color: #1E90FF; }
-
-/* --------------------------
-  History + Stats
---------------------------- */
-#mode-history {
-  margin-top: 2rem;
-  font-size: 0.95rem;
-}
-
-#mode-history ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-#mode-history li {
-  padding: 0.5rem;
-  border-bottom: 1px solid #ddd;
-}
-
-.stats {
-  margin-top: 2rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.stats .streak {
-  font-size: 1.6rem;
-  color: var(--brand);
-}
-
-.streak .emoji {
-  font-size: 2rem;
-  margin-right: 0.3rem;
-  vertical-align: middle;
-}
-
-/* --------------------------
-  Footer
---------------------------- */
 footer {
   text-align: center;
   padding: 2rem 1rem;
   font-size: 0.8rem;
   color: var(--muted);
-}
-
-/* --------------------------
-  Responsive Design
---------------------------- */
-@media (max-width: 600px) {
-  .mode-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .mode-btn {
-    width: 100%;
-    max-width: 260px;
-  }
 }
