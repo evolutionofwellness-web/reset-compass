@@ -1,51 +1,70 @@
-:root {
-  --growing: #2196f3;
-  --drifting: #fdd835;
-  --grounded: #4caf50;
-  --surviving: #f44336;
-}
+/* main.css?v=30 */
 
-/* General Layout */
 body {
-  font-family: system-ui, sans-serif;
   margin: 0;
-  padding: 0;
-  text-align: center;
+  font-family: system-ui, sans-serif;
   background: #fff;
-  color: #000;
+  color: #111;
+  text-align: center;
 }
 
-header h1 {
-  margin-top: 1em;
-  font-size: 2em;
+header {
+  padding: 1rem 0;
+}
+
+nav {
+  margin: 1rem 0;
 }
 
 nav button {
-  margin: 0.5em;
-  padding: 0.5em 1em;
+  background: #f0f0f0;
   border: none;
-  background: #eee;
-  border-radius: 10px;
+  margin: 0 0.3rem;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-weight: 500;
   cursor: pointer;
 }
 
 .stats {
-  margin-top: 10px;
-  font-size: 18px;
+  margin: 1rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
-/* Compass */
-.compass-circle {
-  width: 300px;
-  height: 300px;
-  margin: 2em auto;
+footer {
+  margin: 2rem 0;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.mode-buttons button {
+  display: block;
+  width: 200px;
+  margin: 0.4rem auto;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+}
+
+.growing { background: #2196f3; }
+.drifting { background: #fbc02d; color: #000; }
+.grounded { background: #4caf50; }
+.surviving { background: #f44336; }
+
+.compass {
   position: relative;
-  border: 4px solid black;
+  width: 280px;
+  height: 280px;
+  margin: 1rem auto;
+  border: 5px solid #000;
   border-radius: 50%;
-  overflow: hidden;
 }
 
-/* Each wedge as quarter circle */
 .wedge {
   position: absolute;
   width: 50%;
@@ -56,77 +75,79 @@ nav button {
   color: #fff;
   font-weight: bold;
   cursor: pointer;
+  transform-origin: 100% 100%;
 }
 
-.wedge.top {
-  background: var(--growing);
-  top: 0;
-  left: 25%;
-  border-top-left-radius: 100% 100%;
+.wedge.growing {
+  top: 0; left: 50%;
+  background: #2196f3;
+  transform: rotate(-45deg);
+}
+.wedge.drifting {
+  top: 0; right: 0;
+  background: #fbc02d;
+  color: #000;
+  transform: rotate(45deg);
+}
+.wedge.grounded {
+  bottom: 0; left: 0;
+  background: #4caf50;
+  transform: rotate(-135deg);
+}
+.wedge.surviving {
+  bottom: 0; right: 50%;
+  background: #f44336;
+  transform: rotate(135deg);
 }
 
-.wedge.right {
-  background: var(--drifting);
-  top: 25%;
-  right: 0;
-  border-top-right-radius: 100% 100%;
-}
-
-.wedge.bottom {
-  background: var(--surviving);
-  bottom: 0;
-  left: 25%;
-  border-bottom-right-radius: 100% 100%;
-}
-
-.wedge.left {
-  background: var(--grounded);
-  top: 25%;
-  left: 0;
-  border-bottom-left-radius: 100% 100%;
-}
-
-/* Buttons */
-.mode-buttons {
+#splashScreen {
+  position: fixed;
+  inset: 0;
+  background: #0B3D2E;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 2em;
+  justify-content: center;
+  z-index: 9999;
 }
 
-.mode-buttons button {
-  width: 160px;
-  padding: 10px 0;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  color: white;
+#splashIcon {
+  width: 120px;
+  height: 120px;
+  animation: zoomFade 2s ease-out;
 }
 
-button.growing { background: var(--growing); }
-button.drifting { background: var(--drifting); color: #000; }
-button.grounded { background: var(--grounded); }
-button.surviving { background: var(--surviving); }
-
-footer {
-  margin-top: 2em;
-  padding: 1em 0;
-  background: #f0f0f0;
-  color: #333;
+@keyframes zoomFade {
+  0% {
+    transform: scale(0.5) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 0;
+  }
 }
 
-/* Mode & Activity Pages */
-textarea {
-  width: 80%;
-  height: 60px;
-  margin-top: 10px;
+.popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
 }
 
-input[type="button"] {
-  margin-top: 10px;
-  padding: 8px 16px;
-  font-weight: bold;
+.popup-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 90%;
+}
+
+.popup-content h2 {
+  margin-top: 0;
 }
