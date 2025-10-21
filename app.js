@@ -37,6 +37,13 @@ const modeColors = {
   growing: '#4C7EDC'
 };
 
+const modeIcons = {
+  surviving: '🩺',
+  drifting: '🧭',
+  grounded: '🌿',
+  growing: '🚀'
+};
+
 // === ACTIVITY DATA ===
 const modeActivities = {
   surviving: ['Take 3 deep breaths', 'Drink water', 'Stretch for 1 min'],
@@ -53,27 +60,37 @@ function renderCompass() {
 
   if (!compass || !buttons) return;
 
-  // Compass wedges
   compass.innerHTML = '';
-  modes.forEach(mode => {
+  modes.forEach((mode, i) => {
     const wedge = document.createElement('div');
     wedge.className = 'wedge';
-    wedge.innerHTML = `<span>${mode.charAt(0).toUpperCase() + mode.slice(1)}</span>`;
     wedge.style.backgroundColor = modeColors[mode];
+    wedge.style.transform = `rotate(${i * 90}deg)`;
+
+    const label = document.createElement('div');
+    label.innerHTML = `${modeIcons[mode]} <br><strong>${capitalize(mode)}</strong>`;
+    label.style.transform = `rotate(-${i * 90}deg)`;
+    label.style.textAlign = 'center';
+    wedge.appendChild(label);
+
     wedge.addEventListener('click', () => showMode(mode));
     compass.appendChild(wedge);
   });
 
-  // Mode buttons
   buttons.innerHTML = '';
   modes.forEach(mode => {
     const btn = document.createElement('button');
     btn.className = `mode-btn ${mode}`;
-    btn.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+    btn.textContent = capitalize(mode);
     btn.addEventListener('click', () => showMode(mode));
     buttons.appendChild(btn);
   });
 }
+
+function capitalize(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
 // === SHOW MODE ACTIVITIES ===
 function showMode(mode) {
   const section = document.getElementById('modeView');
@@ -83,7 +100,7 @@ function showMode(mode) {
 
   if (!section || !title || !list || !logBtn) return;
 
-  title.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+  title.textContent = capitalize(mode);
   section.style.display = 'block';
   list.innerHTML = '';
   modeActivities[mode].forEach(item => {
@@ -94,7 +111,7 @@ function showMode(mode) {
 
   logBtn.onclick = () => {
     saveModeChoice(mode);
-    alert(`Logged as "${mode}" for today`);
+    alert(`Logged as "${capitalize(mode)}" for today`);
   };
 }
 
@@ -146,7 +163,7 @@ function updateHistory(log = null) {
   Object.entries(log).reverse().forEach(([date, mode]) => {
     const div = document.createElement('div');
     div.className = 'mode-entry';
-    div.textContent = `${date}: ${mode}`;
+    div.textContent = `${date}: ${capitalize(mode)}`;
     div.style.borderLeft = `4px solid ${modeColors[mode]}`;
     container.appendChild(div);
   });
@@ -167,7 +184,5 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCompass();
   updateStreak();
   updateHistory();
-
-  // Default to home view
   showSection('home');
 });
