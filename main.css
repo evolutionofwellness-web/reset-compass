@@ -1,253 +1,124 @@
-/* Global Reset */
-body, html {
+:root {
+  --brand-green: #0B3D2E;
+  --growing-color: #3B82F6;   /* Blue */
+  --grounded-color: #22C55E;  /* Green */
+  --drifting-color: #FACC15;  /* Yellow */
+  --surviving-color: #EF4444; /* Red */
+}
+
+body {
+  font-family: system-ui, sans-serif;
   margin: 0;
   padding: 0;
-  font-family: 'Georgia', serif;
-  background-color: white;
-  color: #0B3D2E;
-}
-
-/* Splash Screen */
-#splashScreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #0B3D2E;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-#splashIcon {
-  width: 150px;
-  height: 150px;
-  animation: splashZoom 1.2s ease-out forwards;
-}
-
-@keyframes splashZoom {
-  0% {
-    transform: scale(0.6) rotate(0deg);
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.1) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* Welcome Popup */
-#welcomePopup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  color: #0B3D2E;
-  border: 2px solid #0B3D2E;
-  padding: 20px;
-  z-index: 999;
-  display: none;
+  background: #fff;
+  color: var(--brand-green);
   text-align: center;
-  max-width: 90%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-#welcomePopup h2 {
-  margin-top: 0;
-}
-
-#startButton {
-  background-color: #0B3D2E;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* Header */
 header {
-  background-color: #0B3D2E;
-  padding: 20px;
-  text-align: center;
+  background-color: var(--brand-green);
+  padding: 1rem 0;
 }
 
 header h1 {
   color: white;
-  margin-bottom: 10px;
+  margin: 0;
+  font-size: 2rem;
 }
 
-.nav button {
-  margin: 5px;
-  padding: 8px 14px;
-  background-color: #e0e0e0;
+nav {
+  margin-top: 0.5rem;
+}
+
+nav button {
+  background: #E5E7EB;
+  color: var(--brand-green);
   border: none;
-  border-radius: 20px;
-  color: #0B3D2E;
+  border-radius: 1.5rem;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
   font-weight: bold;
-  cursor: pointer;
 }
 
-.nav button:hover {
-  background-color: #d4d4d4;
-}
-
-/* Compass Layout */
-.compass-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 2rem auto;
-}
-
-.compass-circle {
-  position: relative;
+#compass {
   width: 300px;
   height: 300px;
+  margin: 2rem auto;
   border-radius: 50%;
-  background-color: #f9f9f9;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  position: relative;
   overflow: hidden;
+  transform: rotate(45deg); /* Compass layout */
 }
 
-/* Common wedge styles */
 .wedge {
   position: absolute;
   width: 50%;
   height: 50%;
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-  color: #ffffff;
   font-weight: bold;
-  text-align: center;
-  padding: 0.5rem;
-  cursor: pointer;
   font-size: 1rem;
+  color: #fff;
+  transform: rotate(-45deg); /* Make text upright */
 }
 
-/* Top (Growing - Blue) */
-.wedge-top-left {
+/* Wedge positions */
+.wedge.growing {
   top: 0;
-  left: 0;
-  background-color: #3B82F6; /* Blue */
-  transform: rotate(0deg);
+  left: 50%;
+  background-color: var(--growing-color);
 }
 
-/* Right (Drifting - Yellow) */
-.wedge-top-right {
-  top: 0;
-  right: 0;
-  background-color: #FACC15; /* Yellow */
-  transform: rotate(0deg);
-  color: #000; /* Better contrast on yellow */
-}
-
-/* Bottom (Surviving - Pink) */
-.wedge-bottom-right {
+.wedge.surviving {
   bottom: 0;
-  right: 0;
-  background-color: #EC4899; /* Pink */
-  transform: rotate(0deg);
+  right: 50%;
+  background-color: var(--surviving-color);
 }
 
-/* Left (Grounded - Green) */
-.wedge-bottom-left {
+.wedge.grounded {
   bottom: 0;
   left: 0;
-  background-color: #22C55E; /* Green */
-  transform: rotate(0deg);
+  background-color: var(--grounded-color);
 }
 
-/* Optional: Add hover effect */
-.wedge:hover {
-  opacity: 0.9;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15);
+.wedge.drifting {
+  top: 0;
+  right: 0;
+  background-color: var(--drifting-color);
 }
 
-/* Mode Buttons - Final Matching Compass Colors */
-.mode-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.mode-btn {
-  width: 200px;
+/* Mode buttons below compass */
+.mode-button {
+  display: block;
+  width: 80%;
+  max-width: 300px;
+  margin: 0.5rem auto;
   padding: 1rem;
-  border: none;
-  border-radius: 999px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: bold;
   color: white;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  border: none;
+  border-radius: 30px;
 }
 
-.mode-btn:hover {
-  transform: scale(1.03);
+.mode-button.growing { background-color: var(--growing-color); }
+.mode-button.grounded { background-color: var(--grounded-color); }
+.mode-button.drifting { background-color: var(--drifting-color); color: #000; }
+.mode-button.surviving { background-color: var(--surviving-color); }
+
+section {
+  padding: 2rem 1rem;
 }
 
-/* Final brand-aligned colors */
-.mode-btn.grow {
-  background-color: #3B82F6; /* Growing = Blue */
+h2 {
+  color: var(--brand-green);
+  margin-bottom: 0.5rem;
 }
 
-.mode-btn.drift {
-  background-color: #FACC15; /* Drifting = Yellow */
-  color: #000; /* Contrast fix */
-}
-
-.mode-btn.ground {
-  background-color: #22C55E; /* Grounded = Green */
-}
-
-.mode-btn.surv {
-  background-color: #EC4899; /* Surviving = Pink */
-}
-.section {
-  padding: 30px 20px;
-}
-
-/* Footer */
 footer {
-  text-align: center;
-  padding: 20px;
-  font-size: 14px;
-  background-color: #f0f0f0;
-  color: #0B3D2E;
-}
-
-/* Stats */
-.stats {
-  text-align: center;
-  font-size: 18px;
-  margin: 20px auto;
-  font-weight: bold;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  #compass {
-    width: 220px;
-    height: 220px;
-  }
-
-  .mode-btn {
-    width: 160px;
-    font-size: 14px;
-  }
-
-  .wedge {
-    font-size: 12px;
-  }
+  padding: 2rem;
+  background: #f5f5f5;
+  color: var(--brand-green);
+  font-size: 0.9rem;
 }
