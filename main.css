@@ -22,33 +22,37 @@ nav.nav {
   padding: 20px;
 }
 
-/* Splash */
+/* Splash Screen */
 #splashScreen {
   position: fixed;
-  background: white;
-  z-index: 1000;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  background: #0B3D2E;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
 
 #splashIcon {
-  width: 120px;
-  animation: splashZoom 1.5s ease forwards;
+  width: 100px;
+  height: 100px;
+  animation: splashZoomSpinFade 2s ease-out forwards;
 }
 
-@keyframes splashZoom {
+@keyframes splashZoomSpinFade {
   0% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
   }
   50% {
-    transform: scale(1.3) rotate(180deg);
+    transform: scale(2.5) rotate(180deg);
+    opacity: 1;
   }
   100% {
-    transform: scale(1) rotate(360deg);
+    transform: scale(3.5) rotate(360deg);
     opacity: 0;
   }
 }
