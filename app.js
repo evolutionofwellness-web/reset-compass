@@ -1,97 +1,147 @@
-// Splash Screen Animation
-window.addEventListener("load", () => {
-  const splash = document.getElementById("splashScreen");
-  const splashIcon = document.getElementById("splashIcon");
-
-  setTimeout(() => {
-    splash.style.display = "none";
-
-    if (!localStorage.getItem("welcomeShown")) {
-      document.getElementById("welcomePopup").style.display = "block";
-    }
-  }, 2000); // Match animation duration
-});
-// Welcome popup
-document.getElementById("startButton").addEventListener("click", () => {
-  document.getElementById("welcomePopup").style.display = "none";
-  localStorage.setItem("welcomeShown", "true");
-});
-
-// Inject Compass
-function renderCompass() {
+document.addEventListener("DOMContentLoaded", () => {
+  const splashScreen = document.getElementById("splashScreen");
+  const welcomePopup = document.getElementById("welcomePopup");
+  const startButton = document.getElementById("startButton");
   const compass = document.getElementById("compass");
-  if (!compass) return;
-  compass.innerHTML = `
-    <div class="wedge wedge-top" onclick="selectMode('growing')"><span>Growing</span></div>
-    <div class="wedge wedge-left" onclick="selectMode('grounded')"><span>Grounded</span></div>
-    <div class="wedge wedge-right" onclick="selectMode('drifting')"><span>Drifting</span></div>
-    <div class="wedge wedge-bottom" onclick="selectMode('surviving')"><span>Surviving</span></div>
-  `;
-}
-renderCompass();
+  const modeButtons = document.querySelectorAll(".mode-btn");
+  const wedges = document.querySelectorAll(".wedge");
+  const section = document.querySelector(".section");
 
-// Navigation
-function showSection(sectionId) {
-  document.querySelectorAll(".section").forEach(sec => {
-    sec.style.display = "none";
+  // Splash + Popup
+  setTimeout(() => {
+    splashScreen.style.display = "none";
+    if (!localStorage.getItem("hasSeenWelcome")) {
+      welcomePopup.style.display = "block";
+    }
+  }, 2000);
+
+  startButton.addEventListener("click", () => {
+    welcomePopup.style.display = "none";
+    localStorage.setItem("hasSeenWelcome", "true");
   });
-  document.getElementById(sectionId).style.display = "block";
-}
 
-// Mode Logging
-function selectMode(mode) {
-  const today = new Date().toISOString().split("T")[0];
-  let history = JSON.parse(localStorage.getItem("modeHistory") || "[]");
+  // Event listeners for wedges and buttons
+  function initModeNavigation() {
+    wedges.forEach(wedge => {
+      wedge.addEventListener("click", () => {
+        const mode = wedge.getAttribute("data-mode");
+        loadMode(mode);
+      });
+    });
 
-  if (!history.find(entry => entry.date === today)) {
-    history.push({ date: today, mode });
-    localStorage.setItem("modeHistory", JSON.stringify(history));
-    updateStreak(history);
-    renderHistory(history);
+    modeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const mode = btn.getAttribute("data-mode");
+        loadMode(mode);
+      });
+    });
   }
 
-  alert(`You selected: ${mode}`);
-}
+  // Activities per mode
+  const modeActivities = {
+    grow: [
+      "Do something that challenges you",
+      "Take action on a long-term goal",
+      "Declutter a space or complete a small project"
+    ],
+    ground: [
+      "Take 3 deep breaths",
+      "Drink a full glass of water",
+      "Write down 3 things you're grateful for"
+    ],
+    drift: [
+      "Check in with how you're feeling",
+      "Spend 5 minutes stretching or moving",
+      "Reflect on what matters to you"
+    ],
+    surv: [
+      "Pick ONE thing to focus on",
+      "Set a 10-minute timer and start",
+      "Pause and do nothing for 1 minute"
+    ]
+  };
 
-// Streak
-function updateStreak(history) {
-  const dates = history.map(entry => entry.date).sort().reverse();
-  let streak = 0;
-  let currentDate = new Date();
+  function loadMode(mode) {
+    const activities = modeActivities[mode] || [];
+    section.innerHTML = `
+      <h2>${modeName(mode)} Mode</h2>
+      <div class="activities-container">
+        ${activities.map((activity, i) => `
+          <div class="activity-entry">
+            <strong>${activity}</strong>
+            <textarea placeholder="What did you do?"></textarea>
+            <button onclick="saveLog('${mode}', ${i}, this)">Save</button>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
 
-  for (let date of dates) {
-    const entryDate = new Date(date);
-    if (entryDate.toDateString() === currentDate.toDateString()) {
-      streak++;
-    } else {
-      currentDate.setDate(currentDate.getDate() - 1);
-      if (entryDate.toDateString() === currentDate.toDateString()) {
-        streak++;
-      } else {
-        break;
-      }
+  // Human-readable mode name
+  function modeName(mode) {
+    switch (mode) {
+      case "grow": return "Growing";
+      case "ground": return "Grounded";
+      case "drift": return "Drifting";
+      case "surv": return "Surviving";
+      default: return "";
     }
   }
 
-  document.getElementById("streakCount").innerText = streak;
-}
+  // Save to localStorage with streak tracking
+  window.saveLog = function(mode, index, btn) {
+    const entry = btn.previousElementSibling.value.trim();
+    if (!entry) return;
 
-// Render History
-function renderHistory(history = JSON.parse(localStorage.getItem("modeHistory") || "[]")) {
-  const container = document.getElementById("mode-history");
-  if (!container) return;
+    const date = new Date().toLocaleDateString();
+    const log = { date, mode, entry, activity: modeActivities[mode][index] };
 
-  container.innerHTML = "";
-  const sorted = history.sort((a, b) => new Date(b.date) - new Date(a.date));
+    let history = JSON.parse(localStorage.getItem("resetHistory")) || [];
+    const todayExists = history.some(h => h.date === date);
+    history.push(log);
+    localStorage.setItem("resetHistory", JSON.stringify(history));
 
-  sorted.forEach(entry => {
-    const div = document.createElement("div");
-    div.className = "history-entry";
-    div.innerText = `${entry.date}: ${entry.mode}`;
-    container.appendChild(div);
-  });
-}
+    // Streak logic
+    if (!todayExists) {
+      let streak = parseInt(localStorage.getItem("resetStreak") || "0", 10);
+      let lastDate = localStorage.getItem("resetLastDate");
 
-// Init
-renderHistory();
-updateStreak(JSON.parse(localStorage.getItem("modeHistory") || "[]"));
+      const today = new Date().toDateString();
+      const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+      if (lastDate === yesterday) {
+        streak++;
+      } else if (lastDate !== today) {
+        streak = 1;
+      }
+
+      localStorage.setItem("resetStreak", streak);
+      localStorage.setItem("resetLastDate", today);
+      updateStats();
+    }
+
+    btn.textContent = "Saved!";
+    btn.disabled = true;
+  };
+
+  // Stats and history
+  function updateStats() {
+    const stats = document.querySelector(".stats");
+    const streak = localStorage.getItem("resetStreak") || "0";
+    stats.innerHTML = `🔥 ${streak}-day streak`;
+
+    const history = JSON.parse(localStorage.getItem("resetHistory")) || [];
+    const historyBlock = document.getElementById("historyBlock");
+    if (historyBlock) {
+      historyBlock.innerHTML = history.map(h => `
+        <div class="history-entry">
+          <strong>${h.date}</strong> — ${modeName(h.mode)}: ${h.activity}<br>
+          <em>${h.entry}</em>
+        </div>
+      `).reverse().join("");
+    }
+  }
+
+  initModeNavigation();
+  updateStats();
+});
