@@ -33,27 +33,42 @@
   <!-- Main App Container -->
  <div id="app" style="margin-top: 20px;">
     
-    <!-- Home Section -->
-    <section id="homeSection" class="section">
-      <div class="compass-wrapper">
-        <div class="compass-circle">
-          <div class="wedge wedge-top" onclick="selectMode('growing')"><span>Growing</span></div>
-          <div class="wedge wedge-right" onclick="selectMode('drifting')"><span>Drifting</span></div>
-          <div class="wedge wedge-bottom" onclick="selectMode('surviving')"><span>Surviving</span></div>
-          <div class="wedge wedge-left" onclick="selectMode('grounded')"><span>Grounded</span></div>
-        </div>
-      </div>
+ <!-- Home Section -->
+<section id="homeSection" class="section">
+  <div class="compass-wrapper">
+    <div class="compass-circle">
+      <div class="wedge wedge-top" onclick="selectMode('growing')"><span>Growing</span></div>
+      <div class="wedge wedge-right" onclick="selectMode('drifting')"><span>Drifting</span></div>
+      <div class="wedge wedge-bottom" onclick="selectMode('surviving')"><span>Surviving</span></div>
+      <div class="wedge wedge-left" onclick="selectMode('grounded')"><span>Grounded</span></div>
+    </div>
+  </div>
 
-      Spacer below compass to prevent overlap -->
-<div style="height: 20px;"></div>
+  <!-- Spacer below compass to prevent overlap -->
+  <div style="height: 20px;"></div>
 
-<div class="mode-buttons">
-        <button class="mode-btn grow" onclick="selectMode('growing')">🚀 Growing</button>
-        <button class="mode-btn drift" onclick="selectMode('drifting')">🧭 Drifting</button>
-        <button class="mode-btn surv" onclick="selectMode('surviving')">🩺 Surviving</button>
-        <button class="mode-btn ground" onclick="selectMode('grounded')">🌿 Grounded</button>
-      </div>
-    </section>
+  <div class="mode-buttons">
+    <div class="mode-button-wrapper">
+      <button class="mode-btn grow" onclick="selectMode('growing')">🚀 Growing</button>
+      <p class="mode-description">You feel energized and focused. Ready to take on bigger challenges.</p>
+    </div>
+
+    <div class="mode-button-wrapper">
+      <button class="mode-btn drift" onclick="selectMode('drifting')">🧭 Drifting</button>
+      <p class="mode-description">You're going through the motions but feel a little disconnected.</p>
+    </div>
+
+    <div class="mode-button-wrapper">
+      <button class="mode-btn surv" onclick="selectMode('surviving')">🩺 Surviving</button>
+      <p class="mode-description">You're stressed, tired, or struggling — just trying to get by.</p>
+    </div>
+
+    <div class="mode-button-wrapper">
+      <button class="mode-btn ground" onclick="selectMode('grounded')">🌿 Grounded</button>
+      <p class="mode-description">You’re calm and stable, taking care of yourself without pushing too hard.</p>
+    </div>
+  </div>
+</section>
 
     <!-- Mode Section -->
     <section id="modeSection" class="section" style="display:none;">
