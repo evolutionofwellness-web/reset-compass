@@ -22,41 +22,6 @@ nav.nav {
   padding: 20px;
 }
 
-/* Splash Screen */
-#splashScreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #0B3D2E;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-#splashIcon {
-  width: 100px;
-  height: 100px;
-  animation: splashZoomSpinFade 2s ease-out forwards;
-}
-
-@keyframes splashZoomSpinFade {
-  0% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(2.5) rotate(180deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(3.5) rotate(360deg);
-    opacity: 0;
-  }
-}
-
 /* Welcome Popup */
 #welcomePopup {
   position: fixed;
