@@ -100,16 +100,21 @@ header h1 {
 }
 
 /* Compass Styles */
-#compass {
+.compass-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.compass-circle {
   position: relative;
-  width: 280px;
-  height: 280px;
-  margin: 40px auto 20px;
+  width: 300px;
+  height: 300px;
   border-radius: 50%;
-  background-color: #f8f8f8;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  display: grid;
-  place-items: center;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
 .wedge {
@@ -117,35 +122,47 @@ header h1 {
   width: 50%;
   height: 50%;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  color: #fff;
   font-weight: bold;
   text-align: center;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 5px;
-  transform-origin: bottom right;
-  color: white;
+  padding: 10px;
+  box-sizing: border-box;
+  transition: transform 0.3s ease;
 }
 
-/* Wedge Colors & Positions */
-.wedge:nth-child(1) {
-  background-color: #009688; /* Growing */
-  transform: rotate(45deg) translate(50%, -50%);
-}
-.wedge:nth-child(2) {
-  background-color: #e91e63; /* Surviving */
-  transform: rotate(135deg) translate(50%, -50%);
-}
-.wedge:nth-child(3) {
-  background-color: #4caf50; /* Grounded */
-  transform: rotate(225deg) translate(50%, -50%);
-}
-.wedge:nth-child(4) {
-  background-color: #3f51b5; /* Drifting */
-  transform: rotate(315deg) translate(50%, -50%);
+.wedge span {
+  transform: rotate(0deg);
 }
 
+.wedge-top-left {
+  top: 0;
+  left: 0;
+  background-color: #3B5BA0;
+  transform: rotate(-45deg);
+}
+
+.wedge-top-right {
+  top: 0;
+  right: 0;
+  background-color: #00796B;
+  transform: rotate(45deg);
+}
+
+.wedge-bottom-left {
+  bottom: 0;
+  left: 0;
+  background-color: #4CAF50;
+  transform: rotate(-135deg);
+}
+
+.wedge-bottom-right {
+  bottom: 0;
+  right: 0;
+  background-color: #E91E63;
+  transform: rotate(135deg);
+}
 /* Mode Buttons */
 .mode-buttons {
   display: flex;
