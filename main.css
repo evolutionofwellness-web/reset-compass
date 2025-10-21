@@ -100,11 +100,12 @@ header h1 {
 }
 
 /* Compass Styles */
+/* Compass Layout */
 .compass-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 2rem;
+  margin: 2rem auto;
 }
 
 .compass-circle {
@@ -113,10 +114,11 @@ header h1 {
   height: 300px;
   border-radius: 50%;
   background-color: #f9f9f9;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
+/* Common wedge styles */
 .wedge {
   position: absolute;
   width: 50%;
@@ -124,71 +126,94 @@ header h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #fff;
+  color: #ffffff;
   font-weight: bold;
   text-align: center;
-  padding: 10px;
-  box-sizing: border-box;
-  transition: transform 0.3s ease;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
 }
 
-.wedge span {
-  transform: rotate(0deg);
-}
-
+/* Top (Growing - Blue) */
 .wedge-top-left {
   top: 0;
   left: 0;
-  background-color: #3B5BA0;
-  transform: rotate(-45deg);
+  background-color: #3B82F6; /* Blue */
+  transform: rotate(0deg);
 }
 
+/* Right (Drifting - Yellow) */
 .wedge-top-right {
   top: 0;
   right: 0;
-  background-color: #00796B;
-  transform: rotate(45deg);
+  background-color: #FACC15; /* Yellow */
+  transform: rotate(0deg);
+  color: #000; /* Better contrast on yellow */
 }
 
-.wedge-bottom-left {
-  bottom: 0;
-  left: 0;
-  background-color: #4CAF50;
-  transform: rotate(-135deg);
-}
-
+/* Bottom (Surviving - Pink) */
 .wedge-bottom-right {
   bottom: 0;
   right: 0;
-  background-color: #E91E63;
-  transform: rotate(135deg);
+  background-color: #EC4899; /* Pink */
+  transform: rotate(0deg);
 }
-/* Mode Buttons */
+
+/* Left (Grounded - Green) */
+.wedge-bottom-left {
+  bottom: 0;
+  left: 0;
+  background-color: #22C55E; /* Green */
+  transform: rotate(0deg);
+}
+
+/* Optional: Add hover effect */
+.wedge:hover {
+  opacity: 0.9;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Mode Buttons - Matching Compass Colors */
 .mode-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 40px;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
 .mode-btn {
-  margin: 8px;
-  padding: 10px 24px;
-  border: none;
-  border-radius: 20px;
-  color: white;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
   width: 200px;
-  text-align: center;
+  padding: 1rem;
+  border: none;
+  border-radius: 999px;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.mode-btn.grow { background-color: #009688; }
-.mode-btn.surv { background-color: #e91e63; }
-.mode-btn.ground { background-color: #4caf50; }
-.mode-btn.drift { background-color: #3f51b5; }
+.mode-btn:hover {
+  transform: scale(1.03);
+}
 
+.mode-btn.grow {
+  background-color: #3B82F6; /* Blue - Growing */
+}
+
+.mode-btn.drift {
+  background-color: #FACC15; /* Yellow - Drifting */
+  color: #000; /* Improve contrast */
+}
+
+.mode-btn.ground {
+  background-color: #22C55E; /* Green - Grounded */
+}
+
+.mode-btn.surv {
+  background-color: #EC4899; /* Pink - Surviving */
+}
 .section {
   padding: 30px 20px;
 }
