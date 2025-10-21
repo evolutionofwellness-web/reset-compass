@@ -1,35 +1,32 @@
-// Splash Screen Animation
+// Splash Animation
 window.addEventListener("load", () => {
   const splash = document.getElementById("splashScreen");
   const splashIcon = document.getElementById("splashIcon");
 
-  splashIcon.classList.add("zoom");
   setTimeout(() => {
     splash.style.display = "none";
 
-    // Show welcome popup if first visit
     if (!localStorage.getItem("welcomeShown")) {
       document.getElementById("welcomePopup").style.display = "block";
     }
   }, 1500);
 });
 
-// Start Button on Welcome Popup
+// Welcome popup
 document.getElementById("startButton").addEventListener("click", () => {
   document.getElementById("welcomePopup").style.display = "none";
   localStorage.setItem("welcomeShown", "true");
 });
 
-// Inject Compass Wedges
+// Inject Compass
 function renderCompass() {
   const compass = document.getElementById("compass");
+  if (!compass) return;
   compass.innerHTML = `
-    <div class="compass-circle">
-      <div class="wedge wedge-top" onclick="selectMode('growing')"><span>Growing</span></div>
-      <div class="wedge wedge-left" onclick="selectMode('grounded')"><span>Grounded</span></div>
-      <div class="wedge wedge-right" onclick="selectMode('drifting')"><span>Drifting</span></div>
-      <div class="wedge wedge-bottom" onclick="selectMode('surviving')"><span>Surviving</span></div>
-    </div>
+    <div class="wedge wedge-top" onclick="selectMode('growing')"><span>Growing</span></div>
+    <div class="wedge wedge-left" onclick="selectMode('grounded')"><span>Grounded</span></div>
+    <div class="wedge wedge-right" onclick="selectMode('drifting')"><span>Drifting</span></div>
+    <div class="wedge wedge-bottom" onclick="selectMode('surviving')"><span>Surviving</span></div>
   `;
 }
 renderCompass();
@@ -42,12 +39,11 @@ function showSection(sectionId) {
   document.getElementById(sectionId).style.display = "block";
 }
 
-// Mode Logging + Streak
+// Mode Logging
 function selectMode(mode) {
   const today = new Date().toISOString().split("T")[0];
   let history = JSON.parse(localStorage.getItem("modeHistory") || "[]");
 
-  // Only log once per day
   if (!history.find(entry => entry.date === today)) {
     history.push({ date: today, mode });
     localStorage.setItem("modeHistory", JSON.stringify(history));
@@ -55,10 +51,10 @@ function selectMode(mode) {
     renderHistory(history);
   }
 
-  alert(`You selected: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+  alert(`You selected: ${mode}`);
 }
 
-// Streak Logic
+// Streak
 function updateStreak(history) {
   const dates = history.map(entry => entry.date).sort().reverse();
   let streak = 0;
@@ -97,6 +93,6 @@ function renderHistory(history = JSON.parse(localStorage.getItem("modeHistory") 
   });
 }
 
-// On Load
+// Init
 renderHistory();
 updateStreak(JSON.parse(localStorage.getItem("modeHistory") || "[]"));
