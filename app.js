@@ -1,81 +1,85 @@
-// Splash Screen Logic
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    const splash = document.getElementById("splashScreen");
-    splash.style.opacity = "0";
-    splash.style.pointerEvents = "none";
-    setTimeout(() => splash.style.display = "none", 300);
+document.addEventListener("DOMContentLoaded", function () {
+  const modeColors = {
+    growing: "#4285F4",   // Blue
+    grounded: "#34A853",  // Green
+    drifting: "#FBBC05",  // Yellow
+    surviving: "#EA4335"  // Red
+  };
 
-    if (!localStorage.getItem("welcomeShown")) {
-      document.getElementById("welcomePopup").style.display = "block";
-    }
-  }, 1400);
-});
+  const modeIcons = {
+    growing: "🛫",
+    grounded: "🌿",
+    drifting: "🧭",
+    surviving: "🩺"
+  };
 
-// Welcome Popup Logic
-document.getElementById("startButton").addEventListener("click", () => {
-  document.getElementById("welcomePopup").style.display = "none";
-  localStorage.setItem("welcomeShown", "true");
-});
+  const modeLabels = {
+    growing: "Growing",
+    grounded: "Grounded",
+    drifting: "Drifting",
+    surviving: "Surviving"
+  };
 
-// Navigation Between Sections
-function showSection(sectionId) {
-  const sections = document.querySelectorAll("main .section");
-  sections.forEach((section) => {
-    section.style.display = "none";
-  });
-  document.getElementById(sectionId).style.display = "block";
-}
+  const compassOrder = ["growing", "grounded", "drifting", "surviving"];
 
-// Mode Selection & Logging
-function selectMode(mode) {
-  const now = new Date().toLocaleDateString();
-  const history = JSON.parse(localStorage.getItem("modeHistory")) || [];
+  function renderCompass() {
+    const compass = document.getElementById("compass");
+    compass.innerHTML = "";
 
-  if (!history.find(entry => entry.date === now)) {
-    history.push({ date: now, mode });
+    compassOrder.forEach((mode, index) => {
+      const wedge = document.createElement("div");
+      wedge.className = "wedge";
+      wedge.style.backgroundColor = modeColors[mode];
+      wedge.style.transform = `rotate(${index * 90}deg) translate(0, -50%) rotate(-${index * 90}deg)`;
+      wedge.dataset.mode = mode;
+      wedge.innerHTML = `<span>${modeLabels[mode]}</span>`;
+      wedge.addEventListener("click", () => selectMode(mode));
+      compass.appendChild(wedge);
+    });
+  }
+
+  function renderButtons() {
+    const container = document.getElementById("modeButtons");
+    container.innerHTML = "";
+
+    compassOrder.forEach((mode) => {
+      const button = document.createElement("button");
+      button.className = "mode-button";
+      button.style.backgroundColor = modeColors[mode];
+      button.innerHTML = `<span class="mode-icon">${modeIcons[mode]}</span>${modeLabels[mode]}`;
+      button.addEventListener("click", () => selectMode(mode));
+      container.appendChild(button);
+    });
+  }
+
+  function selectMode(mode) {
+    const today = new Date().toISOString().split("T")[0];
+    const history = JSON.parse(localStorage.getItem("modeHistory") || "{}");
+    history[today] = mode;
     localStorage.setItem("modeHistory", JSON.stringify(history));
-    updateStreak(history);
-    renderHistory(history);
+    renderStreak();
   }
 
-  alert(`You selected: ${mode.charAt(0).toUpperCase() + mode.slice(1)} Mode`);
-}
+  function renderStreak() {
+    const history = JSON.parse(localStorage.getItem("modeHistory") || "{}");
+    const today = new Date();
+    let streak = 0;
 
-// Streak Calculation
-function updateStreak(history) {
-  history.sort((a, b) => new Date(b.date) - new Date(a.date));
-  let streak = 0;
-  let currentDate = new Date();
-
-  for (let i = 0; i < history.length; i++) {
-    const entryDate = new Date(history[i].date);
-    if (entryDate.toDateString() === currentDate.toDateString()) {
-      streak++;
-      currentDate.setDate(currentDate.getDate() - 1);
-    } else {
-      break;
+    for (let i = 0; ; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const key = date.toISOString().split("T")[0];
+      if (history[key]) {
+        streak++;
+      } else {
+        break;
+      }
     }
+
+    document.getElementById("streakCount").innerHTML = `🔥 Current Streak: ${streak} day${streak !== 1 ? "s" : ""}`;
   }
 
-  document.getElementById("streakCount").textContent = streak;
-}
-
-// History Renderer
-function renderHistory(history) {
-  const container = document.getElementById("mode-history");
-  container.innerHTML = "";
-
-  history.slice().reverse().forEach(entry => {
-    const item = document.createElement("div");
-    item.textContent = `✔️ ${entry.date}: ${entry.mode}`;
-    container.appendChild(item);
-  });
-}
-
-// Restore history and streak on load
-window.addEventListener("DOMContentLoaded", () => {
-  const history = JSON.parse(localStorage.getItem("modeHistory")) || [];
-  updateStreak(history);
-  renderHistory(history);
+  renderCompass();
+  renderButtons();
+  renderStreak();
 });
