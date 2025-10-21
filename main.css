@@ -1,114 +1,87 @@
-/* === RESET COMPASS MAIN CSS === */
-
-/* === Color Variables === */
+/* === Brand Colors === */
 :root {
-  --brand: #0B3D2E;
-  --surv: #A94747;
-  --drift: #E6B450;
-  --ground: #3B755F;
-  --grow: #4C7EDC;
-  --muted: #666666;
-  --bg: #ffffff;
-  --text: #0B3D2E;
+  --green-dark: #0B3D2E;
+  --green: #1C3B34;
+  --green-light: #E8F1ED;
+  --white: #FFFFFF;
+  --gray-light: #F7F7F7;
+  --text-dark: #1C1C1C;
+  --red: #A93A3A;
+  --blue: #4A76D7;
+  --gold: #E0B252;
 }
 
-/* === Base Styles === */
+/* === Reset & Global === */
 body {
   margin: 0;
-  padding: 0;
-  background-color: var(--bg);
-  color: var(--text);
   font-family: system-ui, sans-serif;
-  overflow-x: hidden;
+  background-color: var(--white);
+  color: var(--text-dark);
 }
 
-h1, h2, h3 {
-  margin: 1rem 0 0.5rem;
-  color: var(--brand);
-  font-weight: bold;
-}
-
-p {
-  line-height: 1.6;
-  margin: 0.5rem 0;
+h1, h2 {
+  font-weight: 600;
 }
 
 a {
-  color: var(--brand);
+  color: var(--green);
   text-decoration: none;
 }
 
-/* === Buttons === */
-button, .btn {
-  background-color: var(--brand);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.6rem 1rem;
+button {
+  font-family: inherit;
   font-size: 1rem;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-}
-
-button:focus,
-.btn:focus {
-  outline: 2px dashed var(--brand);
-  outline-offset: 2px;
-}
-
-.btn.ghost {
-  background: transparent;
-  color: var(--brand);
-  border: 1px solid var(--brand);
-}
-.btn.ghost:hover {
-  background-color: var(--brand);
-  color: white;
+  transition: background 0.2s ease;
 }
 
 /* === Splash Screen === */
 #splashScreen {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: var(--brand);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: var(--white);
+  width: 100%;
+  height: 100%;
   z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#splashIcon {
-  width: 160px;
-  height: 160px;
-  animation: zoomSpinFade 1.6s ease-in-out forwards;
+#splashScreen img {
+  width: 120px;
+  height: 120px;
+  animation: zoomFade 1.4s ease-out forwards;
 }
 
-@keyframes zoomSpinFade {
+@keyframes zoomFade {
   0% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
   }
   50% {
-    transform: scale(1.4) rotate(180deg);
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
   }
   100% {
     opacity: 0;
-    transform: scale(2) rotate(360deg);
+    transform: scale(1) rotate(360deg);
   }
 }
 
 /* === Welcome Popup === */
 #welcomePopup {
+  display: none;
   position: fixed;
+  background: var(--gray-light);
+  color: var(--text-dark);
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(255,255,255,0.97);
-  z-index: 10000;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -118,152 +91,129 @@ button:focus,
 }
 
 #welcomePopup h2 {
-  font-size: 1.6rem;
   margin-bottom: 1rem;
-  color: var(--brand);
 }
 
-#welcomePopup p {
-  max-width: 400px;
-  margin-bottom: 1.5rem;
+#welcomePopup button {
+  background: var(--green);
+  color: var(--white);
+  font-weight: 600;
 }
 
-/* === Header & Navigation === */
+/* === App Layout === */
+#app {
+  padding-top: 60px;
+}
+
+/* === Header === */
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--brand);
-  color: #fff;
+  background: var(--green);
+  color: var(--white);
   padding: 1rem;
+  text-align: center;
 }
 
-nav {
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+nav.nav {
   display: flex;
-  gap: 1rem;
+  justify-content: space-around;
+  margin-top: 1rem;
 }
 
-nav a {
-  color: #fff;
-  font-weight: bold;
+nav.nav button {
+  background: none;
+  border: none;
+  color: var(--white);
+  font-weight: 600;
   font-size: 1rem;
 }
 
-/* === Compass Layout === */
+/* === Sections === */
+.section {
+  padding: 2rem 1rem;
+}
+
+/* === Compass Section === */
 #compass {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 10px;
-  max-width: 480px;
-  margin: 2rem auto;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .wedge {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem 1rem;
-  font-size: 1.2rem;
-  font-weight: bold;
+  background: var(--green-light);
   border-radius: 12px;
+  padding: 1.5rem;
+  font-weight: 600;
   text-align: center;
-  color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-.wedge:nth-child(1) { background-color: var(--grow); }
-.wedge:nth-child(2) { background-color: var(--surv); }
-.wedge:nth-child(3) { background-color: var(--ground); }
-.wedge:nth-child(4) { background-color: var(--drift); }
+.wedge:hover {
+  background: var(--gray-light);
+}
 
 /* === Mode Buttons === */
 .mode-buttons {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 1rem;
-  margin: 2rem 0;
+  justify-content: center;
 }
 
 .mode-btn {
-  padding: 1rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  min-width: 120px;
-  border-radius: 8px;
-  color: #fff;
-  text-transform: uppercase;
-  border: none;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+  color: var(--white);
 }
 
-.mode-btn.surv { background-color: var(--surv); }
-.mode-btn.drift { background-color: var(--drift); }
-.mode-btn.ground { background-color: var(--ground); }
-.mode-btn.grow { background-color: var(--grow); }
+.grow { background: var(--blue); }
+.surv { background: var(--red); }
+.ground { background: var(--green); }
+.drift { background: var(--gold); color: var(--text-dark); }
 
-/* === Activity Lists === */
-.activity-list {
-  padding: 1rem;
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.activity-item {
-  border: 1px solid var(--muted);
-  border-left: 6px solid var(--brand);
-  padding: 0.75rem;
-  margin-bottom: 0.75rem;
-  background-color: #f9f9f9;
-  border-radius: 6px;
-}
-
-/* === Streak/Stats === */
+/* === History === */
 .stats {
-  text-align: center;
-  margin: 2rem auto;
-  font-size: 1.25rem;
   font-weight: bold;
-  color: var(--brand);
+  margin-bottom: 1rem;
 }
 
 #mode-history {
-  padding: 1rem;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.mode-entry {
-  padding: 0.5rem 1rem;
-  border-left: 4px solid var(--brand);
-  margin-bottom: 0.5rem;
-  font-size: 1.05rem;
-  background-color: #f5f5f5;
-  border-radius: 4px;
+  border-top: 1px solid #ccc;
+  padding-top: 1rem;
 }
 
 /* === Footer === */
 footer {
   text-align: center;
-  padding: 2rem 1rem;
+  padding: 1rem;
+  background: var(--gray-light);
   font-size: 0.9rem;
-  color: var(--muted);
 }
 
 /* === Responsive === */
-@media (max-width: 480px) {
-  .wedge {
-    padding: 1.2rem 0.6rem;
-    font-size: 1rem;
-  }
-
-  nav {
+@media (max-width: 600px) {
+  nav.nav {
     flex-direction: column;
     gap: 0.5rem;
   }
 
+  #compass {
+    grid-template-columns: 1fr;
+  }
+
   .mode-buttons {
     flex-direction: column;
-    align-items: center;
+  }
+
+  header h1 {
+    font-size: 1.3rem;
   }
 }
