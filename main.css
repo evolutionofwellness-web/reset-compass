@@ -1,47 +1,34 @@
-/* === Brand Colors === */
+/* === Reset + Variables === */
 :root {
-  --green-dark: #0B3D2E;
-  --green: #1C3B34;
-  --green-light: #E8F1ED;
-  --white: #FFFFFF;
-  --gray-light: #F7F7F7;
-  --text-dark: #1C1C1C;
-  --red: #A93A3A;
-  --blue: #4A76D7;
-  --gold: #E0B252;
+  --green: #0B3D2E;
+  --light-green: #E8F1ED;
+  --blue: #4A90E2;
+  --red: #B94A48;
+  --gold: #F4C542;
+  --text-light: #ffffff;
+  --text-dark: #1a1a1a;
 }
 
-/* === Reset & Global === */
-body {
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
   font-family: system-ui, sans-serif;
-  background-color: var(--white);
+  background: #fff;
   color: var(--text-dark);
+  line-height: 1.5;
 }
-
-h1, h2 {
-  font-weight: 600;
-}
-
-a {
-  color: var(--green);
-  text-decoration: none;
-}
-
 button {
   font-family: inherit;
-  font-size: 1rem;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
 
 /* === Splash Screen === */
 #splashScreen {
   position: fixed;
-  background: var(--white);
+  background: var(--green);
   width: 100%;
   height: 100%;
   z-index: 9999;
@@ -51,169 +38,182 @@ button {
 }
 
 #splashScreen img {
-  width: 120px;
-  height: 120px;
-  animation: zoomFade 1.4s ease-out forwards;
+  width: 140px;
+  height: 140px;
+  animation: zoomFade 1.8s ease-out forwards;
 }
 
 @keyframes zoomFade {
   0% {
     opacity: 0;
-    transform: scale(0.5) rotate(0deg);
+    transform: scale(0.3) rotate(0deg);
   }
   50% {
     opacity: 1;
-    transform: scale(1.2) rotate(180deg);
+    transform: scale(2.5) rotate(180deg);
   }
   100% {
     opacity: 0;
-    transform: scale(1) rotate(360deg);
+    transform: scale(3.5) rotate(360deg);
   }
 }
 
 /* === Welcome Popup === */
 #welcomePopup {
-  display: none;
   position: fixed;
-  background: var(--gray-light);
-  color: var(--text-dark);
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  background: #ffffff;
+  width: 100%;
+  height: 100%;
   z-index: 9998;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 2rem;
 }
-
 #welcomePopup h2 {
   margin-bottom: 1rem;
+  color: var(--green);
 }
-
+#welcomePopup p {
+  margin-bottom: 1.5rem;
+}
 #welcomePopup button {
   background: var(--green);
-  color: var(--white);
-  font-weight: 600;
-}
-
-/* === App Layout === */
-#app {
-  padding-top: 60px;
-}
-
-/* === Header === */
-header {
-  background: var(--green);
-  color: var(--white);
-  padding: 1rem;
-  text-align: center;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-nav.nav {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 1rem;
-}
-
-nav.nav button {
-  background: none;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
   border: none;
-  color: var(--white);
-  font-weight: 600;
+  border-radius: 6px;
   font-size: 1rem;
 }
 
-/* === Sections === */
-.section {
-  padding: 2rem 1rem;
+/* === Header + Nav === */
+header {
+  background: var(--green);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+header h1 {
+  margin-bottom: 0.5rem;
+}
+nav.nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+nav.nav button {
+  background: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.5rem;
+  text-decoration: underline;
 }
 
-/* === Compass Section === */
+/* === Section Layouts === */
+main {
+  padding: 1.5rem 1rem;
+}
+.section {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* === Compass === */
 #compass {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 2rem auto;
+  border-radius: 50%;
+  background: var(--light-green);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .wedge {
-  background: var(--green-light);
-  border-radius: 12px;
-  padding: 1.5rem;
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 600;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  color: #fff;
   cursor: pointer;
-  transition: background 0.2s ease;
+  border-radius: 50% 0 0 0;
+  transform-origin: 100% 100%;
 }
-
-.wedge:hover {
-  background: var(--gray-light);
+.wedge:nth-child(1) {
+  background: var(--blue);
+  transform: rotate(0deg) translate(50%, -50%);
+}
+.wedge:nth-child(2) {
+  background: var(--red);
+  transform: rotate(90deg) translate(50%, -50%);
+}
+.wedge:nth-child(3) {
+  background: var(--green);
+  transform: rotate(180deg) translate(50%, -50%);
+}
+.wedge:nth-child(4) {
+  background: var(--gold);
+  color: var(--text-dark);
+  transform: rotate(270deg) translate(50%, -50%);
 }
 
 /* === Mode Buttons === */
 .mode-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
   justify-content: center;
+  gap: 1rem;
+  margin: 2rem auto;
 }
-
 .mode-btn {
-  font-weight: 600;
-  padding: 1rem 1.5rem;
-  color: var(--white);
-}
-
-.grow { background: var(--blue); }
-.surv { background: var(--red); }
-.ground { background: var(--green); }
-.drift { background: var(--gold); color: var(--text-dark); }
-
-/* === History === */
-.stats {
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
   font-weight: bold;
-  margin-bottom: 1rem;
 }
+.mode-btn.grow { background: var(--blue); }
+.mode-btn.surv { background: var(--red); }
+.mode-btn.ground { background: var(--green); }
+.mode-btn.drift { background: var(--gold); color: var(--text-dark); }
 
-#mode-history {
-  border-top: 1px solid #ccc;
-  padding-top: 1rem;
+/* === History & Stats === */
+.stats {
+  margin: 1rem 0;
+  font-weight: bold;
 }
 
 /* === Footer === */
 footer {
   text-align: center;
   padding: 1rem;
-  background: var(--gray-light);
   font-size: 0.9rem;
+  color: #666;
+  background: #f5f5f5;
 }
 
 /* === Responsive === */
-@media (max-width: 600px) {
-  nav.nav {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
+@media (max-width: 480px) {
   #compass {
-    grid-template-columns: 1fr;
+    width: 260px;
+    height: 260px;
   }
-
-  .mode-buttons {
-    flex-direction: column;
-  }
-
-  header h1 {
-    font-size: 1.3rem;
+  .wedge {
+    font-size: 0.8rem;
   }
 }
