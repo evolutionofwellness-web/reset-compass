@@ -43,7 +43,7 @@ nav.nav {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  margin: 20px 0;
 }
 
 .compass-circle {
@@ -51,61 +51,67 @@ nav.nav {
   width: 280px;
   height: 280px;
   border-radius: 50%;
-  border: 4px solid #000;
+  border: 3px solid #000;
   overflow: hidden;
 }
 
-/* Quadrant wedges */
+/* All wedges */
 .wedge {
   position: absolute;
   width: 50%;
   height: 50%;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   font-weight: bold;
   color: #fff;
   text-align: center;
+  font-size: 14px;
+  padding: 8px;
 }
 
-/* Top (Growing) */
+/* Growing (Top) */
 .wedge-top {
   top: 0;
-  left: 25%;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: #3498db;
   border-bottom-left-radius: 140px;
   border-bottom-right-radius: 140px;
 }
 
-/* Right (Drifting) */
-.wedge-right {
-  top: 25%;
-  right: 0;
-  background-color: #f1c40f;
-  border-top-left-radius: 140px;
-  border-bottom-left-radius: 140px;
-  color: #000;
-}
-
-/* Bottom (Surviving) */
-.wedge-bottom {
-  bottom: 0;
-  left: 25%;
-  background-color: #e74c3c;
-  border-top-left-radius: 140px;
-  border-top-right-radius: 140px;
-}
-
-/* Left (Grounded) */
+/* Grounded (Left) */
 .wedge-left {
-  top: 25%;
+  top: 50%;
   left: 0;
+  transform: translateY(-50%);
   background-color: #2ecc71;
   border-top-right-radius: 140px;
   border-bottom-right-radius: 140px;
 }
 
-/* Make labels upright */
+/* Drifting (Right) */
+.wedge-right {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  background-color: #f1c40f;
+  color: #000;
+  border-top-left-radius: 140px;
+  border-bottom-left-radius: 140px;
+}
+
+/* Surviving (Bottom) */
+.wedge-bottom {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #e74c3c;
+  border-top-left-radius: 140px;
+  border-top-right-radius: 140px;
+}
+
+/* Labels stay upright */
 .wedge span {
   transform: rotate(0deg);
   font-size: 16px;
