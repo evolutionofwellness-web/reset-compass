@@ -1,171 +1,211 @@
-:root {
-  --brand-green: #0B3D2E;
-  --text-color: #ffffff;
-  --wedge-growing: #4285F4;
-  --wedge-surviving: #B22222;
-  --wedge-grounded: #4CAF50;
-  --wedge-drifting: #FFA500;
+/* Global Reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Georgia', serif;
+  background-color: white;
+  color: #0B3D2E;
 }
 
-/* Splash screen */
-#splash {
+/* Splash Screen */
+#splashScreen {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-color: var(--brand-green);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #0B3D2E;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: splashFade 2s ease forwards;
-}
-@keyframes splashFade {
-  0% { opacity: 1; transform: scale(1); }
-  80% { opacity: 1; transform: scale(1.15); }
-  100% { opacity: 0; transform: scale(1.15); }
-}
-#splash img {
-  width: 120px;
-  height: 120px;
-  animation: rotateZoom 2s ease;
-}
-@keyframes rotateZoom {
-  0% { transform: rotate(0deg) scale(1); }
-  100% { transform: rotate(360deg) scale(1.15); }
 }
 
-/* Compass container */
-#compass {
-  position: relative;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin: 0 auto;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
-}
-.wedge {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  transform-origin: 100% 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-}
-.wedge span {
-  transform: rotate(0deg);
-  writing-mode: horizontal-tb;
+#splashIcon {
+  width: 150px;
+  height: 150px;
+  animation: splashZoom 1.2s ease-out forwards;
 }
 
-/* Each quadrant color + rotation */
-.wedge.growing {
-  background-color: var(--wedge-growing);
-  transform: rotate(0deg) skewY(-45deg);
-  top: 0; left: 50%;
-}
-.wedge.surviving {
-  background-color: var(--wedge-surviving);
-  transform: rotate(90deg) skewY(-45deg);
-  top: 50%; left: 50%;
-}
-.wedge.grounded {
-  background-color: var(--wedge-grounded);
-  transform: rotate(180deg) skewY(-45deg);
-  top: 50%; left: 0;
-}
-.wedge.drifting {
-  background-color: var(--wedge-drifting);
-  transform: rotate(270deg) skewY(-45deg);
-  top: 0; left: 0;
+@keyframes splashZoom {
+  0% {
+    transform: scale(0.6) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.1) rotate(360deg);
+    opacity: 0;
+  }
 }
 
 /* Welcome Popup */
 #welcomePopup {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 9998;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  color: #0B3D2E;
+  border: 2px solid #0B3D2E;
+  padding: 20px;
+  z-index: 999;
+  display: none;
+  text-align: center;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#welcomePopup h2 {
+  margin-top: 0;
+}
+
+#startButton {
+  background-color: #0B3D2E;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Header */
+header {
+  background-color: #0B3D2E;
+  padding: 20px;
+  text-align: center;
+}
+
+header h1 {
+  color: white;
+  margin-bottom: 10px;
+}
+
+.nav button {
+  margin: 5px;
+  padding: 8px 14px;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 20px;
+  color: #0B3D2E;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.nav button:hover {
+  background-color: #d4d4d4;
+}
+
+/* Compass Styles */
+#compass {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin: 40px auto 20px;
+  border-radius: 50%;
+  background-color: #f8f8f8;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  display: grid;
+  place-items: center;
+}
+
+.wedge {
+  position: absolute;
+  width: 50%;
+  height: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.popup-content {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  max-width: 400px;
-  color: #000;
-  text-align: center;
-}
-#startButton {
-  margin-top: 15px;
-  background-color: var(--brand-green);
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* Navigation */
-nav {
-  background-color: var(--brand-green);
-  padding: 12px 0;
-  text-align: center;
-}
-nav a {
-  color: white;
-  margin: 0 15px;
-  text-decoration: none;
   font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px;
+  transform-origin: bottom right;
+  color: white;
 }
 
-/* General layout fixes */
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background-color: #fff;
-  color: #000;
+/* Wedge Colors & Positions */
+.wedge:nth-child(1) {
+  background-color: #009688; /* Growing */
+  transform: rotate(45deg) translate(50%, -50%);
 }
-h1 {
-  text-align: center;
-  color: var(--brand-green);
+.wedge:nth-child(2) {
+  background-color: #e91e63; /* Surviving */
+  transform: rotate(135deg) translate(50%, -50%);
 }
+.wedge:nth-child(3) {
+  background-color: #4caf50; /* Grounded */
+  transform: rotate(225deg) translate(50%, -50%);
+}
+.wedge:nth-child(4) {
+  background-color: #3f51b5; /* Drifting */
+  transform: rotate(315deg) translate(50%, -50%);
+}
+
+/* Mode Buttons */
 .mode-buttons {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 20px;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
 }
-.mode-buttons button {
-  background: #f2f2f2;
-  color: #000;
-  font-weight: bold;
+
+.mode-btn {
+  margin: 8px;
+  padding: 10px 24px;
   border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
   cursor: pointer;
+  width: 200px;
+  text-align: center;
+}
+
+.mode-btn.grow { background-color: #009688; }
+.mode-btn.surv { background-color: #e91e63; }
+.mode-btn.ground { background-color: #4caf50; }
+.mode-btn.drift { background-color: #3f51b5; }
+
+.section {
+  padding: 30px 20px;
 }
 
 /* Footer */
 footer {
-  margin-top: 40px;
   text-align: center;
-  color: #333;
+  padding: 20px;
   font-size: 14px;
+  background-color: #f0f0f0;
+  color: #0B3D2E;
 }
 
-/* Responsive Compass */
-@media (max-width: 500px) {
+/* Stats */
+.stats {
+  text-align: center;
+  font-size: 18px;
+  margin: 20px auto;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
   #compass {
-    width: 250px;
-    height: 250px;
+    width: 220px;
+    height: 220px;
+  }
+
+  .mode-btn {
+    width: 160px;
+    font-size: 14px;
+  }
+
+  .wedge {
+    font-size: 12px;
   }
 }
