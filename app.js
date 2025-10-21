@@ -1,115 +1,102 @@
-// app.js?v=6
-
-document.addEventListener("DOMContentLoaded", () => {
-  const splashScreen = document.getElementById("splashScreen");
+// Splash Screen Animation
+window.addEventListener("load", () => {
+  const splash = document.getElementById("splashScreen");
   const splashIcon = document.getElementById("splashIcon");
-  const welcomePopup = document.getElementById("welcomePopup");
-  const startButton = document.getElementById("startButton");
 
-  // Splash animation
-  splashScreen.style.display = "flex";
+  splashIcon.classList.add("zoom");
   setTimeout(() => {
-    splashScreen.classList.add("fade-out");
-    setTimeout(() => {
-      splashScreen.style.display = "none";
+    splash.style.display = "none";
 
-      // Show popup only once
-      if (!localStorage.getItem("popupShown")) {
-        welcomePopup.style.display = "block";
-      }
-    }, 1000);
-  }, 1200);
+    // Show welcome popup if first visit
+    if (!localStorage.getItem("welcomeShown")) {
+      document.getElementById("welcomePopup").style.display = "block";
+    }
+  }, 1500);
+});
 
-  // Welcome popup close
-  if (startButton) {
-    startButton.addEventListener("click", () => {
-      welcomePopup.style.display = "none";
-      localStorage.setItem("popupShown", "true");
-    });
-  }
+// Start Button on Welcome Popup
+document.getElementById("startButton").addEventListener("click", () => {
+  document.getElementById("welcomePopup").style.display = "none";
+  localStorage.setItem("welcomeShown", "true");
+});
 
-  // Wedge rendering
+// Inject Compass Wedges
+function renderCompass() {
   const compass = document.getElementById("compass");
-  if (compass) {
-    const ctx = compass.getContext("2d");
-    const size = compass.width;
-    const center = size / 2;
-    const radius = center - 2;
+  compass.innerHTML = `
+    <div class="compass-circle">
+      <div class="wedge wedge-top" onclick="selectMode('growing')"><span>Growing</span></div>
+      <div class="wedge wedge-left" onclick="selectMode('grounded')"><span>Grounded</span></div>
+      <div class="wedge wedge-right" onclick="selectMode('drifting')"><span>Drifting</span></div>
+      <div class="wedge wedge-bottom" onclick="selectMode('surviving')"><span>Surviving</span></div>
+    </div>
+  `;
+}
+renderCompass();
 
-    const wedges = [
-      { label: "Growing", color: "#007BFF" },
-      { label: "Drifting", color: "#FBC02D" },
-      { label: "Surviving", color: "#E53935" },
-      { label: "Grounded", color: "#43A047" },
-    ];
+// Navigation
+function showSection(sectionId) {
+  document.querySelectorAll(".section").forEach(sec => {
+    sec.style.display = "none";
+  });
+  document.getElementById(sectionId).style.display = "block";
+}
 
-    let startAngle = -0.5 * Math.PI;
-    wedges.forEach((wedge, i) => {
-      const endAngle = startAngle + (Math.PI * 2) / wedges.length;
-      ctx.beginPath();
-      ctx.moveTo(center, center);
-      ctx.arc(center, center, radius, startAngle, endAngle);
-      ctx.closePath();
-      ctx.fillStyle = wedge.color;
-      ctx.fill();
+// Mode Logging + Streak
+function selectMode(mode) {
+  const today = new Date().toISOString().split("T")[0];
+  let history = JSON.parse(localStorage.getItem("modeHistory") || "[]");
 
-      // Text
-      const angle = startAngle + (endAngle - startAngle) / 2;
-      const textX = center + Math.cos(angle) * (radius * 0.6);
-      const textY = center + Math.sin(angle) * (radius * 0.6);
-      ctx.fillStyle = "white";
-      ctx.font = "bold 14px system-ui";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(wedge.label, textX, textY);
-
-      startAngle = endAngle;
-    });
+  // Only log once per day
+  if (!history.find(entry => entry.date === today)) {
+    history.push({ date: today, mode });
+    localStorage.setItem("modeHistory", JSON.stringify(history));
+    updateStreak(history);
+    renderHistory(history);
   }
 
-  // Logging mode selection
-  const log = JSON.parse(localStorage.getItem("activityLog")) || [];
-  const streakElement = document.getElementById("streak");
+  alert(`You selected: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+}
 
-  function updateStreak() {
-    const today = new Date().toISOString().slice(0, 10);
-    let streak = 0;
-    for (let i = 0; i < log.length; i++) {
-      const entryDate = log[log.length - 1 - i].date;
-      const expectedDate = new Date();
-      expectedDate.setDate(expectedDate.getDate() - i);
-      const expected = expectedDate.toISOString().slice(0, 10);
-      if (entryDate === expected) {
+// Streak Logic
+function updateStreak(history) {
+  const dates = history.map(entry => entry.date).sort().reverse();
+  let streak = 0;
+  let currentDate = new Date();
+
+  for (let date of dates) {
+    const entryDate = new Date(date);
+    if (entryDate.toDateString() === currentDate.toDateString()) {
+      streak++;
+    } else {
+      currentDate.setDate(currentDate.getDate() - 1);
+      if (entryDate.toDateString() === currentDate.toDateString()) {
         streak++;
       } else {
         break;
       }
     }
-    if (streakElement) {
-      streakElement.innerHTML = `<span style="font-size: 20px;">🔥 ${streak}</span>`;
-    }
   }
 
-  updateStreak();
+  document.getElementById("streakCount").innerText = streak;
+}
 
-  document.querySelectorAll(".mode-button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const mode = btn.dataset.mode;
-      const today = new Date().toISOString().slice(0, 10);
-      log.push({ date: today, mode });
-      localStorage.setItem("activityLog", JSON.stringify(log));
-      updateStreak();
-    });
+// Render History
+function renderHistory(history = JSON.parse(localStorage.getItem("modeHistory") || "[]")) {
+  const container = document.getElementById("mode-history");
+  if (!container) return;
+
+  container.innerHTML = "";
+  const sorted = history.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  sorted.forEach(entry => {
+    const div = document.createElement("div");
+    div.className = "history-entry";
+    div.innerText = `${entry.date}: ${entry.mode}`;
+    container.appendChild(div);
   });
+}
 
-  // Render history
-  const historySection = document.getElementById("historyList");
-  if (historySection && log.length > 0) {
-    log.slice(-10).reverse().forEach((entry) => {
-      const item = document.createElement("div");
-      item.className = "history-entry";
-      item.textContent = `${entry.date} — ${entry.mode}`;
-      historySection.appendChild(item);
-    });
-  }
-});
+// On Load
+renderHistory();
+updateStreak(JSON.parse(localStorage.getItem("modeHistory") || "[]"));
