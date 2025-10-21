@@ -1,12 +1,15 @@
 // Splash Screen Logic
 window.addEventListener("load", () => {
   setTimeout(() => {
-    document.getElementById("splashScreen").style.display = "none";
+    const splash = document.getElementById("splashScreen");
+    splash.style.opacity = "0";
+    splash.style.pointerEvents = "none";
+    setTimeout(() => splash.style.display = "none", 300);
 
     if (!localStorage.getItem("welcomeShown")) {
       document.getElementById("welcomePopup").style.display = "block";
     }
-  }, 1400); // match splash animation duration
+  }, 1400);
 });
 
 // Welcome Popup Logic
@@ -29,7 +32,6 @@ function selectMode(mode) {
   const now = new Date().toLocaleDateString();
   const history = JSON.parse(localStorage.getItem("modeHistory")) || [];
 
-  // Prevent duplicate entry for the same day
   if (!history.find(entry => entry.date === now)) {
     history.push({ date: now, mode });
     localStorage.setItem("modeHistory", JSON.stringify(history));
@@ -48,9 +50,7 @@ function updateStreak(history) {
 
   for (let i = 0; i < history.length; i++) {
     const entryDate = new Date(history[i].date);
-    if (
-      entryDate.toDateString() === currentDate.toDateString()
-    ) {
+    if (entryDate.toDateString() === currentDate.toDateString()) {
       streak++;
       currentDate.setDate(currentDate.getDate() - 1);
     } else {
