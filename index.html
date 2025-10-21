@@ -37,15 +37,20 @@
     <main>
       <!-- Home -->
       <section id="home" class="section">
-        <div class="compass-wrapper">
-          <div id="compass" class="compass-circle"></div>
-        </div>
-        <div class="mode-buttons">
-          <button class="mode-btn grow" onclick="selectMode('growing')">🚀 Growing</button>
-          <button class="mode-btn ground" onclick="selectMode('grounded')">🌿 Grounded</button>
-          <button class="mode-btn drift" onclick="selectMode('drifting')">🧭 Drifting</button>
-          <button class="mode-btn surv" onclick="selectMode('surviving')">🩺 Surviving</button>
-        </div>
+        <div class="compass-circle">
+  <div class="wedge wedge-top" onclick="selectMode('growing')">
+    <span class="wedge-text">Growing</span>
+  </div>
+  <div class="wedge wedge-left" onclick="selectMode('grounded')">
+    <span class="wedge-text">Grounded</span>
+  </div>
+  <div class="wedge wedge-right" onclick="selectMode('drifting')">
+    <span class="wedge-text">Drifting</span>
+  </div>
+  <div class="wedge wedge-bottom" onclick="selectMode('surviving')">
+    <span class="wedge-text">Surviving</span>
+  </div>
+</div>
       </section>
 
       <!-- Quick Wins -->
