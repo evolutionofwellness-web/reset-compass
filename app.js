@@ -1,79 +1,64 @@
-window.onload = function () {
-  const splash = document.getElementById('splashScreen');
-  const welcomePopup = document.getElementById('welcomePopup');
-  const startButton = document.getElementById('startButton');
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    document.getElementById("splashScreen").style.display = "none";
+    if (!localStorage.getItem("welcomeShown")) {
+      document.getElementById("welcomePopup").style.display = "block";
+    }
+  }, 2000);
 
-  if (!localStorage.getItem('visited')) {
-    welcomePopup.style.display = 'block';
-    startButton.onclick = () => {
-      welcomePopup.style.display = 'none';
-      localStorage.setItem('visited', 'true');
-      renderHome();
-    };
-  } else {
+  document.getElementById("startButton").addEventListener("click", () => {
+    document.getElementById("welcomePopup").style.display = "none";
+    localStorage.setItem("welcomeShown", "true");
     renderHome();
-  }
-};
+  });
 
-// Navigation
-function navigateTo(view) {
-  if (view === 'home') renderHome();
-  if (view === 'quickWins') renderQuickWins();
-  if (view === 'history') renderHistory();
-  if (view === 'about') renderAbout();
+  renderHome();
+});
+
+function navigate(page) {
+  if (page === "home") renderHome();
+  if (page === "quickwins") document.getElementById("app").innerHTML = "<h2>Quick Wins Coming Soon!</h2>";
+  if (page === "history") document.getElementById("app").innerHTML = "<h2>History Coming Soon!</h2>";
+  if (page === "about") document.getElementById("app").innerHTML = "<h2>Built by Evolution of Wellness LLC.</h2>";
 }
 
-// Views
 function renderHome() {
-  const app = document.getElementById('app');
+  const app = document.getElementById("app");
   app.innerHTML = `
-    <div class="compass-wrapper">
-      <div class="compass-circle">
-        <div class="wedge wedge-top" onclick="renderMode('Growing')"><span>Growing</span></div>
-        <div class="wedge wedge-right" onclick="renderMode('Drifting')"><span>Drifting</span></div>
-        <div class="wedge wedge-bottom" onclick="renderMode('Surviving')"><span>Surviving</span></div>
-        <div class="wedge wedge-left" onclick="renderMode('Grounded')"><span>Grounded</span></div>
-      </div>
+    <div id="compass">
+      <div class="wedge growing" onclick="renderMode('growing')"><span>Growing</span></div>
+      <div class="wedge drifting" onclick="renderMode('drifting')"><span>Drifting</span></div>
+      <div class="wedge surviving" onclick="renderMode('surviving')"><span>Surviving</span></div>
+      <div class="wedge grounded" onclick="renderMode('grounded')"><span>Grounded</span></div>
     </div>
     <div class="mode-buttons">
-      <button class="mode-btn grow" onclick="renderMode('Growing')">Growing</button>
-      <button class="mode-btn drift" onclick="renderMode('Drifting')">Drifting</button>
-      <button class="mode-btn surv" onclick="renderMode('Surviving')">Surviving</button>
-      <button class="mode-btn ground" onclick="renderMode('Grounded')">Grounded</button>
+      <button class="growing" onclick="renderMode('growing')">🚀 Growing Mode</button>
+      <button class="drifting" onclick="renderMode('drifting')">🧭 Drifting Mode</button>
+      <button class="surviving" onclick="renderMode('surviving')">🩺 Surviving Mode</button>
+      <button class="grounded" onclick="renderMode('grounded')">🌿 Grounded Mode</button>
     </div>
   `;
 }
 
 function renderMode(mode) {
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <h2>${mode} Mode</h2>
-    <ul>
-      <li>
-        <p>Activity 1</p>
-        <textarea placeholder="What did you do?"></textarea>
-      </li>
-      <li>
-        <p>Activity 2</p>
-        <textarea placeholder="What did you do?"></textarea>
-      </li>
-      <li>
-        <p>Activity 3</p>
-        <textarea placeholder="What did you do?"></textarea>
-      </li>
-    </ul>
+  const activities = {
+    growing: ["Set a bold weekly goal", "Schedule a deep work session", "Teach what you’ve learned"],
+    drifting: ["Write one priority on a sticky note", "Pause and breathe for 3 minutes", "Revisit your why"],
+    surviving: ["Drink a glass of water", "Stretch for 2 minutes", "Do one thing off your mind"],
+    grounded: ["Take a walk without your phone", "Prep a healthy snack", "Unplug from screens for 20 minutes"]
+  };
+
+  const list = activities[mode]
+    .map((item) => `<li>${item}</li>`)
+    .join("");
+
+  document.getElementById("app").innerHTML = `
+    <h2>${capitalize(mode)} Mode</h2>
+    <ul>${list}</ul>
     <button onclick="renderHome()">← Back</button>
   `;
 }
 
-function renderQuickWins() {
-  document.getElementById('app').innerHTML = `<h2>Quick Wins</h2><p>Coming soon...</p>`;
-}
-
-function renderHistory() {
-  document.getElementById('app').innerHTML = `<h2>History</h2><p>Coming soon...</p>`;
-}
-
-function renderAbout() {
-  document.getElementById('app').innerHTML = `<h2>About</h2><p>The Reset Compass was created by Evolution of Wellness to help people take small steps toward better health—one mode at a time.</p>`;
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
