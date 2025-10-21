@@ -38,19 +38,21 @@ nav.nav {
   text-align: center;
 }
 
-/* Compass */
+/* Updated Compass Styling */
 .compass-wrapper {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-bottom: 20px;
 }
 
 .compass-circle {
   position: relative;
-  width: 260px;
-  height: 260px;
+  width: 280px;
+  height: 280px;
   border-radius: 50%;
   border: 3px solid #000;
+  overflow: hidden;
 }
 
 .wedge {
@@ -63,56 +65,51 @@ nav.nav {
   font-weight: bold;
   color: #fff;
   cursor: pointer;
-  transform-origin: 100% 100%;
   text-align: center;
+  padding: 5px;
 }
 
 .wedge-top {
   top: 0;
-  left: 25%;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: #3498db;
   border-top-left-radius: 100% 100%;
-  transform: rotate(0deg);
-}
-
-.wedge-left {
-  top: 25%;
-  left: 0;
-  background-color: #2ecc71;
-  border-bottom-left-radius: 100% 100%;
-  transform: rotate(270deg);
-}
-
-.wedge-right {
-  top: 25%;
-  right: 0;
-  background-color: #f1c40f;
   border-top-right-radius: 100% 100%;
-  transform: rotate(90deg);
 }
 
 .wedge-bottom {
   bottom: 0;
-  left: 25%;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: #e74c3c;
+  border-bottom-left-radius: 100% 100%;
   border-bottom-right-radius: 100% 100%;
-  transform: rotate(180deg);
+}
+
+.wedge-left {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  background-color: #2ecc71;
+  border-top-left-radius: 100% 100%;
+  border-bottom-left-radius: 100% 100%;
+}
+
+.wedge-right {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  background-color: #f1c40f;
+  border-top-right-radius: 100% 100%;
+  border-bottom-right-radius: 100% 100%;
+  color: #000;
 }
 
 .wedge span {
-  transform: rotate(-0deg); /* default: upright */
-  display: block;
   font-size: 16px;
   font-weight: bold;
-}
-.wedge-left span {
-  transform: rotate(-270deg);
-}
-.wedge-right span {
-  transform: rotate(-90deg);
-}
-.wedge-bottom span {
-  transform: rotate(-180deg);
+  transform: none !important;
 }
 
 /* Buttons */
