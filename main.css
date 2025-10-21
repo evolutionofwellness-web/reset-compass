@@ -88,6 +88,18 @@ nav.nav {
   border: 3px solid #000;
 }
 
+/* Compass Container */
+.compass-circle {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #000;
+  margin: 30px auto;
+}
+
+/* Wedge Base */
 .wedge {
   position: absolute;
   width: 50%;
@@ -98,55 +110,50 @@ nav.nav {
   font-weight: bold;
   color: #fff;
   cursor: pointer;
-  transform-origin: 100% 100%;
+  text-align: center;
+  line-height: 1.2;
+  font-size: 14px;
 }
 
+/* Top (Growing) */
 .wedge-top {
   top: 0;
   left: 25%;
-  width: 50%;
-  height: 50%;
   background-color: #3498db;
   border-top-left-radius: 100% 100%;
-  transform: rotate(0deg);
+  border-top-right-radius: 100% 100%;
 }
 
+/* Left (Grounded) */
 .wedge-left {
   top: 25%;
   left: 0;
-  width: 50%;
-  height: 50%;
   background-color: #2ecc71;
+  border-top-left-radius: 100% 100%;
   border-bottom-left-radius: 100% 100%;
-  transform: rotate(270deg);
 }
 
+/* Right (Drifting) */
 .wedge-right {
   top: 25%;
   right: 0;
-  width: 50%;
-  height: 50%;
   background-color: #f1c40f;
   border-top-right-radius: 100% 100%;
-  transform: rotate(90deg);
+  border-bottom-right-radius: 100% 100%;
 }
 
+/* Bottom (Surviving) */
 .wedge-bottom {
   bottom: 0;
   left: 25%;
-  width: 50%;
-  height: 50%;
   background-color: #e74c3c;
+  border-bottom-left-radius: 100% 100%;
   border-bottom-right-radius: 100% 100%;
-  transform: rotate(180deg);
 }
 
-.wedge-text {
-  transform: rotate(0deg);
-  display: block;
-  text-align: center;
-  width: 100%;
-  font-weight: bold;
+/* Wedge Text */
+.wedge span {
+  transform: none;
 }
 
 /* Buttons */
