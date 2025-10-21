@@ -38,7 +38,7 @@ nav.nav {
   text-align: center;
 }
 
-/* Updated Compass Styling */
+/* Compass */
 .compass-wrapper {
   display: flex;
   justify-content: center;
@@ -51,69 +51,65 @@ nav.nav {
   width: 280px;
   height: 280px;
   border-radius: 50%;
-  border: 3px solid #000;
+  border: 4px solid #000;
   overflow: hidden;
 }
 
+/* Quadrant wedges */
 .wedge {
   position: absolute;
   width: 50%;
   height: 50%;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   font-weight: bold;
   color: #fff;
-  cursor: pointer;
   text-align: center;
-  padding: 5px;
 }
 
+/* Top (Growing) */
 .wedge-top {
   top: 0;
-  left: 0;
-  width: 100%;
-  height: 50%;
+  left: 25%;
   background-color: #3498db;
-  border-top-left-radius: 140px;
-  border-top-right-radius: 140px;
-}
-
-.wedge-bottom {
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 50%;
-  background-color: #e74c3c;
   border-bottom-left-radius: 140px;
   border-bottom-right-radius: 140px;
 }
 
-.wedge-left {
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  background-color: #2ecc71;
-  border-top-left-radius: 140px;
-  border-bottom-left-radius: 140px;
-}
-
+/* Right (Drifting) */
 .wedge-right {
-  top: 0;
+  top: 25%;
   right: 0;
-  width: 50%;
-  height: 100%;
   background-color: #f1c40f;
-  border-top-right-radius: 140px;
-  border-bottom-right-radius: 140px;
+  border-top-left-radius: 140px;
+  border-bottom-left-radius: 140px;
   color: #000;
 }
 
+/* Bottom (Surviving) */
+.wedge-bottom {
+  bottom: 0;
+  left: 25%;
+  background-color: #e74c3c;
+  border-top-left-radius: 140px;
+  border-top-right-radius: 140px;
+}
+
+/* Left (Grounded) */
+.wedge-left {
+  top: 25%;
+  left: 0;
+  background-color: #2ecc71;
+  border-top-right-radius: 140px;
+  border-bottom-right-radius: 140px;
+}
+
+/* Make labels upright */
 .wedge span {
+  transform: rotate(0deg);
   font-size: 16px;
   font-weight: bold;
-  transform: none !important;
 }
 
 /* Buttons */
