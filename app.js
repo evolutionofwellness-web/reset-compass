@@ -1,29 +1,45 @@
-// app.js?v=10
-
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splashScreen");
-  setTimeout(() => splash.style.display = "none", 2000);
+  const welcome = document.getElementById("welcomePopup");
+  const startButton = document.getElementById("startButton");
 
-  const hasSeenPopup = localStorage.getItem("seenWelcome");
-  const popup = document.getElementById("welcomePopup");
-  const startBtn = document.getElementById("startButton");
-
-  if (!hasSeenPopup && popup) {
-    popup.style.display = "flex";
-    startBtn.onclick = () => {
-      popup.style.display = "none";
-      localStorage.setItem("seenWelcome", "true");
-    };
+  if (!localStorage.getItem("welcomeShown")) {
+    welcome.style.display = "block";
+    startButton.addEventListener("click", () => {
+      welcome.style.display = "none";
+      localStorage.setItem("welcomeShown", "true");
+    });
   }
 
-  const streak = localStorage.getItem("streak") || 0;
-  document.getElementById("streak").textContent = streak;
+  setTimeout(() => splash.style.display = "none", 3000);
 });
 
-function navigateTo(page) {
-  alert(`Navigating to ${page} page... (function placeholder)`);
+function navigate(sectionId) {
+  document.querySelectorAll("main .section").forEach(section => {
+    section.style.display = "none";
+  });
+  document.getElementById(sectionId).style.display = "block";
 }
 
-function openMode(mode) {
-  window.location.href = `${mode}.html`;
+function selectMode(mode) {
+  const modeData = {
+    growing: ["Take a bold step", "Tackle a challenge", "Create momentum"],
+    drifting: ["Pause and reflect", "Refocus attention", "Break the cycle"],
+    surviving: ["Breathe", "Drink water", "Do one small thing"],
+    grounded: ["Reconnect to purpose", "Feel your body", "Move gently"]
+  };
+
+  const activityList = document.getElementById("activityList");
+  const modeTitle = document.getElementById("modeTitle");
+
+  modeTitle.textContent = `${mode.charAt(0).toUpperCase() + mode.slice(1)} Mode`;
+  activityList.innerHTML = "";
+
+  modeData[mode].forEach((activity, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<strong>${activity}</strong><br/><textarea placeholder="What did you do?"></textarea>`;
+    activityList.appendChild(li);
+  });
+
+  navigate("modeSection");
 }
