@@ -1,195 +1,51 @@
-/* ========== GLOBAL ========== */
+/* General */
 body {
-  font-family: system-ui, sans-serif;
+  font-family: sans-serif;
   margin: 0;
   padding: 0;
   background: #fff;
-  color: #0B3D2E;
-  overflow-x: hidden;
+  color: #111;
 }
 
-h1 {
+h1, h2 {
   text-align: center;
-  margin-top: 1rem;
-  color: #0B3D2E;
 }
 
-/* ========== NAV MENU ========== */
-nav {
+nav.nav {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 1rem;
-  background-color: #e5f3ee;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-nav button {
-  border: 2px solid #0B3D2E;
-  background: #e5f3ee;
-  color: #0B3D2E;
-  font-weight: bold;
-  padding: 8px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.3s;
+.section {
+  padding: 20px;
 }
 
-nav button:hover {
-  background: #d2ece3;
-}
-
-/* ========== SPLASH SCREEN ========== */
+/* Splash */
 #splashScreen {
   position: fixed;
-  top: 0;
-  left: 0;
+  background: white;
+  z-index: 1000;
   width: 100%;
   height: 100%;
-  background: #0B3D2E;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
-  animation: fadeOut 1s ease 2s forwards;
 }
 
 #splashIcon {
-  width: 80px;
-  height: 80px;
-  animation: spin 2s linear infinite;
+  width: 120px;
+  animation: splashZoom 1.5s ease forwards;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes fadeOut {
-  to { opacity: 0; visibility: hidden; }
-}
-
-/* ========== WELCOME POPUP ========== */
-#welcomePopup {
-  position: fixed;
-  top: 15%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  border: 2px solid #0B3D2E;
-  border-radius: 20px;
-  padding: 1.5rem;
-  max-width: 90%;
-  z-index: 9998;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-#welcomePopup p {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-#startButton {
-  background-color: #0B3D2E;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-/* ========== COMPASS ========== */
-#compass {
-  display: block;
-  margin: 2rem auto;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* ========== MODE BUTTONS ========== */
-.mode-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding-bottom: 3rem;
-}
-
-.mode-buttons button {
-  width: 90%;
-  max-width: 500px;
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-weight: bold;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.mode-buttons button:hover {
-  transform: scale(1.02);
-}
-
-.growing { background-color: #007BFF; }     /* Blue */
-.grounded { background-color: #28a745; }    /* Green */
-.drifting { background-color: #ffc107; }    /* Yellow */
-.surviving { background-color: #dc3545; }   /* Red */
-
-/* ========== STREAK DISPLAY ========== */
-.stats {
-  text-align: center;
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-}
-
-/* ========== HISTORY LIST ========== */
-#historyList {
-  list-style: none;
-  padding: 1rem;
-}
-
-#historyList li {
-  margin-bottom: 10px;
-}
-
-/* ========== TOOL LIST ========== */
-.tool-list {
-  list-style: none;
-  padding: 1rem;
-}
-
-.tool-list li {
-  background: #f1f1f1;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-/* ========== ABOUT SECTION ========== */
-#about {
-  padding: 2rem;
-  line-height: 1.6;
-}
-
-#about h2 {
-  color: #0B3D2E;
-  margin-top: 0;
-}
-
-/* Splash Icon Animation */
 @keyframes splashZoom {
   0% {
-    transform: scale(0.5) rotate(0deg);
-    opacity: 0;
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
   }
   50% {
-    transform: scale(1.2) rotate(180deg);
-    opacity: 1;
+    transform: scale(1.3) rotate(180deg);
   }
   100% {
     transform: scale(1) rotate(360deg);
@@ -197,6 +53,120 @@ nav button:hover {
   }
 }
 
-.zoom {
-  animation: splashZoom 1.5s ease-in-out forwards;
+/* Welcome Popup */
+#welcomePopup {
+  position: fixed;
+  background: #fff;
+  padding: 20px;
+  max-width: 300px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  z-index: 1001;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  text-align: center;
+}
+
+/* Compass */
+.compass-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.compass-circle {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 3px solid #000;
+}
+
+.wedge {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transform-origin: 100% 100%;
+}
+
+.wedge-top {
+  top: 0;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  background-color: #3498db;
+  border-top-left-radius: 100% 100%;
+  transform: rotate(0deg);
+}
+
+.wedge-left {
+  top: 25%;
+  left: 0;
+  width: 50%;
+  height: 50%;
+  background-color: #2ecc71;
+  border-bottom-left-radius: 100% 100%;
+  transform: rotate(270deg);
+}
+
+.wedge-right {
+  top: 25%;
+  right: 0;
+  width: 50%;
+  height: 50%;
+  background-color: #f1c40f;
+  border-top-right-radius: 100% 100%;
+  transform: rotate(90deg);
+}
+
+.wedge-bottom {
+  bottom: 0;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  background-color: #e74c3c;
+  border-bottom-right-radius: 100% 100%;
+  transform: rotate(180deg);
+}
+
+/* Buttons */
+.mode-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.mode-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
+
+.mode-btn.grow { background-color: #3498db; }
+.mode-btn.ground { background-color: #2ecc71; }
+.mode-btn.drift { background-color: #f1c40f; color: #000; }
+.mode-btn.surv { background-color: #e74c3c; }
+
+.stats {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.history-entry {
+  padding: 6px;
+  border-bottom: 1px solid #ccc;
 }
