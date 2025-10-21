@@ -1,4 +1,4 @@
-// Splash Animation
+// Splash Screen Animation
 window.addEventListener("load", () => {
   const splash = document.getElementById("splashScreen");
   const splashIcon = document.getElementById("splashIcon");
@@ -9,9 +9,8 @@ window.addEventListener("load", () => {
     if (!localStorage.getItem("welcomeShown")) {
       document.getElementById("welcomePopup").style.display = "block";
     }
-  }, 1500);
+  }, 2000); // Match animation duration
 });
-
 // Welcome popup
 document.getElementById("startButton").addEventListener("click", () => {
   document.getElementById("welcomePopup").style.display = "none";
