@@ -58,7 +58,7 @@ function renderCompass() {
   modes.forEach(mode => {
     const wedge = document.createElement('div');
     wedge.className = 'wedge';
-    wedge.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+    wedge.innerHTML = `<span>${mode.charAt(0).toUpperCase() + mode.slice(1)}</span>`;
     wedge.style.backgroundColor = modeColors[mode];
     wedge.addEventListener('click', () => showMode(mode));
     compass.appendChild(wedge);
@@ -74,7 +74,6 @@ function renderCompass() {
     buttons.appendChild(btn);
   });
 }
-
 // === SHOW MODE ACTIVITIES ===
 function showMode(mode) {
   const section = document.getElementById('modeView');
