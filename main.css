@@ -1,201 +1,182 @@
-/* General Reset */
+/* ========== GLOBAL ========== */
 body {
+  font-family: system-ui, sans-serif;
   margin: 0;
   padding: 0;
-  font-family: system-ui, sans-serif;
-  background-color: #ffffff;
+  background: #fff;
+  color: #0B3D2E;
+  overflow-x: hidden;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 1rem;
   color: #0B3D2E;
 }
 
-/* Splash Screen */
+/* ========== NAV MENU ========== */
+nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 1rem;
+  background-color: #e5f3ee;
+}
+
+nav button {
+  border: 2px solid #0B3D2E;
+  background: #e5f3ee;
+  color: #0B3D2E;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+nav button:hover {
+  background: #d2ece3;
+}
+
+/* ========== SPLASH SCREEN ========== */
 #splashScreen {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: #ffffff;
+  width: 100%;
+  height: 100%;
+  background: #0B3D2E;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 9999;
+  animation: fadeOut 1s ease 2s forwards;
 }
 
 #splashIcon {
-  width: 150px;
-  height: 150px;
-  animation: spinZoom 1.2s ease-out forwards;
+  width: 80px;
+  height: 80px;
+  animation: spin 2s linear infinite;
 }
 
-@keyframes spinZoom {
-  0% {
-    transform: scale(0.5) rotate(0deg);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2) rotate(180deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1) rotate(360deg);
-  }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-/* Welcome Popup */
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* ========== WELCOME POPUP ========== */
 #welcomePopup {
-  display: none;
   position: fixed;
-  top: 20%;
+  top: 15%;
   left: 50%;
   transform: translateX(-50%);
   background: white;
   border: 2px solid #0B3D2E;
-  padding: 2rem;
-  z-index: 9998;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-  border-radius: 12px;
+  border-radius: 20px;
+  padding: 1.5rem;
   max-width: 90%;
+  z-index: 9998;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
-#welcomePopup button {
-  margin-top: 1rem;
-  padding: 0.5rem 1.2rem;
+#welcomePopup p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+#startButton {
   background-color: #0B3D2E;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: bold;
-}
-
-/* Header */
-header {
-  background-color: #ffffff;
-  padding: 1rem;
-  text-align: center;
-}
-
-header h1 {
-  margin-bottom: 1rem;
-}
-
-.nav button {
-  margin: 0.2rem;
-  padding: 0.6rem 1.1rem;
-  background-color: #e0f0ea;
-  border: 2px solid #0B3D2E;
-  color: #0B3D2E;
-  border-radius: 8px;
-  font-weight: bold;
-}
-
-/* Compass Section */
-.compass-wrapper {
-  display: flex;
-  justify-content: center;
-  margin: 2rem auto;
-}
-
-.compass-circle {
-  position: relative;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
-}
-
-.wedge {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 10px;
   cursor: pointer;
-  text-align: center;
+  font-weight: bold;
 }
 
-/* Wedge positions and colors */
-.wedge-top-left {
-  top: 0;
-  left: 0;
-  background-color: #FFD700; /* Drifting - Yellow */
+/* ========== COMPASS ========== */
+#compass {
+  display: block;
+  margin: 2rem auto;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.wedge-top-right {
-  top: 0;
-  right: 0;
-  background-color: #007BFF; /* Growing - Blue */
-}
-
-.wedge-bottom-left {
-  bottom: 0;
-  left: 0;
-  background-color: #28a745; /* Grounded - Green */
-}
-
-.wedge-bottom-right {
-  bottom: 0;
-  right: 0;
-  background-color: #DC3545; /* Surviving - Red */
-}
-
-.wedge span {
-  transform: rotate(0deg);
-}
-
-/* Mode Buttons */
+/* ========== MODE BUTTONS ========== */
 .mode-buttons {
-  text-align: center;
-  margin-top: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 0 1rem;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 3rem;
 }
 
-.mode-btn {
+.mode-buttons button {
+  width: 90%;
+  max-width: 500px;
+  padding: 14px;
   border: none;
-  color: white;
-  padding: 0.9rem;
   border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.mode-btn.grow {
-  background-color: #007BFF;
-}
-.mode-btn.ground {
-  background-color: #28a745;
-}
-.mode-btn.drift {
-  background-color: #FFD700;
-  color: #222;
-}
-.mode-btn.surv {
-  background-color: #DC3545;
-}
-
-/* Other Sections */
-.section {
-  padding: 2rem;
-  text-align: center;
-}
-
-.stats {
-  margin: 1rem 0;
+  color: white;
   font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-/* Footer */
-footer {
-  padding: 1rem;
+.mode-buttons button:hover {
+  transform: scale(1.02);
+}
+
+.growing { background-color: #007BFF; }     /* Blue */
+.grounded { background-color: #28a745; }    /* Green */
+.drifting { background-color: #ffc107; }    /* Yellow */
+.surviving { background-color: #dc3545; }   /* Red */
+
+/* ========== STREAK DISPLAY ========== */
+.stats {
   text-align: center;
-  font-size: 0.85rem;
-  background-color: #f2f2f2;
-  color: #555;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+/* ========== HISTORY LIST ========== */
+#historyList {
+  list-style: none;
+  padding: 1rem;
+}
+
+#historyList li {
+  margin-bottom: 10px;
+}
+
+/* ========== TOOL LIST ========== */
+.tool-list {
+  list-style: none;
+  padding: 1rem;
+}
+
+.tool-list li {
+  background: #f1f1f1;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* ========== ABOUT SECTION ========== */
+#about {
+  padding: 2rem;
+  line-height: 1.6;
+}
+
+#about h2 {
+  color: #0B3D2E;
+  margin-top: 0;
 }
