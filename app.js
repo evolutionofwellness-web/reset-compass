@@ -37,13 +37,6 @@ const modeColors = {
   growing: '#4C7EDC'
 };
 
-const modeIcons = {
-  surviving: '🩺',
-  drifting: '🧭',
-  grounded: '🌿',
-  growing: '🚀'
-};
-
 // === ACTIVITY DATA ===
 const modeActivities = {
   surviving: ['Take 3 deep breaths', 'Drink water', 'Stretch for 1 min'],
@@ -61,34 +54,33 @@ function renderCompass() {
   if (!compass || !buttons) return;
 
   compass.innerHTML = '';
-  modes.forEach((mode, i) => {
+  const wedgeAngles = [45, 135, 225, 315];
+
+  modes.forEach((mode, index) => {
     const wedge = document.createElement('div');
     wedge.className = 'wedge';
     wedge.style.backgroundColor = modeColors[mode];
-    wedge.style.transform = `rotate(${i * 90}deg)`;
-
-    const label = document.createElement('div');
-    label.innerHTML = `${modeIcons[mode]} <br><strong>${capitalize(mode)}</strong>`;
-    label.style.transform = `rotate(-${i * 90}deg)`;
-    label.style.textAlign = 'center';
-    wedge.appendChild(label);
+    wedge.style.transform = `rotate(${wedgeAngles[index]}deg) skewY(-45deg)`;
+    
+    const text = document.createElement('div');
+    text.className = 'wedge-text';
+    text.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+    text.style.transform = `skewY(45deg) rotate(-${wedgeAngles[index]}deg)`;
+    wedge.appendChild(text);
 
     wedge.addEventListener('click', () => showMode(mode));
     compass.appendChild(wedge);
   });
 
+  // Buttons in vertical list format
   buttons.innerHTML = '';
   modes.forEach(mode => {
     const btn = document.createElement('button');
     btn.className = `mode-btn ${mode}`;
-    btn.textContent = capitalize(mode);
+    btn.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
     btn.addEventListener('click', () => showMode(mode));
     buttons.appendChild(btn);
   });
-}
-
-function capitalize(word) {
-  return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
 // === SHOW MODE ACTIVITIES ===
@@ -100,7 +92,7 @@ function showMode(mode) {
 
   if (!section || !title || !list || !logBtn) return;
 
-  title.textContent = capitalize(mode);
+  title.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
   section.style.display = 'block';
   list.innerHTML = '';
   modeActivities[mode].forEach(item => {
@@ -111,7 +103,7 @@ function showMode(mode) {
 
   logBtn.onclick = () => {
     saveModeChoice(mode);
-    alert(`Logged as "${capitalize(mode)}" for today`);
+    alert(`Logged as "${mode}" for today`);
   };
 }
 
@@ -163,7 +155,7 @@ function updateHistory(log = null) {
   Object.entries(log).reverse().forEach(([date, mode]) => {
     const div = document.createElement('div');
     div.className = 'mode-entry';
-    div.textContent = `${date}: ${capitalize(mode)}`;
+    div.textContent = `${date}: ${mode}`;
     div.style.borderLeft = `4px solid ${modeColors[mode]}`;
     container.appendChild(div);
   });
