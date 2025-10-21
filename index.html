@@ -41,12 +41,14 @@
 
       <!-- Home Section -->
       <section id="home" class="section">
-        <div id="compass">
-          <div class="wedge" onclick="selectMode('growing')">🚀 Growing</div>
-          <div class="wedge" onclick="selectMode('surviving')">🩺 Surviving</div>
-          <div class="wedge" onclick="selectMode('grounded')">🌿 Grounded</div>
-          <div class="wedge" onclick="selectMode('drifting')">🧭 Drifting</div>
-        </div>
+        <div class="compass-wrapper">
+  <div class="compass-circle">
+    <div class="wedge wedge-top-left" onclick="selectMode('drifting')"><span>🧭 Drifting</span></div>
+    <div class="wedge wedge-top-right" onclick="selectMode('growing')"><span>🚀 Growing</span></div>
+    <div class="wedge wedge-bottom-left" onclick="selectMode('grounded')"><span>🌿 Grounded</span></div>
+    <div class="wedge wedge-bottom-right" onclick="selectMode('surviving')"><span>🩺 Surviving</span></div>
+  </div>
+</div>
         <div class="mode-buttons">
           <button class="mode-btn grow" onclick="selectMode('growing')">Growing</button>
           <button class="mode-btn surv" onclick="selectMode('surviving')">Surviving</button>
