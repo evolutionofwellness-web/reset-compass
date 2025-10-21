@@ -2,59 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=30" />
-  <script defer src="app.js?v=10"></script>
+  <link rel="stylesheet" href="main.css?v=30">
+  <script defer src="app.js?v=11"></script>
 </head>
 <body>
-  <!-- Splash Screen -->
   <div id="splashScreen">
-    <img src="splash-icon.png" id="splashIcon" alt="Reset Compass Icon" />
+    <img id="splashIcon" src="splash-icon.png" alt="App Icon">
   </div>
 
-  <!-- Welcome Popup -->
-  <div id="welcomePopup" class="popup">
-    <div class="popup-content">
-      <h2>Welcome to The Reset Compass</h2>
-      <p>This tool helps you reset based on how you're feeling. Pick a mode to begin.</p>
-      <button id="startButton">Let's Start</button>
-    </div>
+  <div id="welcomePopup">
+    <p>Let’s get you back on track.</p>
+    <button id="startButton">Start</button>
   </div>
 
-  <!-- Main App -->
   <header>
     <h1>The Reset Compass</h1>
-    <nav>
-      <button onclick="navigateTo('home')">Home</button>
-      <button onclick="navigateTo('quick')">Quick Wins</button>
-      <button onclick="navigateTo('history')">History</button>
-      <button onclick="navigateTo('about')">About</button>
+    <nav class="nav">
+      <button onclick="navigate('home')">Home</button>
+      <button onclick="navigate('quick')">Quick Wins</button>
+      <button onclick="navigate('history')">History</button>
+      <button onclick="navigate('about')">About</button>
     </nav>
   </header>
 
-  <main id="mainContent">
-    <div class="stats">
-      <span>🔥 <span id="streak">0</span>-day streak</span>
-    </div>
+  <main id="app">
+    <section id="home" class="section">
+      <div class="compass-wrapper">
+        <div class="compass-circle">
+          <div class="wedge wedge-top" onclick="selectMode('growing')"><span>Growing</span></div>
+          <div class="wedge wedge-right" onclick="selectMode('drifting')"><span>Drifting</span></div>
+          <div class="wedge wedge-bottom" onclick="selectMode('surviving')"><span>Surviving</span></div>
+          <div class="wedge wedge-left" onclick="selectMode('grounded')"><span>Grounded</span></div>
+        </div>
+      </div>
+      <div class="mode-buttons">
+        <button class="mode-btn grow" onclick="selectMode('growing')">Growing Mode</button>
+        <button class="mode-btn drift" onclick="selectMode('drifting')">Drifting Mode</button>
+        <button class="mode-btn surv" onclick="selectMode('surviving')">Surviving Mode</button>
+        <button class="mode-btn ground" onclick="selectMode('grounded')">Grounded Mode</button>
+      </div>
+    </section>
 
-    <div class="compass">
-      <div class="wedge growing" onclick="openMode('growing')">🚀 Growing</div>
-      <div class="wedge drifting" onclick="openMode('drifting')">🧭 Drifting</div>
-      <div class="wedge grounded" onclick="openMode('grounded')">🌿 Grounded</div>
-      <div class="wedge surviving" onclick="openMode('surviving')">🩺 Surviving</div>
-    </div>
+    <section id="quick" class="section" style="display:none;">
+      <h2>Quick Wins</h2>
+      <p>Coming soon!</p>
+    </section>
 
-    <div class="mode-buttons">
-      <button class="growing" onclick="openMode('growing')">🚀 Growing</button>
-      <button class="drifting" onclick="openMode('drifting')">🧭 Drifting</button>
-      <button class="grounded" onclick="openMode('grounded')">🌿 Grounded</button>
-      <button class="surviving" onclick="openMode('surviving')">🩺 Surviving</button>
-    </div>
+    <section id="history" class="section" style="display:none;">
+      <h2>History</h2>
+      <div id="historyLog"></div>
+    </section>
+
+    <section id="about" class="section" style="display:none;">
+      <h2>About</h2>
+      <p>Created by Evolution of Wellness. Contact: <a href="mailto:marcus@evolutionofwellness.com">marcus@evolutionofwellness.com</a></p>
+    </section>
+
+    <section id="modeSection" class="section" style="display:none;">
+      <h2 id="modeTitle">Mode</h2>
+      <ul id="activityList"></ul>
+    </section>
   </main>
 
-  <footer>
-    <p>© 2025 Evolution of Wellness. The Reset Compass™ is a product of Evolution of Wellness. All rights reserved.</p>
+  <footer style="text-align:center; margin-top:40px;">
+    <p>&copy; 2025 Evolution of Wellness. All rights reserved.</p>
   </footer>
 </body>
 </html>
