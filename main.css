@@ -1,50 +1,103 @@
+/* General */
 body {
-  font-family: Arial, sans-serif;
+  font-family: sans-serif;
   margin: 0;
   padding: 0;
   background: #fff;
-  color: #000;
+  color: #111;
 }
 
-h1 {
+h1, h2 {
   text-align: center;
-  margin-top: 20px;
 }
 
-nav {
+nav.nav {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 10px 0 20px 0;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-nav button {
+.section {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Splash Screen */
+#splashScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background-color: #0B3D2E;
-  color: #fff;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeOut 1s ease 2s forwards;
 }
 
-main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px;
+#splashIcon {
+  width: 120px;
+  height: 120px;
+  animation: zoomSpinFade 2s ease-in-out forwards;
+}
+
+@keyframes zoomSpinFade {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(2.2) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.8) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Welcome Popup */
+#welcomePopup {
+  position: fixed;
+  background: #fff;
+  padding: 20px;
+  max-width: 280px;
+  width: 90%;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  z-index: 1001;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
 /* Compass */
-.compass {
+.compass-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.compass-circle {
   position: relative;
   width: 280px;
   height: 280px;
-  border: 4px solid black;
   border-radius: 50%;
-  margin: 20px auto;
-  overflow: hidden;
+  border: 3px solid #000;
 }
 
 .wedge {
@@ -54,142 +107,143 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
   font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transform-origin: 100% 100%;
   text-align: center;
-  padding: 6px;
+  padding: 8px;
   box-sizing: border-box;
 }
 
-.wedge.top {
+.wedge span {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  transform: rotate(0deg);
+}
+
+.wedge-top {
   top: 0;
   left: 25%;
   background-color: #3498db;
+  border-top-left-radius: 100% 100%;
+  transform: rotate(0deg);
 }
 
-.wedge.right {
+.wedge-right {
   top: 25%;
   right: 0;
   background-color: #f1c40f;
+  color: #000;
+  border-top-right-radius: 100% 100%;
+  transform: rotate(90deg);
 }
 
-.wedge.bottom {
+.wedge-bottom {
   bottom: 0;
   left: 25%;
   background-color: #e74c3c;
+  border-bottom-right-radius: 100% 100%;
+  transform: rotate(180deg);
 }
 
-.wedge.left {
+.wedge-left {
   top: 25%;
   left: 0;
   background-color: #2ecc71;
+  border-bottom-left-radius: 100% 100%;
+  transform: rotate(270deg);
 }
 
-/* Mode buttons */
+.wedge-right span {
+  transform: rotate(-90deg);
+}
+.wedge-bottom span {
+  transform: rotate(-180deg);
+}
+.wedge-left span {
+  transform: rotate(-270deg);
+}
+
+/* Buttons */
 .mode-buttons {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.mode-buttons button {
-  border: none;
-  padding: 12px;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  color: white;
-  width: 180px;
-  margin: 0 auto;
-}
-
-.mode-buttons .growing { background-color: #3498db; }
-.mode-buttons .drifting { background-color: #f1c40f; color: black; }
-.mode-buttons .surviving { background-color: #e74c3c; }
-.mode-buttons .grounded { background-color: #2ecc71; }
-
-/* Popup */
-.popup {
-  position: fixed;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #fff;
-  border: 2px solid #0B3D2E;
-  border-radius: 10px;
-  padding: 20px;
-  text-align: center;
-  z-index: 1001;
-  max-width: 90%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.popup button {
-  background-color: #0B3D2E;
-  color: white;
-  padding: 10px 16px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-/* Pages */
-.page.hidden {
-  display: none;
-}
-
-footer {
-  text-align: center;
-  padding: 20px 0;
-  font-size: 0.9rem;
-}
-
-/* Splash screen */
-#splashScreen {
-  position: fixed;
-  background-color: #0B3D2E;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2000;
-  display: flex;
   align-items: center;
-  justify-content: center;
-}
-
-#splashIcon {
-  width: 120px;
-  height: 120px;
-  animation: zoomSpinFade 2s ease-out forwards;
-}
-
-@keyframes zoomSpinFade {
-  0% {
-    transform: scale(0.6) rotate(0deg);
-    opacity: 0;
-  }
-  40% {
-    transform: scale(1.3) rotate(180deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* History & About formatting */
-#historyList, #quickWinsList {
-  padding-left: 20px;
-  list-style-type: disc;
-  max-width: 90%;
-}
-
-#modeBreakdown, #modeStreak {
+  gap: 12px;
   margin-top: 20px;
-  text-align: center;
+}
+
+.mode-btn {
+  padding: 10px 20px;
+  font-size: 16px;
   font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  width: 220px;
+  text-align: center;
+}
+
+.mode-btn.grow { background-color: #3498db; }
+.mode-btn.ground { background-color: #2ecc71; }
+.mode-btn.drift { background-color: #f1c40f; color: #000; }
+.mode-btn.surv { background-color: #e74c3c; }
+
+/* Activity List */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.activity-item {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f9f9f9;
+}
+
+.activity-item label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.activity-item textarea {
+  width: 100%;
+  height: 60px;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #aaa;
+  resize: vertical;
+}
+
+.activity-item button {
+  margin-top: 6px;
+  padding: 6px 12px;
+  background: #0B3D2E;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* History */
+.stats {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#mode-history {
+  margin-top: 10px;
+}
+
+.history-entry {
+  padding: 6px;
+  border-bottom: 1px solid #ccc;
 }
