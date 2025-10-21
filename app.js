@@ -1,100 +1,115 @@
-// Splash screen and welcome popup logic
-document.addEventListener("DOMContentLoaded", function () {
-  const splash = document.getElementById("splashScreen");
-  const popup = document.getElementById("welcomePopup");
+// app.js?v=6
 
+document.addEventListener("DOMContentLoaded", () => {
+  const splashScreen = document.getElementById("splashScreen");
+  const splashIcon = document.getElementById("splashIcon");
+  const welcomePopup = document.getElementById("welcomePopup");
+  const startButton = document.getElementById("startButton");
+
+  // Splash animation
+  splashScreen.style.display = "flex";
   setTimeout(() => {
-    splash.style.display = "none";
+    splashScreen.classList.add("fade-out");
+    setTimeout(() => {
+      splashScreen.style.display = "none";
 
-    if (!localStorage.getItem("resetCompassStarted")) {
-      popup.style.display = "block";
-    }
-  }, 1500);
+      // Show popup only once
+      if (!localStorage.getItem("popupShown")) {
+        welcomePopup.style.display = "block";
+      }
+    }, 1000);
+  }, 1200);
 
-  const startBtn = document.getElementById("startButton");
-  if (startBtn) {
-    startBtn.addEventListener("click", () => {
-      localStorage.setItem("resetCompassStarted", "true");
-      popup.style.display = "none";
+  // Welcome popup close
+  if (startButton) {
+    startButton.addEventListener("click", () => {
+      welcomePopup.style.display = "none";
+      localStorage.setItem("popupShown", "true");
     });
   }
 
-  renderCompass();
-  renderStreak();
-  renderHistory();
-});
-
-// Compass mode wedge rendering
-function renderCompass() {
+  // Wedge rendering
   const compass = document.getElementById("compass");
-  if (!compass) return;
+  if (compass) {
+    const ctx = compass.getContext("2d");
+    const size = compass.width;
+    const center = size / 2;
+    const radius = center - 2;
 
-  const wedges = [
-    { label: "Drifting", emoji: "🧭", class: "wedge-top-left", mode: "drifting" },
-    { label: "Growing", emoji: "🚀", class: "wedge-top-right", mode: "growing" },
-    { label: "Grounded", emoji: "🌿", class: "wedge-bottom-left", mode: "grounded" },
-    { label: "Surviving", emoji: "🩺", class: "wedge-bottom-right", mode: "surviving" },
-  ];
+    const wedges = [
+      { label: "Growing", color: "#007BFF" },
+      { label: "Drifting", color: "#FBC02D" },
+      { label: "Surviving", color: "#E53935" },
+      { label: "Grounded", color: "#43A047" },
+    ];
 
-  compass.innerHTML = ""; // Clear existing content
+    let startAngle = -0.5 * Math.PI;
+    wedges.forEach((wedge, i) => {
+      const endAngle = startAngle + (Math.PI * 2) / wedges.length;
+      ctx.beginPath();
+      ctx.moveTo(center, center);
+      ctx.arc(center, center, radius, startAngle, endAngle);
+      ctx.closePath();
+      ctx.fillStyle = wedge.color;
+      ctx.fill();
 
-  wedges.forEach(w => {
-    const div = document.createElement("div");
-    div.className = `wedge ${w.class}`;
-    div.innerHTML = `<span>${w.emoji}<br>${w.label}</span>`;
-    div.onclick = () => logMode(w.mode);
-    compass.appendChild(div);
-  });
-}
+      // Text
+      const angle = startAngle + (endAngle - startAngle) / 2;
+      const textX = center + Math.cos(angle) * (radius * 0.6);
+      const textY = center + Math.sin(angle) * (radius * 0.6);
+      ctx.fillStyle = "white";
+      ctx.font = "bold 14px system-ui";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(wedge.label, textX, textY);
 
-// Mode logging and streak tracking
-function logMode(mode) {
-  const today = new Date().toISOString().split("T")[0];
-  let history = JSON.parse(localStorage.getItem("resetCompassHistory") || "{}");
+      startAngle = endAngle;
+    });
+  }
 
-  history[today] = mode;
-  localStorage.setItem("resetCompassHistory", JSON.stringify(history));
+  // Logging mode selection
+  const log = JSON.parse(localStorage.getItem("activityLog")) || [];
+  const streakElement = document.getElementById("streak");
 
-  renderStreak();
-  renderHistory();
-}
-
-// Show 🔥 streak if continuous days are logged
-function renderStreak() {
-  const streakDiv = document.querySelector(".stats");
-  if (!streakDiv) return;
-
-  const history = JSON.parse(localStorage.getItem("resetCompassHistory") || "{}");
-  const dates = Object.keys(history).sort().reverse();
-
-  let streak = 0;
-  let current = new Date();
-
-  for (let i = 0; i < dates.length; i++) {
-    const d = new Date(dates[i]);
-    if (d.toDateString() === current.toDateString()) {
-      streak++;
-      current.setDate(current.getDate() - 1);
-    } else {
-      break;
+  function updateStreak() {
+    const today = new Date().toISOString().slice(0, 10);
+    let streak = 0;
+    for (let i = 0; i < log.length; i++) {
+      const entryDate = log[log.length - 1 - i].date;
+      const expectedDate = new Date();
+      expectedDate.setDate(expectedDate.getDate() - i);
+      const expected = expectedDate.toISOString().slice(0, 10);
+      if (entryDate === expected) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    if (streakElement) {
+      streakElement.innerHTML = `<span style="font-size: 20px;">🔥 ${streak}</span>`;
     }
   }
 
-  streakDiv.innerHTML = `🔥 ${streak} day streak`;
-}
+  updateStreak();
 
-// Mode history rendering
-function renderHistory() {
-  const historySection = document.getElementById("historySection");
-  if (!historySection) return;
+  document.querySelectorAll(".mode-button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.mode;
+      const today = new Date().toISOString().slice(0, 10);
+      log.push({ date: today, mode });
+      localStorage.setItem("activityLog", JSON.stringify(log));
+      updateStreak();
+    });
+  });
 
-  const history = JSON.parse(localStorage.getItem("resetCompassHistory") || "{}");
-  const dates = Object.keys(history).sort().reverse();
-
-  historySection.innerHTML = dates
-    .map(date => {
-      const mode = history[date];
-      return `<p><strong>${date}:</strong> ${mode.charAt(0).toUpperCase() + mode.slice(1)}</p>`;
-    })
-    .join("");
-}
+  // Render history
+  const historySection = document.getElementById("historyList");
+  if (historySection && log.length > 0) {
+    log.slice(-10).reverse().forEach((entry) => {
+      const item = document.createElement("div");
+      item.className = "history-entry";
+      item.textContent = `${entry.date} — ${entry.mode}`;
+      historySection.appendChild(item);
+    });
+  }
+});
