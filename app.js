@@ -1,147 +1,89 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const splashScreen = document.getElementById("splashScreen");
-  const welcomePopup = document.getElementById("welcomePopup");
-  const startButton = document.getElementById("startButton");
-  const compass = document.getElementById("compass");
-  const modeButtons = document.querySelectorAll(".mode-btn");
-  const wedges = document.querySelectorAll(".wedge");
-  const section = document.querySelector(".section");
+const activities = {
+  growing: ["Plan your week", "Tackle a new habit", "Move your body with purpose"],
+  drifting: ["Declutter your space", "Go for a walk", "Reflect on recent patterns"],
+  grounded: ["Prepare a nourishing meal", "Stretch or breathe", "Do something creative"],
+  surviving: ["Drink water", "Lay down for 5 minutes", "Write one sentence to yourself"]
+};
 
-  // Splash + Popup
-  setTimeout(() => {
-    splashScreen.style.display = "none";
-    if (!localStorage.getItem("hasSeenWelcome")) {
-      welcomePopup.style.display = "block";
-    }
-  }, 2000);
+function navigateTo(view) {
+  document.querySelectorAll('main section').forEach(s => s.style.display = 'none');
+  document.getElementById(view + 'View').style.display = 'block';
+}
 
-  startButton.addEventListener("click", () => {
-    welcomePopup.style.display = "none";
-    localStorage.setItem("hasSeenWelcome", "true");
-  });
+function selectMode(mode) {
+  navigateTo('mode');
+  const container = document.getElementById('modeView');
+  container.innerHTML = `<h2>${capitalize(mode)} Mode</h2><ul id="activityList"></ul>`;
 
-  // Event listeners for wedges and buttons
-  function initModeNavigation() {
-    wedges.forEach(wedge => {
-      wedge.addEventListener("click", () => {
-        const mode = wedge.getAttribute("data-mode");
-        loadMode(mode);
-      });
-    });
-
-    modeButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const mode = btn.getAttribute("data-mode");
-        loadMode(mode);
-      });
-    });
-  }
-
-  // Activities per mode
-  const modeActivities = {
-    grow: [
-      "Do something that challenges you",
-      "Take action on a long-term goal",
-      "Declutter a space or complete a small project"
-    ],
-    ground: [
-      "Take 3 deep breaths",
-      "Drink a full glass of water",
-      "Write down 3 things you're grateful for"
-    ],
-    drift: [
-      "Check in with how you're feeling",
-      "Spend 5 minutes stretching or moving",
-      "Reflect on what matters to you"
-    ],
-    surv: [
-      "Pick ONE thing to focus on",
-      "Set a 10-minute timer and start",
-      "Pause and do nothing for 1 minute"
-    ]
-  };
-
-  function loadMode(mode) {
-    const activities = modeActivities[mode] || [];
-    section.innerHTML = `
-      <h2>${modeName(mode)} Mode</h2>
-      <div class="activities-container">
-        ${activities.map((activity, i) => `
-          <div class="activity-entry">
-            <strong>${activity}</strong>
-            <textarea placeholder="What did you do?"></textarea>
-            <button onclick="saveLog('${mode}', ${i}, this)">Save</button>
-          </div>
-        `).join("")}
-      </div>
+  activities[mode].forEach((activity, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <p>${activity}</p>
+      <textarea placeholder="What did you do?"></textarea>
+      <input type="button" value="Save" onclick="saveActivity('${mode}', ${i}, this)">
     `;
-  }
+    container.querySelector("#activityList").appendChild(li);
+  });
+}
 
-  // Human-readable mode name
-  function modeName(mode) {
-    switch (mode) {
-      case "grow": return "Growing";
-      case "ground": return "Grounded";
-      case "drift": return "Drifting";
-      case "surv": return "Surviving";
-      default: return "";
-    }
-  }
-
-  // Save to localStorage with streak tracking
-  window.saveLog = function(mode, index, btn) {
-    const entry = btn.previousElementSibling.value.trim();
-    if (!entry) return;
-
-    const date = new Date().toLocaleDateString();
-    const log = { date, mode, entry, activity: modeActivities[mode][index] };
-
-    let history = JSON.parse(localStorage.getItem("resetHistory")) || [];
-    const todayExists = history.some(h => h.date === date);
-    history.push(log);
-    localStorage.setItem("resetHistory", JSON.stringify(history));
-
-    // Streak logic
-    if (!todayExists) {
-      let streak = parseInt(localStorage.getItem("resetStreak") || "0", 10);
-      let lastDate = localStorage.getItem("resetLastDate");
-
-      const today = new Date().toDateString();
-      const yesterday = new Date(Date.now() - 86400000).toDateString();
-
-      if (lastDate === yesterday) {
-        streak++;
-      } else if (lastDate !== today) {
-        streak = 1;
-      }
-
-      localStorage.setItem("resetStreak", streak);
-      localStorage.setItem("resetLastDate", today);
-      updateStats();
-    }
-
-    btn.textContent = "Saved!";
+function saveActivity(mode, index, btn) {
+  const textarea = btn.previousElementSibling;
+  const value = textarea.value.trim();
+  if (value) {
+    const entry = { date: new Date().toLocaleDateString(), mode, activity: activities[mode][index], note: value };
+    const logs = JSON.parse(localStorage.getItem("resetHistory") || "[]");
+    logs.push(entry);
+    localStorage.setItem("resetHistory", JSON.stringify(logs));
+    updateStreak();
+    textarea.disabled = true;
     btn.disabled = true;
-  };
-
-  // Stats and history
-  function updateStats() {
-    const stats = document.querySelector(".stats");
-    const streak = localStorage.getItem("resetStreak") || "0";
-    stats.innerHTML = `🔥 ${streak}-day streak`;
-
-    const history = JSON.parse(localStorage.getItem("resetHistory")) || [];
-    const historyBlock = document.getElementById("historyBlock");
-    if (historyBlock) {
-      historyBlock.innerHTML = history.map(h => `
-        <div class="history-entry">
-          <strong>${h.date}</strong> — ${modeName(h.mode)}: ${h.activity}<br>
-          <em>${h.entry}</em>
-        </div>
-      `).reverse().join("");
-    }
+    btn.value = "Saved";
   }
+}
 
-  initModeNavigation();
-  updateStats();
-});
+function updateStreak() {
+  const logs = JSON.parse(localStorage.getItem("resetHistory") || "[]");
+  const dates = [...new Set(logs.map(log => log.date))];
+  const today = new Date().toLocaleDateString();
+  let streak = dates.includes(today) ? 1 : 0;
+  for (let i = 1; i < 30; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    if (dates.includes(d.toLocaleDateString())) streak++;
+    else break;
+  }
+  document.querySelector(".streak").textContent = `🔥 ${streak}-day streak`;
+}
+
+function renderHistory() {
+  const list = document.getElementById("historyList");
+  const logs = JSON.parse(localStorage.getItem("resetHistory") || "[]").reverse();
+  list.innerHTML = logs.map(log =>
+    `<li><strong>${log.date}</strong> — [${log.mode}] ${log.activity}<br>${log.note}</li>`
+  ).join("");
+}
+
+document.getElementById("startButton").onclick = () => {
+  document.getElementById("welcomePopup").style.display = "none";
+  document.getElementById("app").style.display = "block";
+};
+
+window.onload = () => {
+  if (!localStorage.getItem("visited")) {
+    document.getElementById("splashScreen").style.display = "block";
+    setTimeout(() => {
+      document.getElementById("splashScreen").style.display = "none";
+      document.getElementById("welcomePopup").style.display = "block";
+      localStorage.setItem("visited", "true");
+    }, 1500);
+  } else {
+    document.getElementById("splashScreen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+  }
+  updateStreak();
+  renderHistory();
+};
+
+function capitalize(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
