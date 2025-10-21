@@ -1,180 +1,131 @@
-// === SPLASH SCREEN ===
-window.addEventListener('load', () => {
-  const splash = document.getElementById('splashScreen');
-  const app = document.getElementById('app');
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js?v=1.0.6').then(function(reg) {
+    console.log('Service Worker registered:', reg);
+  }).catch(function(error) {
+    console.log('Service Worker registration failed:', error);
+  });
+}
 
-  if (splash && app) {
-    setTimeout(() => {
-      splash.classList.add('fade-out');
-      setTimeout(() => {
-        splash.remove();
-        app.style.display = 'block';
-      }, 600);
-    }, 1000);
-  }
-});
-
-// === FIRST-TIME WELCOME POPUP ===
-document.addEventListener('DOMContentLoaded', () => {
-  const hasVisited = localStorage.getItem('hasVisited');
+// Splash Screen + Welcome Popup
+document.addEventListener('DOMContentLoaded', function () {
+  const splashScreen = document.getElementById('splash-screen');
   const welcomePopup = document.getElementById('welcomePopup');
-  const startBtn = document.getElementById('startButton');
+  const startButton = document.getElementById('startButton');
 
-  if (!hasVisited && welcomePopup && startBtn) {
-    welcomePopup.style.display = 'flex';
-    startBtn.addEventListener('click', () => {
-      localStorage.setItem('hasVisited', 'true');
-      welcomePopup.style.display = 'none';
-    });
-  }
+  // Show splash screen, then welcome popup (once only)
+  splashScreen.style.display = 'flex';
+  setTimeout(() => {
+    splashScreen.classList.add('fade-out');
+    setTimeout(() => {
+      splashScreen.style.display = 'none';
+      if (!localStorage.getItem('welcomeShown')) {
+        welcomePopup.style.display = 'flex';
+      }
+    }, 1000);
+  }, 2000);
+
+  // Hide popup on "Let’s Start"
+  startButton.addEventListener('click', () => {
+    welcomePopup.style.display = 'none';
+    localStorage.setItem('welcomeShown', 'true');
+  });
+
+  renderCompass();
+  renderButtons();
+  renderStats();
+  renderHistory();
 });
 
-// === MODE COLOR MAPPING ===
-const modeColors = {
-  surviving: '#A94747',
-  drifting: '#E6B450',
-  grounded: '#3B755F',
-  growing: '#4C7EDC'
-};
+// Mode Data
+const modes = [
+  { name: 'Growing', emoji: '🚀', color: '#3b82f6' },
+  { name: 'Surviving', emoji: '🩺', color: '#b91c1c' },
+  { name: 'Grounded', emoji: '🌿', color: '#15803d' },
+  { name: 'Drifting', emoji: '🧭', color: '#7c3aed' }
+];
 
-// === ACTIVITY DATA ===
-const modeActivities = {
-  surviving: ['Take 3 deep breaths', 'Drink water', 'Stretch for 1 min'],
-  drifting: ['Put phone away', 'Walk outside', 'Write down 1 thing you’re grateful for'],
-  grounded: ['Plan tomorrow', 'Eat a full meal', 'Do a real workout'],
-  growing: ['Reach out to someone', 'Try a challenge', 'Learn something new']
-};
-
-// === RENDER COMPASS & BUTTONS ===
+// Render Compass
 function renderCompass() {
   const compass = document.getElementById('compass');
-  const buttons = document.getElementById('modeButtons');
-  const modes = ['growing', 'surviving', 'grounded', 'drifting'];
-
-  if (!compass || !buttons) return;
-
   compass.innerHTML = '';
-  const wedgeAngles = [45, 135, 225, 315];
+  const wedgeCount = modes.length;
 
-  modes.forEach((mode, index) => {
+  modes.forEach((mode, i) => {
     const wedge = document.createElement('div');
     wedge.className = 'wedge';
-    wedge.style.backgroundColor = modeColors[mode];
-    wedge.style.transform = `rotate(${wedgeAngles[index]}deg) skewY(-45deg)`;
-    
-    const text = document.createElement('div');
-    text.className = 'wedge-text';
-    text.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
-    text.style.transform = `skewY(45deg) rotate(-${wedgeAngles[index]}deg)`;
-    wedge.appendChild(text);
+    wedge.style.background = mode.color;
 
-    wedge.addEventListener('click', () => showMode(mode));
+    const angle = 360 / wedgeCount;
+    wedge.style.transform = `rotate(${angle * i}deg) skewY(-60deg)`;
+
+    const content = document.createElement('div');
+    content.className = 'wedge-content';
+    content.style.transform = `skewY(60deg) rotate(-${angle * i}deg)`;
+
+    content.innerHTML = `<span>${mode.emoji}</span><br><strong>${mode.name}</strong>`;
+    wedge.appendChild(content);
+
+    wedge.addEventListener('click', () => logMode(mode.name));
     compass.appendChild(wedge);
   });
+}
 
-  // Buttons in vertical list format
-  buttons.innerHTML = '';
-  modes.forEach(mode => {
+// Render Buttons
+function renderButtons() {
+  const container = document.getElementById('mode-buttons');
+  container.innerHTML = '';
+  modes.forEach((mode) => {
     const btn = document.createElement('button');
-    btn.className = `mode-btn ${mode}`;
-    btn.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
-    btn.addEventListener('click', () => showMode(mode));
-    buttons.appendChild(btn);
+    btn.textContent = mode.name;
+    btn.onclick = () => logMode(mode.name);
+    container.appendChild(btn);
   });
 }
 
-// === SHOW MODE ACTIVITIES ===
-function showMode(mode) {
-  const section = document.getElementById('modeView');
-  const title = document.getElementById('modeTitle');
-  const list = document.getElementById('modeActivities');
-  const logBtn = document.getElementById('logButton');
-
-  if (!section || !title || !list || !logBtn) return;
-
-  title.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
-  section.style.display = 'block';
-  list.innerHTML = '';
-  modeActivities[mode].forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = item;
-    list.appendChild(li);
-  });
-
-  logBtn.onclick = () => {
-    saveModeChoice(mode);
-    alert(`Logged as "${mode}" for today`);
-  };
-}
-
-// === SAVE MODE + UPDATE STREAK ===
-function saveModeChoice(mode) {
+// Log Mode
+function logMode(modeName) {
   const today = new Date().toISOString().split('T')[0];
-  const log = JSON.parse(localStorage.getItem('modeLog') || '{}');
-  log[today] = mode;
+  let log = JSON.parse(localStorage.getItem('modeLog') || '{}');
+  log[today] = modeName;
   localStorage.setItem('modeLog', JSON.stringify(log));
-  updateStreak(log);
-  updateHistory(log);
+  renderStats();
+  renderHistory();
 }
 
-// === STREAK LOGIC ===
-function updateStreak(log = null) {
-  const streakDisplay = document.getElementById('streakCount');
-  if (!streakDisplay) return;
-
-  if (!log) log = JSON.parse(localStorage.getItem('modeLog') || '{}');
-  const dates = Object.keys(log).sort((a, b) => new Date(b) - new Date(a));
+// Render Stats
+function renderStats() {
+  const stats = document.getElementById('stats');
+  const log = JSON.parse(localStorage.getItem('modeLog') || '{}');
+  const days = Object.keys(log).sort().reverse();
 
   let streak = 0;
-  let currentDate = new Date();
-
-  for (const date of dates) {
-    const logDate = new Date(date);
-    if (
-      logDate.getFullYear() === currentDate.getFullYear() &&
-      logDate.getMonth() === currentDate.getMonth() &&
-      logDate.getDate() === currentDate.getDate()
-    ) {
+  for (let i = 0; i < days.length; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const expected = date.toISOString().split('T')[0];
+    if (log[expected]) {
       streak++;
-      currentDate.setDate(currentDate.getDate() - 1);
     } else {
       break;
     }
   }
 
-  streakDisplay.textContent = `🔥 ${streak}`;
+  stats.innerHTML = `🔥 <strong>${streak}</strong> day streak`;
 }
 
-// === HISTORY PANEL ===
-function updateHistory(log = null) {
-  const container = document.getElementById('historyLog');
-  if (!container) return;
-  if (!log) log = JSON.parse(localStorage.getItem('modeLog') || '{}');
+// Render History
+function renderHistory() {
+  const history = document.getElementById('history');
+  const log = JSON.parse(localStorage.getItem('modeLog') || '{}');
+  const days = Object.keys(log).sort().reverse();
 
-  container.innerHTML = '';
-  Object.entries(log).reverse().forEach(([date, mode]) => {
-    const div = document.createElement('div');
-    div.className = 'mode-entry';
-    div.textContent = `${date}: ${mode}`;
-    div.style.borderLeft = `4px solid ${modeColors[mode]}`;
-    container.appendChild(div);
+  history.innerHTML = '';
+  days.forEach(date => {
+    const entry = document.createElement('div');
+    entry.className = 'history-entry';
+    const mode = modes.find(m => m.name === log[date]);
+    entry.innerHTML = `<span>${date}:</span> ${mode.emoji} <strong>${mode.name}</strong>`;
+    history.appendChild(entry);
   });
 }
-
-// === SIMPLE NAVIGATION ===
-function showSection(sectionId) {
-  document.querySelectorAll('.section').forEach(sec => {
-    sec.style.display = 'none';
-  });
-
-  const target = document.getElementById(sectionId);
-  if (target) target.style.display = 'block';
-}
-
-// === INIT APP ===
-document.addEventListener('DOMContentLoaded', () => {
-  renderCompass();
-  updateStreak();
-  updateHistory();
-  showSection('home');
-});
