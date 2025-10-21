@@ -1,149 +1,116 @@
+/* ====== GENERAL RESET & BASE STYLES ====== */
 body {
-  font-family: system-ui, sans-serif;
   margin: 0;
-  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #fff;
   color: #000;
   text-align: center;
 }
 
-header h1 {
+h1 {
+  margin-top: 20px;
+  font-size: 2em;
+}
+
+/* ====== NAVIGATION ====== */
+nav {
   margin-top: 20px;
 }
 
-nav {
+nav button {
+  margin: 0 5px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background-color: #0B3D2E;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ====== COMPASS CONTAINER ====== */
+#compass {
+  position: relative;
+  margin: 40px auto;
+  width: 300px;
+  height: 300px;
+  border: 4px solid black;
+  border-radius: 50%;
+  overflow: hidden;
   display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 10px 0;
   flex-wrap: wrap;
 }
 
-nav button {
-  background: #f0f0f0;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-#splashScreen {
-  position: fixed;
-  background: #0B3D2E;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
+.wedge {
+  width: 50%;
+  height: 50%;
   display: flex;
-  justify-content: center;
   align-items: center;
-  animation: fadeOut 2s ease-in-out forwards;
-  animation-delay: 2s;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
 }
 
-#splashIcon {
-  width: 120px;
-  height: 120px;
-  animation: zoomSpin 1.5s ease-in-out;
+.growing { background-color: #2196F3; }
+.drifting { background-color: #FFEB3B; color: #000; }
+.grounded { background-color: #4CAF50; }
+.surviving { background-color: #F44336; }
+
+/* ====== MODE BUTTONS BELOW COMPASS ====== */
+#mode-buttons {
+  margin-top: 30px;
 }
 
-@keyframes zoomSpin {
-  0% {
-    transform: scale(0.2) rotate(0deg);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1) rotate(360deg);
-    opacity: 1;
-  }
+#mode-buttons button {
+  display: block;
+  margin: 10px auto;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  width: 200px;
 }
 
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
+#mode-buttons .growing { background-color: #2196F3; }
+#mode-buttons .drifting { background-color: #FFEB3B; color: #000; }
+#mode-buttons .grounded { background-color: #4CAF50; }
+#mode-buttons .surviving { background-color: #F44336; }
 
-.popup {
+/* ====== WELCOME POPUP ====== */
+#welcomePopup {
+  display: none;
   position: fixed;
   top: 20%;
   left: 10%;
-  right: 10%;
-  background: #fff;
+  width: 80%;
   padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  z-index: 9000;
-  display: none;
+  background-color: #fff;
+  border: 2px solid #0B3D2E;
+  border-radius: 12px;
+  z-index: 9999;
+  text-align: center;
+  font-size: 16px;
 }
 
-.popup button {
+#welcomePopup button {
   margin-top: 15px;
-  padding: 8px 16px;
-  background: #0B3D2E;
+  padding: 10px 20px;
+  background-color: #0B3D2E;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
 }
 
+/* ====== FOOTER ====== */
 footer {
-  margin: 40px 0 20px;
-  font-size: 0.85rem;
-  color: #555;
+  margin-top: 60px;
+  font-size: 13px;
+  color: #444;
 }
-
-#compass {
-  margin: 40px auto 20px;
-  width: 240px;
-  height: 240px;
-  position: relative;
-  border-radius: 50%;
-  border: 4px solid #000;
-}
-
-.wedge {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  transform-origin: 100% 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  font-weight: bold;
-  border-radius: 0 100% 0 0;
-}
-
-.wedge span {
-  transform: rotate(-45deg);
-}
-
-.growing { background: #2196F3; transform: rotate(0deg); top: 0; right: 0; }
-.drifting { background: #FFEB3B; color: #000; transform: rotate(90deg); bottom: 0; right: 0; }
-.surviving { background: #F44336; transform: rotate(180deg); bottom: 0; left: 0; }
-.grounded { background: #4CAF50; transform: rotate(270deg); top: 0; left: 0; }
-
-.mode-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin: 20px 0;
-}
-
-.mode-buttons button {
-  padding: 10px 16px;
-  font-size: 1rem;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  color: white;
-  width: 220px;
-}
-
-.mode-buttons .growing { background: #2196F3; }
-.mode-buttons .drifting { background: #FFEB3B; color: #000; }
-.mode-buttons .surviving { background: #F44336; }
-.mode-buttons .grounded { background: #4CAF50; }
