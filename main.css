@@ -141,6 +141,14 @@ nav.nav {
   transform: rotate(180deg);
 }
 
+.wedge-text {
+  transform: rotate(0deg);
+  display: block;
+  text-align: center;
+  width: 100%;
+  font-weight: bold;
+}
+
 /* Buttons */
 .mode-buttons {
   display: flex;
