@@ -38,12 +38,10 @@ nav.nav {
   text-align: center;
 }
 
-/* Compass */
 .compass-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin: 20px 0;
+  margin: 40px 0;
 }
 
 .compass-circle {
@@ -52,73 +50,51 @@ nav.nav {
   height: 280px;
   border-radius: 50%;
   border: 3px solid #000;
-  overflow: hidden;
+  background: conic-gradient(
+    #3498db 0deg 90deg,      /* Top: Growing */
+    #f1c40f 90deg 180deg,    /* Right: Drifting */
+    #e74c3c 180deg 270deg,   /* Bottom: Surviving */
+    #2ecc71 270deg 360deg    /* Left: Grounded */
+  );
 }
 
-/* All wedges */
-.wedge {
+/* Labels */
+.wedge-label {
   position: absolute;
   width: 50%;
-  height: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  color: #fff;
   text-align: center;
-  font-size: 14px;
-  padding: 8px;
-}
-
-/* Growing (Top) */
-.wedge-top {
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #3498db;
-  border-bottom-left-radius: 140px;
-  border-bottom-right-radius: 140px;
-}
-
-/* Grounded (Left) */
-.wedge-left {
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  background-color: #2ecc71;
-  border-top-right-radius: 140px;
-  border-bottom-right-radius: 140px;
-}
-
-/* Drifting (Right) */
-.wedge-right {
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  background-color: #f1c40f;
-  color: #000;
-  border-top-left-radius: 140px;
-  border-bottom-left-radius: 140px;
-}
-
-/* Surviving (Bottom) */
-.wedge-bottom {
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #e74c3c;
-  border-top-left-radius: 140px;
-  border-top-right-radius: 140px;
-}
-
-/* Labels stay upright */
-.wedge span {
-  transform: rotate(0deg);
-  font-size: 16px;
   font-weight: bold;
+  font-size: 15px;
+  color: white;
+  pointer-events: none;
 }
 
-/* Buttons */
+/* Position each label */
+.wedge-label.top {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.wedge-label.right {
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #000;
+}
+
+.wedge-label.bottom {
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.wedge-label.left {
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+}
+
 .mode-buttons {
   display: flex;
   flex-direction: column;
