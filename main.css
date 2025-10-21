@@ -99,7 +99,6 @@ header h1 {
   background-color: #d4d4d4;
 }
 
-/* Compass Styles */
 /* Compass Layout */
 .compass-wrapper {
   display: flex;
@@ -173,7 +172,7 @@ header h1 {
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Mode Buttons - Matching Compass Colors */
+/* Mode Buttons - Final Matching Compass Colors */
 .mode-buttons {
   display: flex;
   flex-direction: column;
@@ -187,9 +186,9 @@ header h1 {
   padding: 1rem;
   border: none;
   border-radius: 999px;
-  color: white;
   font-size: 1rem;
   font-weight: bold;
+  color: white;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -198,21 +197,22 @@ header h1 {
   transform: scale(1.03);
 }
 
+/* Final brand-aligned colors */
 .mode-btn.grow {
-  background-color: #3B82F6; /* Blue - Growing */
+  background-color: #3B82F6; /* Growing = Blue */
 }
 
 .mode-btn.drift {
-  background-color: #FACC15; /* Yellow - Drifting */
-  color: #000; /* Improve contrast */
+  background-color: #FACC15; /* Drifting = Yellow */
+  color: #000; /* Contrast fix */
 }
 
 .mode-btn.ground {
-  background-color: #22C55E; /* Green - Grounded */
+  background-color: #22C55E; /* Grounded = Green */
 }
 
 .mode-btn.surv {
-  background-color: #EC4899; /* Pink - Surviving */
+  background-color: #EC4899; /* Surviving = Pink */
 }
 .section {
   padding: 30px 20px;
