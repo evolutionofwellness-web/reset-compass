@@ -125,52 +125,42 @@ main {
   margin: 0 auto;
 }
 
-/* === Compass === */
 #compass {
-  position: relative;
-  width: 300px;
-  height: 300px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 12px;
+  max-width: 400px;
   margin: 2rem auto;
-  border-radius: 50%;
-  background: var(--light-green);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 0 1rem;
 }
 
 .wedge {
-  position: absolute;
-  width: 50%;
-  height: 50%;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  font-weight: 600;
-  color: #fff;
+  align-items: center;
+  padding: 1.8rem 1rem;
+  color: white;
+  font-weight: bold;
+  border-radius: 12px;
+  text-align: center;
   cursor: pointer;
-  border-radius: 50% 0 0 0;
-  transform-origin: 100% 100%;
-}
-.wedge:nth-child(1) {
-  background: var(--blue);
-  transform: rotate(0deg) translate(50%, -50%);
-}
-.wedge:nth-child(2) {
-  background: var(--red);
-  transform: rotate(90deg) translate(50%, -50%);
-}
-.wedge:nth-child(3) {
-  background: var(--green);
-  transform: rotate(180deg) translate(50%, -50%);
-}
-.wedge:nth-child(4) {
-  background: var(--gold);
-  color: var(--text-dark);
-  transform: rotate(270deg) translate(50%, -50%);
+  font-size: 1.2rem;
+  transform: none; /* no rotation */
 }
 
+.wedge:nth-child(1) { background-color: var(--grow); }
+.wedge:nth-child(2) { background-color: var(--surv); }
+.wedge:nth-child(3) { background-color: var(--ground); }
+.wedge:nth-child(4) { background-color: var(--drift); }
+
+@media (max-width: 480px) {
+  .wedge {
+    font-size: 1rem;
+    padding: 1.2rem 0.6rem;
+  }
+}
 /* === Mode Buttons === */
 .mode-buttons {
   display: flex;
