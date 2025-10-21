@@ -40,31 +40,35 @@
     <main>
 
       <!-- Home Section -->
-      <section id="home" class="section">
-        <div class="compass-wrapper">
-          <div class="compass-circle">
-            <div class="wedge wedge-top" onclick="selectMode('growing')">
-              <span>Growing</span>
-            </div>
-            <div class="wedge wedge-left" onclick="selectMode('grounded')">
-              <span>Grounded</span>
-            </div>
-            <div class="wedge wedge-right" onclick="selectMode('drifting')">
-              <span>Drifting</span>
-            </div>
-            <div class="wedge wedge-bottom" onclick="selectMode('surviving')">
-              <span>Surviving</span>
-            </div>
-          </div>
-        </div>
+<section id="home" class="section">
+  <div class="compass-wrapper">
+    <div class="compass-circle">
+      <!-- TOP = Growing (Blue) -->
+      <div class="wedge wedge-top" onclick="selectMode('growing')">
+        <span>Growing</span>
+      </div>
+      <!-- LEFT = Grounded (Green) -->
+      <div class="wedge wedge-left" onclick="selectMode('grounded')">
+        <span>Grounded</span>
+      </div>
+      <!-- RIGHT = Drifting (Yellow) -->
+      <div class="wedge wedge-right" onclick="selectMode('drifting')">
+        <span>Drifting</span>
+      </div>
+      <!-- BOTTOM = Surviving (Red) -->
+      <div class="wedge wedge-bottom" onclick="selectMode('surviving')">
+        <span>Surviving</span>
+      </div>
+    </div>
+  </div>
 
-        <div class="mode-buttons">
-          <button class="mode-btn grow" onclick="selectMode('growing')">🚀 Growing</button>
-          <button class="mode-btn ground" onclick="selectMode('grounded')">🌿 Grounded</button>
-          <button class="mode-btn drift" onclick="selectMode('drifting')">🧭 Drifting</button>
-          <button class="mode-btn surv" onclick="selectMode('surviving')">🩺 Surviving</button>
-        </div>
-      </section>
+  <div class="mode-buttons">
+    <button class="mode-btn grow" onclick="selectMode('growing')">🚀 Growing</button>
+    <button class="mode-btn ground" onclick="selectMode('grounded')">🌿 Grounded</button>
+    <button class="mode-btn drift" onclick="selectMode('drifting')">🧭 Drifting</button>
+    <button class="mode-btn surv" onclick="selectMode('surviving')">🩺 Surviving</button>
+  </div>
+</section>
 
       <!-- Quick Wins -->
       <section id="quickwins" class="section" style="display:none;">
