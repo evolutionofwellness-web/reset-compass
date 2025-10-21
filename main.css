@@ -150,11 +150,6 @@ nav.nav {
   transform: rotate(-180deg);
 }
 
-/* Wedge Text */
-.wedge span {
-  transform: none;
-}
-
 /* Buttons */
 .mode-buttons {
   display: flex;
