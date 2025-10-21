@@ -4,79 +4,63 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=27" />
-  <script defer src="app.js?v=9"></script>
+  <link rel="stylesheet" href="main.css?v=27">
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div id="splashScreen">
-    <img id="splashIcon" src="splash-icon.png" alt="App Icon">
-  </div>
-
-  <!-- Welcome Popup -->
-  <div id="welcomePopup">
-    <h2>Welcome!</h2>
-    <p>This app helps you reset your health based on how you're feeling. Choose a mode to begin.</p>
+  <div id="splashScreen"><img id="splashIcon" src="splash-icon.png" alt="Splash Icon" /></div>
+  <div id="welcomePopup" style="display:none;">
+    <h2>Welcome to The Reset Compass</h2>
+    <p>Select a mode to get started.</p>
     <button id="startButton">Start</button>
   </div>
 
-  <!-- Header -->
   <header>
     <h1>The Reset Compass</h1>
-    <nav class="nav">
-      <button onclick="showSection('home')">Home</button>
-      <button onclick="showSection('quickWins')">Quick Wins</button>
-      <button onclick="showSection('history')">History</button>
-      <button onclick="showSection('about')">About</button>
+    <nav>
+      <button onclick="navigateTo('home')">Home</button>
+      <button onclick="navigateTo('quickwins')">Quick Wins</button>
+      <button onclick="navigateTo('history')">History</button>
+      <button onclick="navigateTo('about')">About</button>
     </nav>
   </header>
 
-  <!-- Home Section -->
-  <section id="home" class="section">
-    <div class="stats">
-      <p><strong>🔥 <span id="streakCount">0</span></strong> day streak</p>
-    </div>
+  <main id="app">
+    <section id="homeView">
+      <div class="stats"><span class="streak">🔥 0-day streak</span></div>
+      <div class="compass-circle" id="compass">
+        <div class="wedge top" onclick="selectMode('growing')">🚀 Growing</div>
+        <div class="wedge right" onclick="selectMode('drifting')">🧭 Drifting</div>
+        <div class="wedge bottom" onclick="selectMode('surviving')">🩺 Surviving</div>
+        <div class="wedge left" onclick="selectMode('grounded')">🌿 Grounded</div>
+      </div>
+      <div class="mode-buttons">
+        <button class="growing" onclick="selectMode('growing')">🚀 Growing</button>
+        <button class="drifting" onclick="selectMode('drifting')">🧭 Drifting</button>
+        <button class="grounded" onclick="selectMode('grounded')">🌿 Grounded</button>
+        <button class="surviving" onclick="selectMode('surviving')">🩺 Surviving</button>
+      </div>
+    </section>
 
-    <div class="compass-wrapper">
-      <div id="compass" class="compass-circle"></div>
-    </div>
+    <section id="modeView" style="display:none;"></section>
+    <section id="quickwinsView" style="display:none;">
+      <h2>Quick Wins</h2>
+      <p>Here are some quick wins for when you need a fast reset.</p>
+    </section>
+    <section id="historyView" style="display:none;">
+      <h2>History</h2>
+      <ul id="historyList"></ul>
+    </section>
+    <section id="aboutView" style="display:none;">
+      <h2>About</h2>
+      <p>This app helps you take control of your health one step at a time.</p>
+      <p>Contact: <a href="mailto:evolutionofwellness8@gmail.com">evolutionofwellness8@gmail.com</a></p>
+    </section>
+  </main>
 
-    <div class="mode-buttons">
-      <button class="mode-btn grow" onclick="selectMode('growing')">🚀 Growing</button>
-      <button class="mode-btn drift" onclick="selectMode('drifting')">🧭 Drifting</button>
-      <button class="mode-btn ground" onclick="selectMode('grounded')">🌿 Grounded</button>
-      <button class="mode-btn surv" onclick="selectMode('surviving')">🩺 Surviving</button>
-    </div>
-  </section>
+  <footer>
+    <p>© 2025 The Reset Compass. All rights reserved.</p>
+  </footer>
 
-  <!-- Quick Wins -->
-  <section id="quickWins" class="section" style="display:none;">
-    <h2>Quick Wins</h2>
-    <ul>
-      <li>Drink a glass of water</li>
-      <li>Take 5 deep breaths</li>
-      <li>Stand up and stretch</li>
-      <li>Step outside for 2 minutes</li>
-    </ul>
-  </section>
-
-  <!-- History -->
-  <section id="history" class="section" style="display:none;">
-    <h2>Mode History</h2>
-    <div id="mode-history"></div>
-  </section>
-
-  <!-- About -->
-  <section id="about" class="section" style="display:none;">
-    <h2>About This App</h2>
-    <p>The Reset Compass helps you choose small steps toward better health based on how you feel. For support, contact <a href="mailto:evolutionofwellness8@gmail.com">evolutionofwellness8@gmail.com</a>.</p>
-  </section>
-
-  <!-- Activities Section (Rendered dynamically) -->
-  <section id="activities" class="section" style="display:none;">
-    <h2 id="activityModeTitle">Your Reset Activities</h2>
-    <div id="activityList" class="activity-list"></div>
-    <button onclick="goHome()">← Back to Home</button>
-  </section>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
