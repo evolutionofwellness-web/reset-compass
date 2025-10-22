@@ -2,46 +2,52 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=31" />
+  <link rel="stylesheet" href="main.css?v=32" />
   <link rel="icon" href="splash-icon.png" />
-  <script defer src="app.js?v=3"></script>
+  <script src="app.js?v=3" defer></script>
 </head>
 <body>
+
   <!-- Splash Screen -->
-  <div id="splashScreen">
-    <img src="splash-icon.png" alt="Reset Compass Icon" class="splash-icon" />
+  <div id="splash-screen">
+    <img src="splash-icon.png" alt="Reset Compass Logo" class="splash-icon" />
   </div>
 
   <!-- Welcome Popup -->
-  <div id="welcomePopup" class="popup">
+  <div id="welcome-popup" class="popup hidden">
     <div class="popup-content">
       <h2>Welcome to The Reset Compass</h2>
-      <p>Choose your current state and get personalized tools to feel better fast.</p>
-      <button id="startButton" class="start-btn">Start</button>
+      <p>Choose your current state and get personalized activities to feel better fast.</p>
+      <button id="start-button">Start</button>
     </div>
   </div>
 
-  <!-- App Container -->
-  <div id="app" class="app-container">
-    <header>
-      <h1>The Reset Compass</h1>
-      <nav class="nav-menu">
-        <button onclick="goHome()">Home</button>
-        <button onclick="goToQuickWins()">Quick Wins</button>
-        <button onclick="goToHistory()">History</button>
-        <button onclick="goToAbout()">About</button>
-      </nav>
-    </header>
+  <!-- App Header -->
+  <header>
+    <h1>The Reset Compass</h1>
+    <nav>
+      <button class="nav-btn" data-route="home">Home</button>
+      <button class="nav-btn" data-route="quickwins">Quick Wins</button>
+      <button class="nav-btn" data-route="history">History</button>
+      <button class="nav-btn" data-route="about">About</button>
+    </nav>
+  </header>
 
-    <main id="mainContent" class="main">
-      <!-- Compass and Buttons will render here -->
-    </main>
+  <!-- Main Content Area -->
+  <main id="app">
+    <div class="home-screen">
+      <div class="compass-container">
+        <img src="splash-icon.png" alt="Compass Icon" class="compass-icon" />
+      </div>
+    </div>
+  </main>
 
-    <footer>
-      <p>© 2025 Evolution of Wellness. All rights reserved.</p>
-    </footer>
-  </div>
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Evolution of Wellness. All rights reserved.</p>
+  </footer>
+
 </body>
 </html>
