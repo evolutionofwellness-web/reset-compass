@@ -43,28 +43,30 @@
       <div class="wedge wedge-left" onclick="selectMode('grounded')"><span>Grounded</span></div>
     </div>
   </div>
+<!-- Spacer below compass -->
+<div style="height: 20px;"></div>
 
-  <!-- Spacer below compass to prevent overlap -->
-  <div style="height: 20px;"></div>
-
-    <div class="mode-button-wrapper">
-      <button class="mode-btn surv" onclick="selectMode('surviving')">🩺 Surviving</button>
-      <p class="mode-description">You're stressed, tired, or struggling — just trying to get by.</p>
-    </div>
-
-    <div class="mode-button-wrapper">
-      <button class="mode-btn ground" onclick="selectMode('grounded')">🌿 Grounded</button>
-      <p class="mode-description">You’re calm and stable, taking care of yourself without pushing too hard.</p>
-    </div>
+<div class="mode-buttons">
+  <div class="mode-button-wrapper">
+    <button class="mode-btn grow" onclick="navigateToMode('growing')">🚀 Growing</button>
+    <p class="mode-description">You're building momentum and making meaningful progress.</p>
   </div>
-</section>
 
-    <!-- Mode Section -->
-    <section id="modeSection" class="section" style="display:none;">
-      <h2 id="modeTitle"></h2>
-      <div id="activityList" class="activity-list"></div>
-      <button onclick="navigateTo('home')">← Back</button>
-    </section>
+  <div class="mode-button-wrapper">
+    <button class="mode-btn drift" onclick="navigateToMode('drifting')">🧭 Drifting</button>
+    <p class="mode-description">You're not in crisis, but not moving forward either.</p>
+  </div>
+
+  <div class="mode-button-wrapper">
+    <button class="mode-btn surv" onclick="navigateToMode('surviving')">🩺 Surviving</button>
+    <p class="mode-description">You're stressed, tired, or struggling — just trying to get by.</p>
+  </div>
+
+  <div class="mode-button-wrapper">
+    <button class="mode-btn ground" onclick="navigateToMode('grounded')">🌿 Grounded</button>
+    <p class="mode-description">You're calm and stable, taking care of yourself without pushing too hard.</p>
+  </div>
+</div>
 
     <!-- Quick Wins Section -->
     <section id="quickwinsSection" class="section" style="display:none;">
