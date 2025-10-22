@@ -1,56 +1,36 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // Splash screen
+document.addEventListener("DOMContentLoaded", () => {
+  const splash = document.getElementById("splash-screen");
+  const popup = document.getElementById("popup");
+  const startBtn = document.getElementById("start-button");
+  const app = document.getElementById("app");
+
+  // Splash animation and popup trigger
   setTimeout(() => {
-    document.getElementById('splashScreen').style.display = 'none';
+    splash.classList.add("hidden");
 
-    // Show welcome popup only once
-    if (!localStorage.getItem('popupShown')) {
-      document.getElementById('popup').style.display = 'flex';
-      localStorage.setItem('popupShown', 'true');
+    if (!localStorage.getItem("welcomeSeen")) {
+      popup.classList.remove("hidden");
+    } else {
+      app.classList.remove("hidden");
     }
-  }, 2000);
+  }, 1400);
 
-  // Start button for welcome popup
-  document.getElementById('startButton').addEventListener('click', () => {
-    document.getElementById('popup').style.display = 'none';
+  // Start button click
+  startBtn.addEventListener("click", () => {
+    localStorage.setItem("welcomeSeen", "true");
+    popup.classList.add("hidden");
+    app.classList.remove("hidden");
   });
 
-  // Nav buttons
-  document.querySelectorAll('.nav-menu button').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const page = btn.getAttribute('data-page');
-      navigateTo(page);
+  // Nav handling
+  window.navigateTo = (target) => {
+    const sections = ["home", "quickwins", "history", "about"];
+    sections.forEach((sec) => {
+      const el = document.getElementById(`${sec}-section`);
+      if (el) el.style.display = sec === target ? "block" : "none";
     });
-  });
+  };
 
-  // Mode buttons
-  document.querySelectorAll('.mode-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const mode = btn.getAttribute('data-mode');
-      alert(`You selected: ${mode}`);
-    });
-  });
-
-  // Compass wedges
-  document.querySelectorAll('.wedge').forEach((wedge) => {
-    wedge.addEventListener('click', () => {
-      const mode = wedge.getAttribute('data-mode');
-      alert(`You selected: ${mode}`);
-    });
-  });
+  // Default to home
+  navigateTo("home");
 });
-
-function navigateTo(pageId) {
-  const pages = ['home', 'quickwins', 'history', 'about'];
-  pages.forEach((id) => {
-    const section = document.getElementById(`${id}Section`);
-    if (section) {
-      section.style.display = id === pageId ? 'block' : 'none';
-    }
-  });
-
-  // Highlight active nav
-  document.querySelectorAll('.nav-menu button').forEach((btn) => {
-    btn.classList.toggle('active', btn.getAttribute('data-page') === pageId);
-  });
-}
