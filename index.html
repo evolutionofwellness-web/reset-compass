@@ -2,51 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#0B3D2E"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=34">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="splash-icon.png" type="image/png">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZYQJ6B1SMK"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-ZYQJ6B1SMK');
-  </script>
+  <link rel="stylesheet" href="main.css?v=31" />
+  <link rel="icon" href="splash-icon.png" />
+  <script defer src="app.js?v=3"></script>
 </head>
 <body>
+  <!-- Splash Screen -->
   <div id="splashScreen">
-    <img src="splash-icon.png" id="splashIcon" alt="App Icon">
+    <img src="splash-icon.png" alt="Reset Compass Icon" class="splash-icon" />
   </div>
 
+  <!-- Welcome Popup -->
   <div id="welcomePopup" class="popup">
     <div class="popup-content">
       <h2>Welcome to The Reset Compass</h2>
       <p>Choose your current state and get personalized tools to feel better fast.</p>
-      <button id="startButton">Start</button>
+      <button id="startButton" class="start-btn">Start</button>
     </div>
   </div>
 
-  <header>
-    <h1>The Reset Compass</h1>
-    <nav>
-      <button onclick="navigate('home')">Home</button>
-      <button onclick="navigate('quick')">Quick Wins</button>
-      <button onclick="navigate('history')">History</button>
-      <button onclick="navigate('about')">About</button>
-    </nav>
-  </header>
+  <!-- App Container -->
+  <div id="app" class="app-container">
+    <header>
+      <h1>The Reset Compass</h1>
+      <nav class="nav-menu">
+        <button onclick="goHome()">Home</button>
+        <button onclick="goToQuickWins()">Quick Wins</button>
+        <button onclick="goToHistory()">History</button>
+        <button onclick="goToAbout()">About</button>
+      </nav>
+    </header>
 
-  <main id="mainContent">
-    <!-- Compass + Mode Buttons render here -->
-  </main>
+    <main id="mainContent" class="main">
+      <!-- Compass and Buttons will render here -->
+    </main>
 
-  <footer>
-    <p>© 2025 Evolution of Wellness. All rights reserved.</p>
-  </footer>
-
-  <script src="app.js?v=11"></script>
+    <footer>
+      <p>© 2025 Evolution of Wellness. All rights reserved.</p>
+    </footer>
+  </div>
 </body>
 </html>
