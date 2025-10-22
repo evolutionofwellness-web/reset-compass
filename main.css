@@ -7,25 +7,135 @@
 }
 
 body {
-  font-family: 'Arial', sans-serif;
   margin: 0;
-  padding: 0;
-  background: #fff;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
   color: #000;
 }
 
-/* Splash Screen */
+header {
+  background: #fff;
+  text-align: center;
+  padding: 20px 10px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+nav {
+  margin-top: 10px;
+}
+
+nav button {
+  background-color: #e5ebf5;
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 16px;
+  margin: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+nav button:hover {
+  background-color: #d0d9ef;
+}
+
+main {
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.compass-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.wedge {
+  cursor: pointer;
+}
+
+.growing { fill: var(--growing-color); }
+.drifting { fill: var(--drifting-color); }
+.surviving { fill: var(--surviving-color); }
+.grounded { fill: var(--grounded-color); }
+
+.wedge-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  fill: #000;
+  pointer-events: none;
+}
+
+.mode-button {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  margin: 10px auto;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+}
+
+.mode-button.growing { background-color: var(--growing-color); }
+.mode-button.drifting { background-color: var(--drifting-color); color: #000; }
+.mode-button.surviving { background-color: var(--surviving-color); }
+.mode-button.grounded { background-color: var(--grounded-color); }
+
+.hidden {
+  display: none;
+}
+
+#modeDescription {
+  margin-top: 20px;
+  font-size: 1rem;
+  text-align: center;
+  font-style: italic;
+  color: #444;
+}
+
+#historyList {
+  list-style: none;
+  padding: 0;
+}
+
+.stats {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.2rem;
+}
+
+#streakDisplay {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#quickwinsSection,
+#aboutSection {
+  text-align: center;
+}
+
+/* Splash screen */
 #splashScreen {
+  background-color: var(--brand-green);
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: var(--brand-green);
+  z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
 }
 
 #splashIcon {
@@ -36,7 +146,7 @@ body {
 @keyframes zoomSpinFade {
   0% {
     opacity: 0;
-    transform: scale(0.4) rotate(0deg);
+    transform: scale(0.5) rotate(0deg);
   }
   50% {
     opacity: 1;
@@ -48,79 +158,39 @@ body {
   }
 }
 
-/* Compass Layout */
-.compass-wrapper {
-  display: flex;
-  justify-content: center;
-  margin: 30px 0;
-}
-
-.compass-circle {
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  position: relative;
-  overflow: hidden;
-  border: 4px solid #000;
-}
-
-.wedge {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  transform-origin: 100% 100%;
+/* Welcome Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(11, 61, 46, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-weight: bold;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 320px;
   text-align: center;
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
 }
 
-/* Each wedge spans 90° with rotation */
-.wedge-top {
-  background-color: var(--growing-color);
-  transform: rotate(0deg);
+.modal-content h2 {
+  margin-top: 0;
 }
 
-.wedge-right {
-  background-color: var(--drifting-color);
-  transform: rotate(90deg);
-}
-
-.wedge-bottom {
-  background-color: var(--surviving-color);
-  transform: rotate(180deg);
-}
-
-.wedge-left {
-  background-color: var(--grounded-color);
-  transform: rotate(270deg);
-}
-
-/* Mode Buttons */
-.mode-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 40px;
-}
-
-.mode-btn {
+.modal-content button {
+  margin-top: 15px;
+  background: #e5ebf5;
+  color: #000;
   border: none;
-  padding: 12px 20px;
+  padding: 10px 20px;
   border-radius: 8px;
-  color: #fff;
-  font-weight: bold;
   font-size: 1rem;
-  width: 200px;
-  text-align: center;
   cursor: pointer;
 }
-
-.grow { background-color: var(--growing-color); }
-.drift { background-color: var(--drifting-color); color: #000; }
-.surv { background-color: var(--surviving-color); }
-.ground { background-color: var(--grounded-color); }
