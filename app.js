@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ DOM loaded");
+
   const splash = document.getElementById("splashScreen");
   const welcome = document.getElementById("welcomePopup");
   const startBtn = document.getElementById("startButton");
@@ -9,26 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const sections = document.querySelectorAll(".section");
 
   const activitySets = {
-    growing: [
-      "Plan out your next step",
-      "Revisit your goals",
-      "Reflect on recent progress"
-    ],
-    drifting: [
-      "Pause and take 5 deep breaths",
-      "Step away from distractions",
-      "Do a 1-minute body check-in"
-    ],
-    surviving: [
-      "Drink a full glass of water",
-      "Stretch for 60 seconds",
-      "Put your phone down for 5 minutes"
-    ],
-    grounded: [
-      "Take a mindful walk",
-      "Write a gratitude list",
-      "Do a deep breathing exercise"
-    ]
+    growing: ["Plan your next step", "Revisit goals", "Reflect on progress"],
+    drifting: ["Take 5 deep breaths", "Pause distractions", "1-minute body check-in"],
+    surviving: ["Drink water", "Stretch 1 min", "Put phone down 5 mins"],
+    grounded: ["Mindful walk", "Gratitude list", "Deep breathing"]
   };
 
   function hideAllSections() {
@@ -36,11 +22,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function navigateTo(sectionId) {
+    console.log(`🔁 Navigating to: ${sectionId}`);
     hideAllSections();
-    document.getElementById(`${sectionId}Section`).style.display = "block";
+    const target = document.getElementById(`${sectionId}Section`);
+    if (target) target.style.display = "block";
   }
 
   function selectMode(mode) {
+    console.log(`🎯 Mode selected: ${mode}`);
     localStorage.setItem("lastMode", mode);
     saveModeToHistory(mode);
     showModeView(mode);
@@ -58,13 +47,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("modeTitle").textContent = titleMap[mode];
     activityList.innerHTML = "";
 
-    activitySets[mode].forEach((activity, index) => {
+    activitySets[mode].forEach(activity => {
       const container = document.createElement("div");
       const p = document.createElement("p");
       p.textContent = activity;
 
       const textarea = document.createElement("textarea");
-      textarea.placeholder = "Add notes or reflections (optional)";
+      textarea.placeholder = "Add notes or reflections";
 
       const saveBtn = document.createElement("button");
       saveBtn.textContent = "Save note + Completed";
@@ -109,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const today = new Date().toISOString().split("T")[0];
     const modeLog = JSON.parse(localStorage.getItem("modeLog") || "[]");
 
-    // Avoid duplicate entries for the same day
     const alreadyLogged = modeLog.find(entry => entry.date === today);
     if (!alreadyLogged) {
       modeLog.push({ date: today, mode });
@@ -123,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const modeCounts = {};
     let streak = 0;
 
-    // Calculate streak
     const days = modeLog.map(entry => entry.date).sort((a, b) => new Date(b) - new Date(a));
     let currentDate = new Date().toISOString().split("T")[0];
 
@@ -139,20 +126,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     streakEl.textContent = streak;
-
-    // Mode breakdown
     breakdownList.innerHTML = "";
     modeLog.forEach(entry => {
       modeCounts[entry.mode] = (modeCounts[entry.mode] || 0) + 1;
     });
-
     Object.entries(modeCounts).forEach(([mode, count]) => {
       const li = document.createElement("li");
-      li.textContent = `${mode.charAt(0).toUpperCase() + mode.slice(1)}: ${count}`;
+      li.textContent = `${mode}: ${count}`;
       breakdownList.appendChild(li);
     });
 
-    // Activity history
     modeHistory.innerHTML = "";
     log.forEach(entry => {
       const div = document.createElement("div");
@@ -161,23 +144,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Splash → Welcome → Home
-  setTimeout(() => {
+  function showApp() {
     splash.style.display = "none";
-
     const hasVisited = localStorage.getItem("hasVisited");
     if (!hasVisited) {
+      console.log("👋 First-time visitor — showing welcome popup");
       welcome.style.display = "block";
     } else {
+      console.log("🏠 Returning visitor — going to home");
       navigateTo("home");
     }
+  }
+
+  setTimeout(() => {
+    console.log("⏱️ Splash delay complete");
+    showApp();
   }, 1400);
 
   startBtn.addEventListener("click", () => {
+    console.log("👉 Start clicked");
     localStorage.setItem("hasVisited", "true");
     welcome.style.display = "none";
     navigateTo("home");
   });
 
+  console.log("📈 Loading history");
   updateHistory();
 });
