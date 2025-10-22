@@ -1,196 +1,136 @@
 :root {
   --brand-green: #0B3D2E;
-  --growing-color: #3498db;
-  --drifting-color: #f1c40f;
-  --surviving-color: #e74c3c;
-  --grounded-color: #2ecc71;
+  --blue: #4A90E2;
+  --yellow: #F5A623;
+  --red: #D0021B;
+  --green: #7ED321;
 }
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #fff;
-  color: #000;
-}
-
-header {
-  background: #fff;
+  font-family: system-ui, sans-serif;
+  background-color: white;
+  color: black;
   text-align: center;
-  padding: 20px 10px;
+  padding: 0 16px;
 }
 
-header h1 {
-  margin: 0;
+h1 {
   font-size: 2rem;
+  margin-bottom: 10px;
 }
 
 nav {
-  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
 nav button {
-  background-color: #e5ebf5;
-  color: #000;
-  border: none;
-  border-radius: 12px;
+  margin: 4px;
   padding: 8px 16px;
-  margin: 5px;
-  font-size: 1rem;
+  border: none;
+  background-color: #eee;
+  border-radius: 12px;
+  font-size: 14px;
   cursor: pointer;
 }
 
 nav button:hover {
-  background-color: #d0d9ef;
-}
-
-main {
-  padding: 20px;
-  max-width: 600px;
-  margin: auto;
-}
-
-.compass-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.wedge {
-  cursor: pointer;
-}
-
-.growing { fill: var(--growing-color); }
-.drifting { fill: var(--drifting-color); }
-.surviving { fill: var(--surviving-color); }
-.grounded { fill: var(--grounded-color); }
-
-.wedge-label {
-  font-size: 0.9rem;
-  font-weight: bold;
-  fill: #000;
-  pointer-events: none;
-}
-
-.mode-button {
-  display: block;
-  width: 100%;
-  max-width: 280px;
-  margin: 10px auto;
-  padding: 12px;
-  font-size: 1rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  cursor: pointer;
-  text-align: center;
-}
-
-.mode-button.growing { background-color: var(--growing-color); }
-.mode-button.drifting { background-color: var(--drifting-color); color: #000; }
-.mode-button.surviving { background-color: var(--surviving-color); }
-.mode-button.grounded { background-color: var(--grounded-color); }
-
-.hidden {
-  display: none;
-}
-
-#modeDescription {
-  margin-top: 20px;
-  font-size: 1rem;
-  text-align: center;
-  font-style: italic;
-  color: #444;
-}
-
-#historyList {
-  list-style: none;
-  padding: 0;
-}
-
-.stats {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 1.2rem;
-}
-
-#streakDisplay {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-#quickwinsSection,
-#aboutSection {
-  text-align: center;
+  background-color: #ddd;
 }
 
 /* Splash screen */
 #splashScreen {
-  background-color: var(--brand-green);
   position: fixed;
-  top: 0;
-  left: 0;
+  z-index: 9999;
+  top: 0; left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 9999;
+  background-color: var(--brand-green);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 #splashIcon {
-  width: 120px;
-  animation: zoomSpinFade 1.2s ease-out forwards;
+  width: 100px;
+  height: 100px;
+  animation: zoomSpinFade 2s ease-out forwards;
 }
 
 @keyframes zoomSpinFade {
   0% {
-    opacity: 0;
-    transform: scale(0.5) rotate(0deg);
-  }
-  50% {
     opacity: 1;
-    transform: scale(1.1) rotate(180deg);
+    transform: scale(1) rotate(0deg);
   }
   100% {
     opacity: 0;
-    transform: scale(2) rotate(360deg);
+    transform: scale(3) rotate(360deg);
   }
 }
 
-/* Welcome Modal */
-.modal {
+/* Welcome popup */
+#welcomePopup {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(11, 61, 46, 0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 30px;
+  z-index: 999;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 24px;
   border-radius: 10px;
-  max-width: 320px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  display: none;
+  max-width: 90%;
   text-align: center;
 }
 
-.modal-content h2 {
-  margin-top: 0;
-}
-
-.modal-content button {
-  margin-top: 15px;
-  background: #e5ebf5;
-  color: #000;
+#welcomePopup button {
+  background-color: var(--brand-green);
+  color: white;
   border: none;
   padding: 10px 20px;
+  margin-top: 16px;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 16px;
   cursor: pointer;
+}
+
+/* Compass layout */
+#compass {
+  width: 300px;
+  height: 300px;
+  margin: 20px auto;
+}
+
+.wedge-text {
+  font-size: 14px;
+  font-weight: bold;
+  fill: white;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+/* Mode buttons */
+.mode-button {
+  display: block;
+  width: 90%;
+  max-width: 400px;
+  margin: 10px auto;
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  color: black;
+  cursor: pointer;
+}
+
+.mode-button.blue { background-color: var(--blue); color: white; }
+.mode-button.yellow { background-color: var(--yellow); }
+.mode-button.red { background-color: var(--red); color: white; }
+.mode-button.green { background-color: var(--green); }
+
+section {
+  display: none;
+  padding-bottom: 40px;
 }
