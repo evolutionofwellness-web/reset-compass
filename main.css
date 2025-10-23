@@ -1,229 +1,218 @@
-/* Root Variables */
 :root {
   --brand-green: #0B3D2E;
-  --light-gray: #f8f8f8;
-  --text-color: #222;
-  --nav-bg: #e6f0ea;
-  --wedge-growing: #4A90E2;
-  --wedge-drifting: #F5A623;
-  --wedge-surviving: #D0021B;
-  --wedge-grounded: #7ED321;
+  --bg-light: #f9f9f9;
+  --text-dark: #111;
+  --text-light: #fff;
+  --button-bg: #eee;
+  --button-hover: #ddd;
+  --modal-bg: rgba(0, 0, 0, 0.7);
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* General Reset */
 body {
-  font-family: 'Segoe UI', sans-serif;
   margin: 0;
-  padding: 0;
-  background-color: var(--light-gray);
-  color: var(--text-color);
-  line-height: 1.6;
+  font-family: Arial, sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
 }
 
-h1, h2 {
+header {
   text-align: center;
-  margin-top: 20px;
+  padding: 1rem;
 }
 
-/* Splash Screen */
-#splashScreen {
-  background-color: var(--brand-green);
+h1 {
+  margin-bottom: 0.5rem;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.nav-button {
+  padding: 0.5rem 1rem;
+  background-color: #dfeeff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.section {
+  padding: 2rem 1rem;
+  max-width: 700px;
+  margin: auto;
+}
+
+#welcome-popup {
   position: fixed;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--modal-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: var(--box-shadow);
+}
+
+#start-button {
+  background-color: var(--brand-green);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  margin-top: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#splash-screen {
+  position: fixed;
+  z-index: 9999;
+  background-color: var(--brand-green);
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
 }
 
-#splashIcon {
+#splash-icon {
   width: 100px;
   height: 100px;
-  animation: splashZoom 1s ease-out forwards;
+  animation: splashZoom 1.2s ease-out forwards;
 }
 
 @keyframes splashZoom {
   0% {
-    transform: scale(1) rotate(0deg);
+    transform: scale(0.4) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(360deg);
     opacity: 1;
   }
   100% {
-    transform: scale(4) rotate(360deg);
+    transform: scale(1) rotate(720deg);
     opacity: 0;
   }
 }
 
-/* Modal (Welcome Popup) */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 9998;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.6);
+#compass {
+  width: 250px;
+  height: 250px;
+  margin: 2rem auto;
+  display: block;
 }
 
-.modal-content {
-  background-color: #fff;
-  margin: 20% auto;
-  padding: 30px;
-  border-radius: 12px;
-  width: 80%;
-  max-width: 400px;
-  text-align: center;
-}
-
-.modal-content button {
-  background-color: var(--brand-green);
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
+.wedge {
   cursor: pointer;
+  transition: opacity 0.3s;
 }
 
-/* Navigation */
-.top-nav {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
+.wedge:hover {
+  opacity: 0.7;
 }
 
-.top-nav button {
-  background-color: var(--nav-bg);
-  border: none;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-/* Compass */
-.compass-container {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-svg#compass {
-  max-width: 250px;
-  width: 80%;
-  height: auto;
-}
-
-text {
-  font-size: 10px;
+.wedge-label {
+  font-size: 12px;
+  fill: white;
+  text-anchor: middle;
+  dominant-baseline: middle;
   pointer-events: none;
 }
 
-/* Mode Buttons */
-.mode-buttons {
+.button-container {
   display: flex;
   flex-direction: column;
-  gap: 15px;
   align-items: center;
-  margin: 30px 0;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .mode-button {
-  width: 80%;
-  max-width: 250px;
-  padding: 15px;
-  font-size: 18px;
-  background-color: #fff;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  background-color: #f1f1f1;
   border: none;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: var(--box-shadow);
+  width: 90%;
+  max-width: 300px;
   cursor: pointer;
-  color: #666;
+  transition: background-color 0.3s;
 }
 
-/* Sections */
-.section {
-  display: none;
-  padding: 0 20px 40px;
+.mode-button:hover {
+  background-color: var(--button-hover);
 }
 
-.section.active {
-  display: block;
+#quickwins-section ul,
+#mode-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+#quickwins-section li,
+#mode-section li {
+  background-color: #fff;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
 }
 
 textarea {
   width: 100%;
-  max-width: 600px;
-  margin: 10px auto;
-  display: block;
-  padding: 10px;
-  border-radius: 6px;
+  margin-top: 0.5rem;
+  padding: 0.6rem;
   border: 1px solid #ccc;
-  font-size: 14px;
+  border-radius: 8px;
+  font-family: sans-serif;
+  resize: vertical;
+  font-size: 0.95rem;
 }
 
-button {
-  margin-top: 10px;
-  padding: 10px 18px;
-  font-size: 14px;
-  background-color: var(--brand-green);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+#history-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: var(--box-shadow);
 }
 
-/* Activity Input Boxes */
-.activity-block {
-  margin-bottom: 25px;
-}
-
-.activity-block textarea {
-  margin-top: 6px;
-}
-
-/* Quick Wins */
-#quickWins ul,
-#growing ul,
-#drifting ul,
-#surviving ul,
-#grounded ul {
-  padding-left: 20px;
-}
-
-#quickWins li,
-#growing li,
-#drifting li,
-#surviving li,
-#grounded li {
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-/* History Section */
-#historySection {
-  text-align: center;
-}
-
-#modeBreakdown, #modeHistory {
-  margin-top: 20px;
-  font-size: 14px;
-  text-align: left;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Footer */
 footer {
   text-align: center;
-  padding: 20px 0;
-  font-size: 13px;
-  color: #666;
+  padding: 2rem 1rem;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  nav {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #compass {
+    width: 200px;
+    height: 200px;
+  }
+
+  .mode-button {
+    font-size: 1rem;
+  }
 }
