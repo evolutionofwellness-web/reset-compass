@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=36" />
+  <link rel="stylesheet" href="main.css?v=37" />
   <script defer src="app.js?v=8"></script>
 </head>
 <body>
@@ -21,7 +21,6 @@
 
   <!-- Main App Content -->
   <div id="appContent" style="display: none;">
-    <!-- Header -->
     <header>
       <h1>The Reset Compass</h1>
       <nav class="nav">
@@ -32,43 +31,25 @@
       </nav>
     </header>
 
-    <!-- Compass Section -->
     <section id="homeSection" class="section">
       <div id="compass" class="compass-wrapper">
         <svg width="300" height="300" viewBox="0 0 200 200">
-          <!-- Growing -->
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#3498db" data-mode="growing"/>
-          <!-- Drifting -->
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#f1c40f" data-mode="drifting"/>
-          <!-- Surviving -->
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#e74c3c" data-mode="surviving"/>
-          <!-- Grounded -->
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#2ecc71" data-mode="grounded"/>
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4A90E2" data-mode="growing"/>
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#F5A623" data-mode="drifting"/>
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#D0021B" data-mode="surviving"/>
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#7ED321" data-mode="grounded"/>
         </svg>
       </div>
 
       <!-- Mode Buttons -->
-      <!-- Mode Display Section (hidden until a mode is selected) -->
-<section id="modeSection" class="section" style="display: none;">
-  <h2 id="selectedModeName"></h2>
-  <p id="selectedModeDescription"></p>
-
-  <ul id="modeActivitiesList">
-    <!-- Activities will be inserted here dynamically -->
-  </ul>
-
-  <textarea id="activityNote" rows="4" placeholder="What did you do?" style="width: 90%; max-width: 400px; margin-top: 16px;"></textarea><br>
-  <button id="saveActivityButton" style="margin-top: 12px; padding: 10px 20px; font-size: 16px;">Save Activity</button>
-</section>
       <div class="mode-buttons">
-        <button class="mode-button">🚀 Growing</button>
-        <button class="mode-button">🧭 Drifting</button>
-        <button class="mode-button">🩺 Surviving</button>
-        <button class="mode-button">🌿 Grounded</button>
+        <button class="mode-button blue">🚀 Growing</button>
+        <button class="mode-button yellow">🧭 Drifting</button>
+        <button class="mode-button red">🩺 Surviving</button>
+        <button class="mode-button green">🌿 Grounded</button>
       </div>
     </section>
 
-    <!-- Quick Wins Section -->
     <section id="quickwinsSection" class="section" style="display: none;">
       <h2>Quick Wins</h2>
       <ul>
@@ -78,7 +59,6 @@
       </ul>
     </section>
 
-    <!-- History Section -->
     <section id="historySection" class="section" style="display: none;">
       <h2>History</h2>
       <p><strong>🔥 Streak:</strong> <span id="streakCount">0</span> days</p>
@@ -86,13 +66,11 @@
       <div id="mode-history"></div>
     </section>
 
-    <!-- About Section -->
     <section id="aboutSection" class="section" style="display: none;">
       <h2>About</h2>
       <p>This app was created by <strong>Evolution of Wellness</strong> to help you reset and realign your health throughout the day.</p>
     </section>
 
-    <!-- Footer -->
     <footer style="text-align: center; padding: 20px;">
       <p>&copy; 2025 Evolution of Wellness. All rights reserved.</p>
     </footer>
