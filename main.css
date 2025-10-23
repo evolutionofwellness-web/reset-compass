@@ -1,136 +1,218 @@
 :root {
   --brand-green: #0B3D2E;
-  --blue: #4A90E2;
-  --yellow: #F5A623;
-  --red: #D0021B;
-  --green: #7ED321;
+  --blue: #3A8DFF;
+  --red: #D90429;
+  --orange: #F4A259;
+  --green: #90BE6D;
+  --light-gray: #F0F0F0;
+  --text-dark: #111;
+  --text-light: #fff;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 body {
-  margin: 0;
   font-family: system-ui, sans-serif;
-  background-color: white;
-  color: black;
+  background: white;
+  margin: 0;
+  padding: 0;
   text-align: center;
-  padding: 0 16px;
+  color: var(--text-dark);
 }
 
-h1 {
-  font-size: 2rem;
-  margin-bottom: 10px;
+h1, h2 {
+  margin-top: 1.5rem;
+  font-weight: bold;
 }
 
 nav {
-  margin-bottom: 20px;
+  margin: 1rem 0;
 }
 
 nav button {
-  margin: 4px;
-  padding: 8px 16px;
+  background-color: var(--light-gray);
   border: none;
-  background-color: #eee;
+  padding: 0.6rem 1.2rem;
+  margin: 0.4rem;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 1rem;
   cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.2s ease;
 }
 
 nav button:hover {
-  background-color: #ddd;
+  background-color: #e0e0e0;
 }
 
-/* Splash screen */
+footer {
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+#compass {
+  width: 280px;
+  height: 280px;
+  margin: 1.5rem auto;
+  display: block;
+}
+
+.mode-button {
+  display: block;
+  width: 80%;
+  max-width: 320px;
+  margin: 0.6rem auto;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-light);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease;
+}
+
+.mode-button:hover {
+  transform: scale(1.03);
+}
+
+#mode-growing { background-color: var(--blue); }
+#mode-drifting { background-color: var(--orange); }
+#mode-surviving { background-color: var(--red); }
+#mode-grounded { background-color: var(--green); }
+
+.hidden {
+  display: none;
+}
+
+#quickWins ul,
+#modeTools ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  text-align: left;
+  max-width: 600px;
+  margin: 1rem auto;
+}
+
+#modeView h2,
+#quickWins h2,
+#history h2,
+#about h2 {
+  margin-top: 2rem;
+}
+
+textarea {
+  width: 90%;
+  max-width: 600px;
+  height: 100px;
+  margin: 1rem auto;
+  display: block;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button.save-button {
+  background-color: var(--brand-green);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+button.save-button:hover {
+  background-color: #06402c;
+}
+
+#history-log {
+  text-align: left;
+  max-width: 600px;
+  margin: 1rem auto;
+  font-size: 0.95rem;
+}
+
+.mode-log-entry {
+  padding: 0.5rem;
+  margin: 0.3rem 0;
+  border-left: 6px solid var(--brand-green);
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.mode-growing-log { border-left-color: var(--blue); }
+.mode-drifting-log { border-left-color: var(--orange); }
+.mode-surviving-log { border-left-color: var(--red); }
+.mode-grounded-log { border-left-color: var(--green); }
+
+#modeBreakdown {
+  font-size: 0.95rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
 #splashScreen {
   position: fixed;
-  z-index: 9999;
+  background: var(--brand-green);
   top: 0; left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: var(--brand-green);
+  z-index: 9999;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
 #splashIcon {
   width: 100px;
   height: 100px;
-  animation: zoomSpinFade 2s ease-out forwards;
+  animation: splashZoomSpin 2s ease-out forwards;
 }
 
-@keyframes zoomSpinFade {
+@keyframes splashZoomSpin {
   0% {
+    transform: scale(0.2) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
     opacity: 1;
-    transform: scale(1) rotate(0deg);
   }
   100% {
+    transform: scale(1) rotate(360deg);
     opacity: 0;
-    transform: scale(3) rotate(360deg);
   }
 }
 
-/* Welcome popup */
 #welcomePopup {
   position: fixed;
-  z-index: 999;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 24px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  display: none;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  z-index: 9998;
   max-width: 90%;
-  text-align: center;
+  display: none;
+}
+
+#welcomePopup h2 {
+  margin-top: 0;
 }
 
 #welcomePopup button {
   background-color: var(--brand-green);
   color: white;
   border: none;
-  padding: 10px 20px;
-  margin-top: 16px;
+  padding: 0.6rem 1.2rem;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 1rem;
+  margin-top: 1rem;
   cursor: pointer;
-}
-
-/* Compass layout */
-#compass {
-  width: 300px;
-  height: 300px;
-  margin: 20px auto;
-}
-
-.compass-wrapper svg {
-  width: 100%;
-  height: 100%;
-}
-
-.mode-buttons {
-  margin-top: 20px;
-}
-
-.mode-button {
-  display: block;
-  width: 90%;
-  max-width: 400px;
-  margin: 10px auto;
-  padding: 16px;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
-  cursor: pointer;
-  color: white;
-}
-
-.mode-button.blue { background-color: var(--blue); }
-.mode-button.yellow { background-color: var(--yellow); color: black; }
-.mode-button.red { background-color: var(--red); }
-.mode-button.green { background-color: var(--green); }
-
-.section {
-  display: none;
-  padding-bottom: 40px;
 }
