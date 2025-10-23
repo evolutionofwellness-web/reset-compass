@@ -167,3 +167,14 @@ function saveQuickWin() {
     alert('Saved!');
   }
 }
+
+function saveDriftingLog() {
+  const input = document.getElementById("driftingInput").value.trim();
+  if (input) {
+    const existing = JSON.parse(localStorage.getItem("driftingLogs") || "[]");
+    existing.push({ text: input, date: new Date().toISOString() });
+    localStorage.setItem("driftingLogs", JSON.stringify(existing));
+    alert("Your entry has been saved.");
+    document.getElementById("driftingInput").value = "";
+  }
+}
