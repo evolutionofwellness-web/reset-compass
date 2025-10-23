@@ -1,238 +1,186 @@
 :root {
   --green: #0B3D2E;
-  --blue: #4A90E2;
-  --orange: #F5A623;
-  --red: #D0021B;
-  --lime: #7ED321;
-  --white: #ffffff;
-  --light-gray: #f2f2f2;
-  --dark-text: #1a1a1a;
-  --modal-bg: rgba(0, 0, 0, 0.7);
+  --light-bg: #f9f9f9;
+  --dark-text: #222;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: var(--white);
+  font-family: system-ui, sans-serif;
+  background-color: var(--light-bg);
   color: var(--dark-text);
+  line-height: 1.6;
+  padding-bottom: 80px;
 }
 
 h1, h2 {
   text-align: center;
-}
-
-button {
-  padding: 10px 16px;
-  margin: 10px 0;
-  background-color: var(--green);
-  color: var(--white);
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-textarea {
-  width: 100%;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  margin: 10px 0;
-  resize: vertical;
-  font-size: 16px;
+  margin-top: 1rem;
 }
 
 .section {
   display: none;
   padding: 20px;
-}
-
-.section.active {
-  display: block;
-}
-
-#appContent {
-  padding: 20px;
   max-width: 600px;
   margin: 0 auto;
 }
 
+footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #888;
+  padding: 2rem 0;
+}
+
+/* Top Nav */
 .top-nav {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 20px;
+  text-align: center;
+  margin-top: 10px;
 }
-
 .top-nav button {
-  flex: 1;
-  margin: 0 4px;
+  background: #e0ecff;
+  color: #333;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 12px;
+  margin: 5px;
   font-size: 14px;
-  padding: 8px;
-  background-color: var(--blue);
 }
 
+/* Compass */
+.compass-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+#compass {
+  max-width: 250px;
+  cursor: pointer;
+}
+#compass path {
+  cursor: pointer;
+  stroke: #fff;
+  stroke-width: 1px;
+  transition: transform 0.2s ease;
+}
+#compass path:hover {
+  opacity: 0.8;
+}
+
+/* Mode Buttons */
 .mode-buttons {
+  text-align: center;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 20px;
+  margin: 20px;
+}
+.mode-button {
+  background: #eee;
+  padding: 14px;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  transition: background 0.2s ease;
+}
+.mode-button:hover {
+  background: #ddd;
 }
 
-.mode-button {
-  padding: 12px;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
+/* Activity Section */
+#modeSection ul {
+  list-style-type: disc;
+  padding-left: 1.4rem;
+  margin-bottom: 1rem;
+}
+textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+button {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 16px;
+  background-color: var(--green);
   color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
   cursor: pointer;
 }
-
-.mode-button.growing {
-  background-color: var(--blue);
+button:hover {
+  background-color: #064d39;
 }
 
-.mode-button.drifting {
-  background-color: var(--orange);
+/* History */
+#modeHistory {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
 }
-
-.mode-button.surviving {
-  background-color: var(--red);
-}
-
-.mode-button.grounded {
-  background-color: var(--lime);
-  color: black;
-}
-
-#activityList {
-  list-style: disc inside;
-  margin-bottom: 10px;
-}
-
-footer {
-  text-align: center;
-  font-size: 12px;
-  margin-top: 30px;
-  padding: 20px;
-  color: #888;
-}
-
-/* Compass styling */
-.compass-container {
-  text-align: center;
-  margin: 20px auto;
-}
-
-#compass {
-  max-width: 200px;
-  height: auto;
+#modeBreakdown {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
 }
 
 /* Splash Screen */
 #splashScreen {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
   background-color: var(--green);
+  inset: 0;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  animation: fadeOut 2s ease-in-out forwards;
-  animation-delay: 2s;
 }
-
 #splashIcon {
   width: 120px;
   height: 120px;
-  animation: scaleSpinFade 2s ease-in-out forwards;
+  animation: splashGrow 1s ease forwards;
 }
-
-@keyframes scaleSpinFade {
+@keyframes splashGrow {
   0% {
-    transform: scale(1) rotate(0deg);
+    transform: scale(1);
     opacity: 1;
   }
   100% {
-    transform: scale(2.5) rotate(360deg);
+    transform: scale(4);
     opacity: 0;
-  }
-}
-
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    visibility: hidden;
   }
 }
 
 /* Welcome Modal */
 .modal {
-  display: none;
   position: fixed;
-  z-index: 1100;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--modal-bg);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 999;
 }
-
 .modal-content {
-  background-color: var(--white);
-  padding: 30px;
-  border-radius: 8px;
+  background: white;
+  padding: 30px 20px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
   text-align: center;
-  max-width: 300px;
-  margin: 0 auto;
+  width: 90%;
+  max-width: 320px;
 }
-
-#startButton {
+.modal-content h2 {
+  margin-top: 0;
+}
+.modal-content button {
   background-color: var(--green);
   color: white;
-  font-weight: bold;
-  padding: 10px 20px;
-  margin-top: 15px;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-#startButton:hover {
-  background-color: #0a3326;
-}
-
-/* History and Breakdown */
-#modeHistory {
   margin-top: 20px;
-}
-
-#modeBreakdown p {
-  font-weight: bold;
-  margin: 6px 0;
-}
-
-/* Responsive */
-@media (max-width: 500px) {
-  .top-nav {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .mode-buttons {
-    flex-direction: column;
-  }
-
-  button {
-    width: 100%;
-  }
 }
