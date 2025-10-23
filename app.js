@@ -1,173 +1,188 @@
 document.addEventListener('DOMContentLoaded', () => {
   const splash = document.getElementById('splashScreen');
-  const welcome = document.getElementById('welcomePopup');
-  const app = document.getElementById('appContent');
+  const welcomePopup = document.getElementById('welcomePopup');
+  const startButton = document.getElementById('startButton');
+  const appContent = document.getElementById('appContent');
 
-  // Splash and welcome logic
+  // Hide splash after animation
   setTimeout(() => {
     splash.style.display = 'none';
-    if (!localStorage.getItem('hasSeenPopup')) {
-      welcome.style.display = 'block';
+
+    if (!localStorage.getItem('hasVisited')) {
+      welcomePopup.style.display = 'flex';
     } else {
-      app.style.display = 'block';
-      navigateTo('home');
+      appContent.style.display = 'block';
+      showSection('home');
     }
-  }, 2000);
+  }, 1200);
 
-  document.getElementById('startButton').addEventListener('click', () => {
-    localStorage.setItem('hasSeenPopup', 'true');
-    welcome.style.display = 'none';
-    app.style.display = 'block';
-    navigateTo('home');
+  startButton.addEventListener('click', () => {
+    localStorage.setItem('hasVisited', 'true');
+    welcomePopup.style.display = 'none';
+    appContent.style.display = 'block';
+    showSection('home');
   });
 
-  // Navigation system
-  window.navigateTo = function (section) {
-    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
-    document.getElementById(section + 'Section').style.display = 'block';
-  };
-
-  // Mode button + compass click logic
-  const modeMap = {
-    Growing: {
-      icon: '🚀',
-      activities: ['Write a future goal', 'Celebrate a small win', 'Take the next step on a project']
-    },
-    Drifting: {
-      icon: '🧭',
-      activities: ['Name what’s distracting you', 'Write 1 sentence to refocus', 'Stand up and reset']
-    },
-    Surviving: {
-      icon: '🩺',
-      activities: ['Take 3 deep breaths', 'Text someone for support', 'Eat a small nourishing snack']
-    },
-    Grounded: {
-      icon: '🌱',
-      activities: ['Sit in silence for 1 minute', 'Journal 2 thoughts', 'Walk without your phone']
-    }
-  };
-
-  document.querySelectorAll('.mode-button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const mode = btn.innerText.split(' ')[1];
-      loadMode(mode);
+  // Compass wedge click
+  const wedges = document.querySelectorAll('#compass path');
+  wedges.forEach(w => {
+    w.addEventListener('click', () => {
+      const mode = w.getAttribute('data-mode');
+      enterMode(mode);
     });
   });
 
-  const compass = document.getElementById('compass');
-  if (compass) {
-    compass.addEventListener('click', (e) => {
-      if (e.target.tagName === 'path' && e.target.dataset.mode) {
-        const mode = e.target.dataset.mode.charAt(0).toUpperCase() + e.target.dataset.mode.slice(1);
-        loadMode(mode);
-      }
+  // Navigation
+  window.navigateTo = function(sectionId) {
+    document.querySelectorAll('.section').forEach(sec => {
+      sec.style.display = 'none';
     });
+    const section = document.getElementById(sectionId + 'Section');
+    if (section) section.style.display = 'block';
+  };
+
+  // Mode entry
+  window.enterMode = function(mode) {
+    logModeChoice(mode);
+    updateStreak();
+    renderModePage(mode);
+    showSection('mode');
+  };
+
+  function showSection(key) {
+    document.querySelectorAll('.section').forEach(sec => {
+      sec.style.display = 'none';
+    });
+    const map = {
+      home: 'homeSection',
+      quickWins: 'quickWins',
+      history: 'historySection',
+      about: 'aboutSection',
+      mode: 'modeSection',
+    };
+    document.getElementById(map[key]).style.display = 'block';
   }
 
-  function loadMode(mode) {
-    document.getElementById('modeTitle').innerText = `${modeMap[mode].icon} ${mode}`;
-    const activityList = document.getElementById('activityList');
-    activityList.innerHTML = '';
-    modeMap[mode].activities.forEach(act => {
+  function renderModePage(mode) {
+    const title = document.getElementById('modeTitle');
+    const list = document.getElementById('activityList');
+    const note = document.getElementById('activityNote');
+    note.value = '';
+
+    title.textContent = `${mode}`;
+    list.innerHTML = '';
+
+    const modeActivities = {
+      Growing: [
+        "Write a future goal",
+        "Celebrate a small win",
+        "Take the next step on a project",
+      ],
+      Drifting: [
+        "Name what’s distracting you",
+        "Write 1 sentence to refocus",
+        "Stand up and reset",
+      ],
+      Surviving: [
+        "Breathe deeply for 1 minute",
+        "Drink some water",
+        "Choose the next small step",
+      ],
+      Grounded: [
+        "Take a mindful walk",
+        "Listen to calming music",
+        "Limit screen time for 30 minutes",
+      ],
+    };
+
+    modeActivities[mode].forEach(item => {
       const li = document.createElement('li');
-      li.textContent = act;
-      activityList.appendChild(li);
+      li.textContent = item;
+      list.appendChild(li);
     });
-    document.getElementById('activityNote').value = '';
-    document.getElementById('activityNote').dataset.mode = mode;
-    navigateTo('mode');
+
+    note.setAttribute('data-mode', mode);
   }
 
-  window.saveActivity = function () {
-    const mode = document.getElementById('activityNote').dataset.mode;
-    const note = document.getElementById('activityNote').value.trim();
-    const date = new Date().toLocaleDateString();
+  window.saveActivity = function() {
+    const note = document.getElementById('activityNote');
+    const mode = note.getAttribute('data-mode');
+    const text = note.value.trim();
+    if (!text) return;
 
-    if (!note) return;
+    const logs = JSON.parse(localStorage.getItem('activityLogs') || '[]');
+    logs.push({ mode, text, date: new Date().toISOString() });
+    localStorage.setItem('activityLogs', JSON.stringify(logs));
 
-    let history = JSON.parse(localStorage.getItem('modeHistory') || '[]');
-    history.push({ mode, note, date });
-    localStorage.setItem('modeHistory', JSON.stringify(history));
-    updateHistory();
-    calculateStreak();
-    navigateTo('history');
+    note.value = '';
+    alert('Saved!');
   };
 
-  function updateHistory() {
-    const container = document.getElementById('modeHistory');
-    const breakdown = document.getElementById('modeBreakdown');
-    const history = JSON.parse(localStorage.getItem('modeHistory') || '[]');
-
-    container.innerHTML = '';
-    breakdown.innerHTML = '';
-
-    if (history.length === 0) {
-      container.innerHTML = '<p>No history yet.</p>';
-      return;
-    }
-
-    const modeCounts = {};
-    history.forEach(entry => {
-      const div = document.createElement('div');
-      div.innerHTML = `<strong>${entry.date}:</strong> ${entry.mode} — ${entry.note}`;
-      container.appendChild(div);
-
-      modeCounts[entry.mode] = (modeCounts[entry.mode] || 0) + 1;
-    });
-
-    const total = history.length;
-    for (let mode in modeCounts) {
-      const percent = ((modeCounts[mode] / total) * 100).toFixed(0);
-      const p = document.createElement('p');
-      p.textContent = `${mode}: ${percent}%`;
-      breakdown.appendChild(p);
-    }
+  function logModeChoice(mode) {
+    const log = JSON.parse(localStorage.getItem('modeLog') || '[]');
+    const today = new Date().toISOString().split('T')[0];
+    log.push({ date: today, mode });
+    localStorage.setItem('modeLog', JSON.stringify(log));
   }
 
-  function calculateStreak() {
-    const history = JSON.parse(localStorage.getItem('modeHistory') || '[]');
-    if (history.length === 0) {
-      document.getElementById('streakCount').innerText = 0;
-      return;
-    }
+  function updateStreak() {
+    const log = JSON.parse(localStorage.getItem('modeLog') || '[]');
+    let streak = 0;
+    let currentDate = new Date();
 
-    let streak = 1;
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    for (let i = history.length - 2; i >= 0; i--) {
-      const date = new Date(history[i].date);
-      date.setHours(0, 0, 0, 0);
-      const expected = new Date(today);
-      expected.setDate(expected.getDate() - streak);
-
-      if (date.getTime() === expected.getTime()) {
+    while (true) {
+      const dateStr = currentDate.toISOString().split('T')[0];
+      if (log.find(e => e.date === dateStr)) {
         streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
       } else {
         break;
       }
     }
 
-    document.getElementById('streakCount').innerText = streak;
+    document.getElementById('streakCount').textContent = streak;
+    renderBreakdown(log);
+    renderHistory(log);
   }
 
-  window.saveQuickWin = function () {
-    const input = document.getElementById('quickWinsInput').value.trim();
-    if (input) {
-      const entry = {
-        mode: 'Quick Wins',
-        text: input,
-        timestamp: new Date().toLocaleString()
-      };
-      const history = JSON.parse(localStorage.getItem('activityHistory') || '[]');
-      history.push(entry);
-      localStorage.setItem('activityHistory', JSON.stringify(history));
-      document.getElementById('quickWinsInput').value = '';
-      alert('Saved!');
-    }
-  };
+  function renderBreakdown(log) {
+    const counts = {};
+    log.forEach(entry => {
+      counts[entry.mode] = (counts[entry.mode] || 0) + 1;
+    });
 
-  // Initial render
-  updateHistory();
-  calculateStreak();
+    const total = log.length;
+    const container = document.getElementById('modeBreakdown');
+    container.innerHTML = '';
+
+    for (const mode in counts) {
+      const percent = Math.round((counts[mode] / total) * 100);
+      const p = document.createElement('p');
+      p.textContent = `${mode}: ${percent}%`;
+      container.appendChild(p);
+    }
+  }
+
+  function renderHistory(log) {
+    const container = document.getElementById('modeHistory');
+    container.innerHTML = '';
+    log.slice().reverse().forEach(entry => {
+      const div = document.createElement('div');
+      div.textContent = `${entry.date} – ${entry.mode}`;
+      container.appendChild(div);
+    });
+  }
+
+  window.saveQuickWin = function() {
+    const input = document.getElementById('quickWinsInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const logs = JSON.parse(localStorage.getItem('quickWinLogs') || '[]');
+    logs.push({ text, date: new Date().toISOString() });
+    localStorage.setItem('quickWinLogs', JSON.stringify(logs));
+
+    input.value = '';
+    alert('Saved!');
+  };
 });
