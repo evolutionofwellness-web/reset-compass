@@ -1,217 +1,152 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const splash = document.getElementById('splashScreen');
-  const welcome = document.getElementById('welcomePopup');
-  const app = document.getElementById('appContent');
+// app.js?v=9
 
-  // Splash and welcome logic
+document.addEventListener("DOMContentLoaded", () => {
+  // Splash screen logic
+  const splash = document.getElementById("splash-screen");
+  const appContent = document.getElementById("appContent");
+
   setTimeout(() => {
-    splash.style.display = 'none';
-    if (!localStorage.getItem('hasSeenPopup')) {
-      welcome.style.display = 'block';
-    } else {
-      app.style.display = 'block';
-      navigateTo('home');
-    }
-  }, 2000);
+    splash.classList.add("fade-out");
+    splash.addEventListener("animationend", () => {
+      splash.style.display = "none";
+      appContent.style.display = "block";
+    });
+  }, 1200);
 
-  document.getElementById('startButton').addEventListener('click', () => {
-    localStorage.setItem('hasSeenPopup', 'true');
-    welcome.style.display = 'none';
-    app.style.display = 'block';
-    navigateTo('home');
-  });
+  // Welcome popup logic
+  const hasVisited = localStorage.getItem("hasVisited");
+  const popup = document.getElementById("welcome-popup");
+  const startButton = document.getElementById("start-button");
 
-  // Navigation
-  window.navigateTo = function (section) {
-    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
-    document.getElementById(section + 'Section')?.style.display = 'block';
-    document.getElementById(section)?.style.display = 'block';
-  };
+  if (!hasVisited && popup && startButton) {
+    popup.style.display = "flex";
+    startButton.addEventListener("click", () => {
+      popup.style.display = "none";
+      localStorage.setItem("hasVisited", "true");
+    });
+  }
 
-  // Activity content map
-  const modeMap = {
-    Growing: {
-      icon: '🚀',
-      activities: ['Write a future goal', 'Celebrate a small win', 'Take the next step on a project']
-    },
-    Drifting: {
-      icon: '🧭',
-      activities: ['Name what’s distracting you', 'Write 1 sentence to refocus', 'Stand up and reset']
-    },
-    Surviving: {
-      icon: '🩺',
-      activities: ['Take 3 deep breaths', 'Text someone for support', 'Eat a small nourishing snack']
-    },
-    Grounded: {
-      icon: '🌱',
-      activities: ['Sit in silence for 1 minute', 'Journal 2 thoughts', 'Walk without your phone']
-    },
-    QuickWins: {
-      icon: '⚡',
-      activities: ['Take 3 deep breaths', 'Stretch for 1 minute', 'Drink a full glass of water']
-    }
-  };
-
-  // Mode buttons + compass
-  document.querySelectorAll('.mode-button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const mode = btn.innerText.split(' ')[1];
-      loadMode(mode);
+  // Navigation logic
+  const navButtons = document.querySelectorAll(".nav-button");
+  navButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const sectionId = button.getAttribute("data-section");
+      document.querySelectorAll(".section").forEach(sec => sec.style.display = "none");
+      const target = document.getElementById(`${sectionId}-section`);
+      if (target) target.style.display = "block";
     });
   });
 
-  const compass = document.getElementById('compass');
-  if (compass) {
-    compass.addEventListener('click', (e) => {
-      if (e.target.tagName === 'path' && e.target.dataset.mode) {
-        const mode = capitalize(e.target.dataset.mode);
-        loadMode(mode);
-      }
-    });
-  }
-
-  function capitalize(word) {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  }
-
-  function loadMode(mode) {
-    document.getElementById('modeTitle').innerText = `${modeMap[mode].icon} ${mode}`;
-    const activityList = document.getElementById('activityList');
-    activityList.innerHTML = '';
-
-    modeMap[mode].activities.forEach((act, index) => {
-      const block = document.createElement('div');
-      block.className = 'activity-block';
-      block.innerHTML = `
-        <li>${act}</li>
-        <textarea data-mode="${mode}" data-index="${index}" placeholder="Write what you did..."></textarea>
-        <button onclick="saveActivity('${mode}', ${index})">Save</button>
-      `;
-      activityList.appendChild(block);
-    });
-
-    navigateTo('mode');
-  }
-
-  // Save activity
-  window.saveActivity = function (mode, index) {
-    const textarea = document.querySelector(`textarea[data-mode="${mode}"][data-index="${index}"]`);
-    if (!textarea) return;
-    const note = textarea.value.trim();
-    if (!note) return;
-
-    const date = new Date().toLocaleDateString();
-    const entry = { mode, note, date };
-
-    let history = JSON.parse(localStorage.getItem('modeHistory') || '[]');
-    history.push(entry);
-    localStorage.setItem('modeHistory', JSON.stringify(history));
-
-    updateHistory();
-    calculateStreak();
-    navigateTo('history');
+  // Mode selection logic
+  const modes = {
+    growing: {
+      emoji: "🚀",
+      name: "Growing",
+      color: "#3498db",
+      activities: ["Tried a new habit", "Learned something", "Took a positive risk"]
+    },
+    drifting: {
+      emoji: "🧭",
+      name: "Drifting",
+      color: "#f39c12",
+      activities: ["Scrolled aimlessly", "Procrastinated", "Felt scattered"]
+    },
+    surviving: {
+      emoji: "🩺",
+      name: "Surviving",
+      color: "#e74c3c",
+      activities: ["Pushed through stress", "Felt overwhelmed", "Reacted emotionally"]
+    },
+    grounded: {
+      emoji: "🌱",
+      name: "Grounded",
+      color: "#2ecc71",
+      activities: ["Breathed deeply", "Moved gently", "Stayed present"]
+    }
   };
 
-  // Save quick win
-  window.saveQuickWin = function (index) {
-    const textarea = document.querySelector(`#quickWins textarea[data-index="${index}"]`);
-    const input = textarea?.value.trim();
-    if (!input) return;
+  const modeButtons = document.querySelectorAll(".mode-button");
+  const wedges = document.querySelectorAll(".wedge");
+  const modeSection = document.getElementById("mode-section");
 
-    const entry = {
-      mode: 'Quick Wins',
-      note: input,
-      date: new Date().toLocaleDateString()
-    };
+  function renderMode(modeKey) {
+    const mode = modes[modeKey];
+    if (!mode) return;
 
-    let history = JSON.parse(localStorage.getItem('modeHistory') || '[]');
-    history.push(entry);
-    localStorage.setItem('modeHistory', JSON.stringify(history));
-
-    updateHistory();
-    calculateStreak();
-    navigateTo('history');
-  };
-
-  // Render quick wins on load
-  function renderQuickWins() {
-    const section = document.getElementById('quickWins');
-    const ul = section.querySelector('ul');
-    ul.innerHTML = '';
-
-    modeMap.QuickWins.activities.forEach((item, index) => {
-      const block = document.createElement('div');
-      block.className = 'activity-block';
-      block.innerHTML = `
-        <li>${item}</li>
-        <textarea data-index="${index}" placeholder="Write what you did..."></textarea>
-        <button onclick="saveQuickWin(${index})">Save</button>
-      `;
-      ul.appendChild(block);
-    });
+    document.querySelectorAll(".section").forEach(sec => sec.style.display = "none");
+    modeSection.innerHTML = `
+      <h2>${mode.emoji} ${mode.name}</h2>
+      <ul>
+        ${mode.activities.map(act => `<li>${act}</li>`).join("")}
+      </ul>
+      <textarea placeholder="What did you do?" id="entry-text"></textarea>
+      <button class="save-button" data-mode="${modeKey}">Save</button>
+    `;
+    modeSection.style.display = "block";
   }
 
-  // History
-  function updateHistory() {
-    const container = document.getElementById('modeHistory');
-    const breakdown = document.getElementById('modeBreakdown');
-    const history = JSON.parse(localStorage.getItem('modeHistory') || '[]');
+  wedges.forEach(w => {
+    w.addEventListener("click", () => renderMode(w.getAttribute("data-mode")));
+  });
 
-    container.innerHTML = '';
-    breakdown.innerHTML = '';
+  modeButtons.forEach(b => {
+    b.addEventListener("click", () => renderMode(b.getAttribute("data-mode")));
+  });
 
-    if (history.length === 0) {
-      container.innerHTML = '<p>No history yet.</p>';
-      return;
-    }
+  // Save button + history logic
+  const historySection = document.getElementById("history-section");
+  const historyContent = document.getElementById("history-content");
 
-    const modeCounts = {};
-    history.forEach(entry => {
-      const div = document.createElement('div');
-      div.innerHTML = `<strong>${entry.date}:</strong> ${entry.mode} — ${entry.note}`;
-      container.appendChild(div);
-      modeCounts[entry.mode] = (modeCounts[entry.mode] || 0) + 1;
-    });
+  function renderHistory() {
+    const history = JSON.parse(localStorage.getItem("activityHistory") || "[]");
+    const now = new Date();
+    const today = now.toISOString().split("T")[0];
+    const streak = calculateStreak(history, today);
 
-    const total = history.length;
-    for (let mode in modeCounts) {
-      const percent = ((modeCounts[mode] / total) * 100).toFixed(0);
-      const p = document.createElement('p');
-      p.textContent = `${mode}: ${percent}%`;
-      breakdown.appendChild(p);
-    }
+    historySection.querySelector("#streak-count").textContent = streak;
+
+    const grouped = history.reduce((acc, entry) => {
+      if (!acc[entry.mode]) acc[entry.mode] = [];
+      acc[entry.mode].push(entry);
+      return acc;
+    }, {});
+
+    historyContent.innerHTML = Object.entries(grouped)
+      .map(([mode, entries]) => `
+        <h3>${modes[mode].emoji} ${modes[mode].name}</h3>
+        <ul>${entries.map(e => `<li>${e.date}: ${e.text}</li>`).join("")}</ul>
+      `).join("");
   }
 
-  // Streak
-  function calculateStreak() {
-    const history = JSON.parse(localStorage.getItem('modeHistory') || '[]');
-    if (history.length === 0) {
-      document.getElementById('streakCount').innerText = 0;
-      return;
+  function calculateStreak(history, today) {
+    const days = new Set(history.map(e => e.date));
+    let streak = 0;
+    let current = new Date(today);
+
+    while (days.has(current.toISOString().split("T")[0])) {
+      streak++;
+      current.setDate(current.getDate() - 1);
     }
-
-    let streak = 1;
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    for (let i = history.length - 2; i >= 0; i--) {
-      const date = new Date(history[i].date);
-      date.setHours(0, 0, 0, 0);
-      const expected = new Date(today);
-      expected.setDate(expected.getDate() - streak);
-
-      if (date.getTime() === expected.getTime()) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-
-    document.getElementById('streakCount').innerText = streak;
+    return streak;
   }
 
-  // Initialize
-  renderQuickWins();
-  updateHistory();
-  calculateStreak();
+  document.addEventListener("click", e => {
+    if (e.target.classList.contains("save-button")) {
+      const mode = e.target.getAttribute("data-mode");
+      const text = document.getElementById("entry-text").value;
+      if (!text.trim()) return;
+
+      const history = JSON.parse(localStorage.getItem("activityHistory") || "[]");
+      const date = new Date().toISOString().split("T")[0];
+      history.push({ mode, text, date });
+      localStorage.setItem("activityHistory", JSON.stringify(history));
+      renderHistory();
+
+      // Auto-switch to history
+      document.querySelectorAll(".section").forEach(sec => sec.style.display = "none");
+      historySection.style.display = "block";
+    }
+  });
+
+  renderHistory(); // Initialize on load
 });
