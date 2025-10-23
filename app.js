@@ -151,3 +151,19 @@ document.addEventListener('DOMContentLoaded', () => {
   updateHistory();
   calculateStreak();
 });
+
+function saveQuickWin() {
+  const input = document.getElementById('quickWinsInput').value.trim();
+  if (input) {
+    const entry = {
+      mode: 'Quick Wins',
+      text: input,
+      timestamp: new Date().toLocaleString()
+    };
+    const history = JSON.parse(localStorage.getItem('activityHistory') || '[]');
+    history.push(entry);
+    localStorage.setItem('activityHistory', JSON.stringify(history));
+    document.getElementById('quickWinsInput').value = '';
+    alert('Saved!');
+  }
+}
