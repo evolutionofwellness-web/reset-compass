@@ -47,6 +47,51 @@
           <text x="60" y="60" text-anchor="middle" fill="#fff" font-size="10">Grounded</text>
         </svg>
       </div>
+      
+      <!-- Mode Pages -->
+<section id="growing" class="section">
+  <h2>🚀 Growing</h2>
+  <ul>
+    <li>Do something that scares you</li>
+    <li>Plan your next 3 steps</li>
+    <li>Celebrate progress</li>
+  </ul>
+  <textarea id="growingInput" rows="4" placeholder="Write what you did..."></textarea>
+  <button onclick="saveGrowingLog()">Save</button>
+</section>
+
+<section id="drifting" class="section">
+  <h2>🧭 Drifting</h2>
+  <ul>
+    <li>Name what’s distracting you</li>
+    <li>Write 1 sentence to refocus</li>
+    <li>Stand up and reset</li>
+  </ul>
+  <textarea id="driftingInput" rows="4" placeholder="Write what you did..."></textarea>
+  <button onclick="saveDriftingLog()">Save</button>
+</section>
+
+<section id="surviving" class="section">
+  <h2>🩺 Surviving</h2>
+  <ul>
+    <li>Breathe deeply for 1 minute</li>
+    <li>Drink some water</li>
+    <li>Choose the next small step</li>
+  </ul>
+  <textarea id="survivingInput" rows="4" placeholder="Write what you did..."></textarea>
+  <button onclick="saveSurvivingLog()">Save</button>
+</section>
+
+<section id="grounded" class="section">
+  <h2>🌿 Grounded</h2>
+  <ul>
+    <li>Take a mindful walk</li>
+    <li>Listen to calming music</li>
+    <li>Limit screen time for 30 minutes</li>
+  </ul>
+  <textarea id="groundedInput" rows="4" placeholder="Write what you did..."></textarea>
+  <button onclick="saveGroundedLog()">Save</button>
+</section>
 
       <div class="mode-buttons">
         <button class="mode-button growing" onclick="enterMode('Growing')">🚀 Growing</button>
