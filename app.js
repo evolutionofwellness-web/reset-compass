@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const welcome = document.getElementById('welcomePopup');
   const app = document.getElementById('appContent');
 
+  // Splash and welcome logic
   setTimeout(() => {
     splash.style.display = 'none';
     if (!localStorage.getItem('hasSeenPopup')) {
@@ -19,42 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     app.style.display = 'block';
     navigateTo('home');
   });
-  
-  function saveGrowingLog() {
-  const input = document.getElementById('growingInput').value.trim();
-  if (input) {
-    logModeActivity('Growing', input);
-    document.getElementById('growingInput').value = '';
-    alert('Saved to Growing log!');
-  }
-}
-
-function saveDriftingLog() {
-  const input = document.getElementById('driftingInput').value.trim();
-  if (input) {
-    logModeActivity('Drifting', input);
-    document.getElementById('driftingInput').value = '';
-    alert('Saved to Drifting log!');
-  }
-}
-
-function saveSurvivingLog() {
-  const input = document.getElementById('survivingInput').value.trim();
-  if (input) {
-    logModeActivity('Surviving', input);
-    document.getElementById('survivingInput').value = '';
-    alert('Saved to Surviving log!');
-  }
-}
-
-function saveGroundedLog() {
-  const input = document.getElementById('groundedInput').value.trim();
-  if (input) {
-    logModeActivity('Grounded', input);
-    document.getElementById('groundedInput').value = '';
-    alert('Saved to Grounded log!');
-  }
-}
 
   // Navigation system
   window.navigateTo = function (section) {
@@ -62,7 +27,7 @@ function saveGroundedLog() {
     document.getElementById(section + 'Section').style.display = 'block';
   };
 
-  // Mode click via compass or button
+  // Mode button + compass click logic
   const modeMap = {
     Growing: {
       icon: '🚀',
@@ -84,7 +49,7 @@ function saveGroundedLog() {
 
   document.querySelectorAll('.mode-button').forEach(btn => {
     btn.addEventListener('click', () => {
-      const mode = btn.innerText.split(' ')[1]; // e.g. 🚀 Growing → Growing
+      const mode = btn.innerText.split(' ')[1];
       loadMode(mode);
     });
   });
@@ -93,7 +58,8 @@ function saveGroundedLog() {
   if (compass) {
     compass.addEventListener('click', (e) => {
       if (e.target.tagName === 'path' && e.target.dataset.mode) {
-        loadMode(e.target.dataset.mode);
+        const mode = e.target.dataset.mode.charAt(0).toUpperCase() + e.target.dataset.mode.slice(1);
+        loadMode(mode);
       }
     });
   }
@@ -116,6 +82,8 @@ function saveGroundedLog() {
     const mode = document.getElementById('activityNote').dataset.mode;
     const note = document.getElementById('activityNote').value.trim();
     const date = new Date().toLocaleDateString();
+
+    if (!note) return;
 
     let history = JSON.parse(localStorage.getItem('modeHistory') || '[]');
     history.push({ mode, note, date });
@@ -183,34 +151,23 @@ function saveGroundedLog() {
     document.getElementById('streakCount').innerText = streak;
   }
 
-  // On load
+  window.saveQuickWin = function () {
+    const input = document.getElementById('quickWinsInput').value.trim();
+    if (input) {
+      const entry = {
+        mode: 'Quick Wins',
+        text: input,
+        timestamp: new Date().toLocaleString()
+      };
+      const history = JSON.parse(localStorage.getItem('activityHistory') || '[]');
+      history.push(entry);
+      localStorage.setItem('activityHistory', JSON.stringify(history));
+      document.getElementById('quickWinsInput').value = '';
+      alert('Saved!');
+    }
+  };
+
+  // Initial render
   updateHistory();
   calculateStreak();
 });
-
-function saveQuickWin() {
-  const input = document.getElementById('quickWinsInput').value.trim();
-  if (input) {
-    const entry = {
-      mode: 'Quick Wins',
-      text: input,
-      timestamp: new Date().toLocaleString()
-    };
-    const history = JSON.parse(localStorage.getItem('activityHistory') || '[]');
-    history.push(entry);
-    localStorage.setItem('activityHistory', JSON.stringify(history));
-    document.getElementById('quickWinsInput').value = '';
-    alert('Saved!');
-  }
-}
-
-function saveDriftingLog() {
-  const input = document.getElementById("driftingInput").value.trim();
-  if (input) {
-    const existing = JSON.parse(localStorage.getItem("driftingLogs") || "[]");
-    existing.push({ text: input, date: new Date().toISOString() });
-    localStorage.setItem("driftingLogs", JSON.stringify(existing));
-    alert("Your entry has been saved.");
-    document.getElementById("driftingInput").value = "";
-  }
-}
