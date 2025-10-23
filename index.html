@@ -48,6 +48,18 @@
       </div>
 
       <!-- Mode Buttons -->
+      <!-- Mode Display Section (hidden until a mode is selected) -->
+<section id="modeSection" class="section" style="display: none;">
+  <h2 id="selectedModeName"></h2>
+  <p id="selectedModeDescription"></p>
+
+  <ul id="modeActivitiesList">
+    <!-- Activities will be inserted here dynamically -->
+  </ul>
+
+  <textarea id="activityNote" rows="4" placeholder="What did you do?" style="width: 90%; max-width: 400px; margin-top: 16px;"></textarea><br>
+  <button id="saveActivityButton" style="margin-top: 12px; padding: 10px 20px; font-size: 16px;">Save Activity</button>
+</section>
       <div class="mode-buttons">
         <button class="mode-button">🚀 Growing</button>
         <button class="mode-button">🧭 Drifting</button>
