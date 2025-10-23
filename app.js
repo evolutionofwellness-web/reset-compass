@@ -19,6 +19,42 @@ document.addEventListener('DOMContentLoaded', () => {
     app.style.display = 'block';
     navigateTo('home');
   });
+  
+  function saveGrowingLog() {
+  const input = document.getElementById('growingInput').value.trim();
+  if (input) {
+    logModeActivity('Growing', input);
+    document.getElementById('growingInput').value = '';
+    alert('Saved to Growing log!');
+  }
+}
+
+function saveDriftingLog() {
+  const input = document.getElementById('driftingInput').value.trim();
+  if (input) {
+    logModeActivity('Drifting', input);
+    document.getElementById('driftingInput').value = '';
+    alert('Saved to Drifting log!');
+  }
+}
+
+function saveSurvivingLog() {
+  const input = document.getElementById('survivingInput').value.trim();
+  if (input) {
+    logModeActivity('Surviving', input);
+    document.getElementById('survivingInput').value = '';
+    alert('Saved to Surviving log!');
+  }
+}
+
+function saveGroundedLog() {
+  const input = document.getElementById('groundedInput').value.trim();
+  if (input) {
+    logModeActivity('Grounded', input);
+    document.getElementById('groundedInput').value = '';
+    alert('Saved to Grounded log!');
+  }
+}
 
   // Navigation system
   window.navigateTo = function (section) {
