@@ -2,176 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=37" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <script src="app.js?v=9" defer></script>
+  <link rel="stylesheet" href="main.css?v=40" />
+  <script defer src="app.js?v=9"></script>
 </head>
 <body>
   <!-- Splash Screen -->
-  <div id="splashScreen">
-    <img id="splashIcon" src="splash-icon.png" alt="Splash Icon" />
+  <div id="splash-screen">
+    <img src="splash-icon.png" alt="App Icon" id="splash-icon"/>
   </div>
 
-  <!-- Welcome Popup -->
-  <div id="welcomePopup" class="modal">
-    <div class="modal-content">
+  <!-- Welcome Modal -->
+  <div id="welcome-popup">
+    <div class="popup-content">
       <h2>Welcome!</h2>
       <p>Start by choosing your mode for today.</p>
-      <button id="startButton">Let's Start</button>
+      <button id="start-button">Let’s Start</button>
     </div>
   </div>
 
   <!-- App Content -->
-  <div id="appContent" style="display: none;">
-    <h1>The Reset Compass</h1>
+  <div id="appContent" style="display:none;">
+    <header>
+      <h1>The Reset Compass</h1>
+      <nav>
+        <button class="nav-button" data-section="home">Home</button>
+        <button class="nav-button" data-section="quickwins">Quick Wins</button>
+        <button class="nav-button" data-section="history">History</button>
+        <button class="nav-button" data-section="about">About</button>
+      </nav>
+    </header>
 
-    <div class="top-nav">
-      <button onclick="navigateTo('home')">Home</button>
-      <button onclick="navigateTo('quickWins')">Quick Wins</button>
-      <button onclick="navigateTo('history')">History</button>
-      <button onclick="navigateTo('about')">About</button>
-    </div>
-
-    <!-- Home Section with Compass -->
-    <div id="homeSection" class="section active">
-      <div class="compass-container">
-        <svg id="compass" viewBox="0 0 200 200" width="200" height="200">
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4A90E2" data-mode="Growing"></path>
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#F5A623" data-mode="Drifting"></path>
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#D0021B" data-mode="Surviving"></path>
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#7ED321" data-mode="Grounded"></path>
-          <text x="140" y="60" text-anchor="middle" fill="#fff" font-size="10">Growing</text>
-          <text x="140" y="140" text-anchor="middle" fill="#fff" font-size="10">Drifting</text>
-          <text x="60" y="140" text-anchor="middle" fill="#fff" font-size="10">Surviving</text>
-          <text x="60" y="60" text-anchor="middle" fill="#fff" font-size="10">Grounded</text>
+    <!-- Sections -->
+    <main>
+      <section id="home-section" class="section">
+        <svg id="compass" viewBox="0 0 200 200">
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#3498db" class="wedge" data-mode="growing"/>
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#f39c12" class="wedge" data-mode="drifting"/>
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#e74c3c" class="wedge" data-mode="surviving"/>
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#2ecc71" class="wedge" data-mode="grounded"/>
+          <text x="130" y="60" class="wedge-label">Growing</text>
+          <text x="140" y="150" class="wedge-label">Drifting</text>
+          <text x="60" y="180" class="wedge-label">Surviving</text>
+          <text x="30" y="80" class="wedge-label">Grounded</text>
         </svg>
-      </div>
 
-      <div class="mode-buttons">
-        <button class="mode-button growing" onclick="enterMode('Growing')">🚀 Growing</button>
-        <button class="mode-button drifting" onclick="enterMode('Drifting')">🧭 Drifting</button>
-        <button class="mode-button surviving" onclick="enterMode('Surviving')">🩺 Surviving</button>
-        <button class="mode-button grounded" onclick="enterMode('Grounded')">🌱 Grounded</button>
-      </div>
-    </div>
+        <div class="button-container">
+          <button class="mode-button" data-mode="growing">🚀 Growing</button>
+          <button class="mode-button" data-mode="drifting">🧭 Drifting</button>
+          <button class="mode-button" data-mode="surviving">🩺 Surviving</button>
+          <button class="mode-button" data-mode="grounded">🌱 Grounded</button>
+        </div>
+      </section>
 
-    <!-- Growing Section -->
-    <section id="growing" class="section">
-      <h2>🚀 Growing</h2>
-      <ul>
-        <li>Do something that scares you <textarea class="activity-input" data-mode="Growing" data-activity="0" rows="2" placeholder="Write what you did..."></textarea></li>
-        <li>Plan your next 3 steps <textarea class="activity-input" data-mode="Growing" data-activity="1" rows="2" placeholder="Write what you did..."></textarea></li>
-        <li>Celebrate progress <textarea class="activity-input" data-mode="Growing" data-activity="2" rows="2" placeholder="Write what you did..."></textarea></li>
-      </ul>
-      <button onclick="saveActivity('Growing')">Save</button>
-    </section>
+      <section id="mode-section" class="section" style="display:none;"></section>
 
-    <!-- Drifting Section -->
-    <section id="drifting" class="section">
-      <h2>🧭 Drifting</h2>
-      <ul>
-        <li>Name what’s distracting you <textarea class="activity-input" data-mode="Drifting" data-activity="0" rows="2" placeholder="Write what you did..."></textarea></li>
-        <li>Write 1 sentence to refocus <textarea class="activity-input" data-mode="Drifting" data-activity="1" rows="2" placeholder="Write what you did..."></textarea></li>
-        <li>Stand up and reset <textarea class="activity-input" data-mode="Drifting" data-activity="2" rows="2" placeholder="Write what you did..."></textarea></li>
-      </ul>
-      <button onclick="saveActivity('Drifting')">Save</button>
-    </section>
+      <section id="quickwins-section" class="section" style="display:none;">
+        <h2>Quick Wins</h2>
+        <ul>
+          <li>🧘 Deep Breathing <textarea placeholder="What did you notice?"></textarea></li>
+          <li>🚰 Drink Water <textarea placeholder="How did you feel?"></textarea></li>
+          <li>📝 Brain Dump <textarea placeholder="What came out?"></textarea></li>
+        </ul>
+      </section>
 
-    <!-- Surviving Section -->
-    <section id="surviving" class="section">
-      <h2>🩺 Surviving</h2>
-      <ul>
-        <li>Breathe deeply for 1 minute <textarea class="activity-input" data-mode="Surviving" data-activity="0" rows="2" placeholder="Write what you did..."></textarea></li>
-        <li>Drink some water <textarea class="activity-input" data-mode="Surviving" data-activity="1" rows="2" placeholder="Write what you did..."></textarea></li>
-        <li>Choose the next small step <textarea class="activity-input" data-mode="Surviving" data-activity="2" rows="2" placeholder="Write what you did..."></textarea></li>
-      </ul>
-      <button onclick="saveActivity('Surviving')">Save</button>
-    </section>
+      <section id="history-section" class="section" style="display:none;">
+        <h2>Your History</h2>
+        <p>Current Streak: <span id="streak-count">0</span> days</p>
+        <div id="history-content"></div>
+      </section>
 
-    <!-- Grounded Section -->
-    <section id="grounded" class="section">
-      <h2>🌿 Grounded</h2>
-      <ul>
-        <li>Take a mindful walk <textarea class="activity-input" data-mode="Grounded" data-activity="0" rows="2" placeholder="Write what you did..."></textarea></li>
-        <li>Listen to calming music <textarea class="activity-input" data-mode="Grounded" data-activity="1" rows="2" placeholder="Write what you did..."></textarea></li>
-        <li>Limit screen time for 30 minutes <textarea class="activity-input" data-mode="Grounded" data-activity="2" rows="2" placeholder="Write what you did..."></textarea></li>
-      </ul>
-      <button onclick="saveActivity('Grounded')">Save</button>
-    </section>
+      <section id="about-section" class="section" style="display:none;">
+        <h2>About This App</h2>
+        <p>The Reset Compass helps you choose how you're feeling, take aligned action, and track your wellness journey over time.</p>
+      </section>
+    </main>
 
-    <!-- Quick Wins Section -->
-    <section id="quickWins" class="section">
-      <h2>⚡ Quick Wins</h2>
-      <ul>
-        <li>Take 3 deep breaths <textarea class="quick-input" data-win="0" rows="2" placeholder="Write what you did..."></textarea></li>
-        <li>Stretch for 1 minute <textarea class="quick-input" data-win="1" rows="2" placeholder="Write what you did..."></textarea></li>
-        <li>Drink a full glass of water <textarea class="quick-input" data-win="2" rows="2" placeholder="Write what you did..."></textarea></li>
-      </ul>
-      <button onclick="saveQuickWin()">Save</button>
-    </section>
-
-    <!-- History -->
-    <div id="historySection" class="section">
-      <h2>📈 History</h2>
-      <p>🔥 <strong>Streak:</strong> <span id="streakCount">0</span> days</p>
-      <div id="modeBreakdown"></div>
-      <div id="modeHistory"></div>
-    </div>
-
-    <!-- About -->
-    <div id="aboutSection" class="section">
-      <h2>About</h2>
-      <p>This app was created by <strong>Evolution of Wellness</strong> to help you reset and realign your health throughout the day.</p>
-    </div>
-    
-    <!-- Mode Sections -->
-<div id="growingSection" class="section">
-  <h2>🚀 Growing</h2>
-  <ul>
-    <li>Do something that challenges you</li>
-    <li>Reflect on a recent success</li>
-    <li>Plan a small step toward a bigger goal</li>
-  </ul>
-  <textarea placeholder="What did you do?" class="entry-box"></textarea>
-  <button class="save-entry-btn" onclick="saveEntry('Growing')">Save</button>
-</div>
-
-<div id="driftingSection" class="section">
-  <h2>🧭 Drifting</h2>
-  <ul>
-    <li>Identify one small task you’ve been avoiding</li>
-    <li>Step outside for fresh air or change your setting</li>
-    <li>Pick one focus for the next 10 minutes</li>
-  </ul>
-  <textarea placeholder="What did you do?" class="entry-box"></textarea>
-  <button class="save-entry-btn" onclick="saveEntry('Drifting')">Save</button>
-</div>
-
-<div id="survivingSection" class="section">
-  <h2>🩺 Surviving</h2>
-  <ul>
-    <li>Take three deep breaths</li>
-    <li>Do a basic self-check-in</li>
-    <li>Eat something nourishing or hydrate</li>
-  </ul>
-  <textarea placeholder="What did you do?" class="entry-box"></textarea>
-  <button class="save-entry-btn" onclick="saveEntry('Surviving')">Save</button>
-</div>
-
-<div id="groundedSection" class="section">
-  <h2>🌿 Grounded</h2>
-  <ul>
-    <li>Enjoy something slowly (tea, music, a moment)</li>
-    <li>Stretch or move gently</li>
-    <li>Write down 1–2 things you're grateful for</li>
-  </ul>
-  <textarea placeholder="What did you do?" class="entry-box"></textarea>
-  <button class="save-entry-btn" onclick="saveEntry('Grounded')">Save</button>
-</div>
-
-    <!-- Footer -->
     <footer>
       <p>© 2025 Evolution of Wellness. All rights reserved.</p>
     </footer>
