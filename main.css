@@ -1,121 +1,38 @@
+/* Root Variables */
 :root {
   --brand-green: #0B3D2E;
-  --bg-light: #f8f8f8;
-  --text-dark: #111;
-  --button-bg: #eee;
-  --button-text: #333;
-  --button-hover: #ddd;
+  --light-gray: #f8f8f8;
+  --text-color: #222;
+  --nav-bg: #e6f0ea;
+  --wedge-growing: #4A90E2;
+  --wedge-drifting: #F5A623;
+  --wedge-surviving: #D0021B;
+  --wedge-grounded: #7ED321;
 }
 
-* {
-  box-sizing: border-box;
-}
-
+/* General Reset */
 body {
+  font-family: 'Segoe UI', sans-serif;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg-light);
-  color: var(--text-dark);
+  padding: 0;
+  background-color: var(--light-gray);
+  color: var(--text-color);
+  line-height: 1.6;
 }
 
 h1, h2 {
   text-align: center;
-}
-
-nav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 1rem;
-}
-
-nav button {
-  background: #dbeafe;
-  color: #000;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.section {
-  display: none;
-  padding: 20px;
-}
-
-.section.active {
-  display: block;
-}
-
-#compass {
-  display: block;
-  margin: 20px auto;
-}
-
-.mode-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
   margin-top: 20px;
 }
 
-.mode-buttons button {
-  width: 200px;
-  background: var(--button-bg);
-  color: var(--button-text);
-  border: none;
-  padding: 12px;
-  border-radius: 14px;
-  font-size: 16px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.mode-buttons button:hover {
-  background: var(--button-hover);
-}
-
-footer {
-  text-align: center;
-  font-size: 14px;
-  padding: 20px 0;
-  color: #555;
-}
-
-textarea {
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  resize: vertical;
-}
-
-button.save-btn {
-  margin-top: 8px;
-  background: #4caf50;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-button.save-btn:hover {
-  background: #45a049;
-}
-
-/* Splash screen */
+/* Splash Screen */
 #splashScreen {
-  position: fixed;
-  inset: 0;
   background-color: var(--brand-green);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,81 +40,190 @@ button.save-btn:hover {
 }
 
 #splashIcon {
-  width: 120px;
-  height: 120px;
-  animation: splashZoom 1.5s ease-in-out forwards;
+  width: 100px;
+  height: 100px;
+  animation: splashZoom 1s ease-out forwards;
 }
 
 @keyframes splashZoom {
   0% {
     transform: scale(1) rotate(0deg);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.4) rotate(360deg);
     opacity: 1;
   }
   100% {
-    transform: scale(0) rotate(720deg);
+    transform: scale(4) rotate(360deg);
     opacity: 0;
   }
 }
 
-/* Welcome popup modal */
+/* Modal (Welcome Popup) */
 .modal {
+  display: none;
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
   z-index: 9998;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6);
 }
 
 .modal-content {
-  background: white;
+  background-color: #fff;
+  margin: 20% auto;
   padding: 30px;
   border-radius: 12px;
+  width: 80%;
+  max-width: 400px;
   text-align: center;
-  max-width: 90%;
 }
 
 .modal-content button {
-  margin-top: 20px;
-  background: var(--brand-green);
+  background-color: var(--brand-green);
   color: white;
+  padding: 10px 20px;
   border: none;
-  padding: 10px 16px;
   border-radius: 6px;
+  font-size: 16px;
   cursor: pointer;
-  font-weight: bold;
 }
 
-ul {
-  list-style-type: disc;
-  margin: 10px 0;
+/* Navigation */
+.top-nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.top-nav button {
+  background-color: var(--nav-bg);
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Compass */
+.compass-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+svg#compass {
+  max-width: 250px;
+  width: 80%;
+  height: auto;
+}
+
+text {
+  font-size: 10px;
+  pointer-events: none;
+}
+
+/* Mode Buttons */
+.mode-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  margin: 30px 0;
+}
+
+.mode-button {
+  width: 80%;
+  max-width: 250px;
+  padding: 15px;
+  font-size: 18px;
+  background-color: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  color: #666;
+}
+
+/* Sections */
+.section {
+  display: none;
+  padding: 0 20px 40px;
+}
+
+.section.active {
+  display: block;
+}
+
+textarea {
+  width: 100%;
+  max-width: 600px;
+  margin: 10px auto;
+  display: block;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  background-color: var(--brand-green);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Activity Input Boxes */
+.activity-block {
+  margin-bottom: 25px;
+}
+
+.activity-block textarea {
+  margin-top: 6px;
+}
+
+/* Quick Wins */
+#quickWins ul,
+#growing ul,
+#drifting ul,
+#surviving ul,
+#grounded ul {
   padding-left: 20px;
 }
 
-ul li {
+#quickWins li,
+#growing li,
+#drifting li,
+#surviving li,
+#grounded li {
   margin-bottom: 10px;
   font-size: 16px;
 }
 
-li textarea {
-  margin-top: 5px;
-  font-size: 14px;
+/* History Section */
+#historySection {
+  text-align: center;
 }
 
-/* Responsive tweaks */
-@media (min-width: 600px) {
-  .mode-buttons {
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
+#modeBreakdown, #modeHistory {
+  margin-top: 20px;
+  font-size: 14px;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-  .mode-buttons button {
-    width: 180px;
-  }
+/* Footer */
+footer {
+  text-align: center;
+  padding: 20px 0;
+  font-size: 13px;
+  color: #666;
 }
