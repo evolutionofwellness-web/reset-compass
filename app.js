@@ -2,13 +2,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splashScreen");
   const popup = document.getElementById("welcomePopup");
   const app = document.getElementById("appContent");
+
+  // This needs to be moved *inside* DOMContentLoaded
   const startBtn = document.getElementById("startButton");
+  startBtn.addEventListener("click", () => {
+    popup.style.display = "none";
+    app.style.display = "block";
+    localStorage.setItem("popupShown", "true");
+  });
 
   // Splash animation
   setTimeout(() => {
     splash.style.display = "none";
 
-    // Show popup only once
     if (!localStorage.getItem("popupShown")) {
       popup.style.display = "flex";
     } else {
@@ -16,13 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 1800);
 
-  startBtn.addEventListener("click", () => {
-    popup.style.display = "none";
-    app.style.display = "block";
-    localStorage.setItem("popupShown", "true");
-  });
-
-  // Navigation
+  // NAVIGATION
   window.navigateTo = (section) => {
     document.querySelectorAll(".section").forEach((s) => s.classList.remove("active"));
     document.getElementById(`${section}Section`)?.classList.add("active");
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (section === "history") renderHistory();
   };
 
-  // Mode logic
+  // MODES
   const modeActivities = {
     Growing: [
       "Do something that scares you",
@@ -77,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".section").forEach((s) => s.classList.remove("active"));
     section.classList.add("active");
 
-    // Save current mode for logging
     localStorage.setItem("activeMode", mode);
   };
 
