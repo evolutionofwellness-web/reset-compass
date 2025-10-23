@@ -2,88 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=38" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <script src="app.js?v=8" defer></script>
+  <link rel="stylesheet" href="main.css?v=40" />
+  <script src="app.js?v=10" defer></script>
 </head>
 <body>
   <!-- Splash Screen -->
   <div id="splashScreen">
-    <img id="splashIcon" src="splash-icon.png" alt="Splash Icon" />
+    <img src="splash-icon.png" alt="App Icon" id="splashIcon" />
   </div>
 
-  <!-- Welcome Popup -->
-  <div id="welcomePopup" class="modal">
+  <!-- Welcome Modal -->
+  <div id="welcomeModal" class="modal">
     <div class="modal-content">
       <h2>Welcome!</h2>
       <p>Start by choosing your mode for today.</p>
-      <button id="startButton">Let's Start</button>
+      <button onclick="closeWelcome()">Let's Start</button>
     </div>
   </div>
 
   <!-- App Content -->
   <div id="appContent" style="display: none;">
-    <h1>The Reset Compass</h1>
+    <header>
+      <h1>The Reset Compass</h1>
+      <nav>
+        <button onclick="showSection('home')">Home</button>
+        <button onclick="showSection('quickWinsSection')">Quick Wins</button>
+        <button onclick="showSection('historySection')">History</button>
+        <button onclick="showSection('aboutSection')">About</button>
+      </nav>
+    </header>
 
-    <div class="top-nav">
-      <button onclick="navigateTo('home')">Home</button>
-      <button onclick="navigateTo('quickWins')">Quick Wins</button>
-      <button onclick="navigateTo('history')">History</button>
-      <button onclick="navigateTo('about')">About</button>
-    </div>
+    <main>
+      <!-- Home Section -->
+      <div id="home" class="section">
+        <svg id="compass" viewBox="0 0 200 200" width="250" height="250">
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#3498db" onclick="selectMode('growing')" />
+          <text x="150" y="50" text-anchor="middle" fill="white">Growing</text>
 
-    <div id="homeSection" class="section">
-      <div class="compass-container">
-        <svg id="compass" viewBox="0 0 200 200" width="200" height="200">
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4A90E2" data-mode="Growing"></path>
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#F5A623" data-mode="Drifting"></path>
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#D0021B" data-mode="Surviving"></path>
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#7ED321" data-mode="Grounded"></path>
-          <text x="140" y="60" text-anchor="middle" fill="#fff" font-size="10">Growing</text>
-          <text x="140" y="140" text-anchor="middle" fill="#fff" font-size="10">Drifting</text>
-          <text x="60" y="140" text-anchor="middle" fill="#fff" font-size="10">Surviving</text>
-          <text x="60" y="60" text-anchor="middle" fill="#fff" font-size="10">Grounded</text>
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#f39c12" onclick="selectMode('drifting')" />
+          <text x="150" y="150" text-anchor="middle" fill="white">Drifting</text>
+
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#e74c3c" onclick="selectMode('surviving')" />
+          <text x="50" y="150" text-anchor="middle" fill="white">Surviving</text>
+
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#2ecc71" onclick="selectMode('grounded')" />
+          <text x="50" y="50" text-anchor="middle" fill="white">Grounded</text>
         </svg>
+
+        <div class="mode-buttons">
+          <button onclick="selectMode('growing')">🚀 Growing</button>
+          <button onclick="selectMode('drifting')">🧭 Drifting</button>
+          <button onclick="selectMode('surviving')">🩺 Surviving</button>
+          <button onclick="selectMode('grounded')">🌱 Grounded</button>
+        </div>
       </div>
-      <div class="mode-buttons">
-        <button class="mode-button" data-mode="Growing">🚀 Growing</button>
-        <button class="mode-button" data-mode="Drifting">🧭 Drifting</button>
-        <button class="mode-button" data-mode="Surviving">🩺 Surviving</button>
-        <button class="mode-button" data-mode="Grounded">🌱 Grounded</button>
+
+      <!-- Mode Sections -->
+      <div id="modeSection" class="section"></div>
+
+      <!-- Quick Wins -->
+      <div id="quickWinsSection" class="section" style="display: none;">
+        <h2>Quick Wins</h2>
+        <ul id="quickWinList"></ul>
       </div>
-    </div>
 
-    <div id="modeSection" class="section">
-      <h2 id="modeTitle">Mode</h2>
-      <ul id="activityList"></ul>
-      <textarea id="activityNote" placeholder="Write what you did..."></textarea>
-      <button onclick="saveActivity()">Save</button>
-    </div>
+      <!-- History -->
+      <div id="historySection" class="section" style="display: none;">
+        <h2>Activity History</h2>
+        <ul id="historyList"></ul>
+      </div>
 
-    <div id="quickWinsSection" class="section">
-      <h2>Quick Wins</h2>
-      <ul>
-        <li>Take 3 deep breaths</li>
-        <li>Stretch for 1 minute</li>
-        <li>Drink a full glass of water</li>
-      </ul>
-      <textarea id="quickWinsInput" rows="4" placeholder="Write what you did..."></textarea>
-      <button onclick="saveQuickWin()">Save</button>
-    </div>
-
-    <div id="historySection" class="section">
-      <h2>History</h2>
-      <p>🔥 <strong>Streak:</strong> <span id="streakCount">0</span> days</p>
-      <div id="modeBreakdown"></div>
-      <div id="modeHistory"></div>
-    </div>
-
-    <div id="aboutSection" class="section">
-      <h2>About</h2>
-      <p>This app was created by <strong>Evolution of Wellness</strong> to help you reset and realign your health throughout the day.</p>
-    </div>
+      <!-- About -->
+      <div id="aboutSection" class="section" style="display: none;">
+        <h2>About</h2>
+        <p>The Reset Compass is a tool to help you reflect, reset, and take action — no matter what mode you're in.</p>
+      </div>
+    </main>
 
     <footer>
       <p>© 2025 Evolution of Wellness. All rights reserved.</p>
