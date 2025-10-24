@@ -1,89 +1,153 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const splashScreen = document.getElementById("splashScreen");
-  const welcomeModal = document.getElementById("welcomeModal");
-  const startAppBtn = document.getElementById("startApp");
-  const appWrapper = document.getElementById("appWrapper");
-  const streakDisplay = document.getElementById("streakDisplay");
+// Splash & Welcome Popup
+window.addEventListener('load', () => {
+  const hasVisited = localStorage.getItem('visited');
+  const splash = document.getElementById('splashScreen');
+  const popup = document.getElementById('welcomePopup');
 
-  // Show welcome modal only once
-  if (!localStorage.getItem("welcomeShown")) {
-    welcomeModal.classList.remove("hidden");
-  } else {
-    initApp();
+  setTimeout(() => {
+    splash.style.display = 'none';
+    if (!hasVisited) {
+      popup.style.display = 'flex';
+    }
+  }, 1600);
+});
+
+document.getElementById('startButton').addEventListener('click', () => {
+  document.getElementById('welcomePopup').style.display = 'none';
+  localStorage.setItem('visited', 'true');
+});
+
+// Navigation
+const sections = ['homeSection', 'quickWinsSection', 'historySection', 'aboutSection'];
+function showSection(id) {
+  sections.forEach(section => {
+    document.getElementById(section).classList.toggle('active-section', section === id);
+    document.getElementById(section).classList.toggle('hidden-section', section !== id);
+  });
+}
+
+document.querySelectorAll('nav button').forEach(button => {
+  button.addEventListener('click', () => {
+    showSection(button.getAttribute('data-target'));
+  });
+});
+
+// Compass + Mode Buttons
+const modeColors = {
+  Growing: 'blue',
+  Grounded: 'green',
+  Drifting: 'yellow',
+  Surviving: 'red'
+};
+
+const modes = Object.keys(modeColors);
+
+// Routing to Mode Pages
+function goToMode(mode) {
+  const sectionId = `${mode.toLowerCase()}Mode`;
+  showSection(sectionId);
+  saveModeChoice(mode);
+}
+
+// Compass Wedges
+modes.forEach(mode => {
+  const wedge = document.getElementById(`${mode.toLowerCase()}Wedge`);
+  if (wedge) {
+    wedge.addEventListener('click', () => goToMode(mode));
   }
+});
 
-  startAppBtn.addEventListener("click", () => {
-    localStorage.setItem("welcomeShown", "true");
-    welcomeModal.classList.add("hidden");
-    initApp();
+// Mode Buttons
+document.querySelectorAll('.mode-buttons button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.textContent.trim();
+    goToMode(mode);
+  });
+});
+
+// Save User Input per Activity
+document.querySelectorAll('textarea').forEach(textarea => {
+  textarea.addEventListener('change', () => {
+    const key = textarea.getAttribute('data-key');
+    localStorage.setItem(key, textarea.value);
+  });
+});
+
+// Load Saved Inputs
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('textarea').forEach(textarea => {
+    const key = textarea.getAttribute('data-key');
+    textarea.value = localStorage.getItem(key) || '';
+  });
+  renderHistory();
+  renderStreak();
+});
+
+// Logging + History
+function saveModeChoice(mode) {
+  const dateKey = new Date().toISOString().slice(0, 10);
+  localStorage.setItem(`log-${dateKey}`, mode);
+  renderHistory();
+  renderStreak();
+}
+
+function renderHistory() {
+  const historyList = document.getElementById('mode-history');
+  historyList.innerHTML = '';
+
+  const logs = Object.keys(localStorage)
+    .filter(key => key.startsWith('log-'))
+    .sort()
+    .reverse();
+
+  logs.forEach(key => {
+    const date = key.replace('log-', '');
+    const mode = localStorage.getItem(key);
+    const color = modeColors[mode] || 'gray';
+
+    const li = document.createElement('li');
+    li.style.borderLeft = `6px solid ${color}`;
+    li.textContent = `${date}: ${mode}`;
+    historyList.appendChild(li);
   });
 
-  function initApp() {
-    appWrapper.classList.remove("hidden");
-    updateStreakDisplay();
-    setupCompassListeners();
-    setupModeButtons();
-  }
+  // Breakdown
+  const counts = {};
+  modes.forEach(mode => counts[mode] = 0);
+  logs.forEach(key => {
+    const mode = localStorage.getItem(key);
+    if (counts[mode] !== undefined) counts[mode]++;
+  });
 
-  // Splash fade
-  setTimeout(() => {
-    splashScreen.style.display = "none";
-  }, 3000);
+  const breakdown = document.getElementById('mode-breakdown');
+  const total = logs.length;
+  breakdown.innerHTML = modes.map(mode => {
+    const percent = total > 0 ? ((counts[mode] / total) * 100).toFixed(1) : 0;
+    return `<div><strong>${mode}:</strong> ${percent}%</div>`;
+  }).join('');
+}
 
-  function navigate(viewId) {
-    document.querySelectorAll("main section").forEach(section => {
-      section.classList.add("hidden");
-    });
-    document.getElementById(viewId).classList.remove("hidden");
-  }
+// Daily Streak
+function renderStreak() {
+  const logs = Object.keys(localStorage)
+    .filter(k => k.startsWith('log-'))
+    .sort()
+    .reverse();
 
-  // Compass Wedge Clicks
-  function setupCompassListeners() {
-    document.querySelectorAll("#compass path").forEach(wedge => {
-      wedge.addEventListener("click", () => {
-        const mode = wedge.dataset.mode;
-        logModeUse(mode);
-        alert(`You selected ${mode}`);
-      });
-    });
-  }
+  if (logs.length === 0) return document.getElementById('dailyStreak').textContent = '';
 
-  // Mode Buttons
-  function setupModeButtons() {
-    document.querySelectorAll(".mode-button").forEach(button => {
-      button.addEventListener("click", () => {
-        const mode = button.dataset.mode;
-        logModeUse(mode);
-        alert(`You selected ${mode}`);
-      });
-    });
-  }
-
-  // Logging Mode & Updating Streak
-  function logModeUse(mode) {
-    const today = new Date().toISOString().split("T")[0];
-    const lastLogDate = localStorage.getItem("lastLogDate");
-
-    if (lastLogDate !== today) {
-      const currentStreak = parseInt(localStorage.getItem("dailyStreak") || "0");
-      const newStreak = lastLogDate === getYesterdayDate() ? currentStreak + 1 : 1;
-      localStorage.setItem("dailyStreak", newStreak);
-      localStorage.setItem("lastLogDate", today);
-      updateStreakDisplay();
+  let streak = 1;
+  const today = new Date();
+  for (let i = 1; i < logs.length; i++) {
+    const prevDate = new Date(logs[i].replace('log-', ''));
+    const expected = new Date(today);
+    expected.setDate(today.getDate() - i);
+    if (prevDate.toDateString() === expected.toDateString()) {
+      streak++;
+    } else {
+      break;
     }
   }
 
-  function updateStreakDisplay() {
-    const streak = localStorage.getItem("dailyStreak") || 0;
-    streakDisplay.textContent = `🔥 Daily Streak: ${streak}`;
-  }
-
-  function getYesterdayDate() {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    return yesterday.toISOString().split("T")[0];
-  }
-
-  // Expose navigate globally
-  window.navigate = navigate;
-});
+  document.getElementById('dailyStreak').textContent = `🔥 Daily Streak: ${streak} day${streak > 1 ? 's' : ''}`;
+}
