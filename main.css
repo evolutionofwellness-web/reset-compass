@@ -1,136 +1,141 @@
 :root {
   --green: #0B3D2E;
-  --surviving: #4A90E2;
-  --drifting: #D9534F;
-  --grounded: #5CB85C;
-  --growing: #F0AD4E;
+  --surviving: #4285F4;
+  --drifting: #EA4335;
+  --grounded: #34A853;
+  --growing: #FBBC05;
 }
 
 body {
   margin: 0;
-  font-family: sans-serif;
-  background: white;
-  color: #111;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #fff;
 }
 
 header {
-  background-color: var(--green);
+  background: var(--green);
   color: white;
-  padding: 1rem;
   text-align: center;
+  padding: 1rem 0;
+}
+
+nav {
+  margin-top: 0.5rem;
 }
 
 nav button {
-  margin: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-weight: bold;
-  border-radius: 8px;
-  border: none;
+  margin: 0.2rem;
+  padding: 0.4rem 1rem;
   background: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
   color: var(--green);
 }
 
-#splashScreen {
-  position: fixed;
-  background-color: var(--green);
-  z-index: 9999;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.section {
+  display: none;
+  padding: 1rem;
 }
 
-.splash-icon {
-  width: 100px;
-  animation: zoomFade 2s forwards;
-}
-
-@keyframes zoomFade {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(3);
-    opacity: 0;
-  }
-}
-
-.modal {
-  position: fixed;
-  z-index: 9998;
-  background: rgba(0,0,0,0.6);
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  text-align: center;
-}
-
-#compass {
+.section.active {
   display: block;
-  margin: 1rem auto;
-  max-width: 300px;
 }
 
-.wedge-label {
-  font-size: 12px;
-  font-weight: bold;
+.compass {
+  width: 80%;
+  max-width: 300px;
+  margin: 1rem auto;
+  display: block;
+}
+
+.compass-label {
+  font-size: 5px;
+  fill: black;
   text-anchor: middle;
   dominant-baseline: middle;
-  pointer-events: none;
+  font-weight: bold;
 }
 
 .mode-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 1rem;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 
-.mode {
+.mode-btn {
   width: 90%;
-  max-width: 300px;
+  border: none;
+  border-radius: 10px;
   padding: 1rem;
-  border-radius: 8px;
   color: white;
+  font-size: 1rem;
   font-weight: bold;
-  text-align: center;
+  text-align: left;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.mode small {
+.mode-btn small {
   display: block;
   font-weight: normal;
-  margin-top: 5px;
+  font-size: 0.85rem;
 }
 
-.mode.surviving {
-  background-color: var(--surviving);
+.mode-btn.surviving { background: var(--surviving); }
+.mode-btn.drifting { background: var(--drifting); }
+.mode-btn.grounded { background: var(--grounded); }
+.mode-btn.growing { background: var(--growing); }
+
+#splashScreen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: var(--green);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeOut 2.5s ease-in-out forwards;
+  animation-delay: 1.5s;
 }
 
-.mode.drifting {
-  background-color: var(--drifting);
+#splashIcon {
+  width: 100px;
+  animation: splashGrow 1.5s ease-out forwards;
 }
 
-.mode.grounded {
-  background-color: var(--grounded);
+@keyframes splashGrow {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
 }
 
-.mode.growing {
-  background-color: var(--growing);
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
 }
 
-.streak {
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 12px;
+}
+
+#streakDisplay {
   text-align: center;
   font-size: 1.2rem;
-  margin: 1rem auto;
+  font-weight: bold;
+  margin: 1rem 0;
 }
