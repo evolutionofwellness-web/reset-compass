@@ -4,85 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=1001" />
-  <script defer src="app.js?v=1001"></script>
-  <link rel="icon" type="image/png" href="compass-icon.png"/>
+  <link rel="stylesheet" href="main.css?v=42" />
+  <script defer src="app.js?v=12"></script>
 </head>
 <body>
+  <!-- Splash Screen -->
   <div id="splashScreen">
-    <img src="compass-icon.png" alt="Loading..." id="splashIcon" />
+    <img src="splash-icon.png" alt="App Icon" id="splashIcon" />
   </div>
 
-  <div id="welcomePopup" class="modal">
+  <!-- Welcome Modal -->
+  <div id="welcomeModal" class="modal hidden">
     <div class="modal-content">
       <h2>Welcome to The Reset Compass</h2>
-      <p>This tool helps you reset your day with quick, science-backed actions based on how you're feeling. Start by selecting a mode.</p>
-      <button id="startButton">Let’s Start</button>
+      <p>This tool helps you reset your day with science-backed actions based on how you're feeling. Start by selecting a mode.</p>
+      <button id="startApp">Let’s Start</button>
     </div>
   </div>
 
-  <header>
-    <h1>The Reset Compass</h1>
-    <nav>
-      <button onclick="navigateTo('home')">Home</button>
-      <button onclick="navigateTo('quickWins')">Quick Wins</button>
-      <button onclick="navigateTo('history')">History</button>
-      <button onclick="navigateTo('about')">About</button>
-    </nav>
-  </header>
+  <!-- App Wrapper -->
+  <div id="appWrapper" class="hidden">
+    <header>
+      <h1>The Reset Compass</h1>
+      <nav>
+        <button onclick="navigate('homeView')">Home</button>
+        <button onclick="navigate('quickWinsView')">Quick Wins</button>
+        <button onclick="navigate('historyView')">History</button>
+        <button onclick="navigate('aboutView')">About</button>
+      </nav>
+    </header>
 
-  <main>
-    <section id="homeSection" class="active-section">
-      <div class="streak"><span id="streakCount">🔥 Daily Streak: 0 days</span></div>
+    <main id="appContent">
+      <section id="homeView">
+        <div id="streakDisplay"></div>
+        <div class="compass-container">
+          <svg id="compass" viewBox="0 0 200 200">
+            <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0074D9" data-mode="Growing"/>
+            <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2ECC40" data-mode="Grounded"/>
+            <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFDC00" data-mode="Drifting"/>
+            <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FF4136" data-mode="Surviving"/>
+            <text x="150" y="45" text-anchor="middle" fill="#fff" font-size="10">Growing</text>
+            <text x="155" y="155" text-anchor="middle" fill="#fff" font-size="10">Grounded</text>
+            <text x="45" y="160" text-anchor="middle" fill="#fff" font-size="10">Drifting</text>
+            <text x="40" y="45" text-anchor="middle" fill="#fff" font-size="10">Surviving</text>
+          </svg>
+        </div>
+        <div class="mode-buttons">
+          <button class="mode-button" data-mode="Growing">Growing</button>
+          <button class="mode-button" data-mode="Grounded">Grounded</button>
+          <button class="mode-button" data-mode="Drifting">Drifting</button>
+          <button class="mode-button" data-mode="Surviving">Surviving</button>
+        </div>
+      </section>
 
-      <div id="compass">
-        <svg viewBox="0 0 200 200" class="compass-svg">
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#FF4C4C" onclick="selectMode('Surviving')" />
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#FFD700" onclick="selectMode('Drifting')" />
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#32CD32" onclick="selectMode('Grounded')" />
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#1E90FF" onclick="selectMode('Growing')" />
-          <text x="150" y="60" class="wedge-label">Surviving</text>
-          <text x="140" y="160" class="wedge-label">Drifting</text>
-          <text x="50" y="160" class="wedge-label">Grounded</text>
-          <text x="35" y="60" class="wedge-label">Growing</text>
-        </svg>
-      </div>
+      <section id="quickWinsView" class="hidden">
+        <h2>Quick Wins</h2>
+        <div class="mode-activity">Loading...</div>
+      </section>
 
-      <div class="mode-buttons">
-        <button onclick="selectMode('Growing')" class="growing">Growing</button>
-        <button onclick="selectMode('Grounded')" class="grounded">Grounded</button>
-        <button onclick="selectMode('Drifting')" class="drifting">Drifting</button>
-        <button onclick="selectMode('Surviving')" class="surviving">Surviving</button>
-      </div>
-    </section>
+      <section id="historyView" class="hidden">
+        <h2>History</h2>
+        <div id="historyLog">No data yet.</div>
+      </section>
 
-    <section id="quickWinsSection" class="hidden-section">
-      <h2>Quick Wins</h2>
-      <div class="quick-win">
-        <p>Stretch for 2 minutes</p>
-        <textarea placeholder="What did you do?"></textarea>
-      </div>
-      <div class="quick-win">
-        <p>Drink a glass of water</p>
-        <textarea placeholder="What did you do?"></textarea>
-      </div>
-      <div class="quick-win">
-        <p>Step outside for fresh air</p>
-        <textarea placeholder="What did you do?"></textarea>
-      </div>
-    </section>
-
-    <section id="historySection" class="hidden-section">
-      <h2>Your Daily Mode Log</h2>
-      <ul id="mode-history"></ul>
-      <div id="mode-breakdown"></div>
-    </section>
-
-    <section id="aboutSection" class="hidden-section">
-      <h2>About</h2>
-      <p>The Reset Compass is a tool developed by Marcus Clark to help users reset their energy, mood, and intention. This app is not medical advice.</p>
-      <p>Questions? <a href="mailto:marcus@evolutionofwellness.com">Contact Support</a></p>
-    </section>
-  </main>
+      <section id="aboutView" class="hidden">
+        <h2>About</h2>
+        <p>The Reset Compass is your personal reset tool for better wellbeing. Select a mode to get started based on how you're feeling.</p>
+        <p>Created by Marcus Clark, Evolution of Wellness LLC.</p>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
