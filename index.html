@@ -1,72 +1,87 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=39" />
-  <script defer src="app.js?v=10"></script>
+  <link rel="stylesheet" href="main.css?v=50" />
+  <link rel="manifest" href="manifest.webmanifest" />
 </head>
 <body>
-  <div id="splash">
-    <img src="compass-icon.png" alt="Reset Compass Icon" class="splash-icon"/>
+  <div id="splashScreen">
+    <img src="splash-icon.png" alt="Splash Icon" id="splashIcon" />
   </div>
 
-  <div id="welcomeModal" class="modal">
+  <div id="welcomeModal" class="modal hidden">
     <div class="modal-content">
       <h2>Welcome!</h2>
       <p>Start by choosing your mode for today.</p>
-      <button id="startBtn">Let's Start</button>
+      <button onclick="startApp()">Let’s Start</button>
     </div>
   </div>
 
-  <div id="appContent" style="display: none;">
+  <div id="appContent" class="hidden">
     <header>
       <h1>The Reset Compass</h1>
       <nav>
-        <button onclick="navigate('home')">Home</button>
-        <button onclick="navigate('quick')">Quick Wins</button>
-        <button onclick="navigate('history')">History</button>
-        <button onclick="navigate('about')">About</button>
+        <button onclick="showHome()">Home</button>
+        <button onclick="showQuickWins()">Quick Wins</button>
+        <button onclick="showHistory()">History</button>
+        <button onclick="showAbout()">About</button>
       </nav>
     </header>
 
-    <main>
-      <section id="home">
-        <div id="mode-streak" class="stats"></div>
-        <svg viewBox="0 0 200 200" class="compass">
-          <path d="M100,0 A100,100 0 0,1 200,100 L100,100 Z" fill="#4A90E2" onclick="selectMode('Surviving')"/>
-          <text x="150" y="50" class="wedge-label">Surviving</text>
+    <main id="mainContent">
+      <section id="homeSection" class="visible">
+        <svg id="compass" viewBox="0 0 200 200">
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4A90E2" data-mode="Surviving"/>
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#D96F6F" data-mode="Drifting"/>
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#AEDF8F" data-mode="Grounded"/>
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#F5C16C" data-mode="Growing"/>
 
-          <path d="M200,100 A100,100 0 0,1 100,200 L100,100 Z" fill="#D97B7B" onclick="selectMode('Drifting')"/>
-          <text x="150" y="150" class="wedge-label">Drifting</text>
-
-          <path d="M100,200 A100,100 0 0,1 0,100 L100,100 Z" fill="#AEDF8B" onclick="selectMode('Grounded')"/>
-          <text x="25" y="150" class="wedge-label">Grounded</text>
-
-          <path d="M0,100 A100,100 0 0,1 100,0 L100,100 Z" fill="#F7C873" onclick="selectMode('Growing')"/>
-          <text x="25" y="50" class="wedge-label">Growing</text>
+          <text x="150" y="60" class="wedge-label">Surviving</text>
+          <text x="140" y="150" class="wedge-label">Drifting</text>
+          <text x="50" y="150" class="wedge-label">Grounded</text>
+          <text x="40" y="60" class="wedge-label">Growing</text>
         </svg>
 
-        <div class="mode-buttons">
-          <button onclick="selectMode('Surviving')" style="background-color:#4A90E2;">🩺 Surviving<br><span class="description">You're running on empty — we’ll stabilize first.</span></button>
-          <button onclick="selectMode('Drifting')" style="background-color:#D97B7B;">🧭 Drifting<br><span class="description">You’re going through the motions — time to reconnect.</span></button>
-          <button onclick="selectMode('Grounded')" style="background-color:#AEDF8B;">🌿 Grounded<br><span class="description">You're steady — small steps will keep you here.</span></button>
-          <button onclick="selectMode('Growing')" style="background-color:#F7C873;">🚀 Growing<br><span class="description">You're thriving — let’s keep momentum.</span></button>
+        <div id="modeButtons">
+          <button onclick="selectMode('Surviving')" style="background-color:#4A90E2;">
+            🩺 Surviving<br/><span class="desc">Barely getting through the day</span>
+          </button>
+          <button onclick="selectMode('Drifting')" style="background-color:#D96F6F;">
+            🧭 Drifting<br/><span class="desc">Lacking direction or purpose</span>
+          </button>
+          <button onclick="selectMode('Grounded')" style="background-color:#AEDF8F;">
+            🌿 Grounded<br/><span class="desc">Calm and present</span>
+          </button>
+          <button onclick="selectMode('Growing')" style="background-color:#F5C16C;">
+            🚀 Growing<br/><span class="desc">Challenging yourself to improve</span>
+          </button>
         </div>
+
+        <div id="streakDisplay" class="stats"></div>
       </section>
 
-      <section id="modeView" style="display:none;"></section>
-      <section id="quick" style="display:none;"></section>
-      <section id="history" style="display:none;">
-        <div id="mode-streak-history" class="stats"></div>
-        <div id="mode-breakdown" class="stats"></div>
-        <div id="mode-history"></div>
+      <section id="modeSection"></section>
+      <section id="quickWinsSection" class="hidden"></section>
+      <section id="historySection" class="hidden">
+        <h2>Your Daily Mode Log</h2>
+        <ul id="modeLog"></ul>
+
+        <h2>Activity History</h2>
+        <ul id="historyList"></ul>
+
+        <div id="streakInHistory" class="stats"></div>
       </section>
-      <section id="about" style="display:none;">
-        <p>This tool was created by Marcus Clark to help you reset your health, one mode at a time.</p>
+
+      <section id="aboutSection" class="hidden">
+        <p>Created by Marcus Clark – <a href="mailto:evolutionofwellness8@gmail.com">Contact Support</a></p>
       </section>
     </main>
   </div>
+
+  <script src="app.js?v=12"></script>
 </body>
 </html>
