@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=42" />
-  <script defer src="app.js?v=11"></script>
+  <link rel="stylesheet" href="main.css?v=41" />
+  <script defer src="app.js?v=10"></script>
 </head>
 <body>
   <!-- Splash Screen -->
@@ -35,9 +35,9 @@
     </header>
 
     <main id="appContent">
-      <!-- HOME -->
+      <!-- Home View -->
       <section id="homeView">
-        <div class="streak-display">🔥 0-Day Streak</div>
+        <div class="streak-banner" id="streakBanner">🔥 0-Day Streak</div>
         <div class="compass">
           <div class="wedge red" data-mode="Surviving">Surviving</div>
           <div class="wedge yellow" data-mode="Drifting">Drifting</div>
@@ -52,23 +52,34 @@
         </div>
       </section>
 
-      <!-- QUICK WINS -->
+      <!-- Mode Pages -->
+      <section id="modeView" class="hidden">
+        <h2 id="modeTitle">Mode</h2>
+        <div id="modeActivities"></div>
+        <button onclick="navigate('homeView')">← Back to Compass</button>
+      </section>
+
+      <!-- Quick Wins -->
       <section id="quickWinsView" class="hidden">
         <h2>Quick Wins</h2>
-        <p>Fast actions you can take any time.</p>
+        <p>Fast actions you can take anytime.</p>
+        <div id="quickWinsContainer"></div>
       </section>
 
-      <!-- HISTORY -->
+      <!-- History -->
       <section id="historyView" class="hidden">
         <h2>History</h2>
-        <div id="historyContainer"></div>
-        <div id="modeBreakdown" class="mode-breakdown"></div>
+        <div class="stats">
+          <div id="streakDisplay">🔥 0-Day Streak</div>
+          <div id="modeBreakdown">No data yet.</div>
+        </div>
+        <div id="historyLog"></div>
       </section>
 
-      <!-- ABOUT -->
+      <!-- About -->
       <section id="aboutView" class="hidden">
         <h2>About</h2>
-        <p>The Reset Compass is your personal reset tool for better wellbeing.</p>
+        <p>The Reset Compass is your personal reset tool for better wellbeing. Choose how you're feeling, take a simple action, and log your progress. Built for real life, not perfection.</p>
       </section>
     </main>
   </div>
