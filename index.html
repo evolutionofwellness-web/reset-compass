@@ -35,20 +35,19 @@
     </header>
 
     <main id="appContent">
-      <!-- Home View -->
+      <!-- HOME VIEW -->
       <section id="homeView">
-        <div class="compass">
-          <svg viewBox="0 0 200 200" class="compass-svg">
-            <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="red" data-mode="Surviving"></path>
-            <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="yellow" data-mode="Drifting"></path>
-            <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="green" data-mode="Grounded"></path>
-            <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="blue" data-mode="Growing"></path>
-            <text x="150" y="40" class="wedge-label">Surviving</text>
-            <text x="150" y="160" class="wedge-label">Drifting</text>
-            <text x="40" y="160" class="wedge-label">Grounded</text>
-            <text x="40" y="40" class="wedge-label">Growing</text>
-          </svg>
+        <div class="streak-display">
+          🔥 <span id="streakCount">0</span> day streak
         </div>
+
+        <div class="compass">
+          <div class="wedge red" data-mode="Surviving"><span>Surviving</span></div>
+          <div class="wedge yellow" data-mode="Drifting"><span>Drifting</span></div>
+          <div class="wedge green" data-mode="Grounded"><span>Grounded</span></div>
+          <div class="wedge blue" data-mode="Growing"><span>Growing</span></div>
+        </div>
+
         <div class="mode-buttons">
           <button class="mode-button" data-mode="Growing">Growing</button>
           <button class="mode-button" data-mode="Grounded">Grounded</button>
@@ -57,24 +56,25 @@
         </div>
       </section>
 
-      <!-- Quick Wins View -->
+      <!-- QUICK WINS VIEW -->
       <section id="quickWinsView" class="hidden">
         <h2>Quick Wins</h2>
+        <p>Fast actions you can take any time.</p>
         <div id="quickWinsContainer"></div>
       </section>
 
-      <!-- History View -->
+      <!-- HISTORY VIEW -->
       <section id="historyView" class="hidden">
         <h2>History</h2>
-        <p>Daily Streak: <span id="dailyStreak">0</span> 🔥</p>
-        <div id="modeBreakdown"></div>
+        <p>Your past resets will appear here.</p>
         <div id="historyContainer"></div>
+        <div class="mode-breakdown" id="modeBreakdown"></div>
       </section>
 
-      <!-- About View -->
+      <!-- ABOUT VIEW -->
       <section id="aboutView" class="hidden">
         <h2>About</h2>
-        <p>The Reset Compass is your personal reset tool for better wellbeing. Created by Marcus Clark to help you navigate your energy, attention, and habits with ease.</p>
+        <p>The Reset Compass is your personal reset tool for better wellbeing.</p>
       </section>
     </main>
   </div>
