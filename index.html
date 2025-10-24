@@ -35,19 +35,15 @@
     </header>
 
     <main id="appContent">
-      <!-- HOME VIEW -->
+      <!-- HOME -->
       <section id="homeView">
-        <div class="streak-display">
-          🔥 <span id="streakCount">0</span> day streak
-        </div>
-
+        <div class="streak-display">🔥 0-Day Streak</div>
         <div class="compass">
-          <div class="wedge red" data-mode="Surviving"><span>Surviving</span></div>
-          <div class="wedge yellow" data-mode="Drifting"><span>Drifting</span></div>
-          <div class="wedge green" data-mode="Grounded"><span>Grounded</span></div>
-          <div class="wedge blue" data-mode="Growing"><span>Growing</span></div>
+          <div class="wedge red" data-mode="Surviving">Surviving</div>
+          <div class="wedge yellow" data-mode="Drifting">Drifting</div>
+          <div class="wedge green" data-mode="Grounded">Grounded</div>
+          <div class="wedge blue" data-mode="Growing">Growing</div>
         </div>
-
         <div class="mode-buttons">
           <button class="mode-button" data-mode="Growing">Growing</button>
           <button class="mode-button" data-mode="Grounded">Grounded</button>
@@ -56,22 +52,20 @@
         </div>
       </section>
 
-      <!-- QUICK WINS VIEW -->
+      <!-- QUICK WINS -->
       <section id="quickWinsView" class="hidden">
         <h2>Quick Wins</h2>
         <p>Fast actions you can take any time.</p>
-        <div id="quickWinsContainer"></div>
       </section>
 
-      <!-- HISTORY VIEW -->
+      <!-- HISTORY -->
       <section id="historyView" class="hidden">
         <h2>History</h2>
-        <p>Your past resets will appear here.</p>
         <div id="historyContainer"></div>
-        <div class="mode-breakdown" id="modeBreakdown"></div>
+        <div id="modeBreakdown" class="mode-breakdown"></div>
       </section>
 
-      <!-- ABOUT VIEW -->
+      <!-- ABOUT -->
       <section id="aboutView" class="hidden">
         <h2>About</h2>
         <p>The Reset Compass is your personal reset tool for better wellbeing.</p>
