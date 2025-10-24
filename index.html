@@ -10,69 +10,66 @@
 <body>
   <!-- Splash Screen -->
   <div id="splashScreen">
-    <img src="splash-icon.png" alt="App Icon" id="splashIcon" />
+    <img id="splashIcon" src="splash-icon.png" alt="Splash Icon" />
   </div>
 
-  <!-- Welcome Modal -->
-  <div id="welcomeModal" class="modal hidden">
+  <!-- Welcome Popup -->
+  <div id="welcomePopup" class="modal hidden">
     <div class="modal-content">
       <h2>Welcome to The Reset Compass</h2>
-      <p>This tool helps you reset your day with science-backed actions based on how you're feeling. Start by selecting a mode.</p>
-      <button id="startApp">Let’s Start</button>
+      <p>This tool helps you reset your day with quick, science-backed actions based on how you're feeling. Start by selecting a mode.</p>
+      <button id="startButton">Let’s Start</button>
     </div>
   </div>
 
-  <!-- App Wrapper -->
-  <div id="appWrapper" class="hidden">
+  <!-- Main App -->
+  <div id="appContent" class="hidden">
     <header>
       <h1>The Reset Compass</h1>
       <nav>
-        <button onclick="navigate('homeView')">Home</button>
-        <button onclick="navigate('quickWinsView')">Quick Wins</button>
-        <button onclick="navigate('historyView')">History</button>
-        <button onclick="navigate('aboutView')">About</button>
+        <button onclick="navigateTo('home')">Home</button>
+        <button onclick="navigateTo('quickWins')">Quick Wins</button>
+        <button onclick="navigateTo('history')">History</button>
+        <button onclick="navigateTo('about')">About</button>
       </nav>
     </header>
-
-    <main id="appContent">
-      <section id="homeView">
-        <div id="streakDisplay"></div>
-        <div class="compass-container">
-          <svg id="compass" viewBox="0 0 200 200">
-            <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0074D9" data-mode="Growing"/>
-            <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2ECC40" data-mode="Grounded"/>
-            <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFDC00" data-mode="Drifting"/>
-            <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FF4136" data-mode="Surviving"/>
-            <text x="150" y="45" text-anchor="middle" fill="#fff" font-size="10">Growing</text>
-            <text x="155" y="155" text-anchor="middle" fill="#fff" font-size="10">Grounded</text>
-            <text x="45" y="160" text-anchor="middle" fill="#fff" font-size="10">Drifting</text>
-            <text x="40" y="45" text-anchor="middle" fill="#fff" font-size="10">Surviving</text>
-          </svg>
-        </div>
-        <div class="mode-buttons">
-          <button class="mode-button" data-mode="Growing">Growing</button>
-          <button class="mode-button" data-mode="Grounded">Grounded</button>
-          <button class="mode-button" data-mode="Drifting">Drifting</button>
-          <button class="mode-button" data-mode="Surviving">Surviving</button>
-        </div>
-      </section>
-
-      <section id="quickWinsView" class="hidden">
-        <h2>Quick Wins</h2>
-        <div class="mode-activity">Loading...</div>
-      </section>
-
-      <section id="historyView" class="hidden">
-        <h2>History</h2>
-        <div id="historyLog">No data yet.</div>
-      </section>
-
-      <section id="aboutView" class="hidden">
-        <h2>About</h2>
-        <p>The Reset Compass is your personal reset tool for better wellbeing. Select a mode to get started based on how you're feeling.</p>
-        <p>Created by Marcus Clark, Evolution of Wellness LLC.</p>
-      </section>
-    </main>
+    <main id="app"></main>
   </div>
+
+  <script>
+    // Splash logic
+    window.addEventListener("load", () => {
+      const splash = document.getElementById("splashScreen");
+      const splashIcon = document.getElementById("splashIcon");
+
+      splash.classList.add("show");
+      setTimeout(() => {
+        splashIcon.classList.add("animate");
+      }, 100);
+
+      setTimeout(() => {
+        splash.classList.add("hide");
+        setTimeout(() => {
+          splash.style.display = "none";
+
+          // Show popup once
+          if (!localStorage.getItem("hasVisited")) {
+            document.getElementById("welcomePopup").classList.remove("hidden");
+          } else {
+            document.getElementById("appContent").classList.remove("hidden");
+            renderHome();
+          }
+        }, 500);
+      }, 2000);
+    });
+
+    // Popup start button
+    document.getElementById("startButton").addEventListener("click", () => {
+      document.getElementById("welcomePopup").classList.add("hidden");
+      document.getElementById("appContent").classList.remove("hidden");
+      localStorage.setItem("hasVisited", "true");
+      renderHome();
+    });
+  </script>
 </body>
 </html>
