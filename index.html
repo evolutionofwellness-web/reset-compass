@@ -2,74 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="The Reset Compass - Daily reset tool to improve your health based on how you feel today.">
   <title>The Reset Compass</title>
+  <link rel="stylesheet" href="main.css?v=52">
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="stylesheet" href="main.css?v=36" />
-  <link rel="icon" href="favicon.ico" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-  <div id="splashScreen" class="splash-screen">
-    <img src="splash-icon.png" alt="Splash Icon" class="splash-icon" />
+  <div id="splashScreen" class="splash">
+    <img src="splash-icon.png" alt="App Icon" class="splash-icon">
   </div>
 
-  <div class="modal" id="welcomeModal">
+  <div id="welcomeModal" class="modal hidden">
     <div class="modal-content">
       <h2>Welcome to The Reset Compass</h2>
       <p>This tool helps you reset your day with quick, science-backed actions based on how you're feeling. Start by selecting a mode.</p>
-      <button onclick="closeWelcomeModal()">Let's Start</button>
+      <button onclick="closeModal()">Let’s Start</button>
     </div>
   </div>
 
-  <div id="appContent" style="display: none;">
+  <div id="appContent" class="hidden">
     <header>
       <h1>The Reset Compass</h1>
       <nav>
-        <button onclick="navigateTo('home')">Home</button>
-        <button onclick="navigateTo('quickwins')">Quick Wins</button>
-        <button onclick="navigateTo('history')">History</button>
-        <button onclick="navigateTo('about')">About</button>
+        <button onclick="renderHome()">Home</button>
+        <button onclick="renderQuickWins()">Quick Wins</button>
+        <button onclick="renderHistory()">History</button>
+        <button onclick="renderAbout()">About</button>
       </nav>
     </header>
 
-    <main>
-      <section id="homeView" class="view active">
-        <div class="stats">
-          <p id="streakDisplay"><span class="fire">🔥</span> <span id="streakCount">0</span>-Day Streak</p>
-        </div>
-        <div id="compassContainer">
-          <svg id="compass" viewBox="0 0 200 200"></svg>
-        </div>
-        <div id="modeButtons" class="mode-buttons">
-          <button class="growing" onclick="selectMode('Growing')">Growing</button>
-          <button class="grounded" onclick="selectMode('Grounded')">Grounded</button>
-          <button class="drifting" onclick="selectMode('Drifting')">Drifting</button>
-          <button class="surviving" onclick="selectMode('Surviving')">Surviving</button>
-        </div>
-      </section>
-
-      <section id="quickwinsView" class="view hidden"></section>
-      <section id="historyView" class="view hidden"></section>
-      <section id="aboutView" class="view hidden"></section>
-      <section id="modeView" class="view hidden"></section>
-    </main>
+    <main id="mainContent"></main>
   </div>
 
-  <script src="app.js?v=9"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js?v=106')
-        .then(reg => console.log('Service Worker Registered'))
-        .catch(err => console.error('SW registration failed', err));
-    }
-  </script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VJQMPZ34MH"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-VJQMPZ34MH');
-  </script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9750731985233232" crossorigin="anonymous"></script>
+  <script src="app.js?v=22" defer></script>
 </body>
 </html>
