@@ -1,75 +1,122 @@
+// app.js?v=12
 document.addEventListener("DOMContentLoaded", () => {
-  const splash = document.getElementById("splash");
-  const app = document.getElementById("appContent");
-  const modal = document.getElementById("welcomeModal");
-
   setTimeout(() => {
-    splash.style.display = "none";
-    if (!localStorage.getItem("visited")) {
-      modal.style.display = "flex";
+    document.getElementById("splashScreen").style.display = "none";
+    if (!localStorage.getItem("welcomeShown")) {
+      document.getElementById("welcomeModal").classList.remove("hidden");
     } else {
-      app.style.display = "block";
+      document.getElementById("appContent").classList.remove("hidden");
     }
-  }, 1200);
+  }, 2000);
 
-  document.getElementById("startBtn").onclick = () => {
-    modal.style.display = "none";
-    localStorage.setItem("visited", "true");
-    app.style.display = "block";
-  };
+  document.querySelectorAll("#compass path").forEach(path => {
+    path.addEventListener("click", () => {
+      const mode = path.getAttribute("data-mode");
+      selectMode(mode);
+    });
+  });
 
-  updateStreakDisplay();
-  showHistory();
+  renderStreak();
+  renderHistory();
 });
 
-let modeLog = JSON.parse(localStorage.getItem("modeLog") || "[]");
-
-function selectMode(mode) {
-  const today = new Date().toISOString().split("T")[0];
-  if (!modeLog.find(entry => entry.date === today)) {
-    modeLog.push({ date: today, mode });
-    localStorage.setItem("modeLog", JSON.stringify(modeLog));
-  }
-  updateStreakDisplay();
-  renderModeView(mode);
+function startApp() {
+  localStorage.setItem("welcomeShown", "true");
+  document.getElementById("welcomeModal").classList.add("hidden");
+  document.getElementById("appContent").classList.remove("hidden");
 }
 
-function renderModeView(mode) {
-  navigate('modeView');
-  document.getElementById("modeView").innerHTML = `
-    <h2>${mode} Mode</h2>
-    <ul>
-      <li>${mode === 'Surviving' ? 'Drink water' : mode === 'Drifting' ? 'Take 5 slow breaths' : mode === 'Grounded' ? 'Move your body' : 'Do something bold'}</li>
-    </ul>
-  `;
+function showHome() {
+  showSection("homeSection");
 }
 
-function updateStreakDisplay() {
-  const today = new Date().toISOString().split("T")[0];
-  let streak = 0;
-  let date = new Date();
-  while (modeLog.find(e => e.date === date.toISOString().split("T")[0])) {
-    streak++;
-    date.setDate(date.getDate() - 1);
-  }
-  document.getElementById("mode-streak").innerHTML = `🔥 ${streak}-day streak`;
-  document.getElementById("mode-streak-history").innerHTML = `🔥 ${streak}-day streak`;
+function showQuickWins() {
+  showSection("quickWinsSection");
 }
 
 function showHistory() {
-  const breakdown = { Surviving: 0, Drifting: 0, Grounded: 0, Growing: 0 };
-  modeLog.forEach(e => breakdown[e.mode]++);
-  const total = modeLog.length;
-  const summary = Object.entries(breakdown).map(([mode, count]) =>
-    `<div>${mode}: ${((count / total) * 100).toFixed(1)}%</div>`
-  ).join('');
-  document.getElementById("mode-breakdown").innerHTML = summary;
-  document.getElementById("mode-history").innerHTML = modeLog.map(e =>
-    `<div>${e.date} - ${e.mode}</div>`
-  ).join('');
+  showSection("historySection");
+  renderStreak();
+  renderHistory();
 }
 
-function navigate(id) {
-  document.querySelectorAll("main section").forEach(s => s.style.display = "none");
-  document.getElementById(id).style.display = "block";
+function showAbout() {
+  showSection("aboutSection");
+}
+
+function showSection(id) {
+  document.querySelectorAll("main > section").forEach(s => s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+
+function selectMode(mode) {
+  const activities = {
+    Surviving: ["Drink water", "Take 5 breaths", "Do one tiny task"],
+    Drifting: ["Take 5 slow breaths", "Journal one thought", "Reconnect to one intention"],
+    Grounded: ["Stretch for 2 minutes", "Step outside", "Eat a full meal"],
+    Growing: ["Do a hard thing first", "Make a bold request", "Reflect on what’s next"]
+  };
+
+  const section = document.getElementById("modeSection");
+  section.innerHTML = `<h2>${mode} Mode</h2>` +
+    activities[mode].map(item => `
+      <div>
+        <strong>${item}</strong>
+        <textarea placeholder="What did you do?"></textarea>
+      </div>`).join('') +
+    `<button onclick="saveModeChoice('${mode}')">Save My Reset</button>`;
+
+  showSection("modeSection");
+}
+
+function saveModeChoice(mode) {
+  const today = new Date().toLocaleDateString();
+  const existing = JSON.parse(localStorage.getItem("modeLog") || "[]");
+  if (!existing.find(entry => entry.date === today)) {
+    existing.push({ date: today, mode });
+    localStorage.setItem("modeLog", JSON.stringify(existing));
+  }
+
+  const entries = [...document.querySelectorAll("#modeSection textarea")].map(t => ({
+    activity: t.previousElementSibling.innerText,
+    note: t.value
+  }));
+
+  const history = JSON.parse(localStorage.getItem("history") || "[]");
+  history.push({ mode, date: today, entries });
+  localStorage.setItem("history", JSON.stringify(history));
+
+  alert("Reset saved!");
+  showHome();
+  renderStreak();
+  renderHistory();
+}
+
+function renderHistory() {
+  const modeLog = JSON.parse(localStorage.getItem("modeLog") || "[]");
+  const logList = document.getElementById("modeLog");
+  logList.innerHTML = modeLog.map(entry => `<li>${entry.date} — ${entry.mode}</li>`).join("");
+
+  const history = JSON.parse(localStorage.getItem("history") || "[]");
+  const histList = document.getElementById("historyList");
+  histList.innerHTML = history.map(entry => `
+    <li><strong>${entry.date} (${entry.mode})</strong><ul>${
+      entry.entries.map(e => `<li>${e.activity}: ${e.note || "—"}</li>`).join("")
+    }</ul></li>`).join("");
+}
+
+function renderStreak() {
+  const log = JSON.parse(localStorage.getItem("modeLog") || "[]")
+    .map(e => e.date);
+  let streak = 0;
+  let day = new Date();
+
+  while (log.includes(day.toLocaleDateString())) {
+    streak++;
+    day.setDate(day.getDate() - 1);
+  }
+
+  const display = `<div>🔥 ${streak}-day streak</div>`;
+  document.getElementById("streakDisplay").innerHTML = display;
+  document.getElementById("streakInHistory").innerHTML = display;
 }
