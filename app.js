@@ -1,62 +1,104 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const splash = document.getElementById("splashScreen");
-  const welcome = document.getElementById("welcomePopup");
-  const startBtn = document.getElementById("startButton");
-
+document.addEventListener("DOMContentLoaded", function () {
+  // Splash screen removal
   setTimeout(() => {
-    splash.style.display = "none";
-    if (!localStorage.getItem("visited")) {
-      welcome.style.display = "flex";
-    }
-  }, 2000);
+    document.getElementById("splashScreen").style.display = "none";
+  }, 2500);
 
-  startBtn.onclick = () => {
-    welcome.style.display = "none";
-    localStorage.setItem("visited", "true");
-  };
+  // Welcome popup logic
+  if (!localStorage.getItem("welcomeShown")) {
+    document.getElementById("welcomePopup").style.display = "block";
+  }
 
-  document.querySelectorAll("#compass path").forEach(path => {
-    path.addEventListener("click", () => {
-      const mode = path.dataset.mode;
-      logMode(mode);
+  document.getElementById("startButton").addEventListener("click", function () {
+    document.getElementById("welcomePopup").style.display = "none";
+    localStorage.setItem("welcomeShown", true);
+  });
+
+  // Navigation
+  document.querySelectorAll("nav button").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const section = this.dataset.section;
+      document.querySelectorAll(".section").forEach((s) => s.style.display = "none");
+      document.getElementById(section).style.display = "block";
+      if (section === "history") renderHistory();
     });
   });
 
-  window.selectMode = (mode) => {
-    logMode(mode);
-  };
+  // Compass click handlers
+  document.getElementById("wedge-growing").addEventListener("click", () => goToMode("growing"));
+  document.getElementById("wedge-grounded").addEventListener("click", () => goToMode("grounded"));
+  document.getElementById("wedge-drifting").addEventListener("click", () => goToMode("drifting"));
+  document.getElementById("wedge-surviving").addEventListener("click", () => goToMode("surviving"));
 
-  window.showSection = (id) => {
-    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-  };
+  // Button handlers
+  document.getElementById("btn-growing").addEventListener("click", () => goToMode("growing"));
+  document.getElementById("btn-grounded").addEventListener("click", () => goToMode("grounded"));
+  document.getElementById("btn-drifting").addEventListener("click", () => goToMode("drifting"));
+  document.getElementById("btn-surviving").addEventListener("click", () => goToMode("surviving"));
 
-  function logMode(mode) {
-    const date = new Date().toLocaleDateString();
-    const history = JSON.parse(localStorage.getItem("modeHistory") || "[]");
-    history.push({ date, mode });
-    localStorage.setItem("modeHistory", JSON.stringify(history));
-    updateStreak(history);
-    alert(`Logged: ${mode}`);
-  }
+  // Save button listeners
+  ["growing", "grounded", "drifting", "surviving", "quick"].forEach(mode => {
+    const saveBtn = document.getElementById(`save-${mode}`);
+    if (saveBtn) {
+      saveBtn.addEventListener("click", () => {
+        const text = document.getElementById(`log-${mode}`).value.trim();
+        if (text) saveLog(mode, text);
+      });
+    }
+  });
 
-  function updateStreak(history) {
-    const days = [...new Set(history.map(e => e.date))];
-    const streak = days.length;
-    document.getElementById("streakDisplay").textContent = `🔥 ${streak} day streak`;
-  }
-
-  function loadHistory() {
-    const history = JSON.parse(localStorage.getItem("modeHistory") || "[]");
-    const container = document.getElementById("modeHistory");
-    container.innerHTML = "";
-    history.reverse().forEach(entry => {
-      const div = document.createElement("div");
-      div.textContent = `${entry.date}: ${entry.mode}`;
-      container.appendChild(div);
-    });
-    updateStreak(history);
-  }
-
-  loadHistory();
+  updateStreak();
 });
+
+// Mode navigation
+function goToMode(mode) {
+  document.querySelectorAll(".section").forEach((s) => s.style.display = "none");
+  document.getElementById(`mode-${mode}`).style.display = "block";
+}
+
+// Save activity
+function saveLog(mode, text) {
+  const today = new Date().toISOString().split("T")[0];
+  const entry = { mode, text, date: today };
+
+  let logs = JSON.parse(localStorage.getItem("logs") || "[]");
+  logs.push(entry);
+  localStorage.setItem("logs", JSON.stringify(logs));
+
+  updateStreak();
+  alert("Saved!");
+}
+
+// Display history
+function renderHistory() {
+  const historyEl = document.getElementById("historyLog");
+  const logs = JSON.parse(localStorage.getItem("logs") || "[]").reverse();
+
+  historyEl.innerHTML = logs.map(log =>
+    `<div><strong>${log.date}</strong> — <em>${log.mode}</em><br>${log.text}</div>`
+  ).join("") || "<p>No activity logged yet.</p>";
+}
+
+// Update streak
+function updateStreak() {
+  const logs = JSON.parse(localStorage.getItem("logs") || "[]");
+  const dates = [...new Set(logs.map(log => log.date))].sort().reverse();
+
+  let streak = 0;
+  let currentDate = new Date();
+
+  for (let date of dates) {
+    const logDate = new Date(date);
+    const diff = Math.floor((currentDate - logDate) / (1000 * 60 * 60 * 24));
+    if (diff === 0) {
+      streak++;
+    } else if (diff === 1 && streak > 0) {
+      streak++;
+    } else {
+      break;
+    }
+    currentDate.setDate(currentDate.getDate() - 1);
+  }
+
+  document.getElementById("streak").innerHTML = `<span class="emoji">🔥</span>${streak} day streak`;
+}
