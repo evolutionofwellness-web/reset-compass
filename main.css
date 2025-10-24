@@ -58,20 +58,33 @@ nav button {
 .grounded { fill: var(--wedge3); }
 .growing { fill: var(--wedge4); }
 
+.wedge-label {
+  font-size: 8px;
+  fill: #fff;
+  font-weight: bold;
+  pointer-events: none;
+}
+
 #modeButtons {
   text-align: center;
   margin-top: 1em;
 }
 
-#modeButtons button {
-  display: block;
-  margin: 0.5em auto;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  background: var(--green);
-  color: white;
-  border: none;
-  border-radius: 4px;
+/* Updated button colors to match compass wedges */
+#survivingBtn {
+  background-color: #4B9CD3;
+}
+
+#driftingBtn {
+  background-color: #C97C7C;
+}
+
+#groundedBtn {
+  background-color: #A6D785;
+}
+
+#growingBtn {
+  background-color: #F2C57C;
 }
 
 .activity {
