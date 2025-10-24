@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=40" />
+  <link rel="stylesheet" href="main.css?v=99" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
 <body>
   <!-- Splash Screen -->
   <div id="splashScreen">
-    <img id="splashIcon" src="splash-icon.png" alt="App Icon" />
+    <img id="splashIcon" src="splash-icon.png" alt="App Icon">
   </div>
 
   <!-- Welcome Modal -->
@@ -40,56 +41,51 @@
       <section id="homeView">
         <div class="compass-container">
           <svg id="compass" viewBox="0 0 200 200">
-            <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="var(--mode-growing)" class="wedge" data-mode="Growing"/>
-            <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="var(--mode-grounded)" class="wedge" data-mode="Grounded"/>
-            <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="var(--mode-drifting)" class="wedge" data-mode="Drifting"/>
-            <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="var(--mode-surviving)" class="wedge" data-mode="Surviving"/>
-            <text x="140" y="60" text-anchor="middle" alignment-baseline="middle" font-size="10" fill="white">Growing</text>
-            <text x="140" y="140" text-anchor="middle" alignment-baseline="middle" font-size="10" fill="white">Grounded</text>
-            <text x="60" y="140" text-anchor="middle" alignment-baseline="middle" font-size="10" fill="white">Drifting</text>
-            <text x="60" y="60" text-anchor="middle" alignment-baseline="middle" font-size="10" fill="white">Surviving</text>
+            <g transform="translate(100,100)">
+              <path class="wedge" d="M0,0 L100,0 A100,100 0 0,1 0,100 Z" fill="#0074D9" data-mode="Growing"/>
+              <path class="wedge" d="M0,0 L0,100 A100,100 0 0,1 -100,0 Z" fill="#2ECC40" data-mode="Grounded"/>
+              <path class="wedge" d="M0,0 L-100,0 A100,100 0 0,1 0,-100 Z" fill="#FFDC00" data-mode="Drifting"/>
+              <path class="wedge" d="M0,0 L0,-100 A100,100 0 0,1 100,0 Z" fill="#FF4136" data-mode="Surviving"/>
+            </g>
           </svg>
         </div>
 
         <div class="mode-buttons">
-          <button class="mode-btn" data-mode="Growing" style="background-color: var(--mode-growing); color: white;">Growing – Strive, Learn, Help</button>
-          <button class="mode-btn" data-mode="Grounded" style="background-color: var(--mode-grounded); color: white;">Grounded – Nourish, Breathe, Reflect</button>
-          <button class="mode-btn" data-mode="Drifting" style="background-color: var(--mode-drifting);">Drifting – Pause, Reset, Reconnect</button>
-          <button class="mode-btn" data-mode="Surviving" style="background-color: var(--mode-surviving); color: white;">Surviving – Breathe, Hydrate, Reach Out</button>
+          <button class="mode-btn" data-mode="Growing">Growing</button>
+          <button class="mode-btn" data-mode="Grounded">Grounded</button>
+          <button class="mode-btn" data-mode="Drifting">Drifting</button>
+          <button class="mode-btn" data-mode="Surviving">Surviving</button>
         </div>
       </section>
 
       <!-- Mode View -->
       <section id="modeView" class="hidden">
-        <h2 id="modeTitle" class="mode-title"></h2>
+        <h2 class="mode-title" id="modeTitle"></h2>
         <div id="modeActivities"></div>
       </section>
 
       <!-- Quick Wins View -->
       <section id="quickWinsView" class="hidden">
         <h2 class="mode-title">Quick Wins</h2>
-        <div id="quickWinsList">
-          <div class="mode-activity"><strong>Take 3 deep breaths</strong><br><input type="text" placeholder="What did you notice?" /></div>
-          <div class="mode-activity"><strong>Drink water</strong><br><input type="text" placeholder="How did you feel after?" /></div>
-          <div class="mode-activity"><strong>Stand up and stretch</strong><br><input type="text" placeholder="How did your body respond?" /></div>
-        </div>
+        <div class="mode-activity"><strong>3-Minute Reset</strong><br/><input type="text" placeholder="What did you do?" data-mode="Quick" data-activity="3-Minute Reset" /></div>
+        <div class="mode-activity"><strong>Mindful Breathing</strong><br/><input type="text" placeholder="What did you do?" data-mode="Quick" data-activity="Mindful Breathing" /></div>
+        <div class="mode-activity"><strong>Drink Water</strong><br/><input type="text" placeholder="What did you do?" data-mode="Quick" data-activity="Drink Water" /></div>
       </section>
 
       <!-- History View -->
       <section id="historyView" class="hidden">
-        <h2 class="mode-title">Your Activity History</h2>
+        <h2 class="mode-title">Your History</h2>
         <div id="historyContent"></div>
       </section>
 
       <!-- About View -->
       <section id="aboutView" class="hidden">
-        <h2 class="mode-title">About This App</h2>
-        <p>This tool was created to help you reset your day in just a few minutes, no matter what state you're in. Use it regularly to build healthy habits and stay aligned with what matters most.</p>
-        <p>Created by <a href="https://evolutionofwellness.com" target="_blank">Evolution of Wellness</a>.</p>
+        <h2 class="mode-title">About</h2>
+        <p>The Reset Compass is a simple tool designed to help you reconnect with your health in just a few minutes a day. Select how you're feeling, take action, and log your progress. Your journey, your pace.</p>
       </section>
     </main>
   </div>
 
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=99"></script>
 </body>
 </html>
