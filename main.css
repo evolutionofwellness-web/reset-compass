@@ -1,141 +1,108 @@
 :root {
   --green: #0B3D2E;
-  --surviving: #4285F4;
-  --drifting: #EA4335;
-  --grounded: #34A853;
-  --growing: #FBBC05;
+  --surviving: #FF4C4C;
+  --drifting: #FFD700;
+  --grounded: #4CAF50;
+  --growing: #1E90FF;
+  --white: #FFFFFF;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #fff;
+  font-family: sans-serif;
+  background-color: var(--white);
 }
 
 header {
-  background: var(--green);
-  color: white;
+  background-color: var(--green);
+  color: var(--white);
+  padding: 1rem;
   text-align: center;
-  padding: 1rem 0;
-}
-
-nav {
-  margin-top: 0.5rem;
 }
 
 nav button {
-  margin: 0.2rem;
-  padding: 0.4rem 1rem;
-  background: white;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
+  background: var(--white);
   color: var(--green);
-}
-
-.section {
-  display: none;
-  padding: 1rem;
-}
-
-.section.active {
-  display: block;
-}
-
-.compass {
-  width: 80%;
-  max-width: 300px;
-  margin: 1rem auto;
-  display: block;
-}
-
-.compass-label {
-  font-size: 5px;
-  fill: black;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  font-weight: bold;
-}
-
-.mode-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.mode-btn {
-  width: 90%;
+  margin: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
   border: none;
-  border-radius: 10px;
-  padding: 1rem;
-  color: white;
-  font-size: 1rem;
   font-weight: bold;
-  text-align: left;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
-.mode-btn small {
-  display: block;
-  font-weight: normal;
-  font-size: 0.85rem;
-}
-
-.mode-btn.surviving { background: var(--surviving); }
-.mode-btn.drifting { background: var(--drifting); }
-.mode-btn.grounded { background: var(--grounded); }
-.mode-btn.growing { background: var(--growing); }
 
 #splashScreen {
+  background-color: var(--green);
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: var(--green);
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
-  animation: fadeOut 2.5s ease-in-out forwards;
-  animation-delay: 1.5s;
+  justify-content: center;
 }
 
 #splashIcon {
   width: 100px;
-  animation: splashGrow 1.5s ease-out forwards;
+  height: 100px;
+  animation: splashSpin 2s ease-out forwards;
 }
 
-@keyframes splashGrow {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(2); opacity: 0; }
-}
-
-@keyframes fadeOut {
-  to { opacity: 0; visibility: hidden; }
+@keyframes splashSpin {
+  0% {
+    opacity: 1;
+    transform: scale(0.5) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(5) rotate(360deg);
+  }
 }
 
 .modal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: fixed;
+  z-index: 10000;
   top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 999;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-content {
   background: white;
   padding: 2rem;
-  text-align: center;
   border-radius: 12px;
+  text-align: center;
+  max-width: 300px;
 }
 
-#streakDisplay {
-  text-align: center;
-  font-size: 1.2rem;
+button {
+  cursor: pointer;
+}
+
+.wedge-label {
+  font-size: 1.1rem;
+  fill: #000;
+  dominant-baseline: middle;
+  text-anchor: middle;
+}
+
+.mode-button {
+  padding: 1rem;
+  color: white;
+  margin: 1rem;
+  border-radius: 12px;
   font-weight: bold;
-  margin: 1rem 0;
+  font-size: 1rem;
+}
+
+textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
 }
