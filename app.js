@@ -1,178 +1,84 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const splash = document.getElementById("splashScreen");
-  if (splash) {
-    setTimeout(() => {
-      splash.style.display = "none";
-      document.getElementById("appContent").style.display = "block";
-    }, 1200);
-  }
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    document.getElementById('splashScreen').classList.add('hidden');
 
-  const modal = document.getElementById("welcomeModal");
-  if (localStorage.getItem("visitedBefore") !== "true") {
-    modal.classList.remove("hidden");
-    localStorage.setItem("visitedBefore", "true");
-  }
-
-  document.getElementById("closeModal").addEventListener("click", () => {
-    modal.classList.add("hidden");
-  });
-
-  const navLinks = document.querySelectorAll("nav button");
-  const sections = document.querySelectorAll("main > section");
-  const homeSection = document.getElementById("home");
-
-  navLinks.forEach((button) => {
-    button.addEventListener("click", () => {
-      const sectionId = button.getAttribute("data-section");
-      sections.forEach((section) => {
-        section.classList.add("hidden");
-      });
-      document.getElementById(sectionId).classList.remove("hidden");
-    });
-  });
-
-  const modeButtons = document.querySelectorAll(".mode-button");
-  modeButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const selectedMode = button.getAttribute("data-mode");
-      renderModePage(selectedMode);
-      logMode(selectedMode);
-      updateStreak();
-      updateHistoryDisplay();
-    });
-  });
-
-  const wedges = document.querySelectorAll(".wedge");
-  wedges.forEach((wedge) => {
-    wedge.addEventListener("click", () => {
-      const mode = wedge.getAttribute("data-mode");
-      renderModePage(mode);
-      logMode(mode);
-      updateStreak();
-      updateHistoryDisplay();
-    });
-  });
-
-  function renderModePage(mode) {
-    document.querySelectorAll("main > section").forEach((section) => section.classList.add("hidden"));
-    const section = document.getElementById("modeView");
-    section.classList.remove("hidden");
-
-    const title = document.getElementById("modeTitle");
-    const container = document.getElementById("modeActivities");
-    container.innerHTML = "";
-
-    const activities = getModeActivities(mode);
-    title.textContent = mode;
-
-    activities.forEach((activity, index) => {
-      const div = document.createElement("div");
-      div.className = "activity";
-      div.innerHTML = `<strong>${activity}</strong><br><textarea placeholder="What did you do?" data-mode="${mode}" data-activity="${index}"></textarea>`;
-      container.appendChild(div);
-    });
-  }
-
-  function getModeActivities(mode) {
-    const activitiesByMode = {
-      Growing: [
-        "Did something that pushed you out of your comfort zone",
-        "Learned a new skill or concept",
-        "Took meaningful action toward a long-term goal",
-      ],
-      Grounded: [
-        "Completed a routine habit (exercise, meal prep, etc.)",
-        "Took care of a responsibility",
-        "Stayed off autopilot and moved with intention",
-      ],
-      Drifting: [
-        "Felt distracted or unmotivated",
-        "Wasted time or procrastinated",
-        "Let the day happen to you without structure",
-      ],
-      Surviving: [
-        "Felt overwhelmed, sick, or burnt out",
-        "Couldn’t focus on anything beyond the next task",
-        "Did the bare minimum to get by",
-      ],
-    };
-    return activitiesByMode[mode] || [];
-  }
-
-  function logMode(mode) {
-    const logs = JSON.parse(localStorage.getItem("modeLogs") || "[]");
-    const today = new Date().toLocaleDateString();
-    const existing = logs.find((log) => log.date === today);
-    if (!existing) {
-      logs.push({ date: today, mode });
-      localStorage.setItem("modeLogs", JSON.stringify(logs));
+    const seenModal = localStorage.getItem('seenWelcome');
+    if (!seenModal) {
+      document.getElementById('welcomeModal').classList.remove('hidden');
+    } else {
+      document.getElementById('appContent').classList.remove('hidden');
+      renderHome();
     }
-  }
-
-  function updateStreak() {
-    const logs = JSON.parse(localStorage.getItem("modeLogs") || "[]");
-    const sorted = logs.map((log) => log.date).sort();
-    let streak = 0;
-    let current = new Date();
-
-    for (let i = sorted.length - 1; i >= 0; i--) {
-      const logDate = new Date(sorted[i]);
-      if (
-        logDate.toDateString() === current.toDateString()
-      ) {
-        streak++;
-        current.setDate(current.getDate() - 1);
-      } else {
-        break;
-      }
-    }
-
-    const streakBanner = document.getElementById("streakBanner");
-    streakBanner.innerHTML = `🔥 ${streak}-day streak`;
-  }
-
-  function updateHistoryDisplay() {
-    const logs = JSON.parse(localStorage.getItem("modeLogs") || "[]");
-    const historyLog = document.getElementById("historyLog");
-    historyLog.innerHTML = "<h3>Your Daily Mode Log</h3>";
-
-    logs.forEach((log) => {
-      const p = document.createElement("p");
-      p.textContent = `${log.date}: ${log.mode}`;
-      historyLog.appendChild(p);
-    });
-
-    // Calculate breakdown
-    const counts = {};
-    logs.forEach((log) => {
-      counts[log.mode] = (counts[log.mode] || 0) + 1;
-    });
-    const total = logs.length;
-    const breakdown = Object.entries(counts)
-      .map(([mode, count]) => `${mode}: ${Math.round((count / total) * 100)}%`)
-      .join(" | ");
-    document.getElementById("modeBreakdown").textContent = breakdown;
-  }
-
-  function renderQuickWins() {
-    const quickWins = [
-      "Took 5 deep breaths",
-      "Stretched for 30 seconds",
-      "Drank a full glass of water",
-      "Stepped outside or opened a window",
-      "Did 10 seconds of light movement",
-    ];
-    const container = document.getElementById("quickWinsContainer");
-    container.innerHTML = "";
-    quickWins.forEach((win, index) => {
-      const div = document.createElement("div");
-      div.className = "activity";
-      div.innerHTML = `<strong>${win}</strong><br><textarea placeholder="What did you do?" data-mode="QuickWin" data-activity="${index}"></textarea>`;
-      container.appendChild(div);
-    });
-  }
-
-  renderQuickWins();
-  updateStreak();
-  updateHistoryDisplay();
+  }, 1200);
 });
+
+function closeModal() {
+  localStorage.setItem('seenWelcome', 'true');
+  document.getElementById('welcomeModal').classList.add('hidden');
+  document.getElementById('appContent').classList.remove('hidden');
+  renderHome();
+}
+
+function renderHome() {
+  const main = document.getElementById('mainContent');
+  const streak = getStreak();
+
+  main.innerHTML = `
+    <div class="streak">🔥 ${streak}-Day Streak</div>
+    <button class="mode-button mode-growing" onclick="selectMode('Growing')">Growing</button>
+    <button class="mode-button mode-grounded" onclick="selectMode('Grounded')">Grounded</button>
+    <button class="mode-button mode-drifting" onclick="selectMode('Drifting')">Drifting</button>
+    <button class="mode-button mode-surviving" onclick="selectMode('Surviving')">Surviving</button>
+  `;
+}
+
+function selectMode(mode) {
+  logDay(mode);
+  alert(`Mode selected: ${mode}`);
+  renderHome();
+}
+
+function getStreak() {
+  const today = new Date().toISOString().split("T")[0];
+  const stored = JSON.parse(localStorage.getItem('streakData')) || { lastDate: '', count: 0 };
+
+  if (stored.lastDate === today) return stored.count;
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yDate = yesterday.toISOString().split("T")[0];
+
+  const newCount = stored.lastDate === yDate ? stored.count + 1 : 1;
+
+  localStorage.setItem('streakData', JSON.stringify({ lastDate: today, count: newCount }));
+  return newCount;
+}
+
+function logDay(mode) {
+  const date = new Date().toISOString().split("T")[0];
+  const logs = JSON.parse(localStorage.getItem('modeLogs')) || [];
+  logs.push({ date, mode });
+  localStorage.setItem('modeLogs', JSON.stringify(logs));
+}
+
+function renderQuickWins() {
+  document.getElementById('mainContent').innerHTML = `<p>Quick Wins section coming soon.</p>`;
+}
+
+function renderHistory() {
+  const logs = JSON.parse(localStorage.getItem('modeLogs')) || [];
+  let html = `<h2>History</h2>`;
+  if (logs.length === 0) {
+    html += `<p>No logs yet.</p>`;
+  } else {
+    html += `<ul>${logs.map(log => `<li>${log.date}: ${log.mode}</li>`).join('')}</ul>`;
+  }
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+function renderAbout() {
+  document.getElementById('mainContent').innerHTML = `
+    <h2>About This App</h2>
+    <p>The Reset Compass helps you take simple, effective actions based on how you feel each day. It’s your daily anchor for better health.</p>
+  `;
+}
