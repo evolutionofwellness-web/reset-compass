@@ -65,18 +65,35 @@ main {
   color: var(--brand-green);
 }
 
+/* Compass Container */
 .compass-container {
   display: flex;
   justify-content: center;
   margin-bottom: 1.5rem;
+  position: relative;
 }
 
 #compass {
   width: 90%;
-  max-width: 300px;
+  max-width: 320px;
   height: auto;
 }
 
+.wedge-label {
+  position: absolute;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: bold;
+  pointer-events: none;
+  text-shadow: 1px 1px 2px black;
+}
+
+.label-growing   { top: 72%; left: 70%; transform: translate(-50%, -50%); }
+.label-grounded  { top: 72%; left: 30%; transform: translate(-50%, -50%); }
+.label-drifting  { top: 30%; left: 30%; transform: translate(-50%, -50%); }
+.label-surviving { top: 30%; left: 70%; transform: translate(-50%, -50%); }
+
+/* Mode Buttons */
 .mode-buttons {
   display: flex;
   flex-direction: column;
@@ -107,7 +124,7 @@ section.hidden {
   display: none;
 }
 
-/* Mode-specific styling */
+/* Mode-specific styling (dynamically applied in JS) */
 .mode-title {
   text-align: center;
   font-size: 1.8rem;
@@ -143,10 +160,6 @@ section.hidden {
   align-items: center;
 }
 
-.modal.hidden {
-  display: none;
-}
-
 .modal-content {
   background: #fff;
   padding: 2rem;
@@ -157,7 +170,7 @@ section.hidden {
 }
 
 #welcomeModal button {
-  background-color: var(--brand-green);
+  background-color: #0B3D2E;
   color: white;
   border: none;
   padding: 12px 20px;
@@ -207,12 +220,41 @@ section.hidden {
   }
 }
 
-/* About + History Sections */
-#aboutView,
-#historyView {
+/* About + History */
+#aboutView, #historyView {
   max-width: 700px;
   margin: 0 auto;
   padding: 1rem;
   line-height: 1.6;
   color: var(--text-dark);
+}
+
+/* Activity History + Streaks */
+.log-entry {
+  background: #f0f0f0;
+  border-left: 5px solid var(--brand-green);
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 6px;
+}
+
+.log-entry.surviving { border-color: var(--mode-surviving); }
+.log-entry.drifting  { border-color: var(--mode-drifting); }
+.log-entry.grounded  { border-color: var(--mode-grounded); }
+.log-entry.growing   { border-color: var(--mode-growing); }
+
+.streak-display {
+  font-size: 1.3rem;
+  color: var(--brand-green);
+  font-weight: bold;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.mode-breakdown {
+  font-size: 1rem;
+  margin: 0.5rem auto;
+  max-width: 400px;
+  line-height: 1.6;
+  text-align: center;
 }
