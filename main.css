@@ -1,37 +1,35 @@
 :root {
   --brand-green: #0B3D2E;
-  --text-dark: #1a1a1a;
-  --text-light: #ffffff;
-  --mode-growing: #0074D9;
-  --mode-grounded: #2ECC40;
-  --mode-drifting: #FFDC00;
-  --mode-surviving: #FF4136;
-  --btn-bg: #E8E8E8;
-  --btn-shadow: rgba(0, 0, 0, 0.1);
-  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --mode-red: #FF3B30;
+  --mode-yellow: #FFCC00;
+  --mode-green: #34C759;
+  --mode-blue: #007AFF;
+  --text-dark: #111;
+  --text-light: #fff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  font-family: var(--font-family);
+  font-family: system-ui, sans-serif;
   background: white;
   color: var(--text-dark);
 }
 
-.hidden {
-  display: none !important;
+h1, h2 {
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
 header {
-  background: var(--brand-green);
-  color: var(--text-light);
-  padding: 2rem 1rem 1rem;
+  background-color: var(--brand-green);
+  color: white;
+  padding: 1rem 0;
   text-align: center;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 2.4rem;
 }
 
 nav {
@@ -43,154 +41,179 @@ nav {
 }
 
 nav button {
-  background: var(--brand-green);
-  color: var(--text-light);
-  border: none;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  border-radius: 0.6rem;
-  box-shadow: 0 2px 5px var(--btn-shadow);
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 1rem;
 }
 
 nav button:hover {
-  background-color: #085233;
+  background: white;
+  color: var(--brand-green);
 }
 
 main {
   padding: 1.5rem;
 }
 
-.compass {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
-  max-width: 400px;
-  margin: 2rem auto;
-}
-
-.wedge {
-  height: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  font-weight: bold;
-  font-size: 1.1rem;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 0.5rem;
-}
-
-.wedge.red { background-color: var(--mode-surviving); }
-.wedge.yellow { background-color: var(--mode-drifting); }
-.wedge.green { background-color: var(--mode-grounded); }
-.wedge.blue { background-color: var(--mode-growing); }
-
-.mode-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: center;
-  margin-top: 2rem;
-}
-
-.mode-button {
-  width: 90%;
-  max-width: 340px;
-  font-size: 1rem;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 0.6rem;
-  cursor: pointer;
-  box-shadow: 0 2px 5px var(--btn-shadow);
-  background-color: var(--btn-bg);
-  color: var(--text-dark);
-  text-align: center;
-  transition: background-color 0.3s ease;
-}
-
-.mode-button:hover {
-  background-color: #d5d5d5;
-}
-
-/* Splash Screen */
+/* Splash */
 #splashScreen {
   position: fixed;
+  z-index: 1000;
+  background: var(--brand-green);
   top: 0;
   left: 0;
-  background: var(--brand-green);
   width: 100%;
   height: 100%;
-  z-index: 2000;
   display: flex;
-  justify-content: center;
   align-items: center;
-  animation: fadeOut 1.2s ease-out forwards;
-  animation-delay: 2s;
+  justify-content: center;
 }
 
 .splash-icon {
-  width: 120px;
-  height: 120px;
-  animation: zoomSpinFade 2s ease-in-out forwards;
+  width: 100px;
+  height: 100px;
+  animation: splashAnim 1.2s ease-in-out forwards;
 }
 
-@keyframes zoomSpinFade {
+@keyframes splashAnim {
   0% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
   }
-  100% {
-    transform: scale(3.5) rotate(360deg);
-    opacity: 0;
+  50% {
+    transform: scale(2) rotate(180deg);
+    opacity: 1;
   }
-}
-
-@keyframes fadeOut {
-  to {
+  100% {
+    transform: scale(0.1) rotate(360deg);
     opacity: 0;
-    visibility: hidden;
   }
 }
 
 /* Welcome Modal */
 .modal {
   position: fixed;
-  z-index: 9999;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
+  z-index: 1001;
   background: white;
+  color: var(--text-dark);
+  width: 90%;
+  max-width: 400px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   padding: 2rem;
-  border-radius: 1rem;
-  max-width: 90%;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-#welcomeModal button {
-  background-color: var(--brand-green);
+.modal-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.modal-content p {
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.modal-content button {
+  background: var(--brand-green);
   color: white;
   border: none;
-  padding: 0.8rem 1.2rem;
-  margin-top: 1.5rem;
+  padding: 0.6rem 1.2rem;
   font-size: 1rem;
-  border-radius: 0.5rem;
+  border-radius: 8px;
   cursor: pointer;
 }
 
-/* Views */
-#aboutView, #historyView, #quickWinsView {
-  max-width: 700px;
+.hidden {
+  display: none;
+}
+
+/* Compass */
+.compass {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.compass-svg {
+  width: 250px;
+  height: 250px;
+  cursor: pointer;
+}
+
+.wedge-label {
+  font-size: 12px;
+  fill: white;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+/* Mode Buttons */
+.mode-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  max-width: 400px;
   margin: 0 auto;
-  line-height: 1.6;
+}
+
+.mode-button {
+  padding: 1.25rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+}
+
+.mode-button[data-mode="Surviving"] {
+  background-color: var(--mode-red);
+}
+.mode-button[data-mode="Drifting"] {
+  background-color: var(--mode-yellow);
+  color: black;
+}
+.mode-button[data-mode="Grounded"] {
+  background-color: var(--mode-green);
+}
+.mode-button[data-mode="Growing"] {
+  background-color: var(--mode-blue);
+}
+
+/* Section Styling */
+section {
+  margin-top: 2rem;
+}
+
+#historyContainer {
+  margin-top: 1rem;
+}
+
+#modeBreakdown {
+  margin: 1rem 0;
+}
+
+/* Responsive Fixes */
+@media (max-width: 500px) {
+  .mode-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .compass-svg {
+    width: 200px;
+    height: 200px;
+  }
+
+  nav {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
