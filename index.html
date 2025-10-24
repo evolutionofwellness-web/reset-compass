@@ -5,19 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
   <link rel="stylesheet" href="main.css?v=40">
-  <link rel="manifest" href="manifest.webmanifest">
-  <script defer src="app.js?v=40"></script>
+  <link rel="manifest" href="manifest.webmanifest" />
 </head>
 <body>
   <div id="splashScreen">
-    <img src="splash-icon.png" alt="Splash Icon" id="splashIcon" />
+    <img src="splash-icon.png" alt="Splash Icon" class="splash-icon" />
   </div>
 
-  <div id="welcomePopup" class="modal">
+  <div id="welcomeModal" class="modal">
     <div class="modal-content">
       <h2>Welcome!</h2>
       <p>Start by choosing your mode for today.</p>
-      <button id="startBtn">Let's Start</button>
+      <button onclick="closeWelcome()">Let’s Start</button>
     </div>
   </div>
 
@@ -32,51 +31,49 @@
   </header>
 
   <main id="appContent">
-    <!-- Home Section -->
-    <section id="home" class="app-section active">
-      <div id="streakDisplay" class="streak">🔥 0-day streak</div>
-      <div id="compass">
-        <svg viewBox="0 0 200 200">
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4a90e2"/>
-          <text x="150" y="50" text-anchor="middle" dominant-baseline="middle">Surviving</text>
-
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#f67280"/>
-          <text x="150" y="150" text-anchor="middle" dominant-baseline="middle">Drifting</text>
-
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#a8e6cf"/>
-          <text x="50" y="150" text-anchor="middle" dominant-baseline="middle">Grounded</text>
-
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#fbc16d"/>
-          <text x="50" y="50" text-anchor="middle" dominant-baseline="middle">Growing</text>
-        </svg>
-      </div>
+    <section id="home">
+      <div id="streakDisplay" class="streak"></div>
+      <svg id="compass" viewBox="0 0 200 200">
+        <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4A90E2"/>
+        <text x="150" y="50" class="wedge-label">Surviving</text>
+        <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#D9534F"/>
+        <text x="150" y="150" class="wedge-label">Drifting</text>
+        <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#5CB85C"/>
+        <text x="50" y="150" class="wedge-label">Grounded</text>
+        <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#F0AD4E"/>
+        <text x="50" y="50" class="wedge-label">Growing</text>
+      </svg>
 
       <div class="mode-buttons">
-        <button class="mode-button blue" onclick="selectMode('Surviving')">🩺 Surviving<br><span class="desc">Barely getting through the day</span></button>
-        <button class="mode-button red" onclick="selectMode('Drifting')">🎯 Drifting<br><span class="desc">Lacking direction or purpose</span></button>
-        <button class="mode-button green" onclick="selectMode('Grounded')">🌿 Grounded<br><span class="desc">Calm and present</span></button>
-        <button class="mode-button yellow" onclick="selectMode('Growing')">🚀 Growing<br><span class="desc">Challenging yourself to improve</span></button>
+        <button class="mode surviving" onclick="selectMode('Surviving')">🩺 Surviving<br><small>Barely getting through the day</small></button>
+        <button class="mode drifting" onclick="selectMode('Drifting')">🎯 Drifting<br><small>Lacking direction or purpose</small></button>
+        <button class="mode grounded" onclick="selectMode('Grounded')">🌿 Grounded<br><small>Calm and present</small></button>
+        <button class="mode growing" onclick="selectMode('Growing')">🚀 Growing<br><small>Challenging yourself to improve</small></button>
       </div>
     </section>
 
-    <!-- Quick Wins Section -->
-    <section id="quickWins" class="app-section">
+    <section id="quickWins" style="display:none;">
       <h2>Quick Wins</h2>
-      <p>Here are simple ideas to get you started.</p>
-      <ul id="quickWinList"></ul>
+      <p>Try one small win right now to shift your energy:</p>
+      <ul>
+        <li>Drink a full glass of water</li>
+        <li>Step outside for 2 minutes</li>
+        <li>Take 5 slow breaths</li>
+        <li>Write one thing you’re grateful for</li>
+      </ul>
     </section>
 
-    <!-- History Section -->
-    <section id="history" class="app-section">
-      <h2>Your Activity History</h2>
-      <div id="historyList"></div>
+    <section id="history" style="display:none;">
+      <h2>History</h2>
+      <ul id="historyList"></ul>
+      <div id="historyStreak" class="streak"></div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="app-section">
-      <h2>About</h2>
-      <p>Created by Marcus Clark — <a href="mailto:support@evolutionofwellness.com">Contact Support</a></p>
+    <section id="about" style="display:none;">
+      <p>Created by Marcus Clark – <a href="mailto:marcus@evolutionofwellness.com">Contact Support</a></p>
     </section>
   </main>
+
+  <script src="app.js?v=10"></script>
 </body>
 </html>
