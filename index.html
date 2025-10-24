@@ -27,14 +27,15 @@
     <header>
       <h1>The Reset Compass</h1>
       <nav>
-        <button onclick="navigate('homeView')">Home</button>
-        <button onclick="navigate('quickWinsView')">Quick Wins</button>
-        <button onclick="navigate('historyView')">History</button>
-        <button onclick="navigate('aboutView')">About</button>
+        <button data-view="Home">Home</button>
+        <button data-view="Quick Wins">Quick Wins</button>
+        <button data-view="History">History</button>
+        <button data-view="About">About</button>
       </nav>
     </header>
 
     <main id="appContent">
+      <!-- Home View -->
       <section id="homeView">
         <div class="compass">
           <div class="wedge red" data-mode="Surviving">Surviving</div>
@@ -43,26 +44,37 @@
           <div class="wedge blue" data-mode="Growing">Growing</div>
         </div>
         <div class="mode-buttons">
-          <button class="mode-button" data-mode="Growing">Growing</button>
-          <button class="mode-button" data-mode="Grounded">Grounded</button>
-          <button class="mode-button" data-mode="Drifting">Drifting</button>
-          <button class="mode-button" data-mode="Surviving">Surviving</button>
+          <button class="mode-btn" data-mode="Growing">Growing</button>
+          <button class="mode-btn" data-mode="Grounded">Grounded</button>
+          <button class="mode-btn" data-mode="Drifting">Drifting</button>
+          <button class="mode-btn" data-mode="Surviving">Surviving</button>
         </div>
       </section>
 
+      <!-- Quick Wins View -->
       <section id="quickWinsView" class="hidden">
         <h2>Quick Wins</h2>
         <p>Fast actions you can take any time.</p>
+        <div id="quickWinsContent"></div>
       </section>
 
+      <!-- History View -->
       <section id="historyView" class="hidden">
         <h2>History</h2>
-        <p>Your past resets will appear here.</p>
+        <p id="streakDisplay">Daily Streak: 0</p>
+        <div id="historyContent"></div>
       </section>
 
+      <!-- About View -->
       <section id="aboutView" class="hidden">
         <h2>About</h2>
         <p>The Reset Compass is your personal reset tool for better wellbeing.</p>
+      </section>
+
+      <!-- Mode View (dynamically filled) -->
+      <section id="modeView" class="hidden">
+        <h2 id="modeTitle" class="mode-title"></h2>
+        <div id="modeActivities"></div>
       </section>
     </main>
   </div>
