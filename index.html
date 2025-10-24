@@ -4,76 +4,73 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=40">
-  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="main.css?v=38" />
+  <script defer src="app.js?v=9"></script>
 </head>
 <body>
   <div id="splashScreen">
-    <img src="splash-icon.png" alt="Splash Icon" class="splash-icon" />
+    <img src="splash-icon.png" alt="Splash Icon" id="splashIcon" />
   </div>
 
   <div id="welcomeModal" class="modal">
     <div class="modal-content">
       <h2>Welcome!</h2>
       <p>Start by choosing your mode for today.</p>
-      <button onclick="closeWelcome()">Let’s Start</button>
+      <button id="startButton">Let’s Start</button>
     </div>
   </div>
 
-  <header>
-    <h1>The Reset Compass</h1>
-    <nav>
-      <button onclick="showSection('home')">Home</button>
-      <button onclick="showSection('quickWins')">Quick Wins</button>
-      <button onclick="showSection('history')">History</button>
-      <button onclick="showSection('about')">About</button>
-    </nav>
-  </header>
+  <div id="appContent" style="display:none;">
+    <header>
+      <h1>The Reset Compass</h1>
+      <nav>
+        <button onclick="showSection('home')">Home</button>
+        <button onclick="showSection('quickWins')">Quick Wins</button>
+        <button onclick="showSection('history')">History</button>
+        <button onclick="showSection('about')">About</button>
+      </nav>
+    </header>
 
-  <main id="appContent">
-    <section id="home">
-      <div id="streakDisplay" class="streak"></div>
-      <svg id="compass" viewBox="0 0 200 200">
-        <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4A90E2"/>
-        <text x="150" y="50" class="wedge-label">Surviving</text>
-        <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#D9534F"/>
-        <text x="150" y="150" class="wedge-label">Drifting</text>
-        <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#5CB85C"/>
-        <text x="50" y="150" class="wedge-label">Grounded</text>
-        <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#F0AD4E"/>
-        <text x="50" y="50" class="wedge-label">Growing</text>
-      </svg>
+    <main>
+      <section id="home" class="section active">
+        <div id="streakDisplay"></div>
 
-      <div class="mode-buttons">
-        <button class="mode surviving" onclick="selectMode('Surviving')">🩺 Surviving<br><small>Barely getting through the day</small></button>
-        <button class="mode drifting" onclick="selectMode('Drifting')">🎯 Drifting<br><small>Lacking direction or purpose</small></button>
-        <button class="mode grounded" onclick="selectMode('Grounded')">🌿 Grounded<br><small>Calm and present</small></button>
-        <button class="mode growing" onclick="selectMode('Growing')">🚀 Growing<br><small>Challenging yourself to improve</small></button>
-      </div>
-    </section>
+        <svg viewBox="0 0 200 200" class="compass">
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4285F4" data-mode="Surviving"></path>
+          <text x="150" y="50" class="compass-label">Surviving</text>
 
-    <section id="quickWins" style="display:none;">
-      <h2>Quick Wins</h2>
-      <p>Try one small win right now to shift your energy:</p>
-      <ul>
-        <li>Drink a full glass of water</li>
-        <li>Step outside for 2 minutes</li>
-        <li>Take 5 slow breaths</li>
-        <li>Write one thing you’re grateful for</li>
-      </ul>
-    </section>
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#EA4335" data-mode="Drifting"></path>
+          <text x="150" y="150" class="compass-label">Drifting</text>
 
-    <section id="history" style="display:none;">
-      <h2>History</h2>
-      <ul id="historyList"></ul>
-      <div id="historyStreak" class="streak"></div>
-    </section>
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#34A853" data-mode="Grounded"></path>
+          <text x="35" y="150" class="compass-label">Grounded</text>
 
-    <section id="about" style="display:none;">
-      <p>Created by Marcus Clark – <a href="mailto:marcus@evolutionofwellness.com">Contact Support</a></p>
-    </section>
-  </main>
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FBBC05" data-mode="Growing"></path>
+          <text x="35" y="50" class="compass-label">Growing</text>
+        </svg>
 
-  <script src="app.js?v=10"></script>
+        <div class="mode-buttons">
+          <button class="mode-btn surviving" onclick="selectMode('Surviving')">🩺 Surviving<br><small>Barely getting through the day</small></button>
+          <button class="mode-btn drifting" onclick="selectMode('Drifting')">🎯 Drifting<br><small>Lacking direction or purpose</small></button>
+          <button class="mode-btn grounded" onclick="selectMode('Grounded')">🌿 Grounded<br><small>Calm and present</small></button>
+          <button class="mode-btn growing" onclick="selectMode('Growing')">🚀 Growing<br><small>Challenging yourself to improve</small></button>
+        </div>
+      </section>
+
+      <section id="quickWins" class="section">
+        <h2>Quick Wins</h2>
+        <div id="quickWinList"></div>
+      </section>
+
+      <section id="history" class="section">
+        <h2>Activity History</h2>
+        <div id="historyLog"></div>
+      </section>
+
+      <section id="about" class="section">
+        <p>Created by Marcus Clark — <a href="mailto:evolutionofwellness8@gmail.com">Contact Support</a></p>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
