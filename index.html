@@ -4,14 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=45" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <script src="app.js?v=16" defer></script>
+  <link rel="stylesheet" href="main.css?v=40" />
 </head>
 <body>
   <!-- Splash Screen -->
   <div id="splashScreen">
-    <img src="splash-icon.png" alt="Splash Icon" id="splashIcon" />
+    <img id="splashIcon" src="splash-icon.png" alt="App Icon" />
   </div>
 
   <!-- Welcome Modal -->
@@ -28,38 +26,36 @@
     <header>
       <h1>The Reset Compass</h1>
       <nav>
-        <button onclick="navigate('homeView')">Home</button>
-        <button onclick="navigate('quickWinsView')">Quick Wins</button>
-        <button onclick="navigate('historyView')">History</button>
-        <button onclick="navigate('aboutView')">About</button>
+        <button data-view="homeView">Home</button>
+        <button data-view="quickWinsView">Quick Wins</button>
+        <button data-view="historyView">History</button>
+        <button data-view="aboutView">About</button>
       </nav>
     </header>
 
-    <main id="mainContent">
+    <main>
+      <div id="streakDisplay"></div>
+
       <!-- Home View -->
       <section id="homeView">
-        <h2 id="streakDisplay">Daily Streak: 0</h2>
         <div class="compass-container">
           <svg id="compass" viewBox="0 0 200 200">
-            <path class="wedge" d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0074D9" data-mode="Growing"/>
-            <text x="150" y="40" text-anchor="middle" fill="white" font-size="12">Growing</text>
-
-            <path class="wedge" d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2ECC40" data-mode="Grounded"/>
-            <text x="160" y="160" text-anchor="middle" fill="white" font-size="12">Grounded</text>
-
-            <path class="wedge" d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFDC00" data-mode="Drifting"/>
-            <text x="50" y="170" text-anchor="middle" fill="white" font-size="12">Drifting</text>
-
-            <path class="wedge" d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FF4136" data-mode="Surviving"/>
-            <text x="40" y="50" text-anchor="middle" fill="white" font-size="12">Surviving</text>
+            <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="var(--mode-growing)" class="wedge" data-mode="Growing"/>
+            <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="var(--mode-grounded)" class="wedge" data-mode="Grounded"/>
+            <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="var(--mode-drifting)" class="wedge" data-mode="Drifting"/>
+            <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="var(--mode-surviving)" class="wedge" data-mode="Surviving"/>
+            <text x="140" y="60" text-anchor="middle" alignment-baseline="middle" font-size="10" fill="white">Growing</text>
+            <text x="140" y="140" text-anchor="middle" alignment-baseline="middle" font-size="10" fill="white">Grounded</text>
+            <text x="60" y="140" text-anchor="middle" alignment-baseline="middle" font-size="10" fill="white">Drifting</text>
+            <text x="60" y="60" text-anchor="middle" alignment-baseline="middle" font-size="10" fill="white">Surviving</text>
           </svg>
         </div>
 
         <div class="mode-buttons">
-          <button class="mode-btn" data-mode="Growing">Growing – Strive, Learn, Help</button>
-          <button class="mode-btn" data-mode="Grounded">Grounded – Rest, Nourish, Reset</button>
-          <button class="mode-btn" data-mode="Drifting">Drifting – Reflect, Refocus, Stabilize</button>
-          <button class="mode-btn" data-mode="Surviving">Surviving – Cope, Breathe, Reach Out</button>
+          <button class="mode-btn" data-mode="Growing" style="background-color: var(--mode-growing); color: white;">Growing – Strive, Learn, Help</button>
+          <button class="mode-btn" data-mode="Grounded" style="background-color: var(--mode-grounded); color: white;">Grounded – Nourish, Breathe, Reflect</button>
+          <button class="mode-btn" data-mode="Drifting" style="background-color: var(--mode-drifting);">Drifting – Pause, Reset, Reconnect</button>
+          <button class="mode-btn" data-mode="Surviving" style="background-color: var(--mode-surviving); color: white;">Surviving – Breathe, Hydrate, Reach Out</button>
         </div>
       </section>
 
@@ -71,25 +67,29 @@
 
       <!-- Quick Wins View -->
       <section id="quickWinsView" class="hidden">
-        <h2>Quick Wins</h2>
-        <p>Try one of these quick resets:</p>
-        <div class="mode-activity"><strong>Stand up and stretch for 1 minute</strong><br/><input type="text" placeholder="Did this?" /></div>
-        <div class="mode-activity"><strong>Drink a full glass of water</strong><br/><input type="text" placeholder="Did this?" /></div>
-        <div class="mode-activity"><strong>Take 3 deep breaths</strong><br/><input type="text" placeholder="Did this?" /></div>
+        <h2 class="mode-title">Quick Wins</h2>
+        <div id="quickWinsList">
+          <div class="mode-activity"><strong>Take 3 deep breaths</strong><br><input type="text" placeholder="What did you notice?" /></div>
+          <div class="mode-activity"><strong>Drink water</strong><br><input type="text" placeholder="How did you feel after?" /></div>
+          <div class="mode-activity"><strong>Stand up and stretch</strong><br><input type="text" placeholder="How did your body respond?" /></div>
+        </div>
       </section>
 
       <!-- History View -->
       <section id="historyView" class="hidden">
-        <h2>Your History</h2>
+        <h2 class="mode-title">Your Activity History</h2>
         <div id="historyContent"></div>
       </section>
 
       <!-- About View -->
       <section id="aboutView" class="hidden">
-        <h2>About The Reset Compass</h2>
-        <p>This tool was designed by Marcus Clark to make wellness easier, faster, and more aligned with how you actually feel. No tracking. No pressure. Just small resets that work.</p>
+        <h2 class="mode-title">About This App</h2>
+        <p>This tool was created to help you reset your day in just a few minutes, no matter what state you're in. Use it regularly to build healthy habits and stay aligned with what matters most.</p>
+        <p>Created by <a href="https://evolutionofwellness.com" target="_blank">Evolution of Wellness</a>.</p>
       </section>
     </main>
   </div>
+
+  <script src="app.js?v=10"></script>
 </body>
 </html>
