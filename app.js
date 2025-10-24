@@ -1,65 +1,90 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Splash Screen
   const splash = document.getElementById("splashScreen");
+  setTimeout(() => splash.style.display = "none", 3000);
+
+  // Welcome Modal - one time only
   const welcomeModal = document.getElementById("welcomeModal");
-  const appWrapper = document.getElementById("app");
-  const startButton = document.getElementById("startApp");
+  const appContent = document.getElementById("app");
 
-  setTimeout(() => {
-    splash.style.display = "none";
-    if (!localStorage.getItem("welcomeSeen")) {
-      welcomeModal.classList.remove("hidden");
-    } else {
-      appWrapper.classList.remove("hidden");
-    }
-  }, 2500);
+  if (!localStorage.getItem("welcomeSeen")) {
+    welcomeModal.classList.remove("hidden");
+    appContent.classList.add("hidden");
 
-  startButton.addEventListener("click", () => {
-    welcomeModal.classList.add("hidden");
-    appWrapper.classList.remove("hidden");
-    localStorage.setItem("welcomeSeen", "true");
-  });
-
-  // Navigation logic
-  window.navigate = function(viewId) {
-    ["homeView", "quickWinsView", "historyView", "aboutView", "modeView"].forEach(id => {
-      document.getElementById(id).classList.add("hidden");
+    document.getElementById("startApp").addEventListener("click", () => {
+      welcomeModal.classList.add("hidden");
+      appContent.classList.remove("hidden");
+      localStorage.setItem("welcomeSeen", true);
     });
-    document.getElementById(viewId).classList.remove("hidden");
+  } else {
+    welcomeModal.classList.add("hidden");
+    appContent.classList.remove("hidden");
+  }
+
+  // Navigation handling
+  const sections = ["homeView", "quickView", "historyView", "aboutView", "modeView"];
+  const navButtons = {
+    "Home": "homeView",
+    "Quick Wins": "quickView",
+    "History": "historyView",
+    "About": "aboutView"
   };
 
-  document.querySelectorAll("nav button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const view = btn.getAttribute("data-view");
-      if (view) navigate(view);
+  Object.keys(navButtons).forEach(label => {
+    document.querySelector(`button[data-view="${label}"]`).addEventListener("click", () => {
+      showView(navButtons[label]);
     });
   });
 
-  // Mode click handlers
-  document.querySelectorAll(".wedge, .mode-btn").forEach(el => {
-    el.addEventListener("click", () => {
-      const mode = el.getAttribute("data-mode");
-      if (mode) loadMode(mode);
+  function showView(id) {
+    sections.forEach(view => {
+      document.getElementById(view).classList.add("hidden");
+    });
+    document.getElementById(id).classList.remove("hidden");
+  }
+
+  // Compass click + mode button click
+  document.querySelectorAll(".wedge").forEach(w => {
+    w.addEventListener("click", () => {
+      const mode = w.getAttribute("data-mode");
+      loadMode(mode);
+    });
+  });
+
+  document.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const mode = btn.getAttribute("data-mode");
+      loadMode(mode);
     });
   });
 
   function loadMode(mode) {
-    const config = modeData[mode];
-    document.getElementById("modeTitle").innerText = `${config.name} Mode`;
+    const view = document.getElementById("modeView");
+    const title = document.getElementById("modeTitle");
     const list = document.getElementById("modeActivities");
+    const config = modeData[mode];
+
+    title.innerText = `${config.name} Mode`;
     list.innerHTML = "";
 
-    config.activities.forEach(activity => {
-      const div = document.createElement("div");
-      div.className = "mode-activity";
-      div.innerHTML = `<strong>${activity}</strong><br><input type="text" placeholder="What did you do?" data-mode="${mode}" data-activity="${activity}">`;
-      list.appendChild(div);
+    config.activities.forEach((activity) => {
+      const box = document.createElement("div");
+      box.className = "mode-activity";
+      box.innerHTML = `
+        <strong>${activity}</strong><br/>
+        <input type="text" placeholder="What did you do?" 
+          data-mode="${mode}" 
+          data-activity="${activity}" 
+          onblur="saveActivityLog('${mode}', '${activity}', this.value)" />
+      `;
+      list.appendChild(box);
     });
 
-    saveLog(mode);
-    navigate("modeView");
+    showView("modeView");
+    saveDailyModeLog(mode);
   }
 
-  function saveLog(mode) {
+  function saveDailyModeLog(mode) {
     const today = new Date().toISOString().split("T")[0];
     const logs = JSON.parse(localStorage.getItem("logs") || "{}");
     if (!logs[today]) logs[today] = [];
@@ -69,9 +94,23 @@ document.addEventListener("DOMContentLoaded", () => {
     renderHistory();
   }
 
+  function saveActivityLog(mode, activity, inputValue) {
+    if (!inputValue.trim()) return;
+    const history = JSON.parse(localStorage.getItem("activityHistory") || "[]");
+    history.unshift({
+      date: new Date().toISOString(),
+      mode,
+      activity,
+      entry: inputValue.trim()
+    });
+    localStorage.setItem("activityHistory", JSON.stringify(history));
+    renderHistory();
+  }
+
   function updateStreak() {
     const logs = JSON.parse(localStorage.getItem("logs") || "{}");
     const days = Object.keys(logs).sort().reverse();
+
     let streak = 0;
     let today = new Date();
     for (let day of days) {
@@ -83,15 +122,16 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
       }
     }
+
     document.getElementById("streakDisplay").innerText = `Daily Streak: ${streak}`;
   }
 
   function renderHistory() {
     const container = document.getElementById("historyContent");
     const logs = JSON.parse(localStorage.getItem("logs") || "{}");
-    container.innerHTML = "";
-
     const entries = Object.entries(logs).sort((a, b) => b[0].localeCompare(a[0]));
+
+    container.innerHTML = "";
 
     entries.forEach(([date, modes]) => {
       const div = document.createElement("div");
@@ -99,14 +139,33 @@ document.addEventListener("DOMContentLoaded", () => {
       div.innerHTML = `<strong>${date}</strong><br/>${modes.join(", ")}`;
       container.appendChild(div);
     });
+
+    const activityHistory = JSON.parse(localStorage.getItem("activityHistory") || "[]");
+    if (activityHistory.length) {
+      const divider = document.createElement("hr");
+      container.appendChild(divider);
+
+      activityHistory.slice(0, 10).forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "mode-activity";
+        const date = new Date(entry.date).toLocaleString();
+        div.innerHTML = `
+          <strong>${entry.activity}</strong><br/>
+          <em>${entry.mode}</em> — ${entry.entry}<br/>
+          <small>${date}</small>
+        `;
+        container.appendChild(div);
+      });
+    }
   }
 
   updateStreak();
   renderHistory();
 });
 
+// Mode definitions
 const modeData = {
-  Growing: {
+  "Growing": {
     name: "Growing",
     activities: [
       "Learn something new",
@@ -114,7 +173,7 @@ const modeData = {
       "Help someone today"
     ]
   },
-  Grounded: {
+  "Grounded": {
     name: "Grounded",
     activities: [
       "Eat a nourishing meal",
@@ -122,7 +181,7 @@ const modeData = {
       "Reflect in a journal"
     ]
   },
-  Drifting: {
+  "Drifting": {
     name: "Drifting",
     activities: [
       "Pause for 5 minutes",
@@ -130,7 +189,7 @@ const modeData = {
       "Reconnect with priorities"
     ]
   },
-  Surviving: {
+  "Surviving": {
     name: "Surviving",
     activities: [
       "Take 5 deep breaths",
