@@ -1,54 +1,35 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Splash
   const splash = document.getElementById("splashScreen");
-  setTimeout(() => splash.style.display = "none", 3000);
+  setTimeout(() => splash.style.display = "none", 2000);
 
-  // Welcome Modal
   const welcomeModal = document.getElementById("welcomeModal");
+  const appWrapper = document.getElementById("app");
+
   if (!localStorage.getItem("welcomeSeen")) {
     welcomeModal.classList.remove("hidden");
-  document.getElementById("startApp").addEventListener("click", () => {
-  welcomeModal.classList.add("hidden");
-  localStorage.setItem("welcomeSeen", true);
-  document.getElementById("app").classList.remove("hidden");
-});
-document.getElementById("app").classList.remove("hidden");
-
-  // Navigation
-  const sections = ["homeView", "quickView", "historyView", "aboutView"];
-  const navButtons = {
-    "Home": "homeView",
-    "Quick Wins": "quickView",
-    "History": "historyView",
-    "About": "aboutView"
-  };
-
-  Object.keys(navButtons).forEach(label => {
-    document.querySelector(`button[data-view="${label}"]`).addEventListener("click", () => {
-      showView(navButtons[label]);
-    });
-  });
-
-  function showView(id) {
-    sections.forEach(view => {
-      document.getElementById(view).classList.add("hidden");
-    });
-    document.getElementById(id).classList.remove("hidden");
+  } else {
+    appWrapper.classList.remove("hidden");
   }
 
-  // Compass click handling
-  document.querySelectorAll(".wedge").forEach(w => {
-    w.addEventListener("click", () => {
-      const mode = w.getAttribute("data-mode");
-      loadMode(mode);
-    });
+  document.getElementById("startApp").addEventListener("click", () => {
+    welcomeModal.classList.add("hidden");
+    localStorage.setItem("welcomeSeen", true);
+    appWrapper.classList.remove("hidden");
   });
 
-  // Mode button handling
-  document.querySelectorAll(".mode-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const mode = btn.getAttribute("data-mode");
-      loadMode(mode);
+  // Navigation
+  window.navigate = function(viewId) {
+    ["homeView", "quickWinsView", "historyView", "aboutView", "modeView"].forEach(id => {
+      document.getElementById(id).classList.add("hidden");
+    });
+    document.getElementById(viewId).classList.remove("hidden");
+  };
+
+  // Wedge + Button click handlers
+  document.querySelectorAll(".wedge, .mode-btn").forEach(el => {
+    el.addEventListener("click", () => {
+      const mode = el.getAttribute("data-mode");
+      if (mode) loadMode(mode);
     });
   });
 
@@ -61,24 +42,22 @@ document.getElementById("app").classList.remove("hidden");
     title.innerText = `${config.name} Mode`;
     list.innerHTML = "";
 
-    config.activities.forEach((activity, i) => {
+    config.activities.forEach(activity => {
       const box = document.createElement("div");
       box.className = "mode-activity";
       box.innerHTML = `<strong>${activity}</strong><br/><input type="text" placeholder="What did you do?" data-mode="${mode}" data-activity="${activity}" />`;
       list.appendChild(box);
     });
 
-    showView("modeView");
+    navigate("modeView");
     saveLog(mode);
   }
 
   function saveLog(mode) {
     const today = new Date().toISOString().split("T")[0];
     const logs = JSON.parse(localStorage.getItem("logs") || "{}");
-
     if (!logs[today]) logs[today] = [];
     if (!logs[today].includes(mode)) logs[today].push(mode);
-
     localStorage.setItem("logs", JSON.stringify(logs));
     updateStreak();
     renderHistory();
@@ -87,7 +66,6 @@ document.getElementById("app").classList.remove("hidden");
   function updateStreak() {
     const logs = JSON.parse(localStorage.getItem("logs") || "{}");
     const days = Object.keys(logs).sort().reverse();
-
     let streak = 0;
     let today = new Date();
     for (let day of days) {
@@ -99,7 +77,6 @@ document.getElementById("app").classList.remove("hidden");
         break;
       }
     }
-
     document.getElementById("streakDisplay").innerText = `Daily Streak: ${streak}`;
   }
 
@@ -107,9 +84,7 @@ document.getElementById("app").classList.remove("hidden");
     const container = document.getElementById("historyContent");
     const logs = JSON.parse(localStorage.getItem("logs") || "{}");
     container.innerHTML = "";
-
     const entries = Object.entries(logs).sort((a, b) => b[0].localeCompare(a[0]));
-
     entries.forEach(([date, modes]) => {
       const div = document.createElement("div");
       div.className = "mode-activity";
@@ -122,7 +97,6 @@ document.getElementById("app").classList.remove("hidden");
   renderHistory();
 });
 
-// Mode definitions
 const modeData = {
   "Growing": {
     name: "Growing",
