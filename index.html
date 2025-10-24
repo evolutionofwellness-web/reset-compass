@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=41" />
-  <script defer src="app.js?v=10"></script>
+  <link rel="stylesheet" href="main.css?v=42" />
+  <script defer src="app.js?v=11"></script>
 </head>
 <body>
   <!-- Splash Screen -->
@@ -27,10 +27,10 @@
     <header>
       <h1>The Reset Compass</h1>
       <nav>
-        <button data-view="Home">Home</button>
-        <button data-view="Quick Wins">Quick Wins</button>
-        <button data-view="History">History</button>
-        <button data-view="About">About</button>
+        <button onclick="navigate('homeView')">Home</button>
+        <button onclick="navigate('quickWinsView')">Quick Wins</button>
+        <button onclick="navigate('historyView')">History</button>
+        <button onclick="navigate('aboutView')">About</button>
       </nav>
     </header>
 
@@ -38,43 +38,43 @@
       <!-- Home View -->
       <section id="homeView">
         <div class="compass">
-          <div class="wedge red" data-mode="Surviving">Surviving</div>
-          <div class="wedge yellow" data-mode="Drifting">Drifting</div>
-          <div class="wedge green" data-mode="Grounded">Grounded</div>
-          <div class="wedge blue" data-mode="Growing">Growing</div>
+          <svg viewBox="0 0 200 200" class="compass-svg">
+            <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="red" data-mode="Surviving"></path>
+            <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="yellow" data-mode="Drifting"></path>
+            <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="green" data-mode="Grounded"></path>
+            <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="blue" data-mode="Growing"></path>
+            <text x="150" y="40" class="wedge-label">Surviving</text>
+            <text x="150" y="160" class="wedge-label">Drifting</text>
+            <text x="40" y="160" class="wedge-label">Grounded</text>
+            <text x="40" y="40" class="wedge-label">Growing</text>
+          </svg>
         </div>
         <div class="mode-buttons">
-          <button class="mode-btn" data-mode="Growing">Growing</button>
-          <button class="mode-btn" data-mode="Grounded">Grounded</button>
-          <button class="mode-btn" data-mode="Drifting">Drifting</button>
-          <button class="mode-btn" data-mode="Surviving">Surviving</button>
+          <button class="mode-button" data-mode="Growing">Growing</button>
+          <button class="mode-button" data-mode="Grounded">Grounded</button>
+          <button class="mode-button" data-mode="Drifting">Drifting</button>
+          <button class="mode-button" data-mode="Surviving">Surviving</button>
         </div>
       </section>
 
       <!-- Quick Wins View -->
       <section id="quickWinsView" class="hidden">
         <h2>Quick Wins</h2>
-        <p>Fast actions you can take any time.</p>
-        <div id="quickWinsContent"></div>
+        <div id="quickWinsContainer"></div>
       </section>
 
       <!-- History View -->
       <section id="historyView" class="hidden">
         <h2>History</h2>
-        <p id="streakDisplay">Daily Streak: 0</p>
-        <div id="historyContent"></div>
+        <p>Daily Streak: <span id="dailyStreak">0</span> 🔥</p>
+        <div id="modeBreakdown"></div>
+        <div id="historyContainer"></div>
       </section>
 
       <!-- About View -->
       <section id="aboutView" class="hidden">
         <h2>About</h2>
-        <p>The Reset Compass is your personal reset tool for better wellbeing.</p>
-      </section>
-
-      <!-- Mode View (dynamically filled) -->
-      <section id="modeView" class="hidden">
-        <h2 id="modeTitle" class="mode-title"></h2>
-        <div id="modeActivities"></div>
+        <p>The Reset Compass is your personal reset tool for better wellbeing. Created by Marcus Clark to help you navigate your energy, attention, and habits with ease.</p>
       </section>
     </main>
   </div>
