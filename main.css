@@ -1,219 +1,195 @@
-:root {
-  --brand-green: #0B3D2E;
-  --mode-red: #FF3B30;
-  --mode-yellow: #FFCC00;
-  --mode-green: #34C759;
-  --mode-blue: #007AFF;
-  --text-dark: #111;
-  --text-light: #fff;
-}
-
-* {
-  box-sizing: border-box;
+/* Core Styling */
+body {
+  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-}
-
-body {
-  font-family: system-ui, sans-serif;
-  background: white;
-  color: var(--text-dark);
-}
-
-h1, h2 {
-  text-align: center;
-  margin-bottom: 1rem;
+  background: #fff;
+  color: #000;
 }
 
 header {
-  background-color: var(--brand-green);
+  background-color: #004d3c;
   color: white;
-  padding: 1rem 0;
+  padding: 1rem;
   text-align: center;
 }
 
+header h1 {
+  margin: 0 0 1rem;
+}
+
 nav {
-  margin-top: 1rem;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 10px;
 }
 
 nav button {
-  background: transparent;
+  background-color: #003b2e;
   color: white;
-  border: 2px solid white;
-  padding: 0.5rem 1rem;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1rem;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
-}
-
-nav button:hover {
-  background: white;
-  color: var(--brand-green);
 }
 
 main {
-  padding: 1.5rem;
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal-content button {
+  margin-top: 1rem;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #004d3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 /* Splash */
 #splashScreen {
   position: fixed;
-  z-index: 1000;
-  background: var(--brand-green);
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  background: #fff;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  z-index: 2000;
 }
 
 .splash-icon {
-  width: 100px;
-  height: 100px;
-  animation: splashAnim 1.2s ease-in-out forwards;
+  width: 120px;
+  height: 120px;
+  animation: splashZoom 2s ease forwards;
 }
 
-@keyframes splashAnim {
+@keyframes splashZoom {
   0% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
+    transform: scale(0.5) rotate(0deg);
+    opacity: 0;
   }
   50% {
-    transform: scale(2) rotate(180deg);
+    transform: scale(1.2) rotate(180deg);
     opacity: 1;
   }
   100% {
-    transform: scale(0.1) rotate(360deg);
+    transform: scale(1) rotate(360deg);
     opacity: 0;
   }
 }
 
-/* Welcome Modal */
-.modal {
-  position: fixed;
-  z-index: 1001;
-  background: white;
-  color: var(--text-dark);
-  width: 90%;
-  max-width: 400px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  padding: 2rem;
-  text-align: center;
-}
-
-.modal-content h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.modal-content p {
-  margin-bottom: 1.5rem;
-  line-height: 1.4;
-}
-
-.modal-content button {
-  background: var(--brand-green);
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.hidden {
-  display: none;
-}
-
 /* Compass */
 .compass {
-  display: flex;
-  justify-content: center;
-  margin: 2rem 0;
-}
-
-.compass-svg {
-  width: 250px;
-  height: 250px;
-  cursor: pointer;
-}
-
-.wedge-label {
-  font-size: 12px;
-  fill: white;
-  text-anchor: middle;
-  pointer-events: none;
-}
-
-/* Mode Buttons */
-.mode-buttons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.mode-button {
-  padding: 1.25rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 12px;
-  color: white;
-  cursor: pointer;
-}
-
-.mode-button[data-mode="Surviving"] {
-  background-color: var(--mode-red);
-}
-.mode-button[data-mode="Drifting"] {
-  background-color: var(--mode-yellow);
-  color: black;
-}
-.mode-button[data-mode="Grounded"] {
-  background-color: var(--mode-green);
-}
-.mode-button[data-mode="Growing"] {
-  background-color: var(--mode-blue);
-}
-
-/* Section Styling */
-section {
+  gap: 15px;
   margin-top: 2rem;
 }
 
-#historyContainer {
+.wedge {
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.wedge span {
+  pointer-events: none;
+}
+
+.red { background-color: #ff3b30; }
+.yellow { background-color: #ffcc00; color: #333; }
+.green { background-color: #34c759; }
+.blue { background-color: #007aff; }
+
+/* Mode Buttons */
+.mode-buttons {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.mode-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.mode-button[data-mode="Growing"] {
+  background-color: #007aff; color: white;
+}
+.mode-button[data-mode="Grounded"] {
+  background-color: #34c759; color: white;
+}
+.mode-button[data-mode="Drifting"] {
+  background-color: #ffcc00; color: #333;
+}
+.mode-button[data-mode="Surviving"] {
+  background-color: #ff3b30; color: white;
+}
+
+/* Streak Display */
+.streak-display {
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
   margin-top: 1rem;
 }
 
-#modeBreakdown {
-  margin: 1rem 0;
+/* History View */
+#historyContainer {
+  margin-top: 20px;
 }
 
-/* Responsive Fixes */
-@media (max-width: 500px) {
-  .mode-buttons {
-    grid-template-columns: 1fr;
-  }
+.mode-breakdown {
+  margin-top: 20px;
+  font-size: 1rem;
+  font-weight: bold;
+}
 
-  .compass-svg {
-    width: 200px;
-    height: 200px;
-  }
-
-  nav {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+/* Hidden Class */
+.hidden {
+  display: none;
 }
