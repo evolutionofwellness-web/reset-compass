@@ -1,54 +1,182 @@
-/* Core Styling */
+:root {
+  --surviving-color: #ff3b30;
+  --drifting-color: #ffcc00;
+  --grounded-color: #34c759;
+  --growing-color: #007aff;
+  --dark-green: #083d2b;
+  --light-gray: #f5f5f5;
+  --text-color: #333;
+}
+
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
-  background: #fff;
-  color: #000;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #ffffff;
+  color: var(--text-color);
 }
 
 header {
-  background-color: #004d3c;
+  background-color: var(--dark-green);
   color: white;
-  padding: 1rem;
   text-align: center;
+  padding: 20px;
 }
 
 header h1 {
-  margin: 0 0 1rem;
+  margin: 0;
+  font-size: 2.2em;
 }
 
 nav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
+  margin-top: 10px;
 }
 
 nav button {
-  background-color: #003b2e;
-  color: white;
+  margin: 5px;
+  padding: 10px 16px;
   border: none;
-  padding: 10px 15px;
-  font-size: 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1em;
   border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+nav button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 main {
   padding: 20px;
-  max-width: 900px;
-  margin: 0 auto;
 }
 
-/* Modal */
+#appContent section {
+  display: none;
+}
+
+#appContent section:not(.hidden) {
+  display: block;
+}
+
+.compass {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 30px auto 20px;
+  max-width: 400px;
+}
+
+.wedge {
+  flex: 0 0 50%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1em;
+  border-radius: 16px;
+  margin: 8px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.red    { background-color: var(--surviving-color); }
+.yellow { background-color: var(--drifting-color); color: #333; }
+.green  { background-color: var(--grounded-color); }
+.blue   { background-color: var(--growing-color); }
+
+.mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.mode-button {
+  padding: 12px 18px;
+  font-size: 1em;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.mode-button[data-mode="Surviving"] { background-color: var(--surviving-color); }
+.mode-button[data-mode="Drifting"]  { background-color: var(--drifting-color); color: #333; }
+.mode-button[data-mode="Grounded"]  { background-color: var(--grounded-color); }
+.mode-button[data-mode="Growing"]   { background-color: var(--growing-color); }
+
+.mode-button:hover {
+  transform: scale(1.05);
+}
+
+#modeTitle {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 1.8em;
+}
+
+#modeActivities {
+  margin-top: 20px;
+}
+
+.activity {
+  background-color: #f8f8f8;
+  border-left: 6px solid #ccc;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+.activity textarea {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95em;
+  resize: vertical;
+}
+
+.streak-banner {
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-top: 10px;
+  color: var(--dark-green);
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#modeBreakdown {
+  font-size: 0.9em;
+  color: #555;
+  margin-top: 5px;
+}
+
+#quickWinsContainer .activity {
+  border-left: 6px solid var(--dark-green);
+}
+
+#historyLog {
+  margin-top: 20px;
+}
+
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -57,49 +185,45 @@ main {
 
 .modal-content {
   background: white;
-  padding: 2rem;
+  padding: 30px;
   border-radius: 12px;
   max-width: 400px;
   text-align: center;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
 }
 
-.modal-content button {
-  margin-top: 1rem;
-  padding: 10px 20px;
-  font-size: 1rem;
-  background-color: #004d3c;
-  color: white;
-  border: none;
-  border-radius: 8px;
+.hidden {
+  display: none;
+}
+
+button {
   cursor: pointer;
 }
 
-/* Splash */
 #splashScreen {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   width: 100%;
   height: 100%;
-  background: #fff;
+  background-color: white;
+  z-index: 2000;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000;
 }
 
 .splash-icon {
   width: 120px;
   height: 120px;
-  animation: splashZoom 2s ease forwards;
+  animation: splashZoomSpinFade 1.2s ease-in-out forwards;
 }
 
-@keyframes splashZoom {
+@keyframes splashZoomSpinFade {
   0% {
-    transform: scale(0.5) rotate(0deg);
-    opacity: 0;
+    transform: scale(0.6) rotate(0deg);
+    opacity: 1;
   }
-  50% {
+  60% {
     transform: scale(1.2) rotate(180deg);
     opacity: 1;
   }
@@ -107,89 +231,4 @@ main {
     transform: scale(1) rotate(360deg);
     opacity: 0;
   }
-}
-
-/* Compass */
-.compass {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  margin-top: 2rem;
-}
-
-.wedge {
-  height: 120px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-weight: bold;
-  font-size: 1.2rem;
-  border-radius: 16px;
-  cursor: pointer;
-  text-align: center;
-}
-
-.wedge span {
-  pointer-events: none;
-}
-
-.red { background-color: #ff3b30; }
-.yellow { background-color: #ffcc00; color: #333; }
-.green { background-color: #34c759; }
-.blue { background-color: #007aff; }
-
-/* Mode Buttons */
-.mode-buttons {
-  margin-top: 2rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
-
-.mode-button {
-  padding: 10px 20px;
-  font-size: 1rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.mode-button[data-mode="Growing"] {
-  background-color: #007aff; color: white;
-}
-.mode-button[data-mode="Grounded"] {
-  background-color: #34c759; color: white;
-}
-.mode-button[data-mode="Drifting"] {
-  background-color: #ffcc00; color: #333;
-}
-.mode-button[data-mode="Surviving"] {
-  background-color: #ff3b30; color: white;
-}
-
-/* Streak Display */
-.streak-display {
-  font-size: 1.4rem;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 1rem;
-}
-
-/* History View */
-#historyContainer {
-  margin-top: 20px;
-}
-
-.mode-breakdown {
-  margin-top: 20px;
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-/* Hidden Class */
-.hidden {
-  display: none;
 }
