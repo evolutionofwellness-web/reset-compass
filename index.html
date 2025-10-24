@@ -1,87 +1,82 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=50" />
-  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="main.css?v=40">
+  <link rel="manifest" href="manifest.webmanifest">
+  <script defer src="app.js?v=40"></script>
 </head>
 <body>
   <div id="splashScreen">
     <img src="splash-icon.png" alt="Splash Icon" id="splashIcon" />
   </div>
 
-  <div id="welcomeModal" class="modal hidden">
+  <div id="welcomePopup" class="modal">
     <div class="modal-content">
       <h2>Welcome!</h2>
       <p>Start by choosing your mode for today.</p>
-      <button onclick="startApp()">Let’s Start</button>
+      <button id="startBtn">Let's Start</button>
     </div>
   </div>
 
-  <div id="appContent" class="hidden">
-    <header>
-      <h1>The Reset Compass</h1>
-      <nav>
-        <button onclick="showHome()">Home</button>
-        <button onclick="showQuickWins()">Quick Wins</button>
-        <button onclick="showHistory()">History</button>
-        <button onclick="showAbout()">About</button>
-      </nav>
-    </header>
+  <header>
+    <h1>The Reset Compass</h1>
+    <nav>
+      <button onclick="showSection('home')">Home</button>
+      <button onclick="showSection('quickWins')">Quick Wins</button>
+      <button onclick="showSection('history')">History</button>
+      <button onclick="showSection('about')">About</button>
+    </nav>
+  </header>
 
-    <main id="mainContent">
-      <section id="homeSection" class="visible">
-        <svg id="compass" viewBox="0 0 200 200">
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4A90E2" data-mode="Surviving"/>
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#D96F6F" data-mode="Drifting"/>
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#AEDF8F" data-mode="Grounded"/>
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#F5C16C" data-mode="Growing"/>
+  <main id="appContent">
+    <!-- Home Section -->
+    <section id="home" class="app-section active">
+      <div id="streakDisplay" class="streak">🔥 0-day streak</div>
+      <div id="compass">
+        <svg viewBox="0 0 200 200">
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4a90e2"/>
+          <text x="150" y="50" text-anchor="middle" dominant-baseline="middle">Surviving</text>
 
-          <text x="150" y="60" class="wedge-label">Surviving</text>
-          <text x="140" y="150" class="wedge-label">Drifting</text>
-          <text x="50" y="150" class="wedge-label">Grounded</text>
-          <text x="40" y="60" class="wedge-label">Growing</text>
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#f67280"/>
+          <text x="150" y="150" text-anchor="middle" dominant-baseline="middle">Drifting</text>
+
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#a8e6cf"/>
+          <text x="50" y="150" text-anchor="middle" dominant-baseline="middle">Grounded</text>
+
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#fbc16d"/>
+          <text x="50" y="50" text-anchor="middle" dominant-baseline="middle">Growing</text>
         </svg>
+      </div>
 
-        <div id="modeButtons">
-          <button onclick="selectMode('Surviving')" style="background-color:#4A90E2;">
-            🩺 Surviving<br/><span class="desc">Barely getting through the day</span>
-          </button>
-          <button onclick="selectMode('Drifting')" style="background-color:#D96F6F;">
-            🧭 Drifting<br/><span class="desc">Lacking direction or purpose</span>
-          </button>
-          <button onclick="selectMode('Grounded')" style="background-color:#AEDF8F;">
-            🌿 Grounded<br/><span class="desc">Calm and present</span>
-          </button>
-          <button onclick="selectMode('Growing')" style="background-color:#F5C16C;">
-            🚀 Growing<br/><span class="desc">Challenging yourself to improve</span>
-          </button>
-        </div>
+      <div class="mode-buttons">
+        <button class="mode-button blue" onclick="selectMode('Surviving')">🩺 Surviving<br><span class="desc">Barely getting through the day</span></button>
+        <button class="mode-button red" onclick="selectMode('Drifting')">🎯 Drifting<br><span class="desc">Lacking direction or purpose</span></button>
+        <button class="mode-button green" onclick="selectMode('Grounded')">🌿 Grounded<br><span class="desc">Calm and present</span></button>
+        <button class="mode-button yellow" onclick="selectMode('Growing')">🚀 Growing<br><span class="desc">Challenging yourself to improve</span></button>
+      </div>
+    </section>
 
-        <div id="streakDisplay" class="stats"></div>
-      </section>
+    <!-- Quick Wins Section -->
+    <section id="quickWins" class="app-section">
+      <h2>Quick Wins</h2>
+      <p>Here are simple ideas to get you started.</p>
+      <ul id="quickWinList"></ul>
+    </section>
 
-      <section id="modeSection"></section>
-      <section id="quickWinsSection" class="hidden"></section>
-      <section id="historySection" class="hidden">
-        <h2>Your Daily Mode Log</h2>
-        <ul id="modeLog"></ul>
+    <!-- History Section -->
+    <section id="history" class="app-section">
+      <h2>Your Activity History</h2>
+      <div id="historyList"></div>
+    </section>
 
-        <h2>Activity History</h2>
-        <ul id="historyList"></ul>
-
-        <div id="streakInHistory" class="stats"></div>
-      </section>
-
-      <section id="aboutSection" class="hidden">
-        <p>Created by Marcus Clark – <a href="mailto:evolutionofwellness8@gmail.com">Contact Support</a></p>
-      </section>
-    </main>
-  </div>
-
-  <script src="app.js?v=12"></script>
+    <!-- About Section -->
+    <section id="about" class="app-section">
+      <h2>About</h2>
+      <p>Created by Marcus Clark — <a href="mailto:support@evolutionofwellness.com">Contact Support</a></p>
+    </section>
+  </main>
 </body>
 </html>
