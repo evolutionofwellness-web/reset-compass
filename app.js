@@ -1,78 +1,62 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const splash = document.getElementById("splashScreen");
-  const welcomePopup = document.getElementById("welcomePopup");
-  const startBtn = document.getElementById("startBtn");
-
+window.onload = () => {
   setTimeout(() => {
-    splash.style.display = "none";
-    if (!localStorage.getItem("welcomeSeen")) {
-      welcomePopup.style.display = "flex";
+    document.getElementById('splashScreen').style.display = 'none';
+
+    if (!localStorage.getItem('welcomeShown')) {
+      document.getElementById('welcomeModal').style.display = 'flex';
     }
-  }, 1500);
+  }, 2000);
 
-  startBtn.onclick = () => {
-    welcomePopup.style.display = "none";
-    localStorage.setItem("welcomeSeen", "true");
-  };
-
-  showSection("home");
   updateStreak();
-  loadQuickWins();
-  loadHistory();
-});
+  showSection('home');
+};
+
+function closeWelcome() {
+  document.getElementById('welcomeModal').style.display = 'none';
+  localStorage.setItem('welcomeShown', 'true');
+}
 
 function showSection(id) {
-  document.querySelectorAll(".app-section").forEach(sec => sec.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  document.querySelectorAll('main section').forEach(sec => sec.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+  if (id === 'history') updateStreak(true);
 }
 
 function selectMode(mode) {
-  const date = new Date().toISOString().split('T')[0];
-  let history = JSON.parse(localStorage.getItem("history") || "{}");
-  history[date] = mode;
-  localStorage.setItem("history", JSON.stringify(history));
+  const today = new Date().toISOString().split('T')[0];
+  let log = JSON.parse(localStorage.getItem('log') || '{}');
+  log[today] = mode;
+  localStorage.setItem('log', JSON.stringify(log));
   updateStreak();
-  loadHistory();
-  alert(`Mode for today set as: ${mode}`);
+  alert(`Logged mode: ${mode}`);
 }
 
-function updateStreak() {
-  const history = JSON.parse(localStorage.getItem("history") || "{}");
+function updateStreak(showHistory = false) {
+  const log = JSON.parse(localStorage.getItem('log') || '{}');
+  const today = new Date().toISOString().split('T')[0];
   let streak = 0;
-  let today = new Date();
+  let date = new Date();
+
   while (true) {
-    const dateStr = today.toISOString().split('T')[0];
-    if (history[dateStr]) {
+    const dateString = date.toISOString().split('T')[0];
+    if (log[dateString]) {
       streak++;
-      today.setDate(today.getDate() - 1);
+      date.setDate(date.getDate() - 1);
     } else {
       break;
     }
   }
-  document.getElementById("streakDisplay").textContent = `🔥 ${streak}-day streak`;
-}
 
-function loadHistory() {
-  const history = JSON.parse(localStorage.getItem("history") || "{}");
-  const list = Object.entries(history).sort((a,b)=>b[0].localeCompare(a[0]));
-  const container = document.getElementById("historyList");
-  container.innerHTML = list.length
-    ? `<ul>${list.map(([date, mode]) => `<li>${date}: ${mode}</li>`).join('')}</ul>`
-    : `<p>No history yet.</p>`;
-}
-
-function loadQuickWins() {
-  const wins = [
-    "Drink a glass of water",
-    "Take 3 deep breaths",
-    "Stretch for 2 minutes",
-    "Step outside",
-    "Write down 1 thing you did well today"
-  ];
-  const ul = document.getElementById("quickWinList");
-  wins.forEach(win => {
-    const li = document.createElement("li");
-    li.textContent = win;
-    ul.appendChild(li);
-  });
+  const text = `🔥 ${streak}-day streak`;
+  document.getElementById('streakDisplay').innerText = text;
+  if (showHistory) {
+    const list = document.getElementById('historyList');
+    list.innerHTML = '';
+    Object.entries(log).reverse().forEach(([date, mode]) => {
+      const li = document.createElement('li');
+      li.textContent = `${date}: ${mode}`;
+      list.appendChild(li);
+    });
+    document.getElementById('historyStreak').innerText = text;
+  }
 }
