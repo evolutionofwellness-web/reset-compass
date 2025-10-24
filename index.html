@@ -1,23 +1,25 @@
+<!-- FULL index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=41">
+  <link rel="stylesheet" href="main.css?v=40">
+  <script defer src="app.js?v=11"></script>
 </head>
 <body>
   <!-- Splash Screen -->
   <div id="splashScreen">
-    <img id="splashIcon" src="splash-icon.png" alt="App Icon" />
+    <img src="splash-icon.png" id="splashIcon" alt="Splash Icon">
   </div>
 
-  <!-- Welcome Popup -->
-  <div id="welcomePopup" class="modal">
+  <!-- Welcome Modal -->
+  <div id="welcomeModal" class="modal hidden">
     <div class="modal-content">
       <h2>Welcome to The Reset Compass</h2>
-      <p>This quick tool helps you reset your energy, focus, and routine in under 5 minutes.</p>
-      <button id="startButton">Let's Start</button>
+      <p>This tool helps you track your wellness day by day. Pick a mode that matches your current state, and take small steps to support yourself today.</p>
+      <button id="startApp">Let’s Start</button>
     </div>
   </div>
 
@@ -25,138 +27,57 @@
   <header>
     <h1>The Reset Compass</h1>
     <nav>
-      <button data-section="home">Home</button>
-      <button data-section="quick">Quick Wins</button>
-      <button data-section="history">History</button>
-      <button data-section="about">About</button>
+      <button onclick="navigateTo('home')">Home</button>
+      <button onclick="navigateTo('quickWins')">Quick Wins</button>
+      <button onclick="navigateTo('history')">History</button>
+      <button onclick="navigateTo('about')">About</button>
     </nav>
   </header>
 
-  <!-- App Content -->
-  <main id="appContent">
+  <!-- Main App Sections -->
+  <main id="app">
 
-    <!-- Home Section -->
-    <section id="home" class="section">
-      <div id="streak"><span class="emoji">🔥</span>0 day streak</div>
+    <!-- HOME -->
+    <section id="homeSection" class="section">
+      <h2>Welcome</h2>
+      <div id="streakDisplay"></div>
 
       <!-- Compass -->
-      <div id="compass">
-        <svg viewBox="0 0 200 200" class="compass-svg">
-          <path id="wedge-growing" d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#3498db"/>
-          <path id="wedge-drifting" d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#f39c12"/>
-          <path id="wedge-surviving" d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#e74c3c"/>
-          <path id="wedge-grounded" d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#2ecc71"/>
-          <text x="140" y="60" class="wedge-label">Growing</text>
-          <text x="140" y="160" class="wedge-label">Drifting</text>
-          <text x="40" y="160" class="wedge-label">Surviving</text>
-          <text x="40" y="60" class="wedge-label">Grounded</text>
-        </svg>
-      </div>
+      <svg id="compass" viewBox="0 0 200 200">
+        <g id="wedges"></g>
+      </svg>
 
       <!-- Mode Buttons -->
-      <div class="mode-buttons">
-        <button id="btn-growing" class="growing">🚀 <strong>Growing</strong><br><span>Take bold action</span></button>
-        <button id="btn-grounded" class="grounded">🌿 <strong>Grounded</strong><br><span>Stay centered</span></button>
-        <button id="btn-drifting" class="drifting">🧭 <strong>Drifting</strong><br><span>Refocus and reset</span></button>
-        <button id="btn-surviving" class="surviving">🩺 <strong>Surviving</strong><br><span>Stabilize the basics</span></button>
+      <div id="modeButtons">
+        <button class="mode-button growing" onclick="openMode('growing')">Growing<br><span>You're energized and expanding</span></button>
+        <button class="mode-button grounded" onclick="openMode('grounded')">Grounded<br><span>You're steady and focused</span></button>
+        <button class="mode-button drifting" onclick="openMode('drifting')">Drifting<br><span>You're distracted or disengaged</span></button>
+        <button class="mode-button surviving" onclick="openMode('surviving')">Surviving<br><span>You're overwhelmed or depleted</span></button>
       </div>
     </section>
 
-    <!-- Quick Wins Section -->
-    <section id="quick" class="section" style="display:none">
+    <!-- MODE VIEWS -->
+    <section id="modeView" class="section hidden"></section>
+
+    <!-- QUICK WINS -->
+    <section id="quickWins" class="section hidden">
       <h2>Quick Wins</h2>
-      <p>Pick something small and achievable right now.</p>
-      <ul>
-        <li>🧘‍♀️ 1-minute deep breathing</li>
-        <li>🚶‍♂️ Walk around the block</li>
-        <li>🧊 Drink a glass of water</li>
-        <li>📴 Silence your phone for 10 minutes</li>
-      </ul>
-      <textarea id="log-quick" placeholder="What did you do?"></textarea>
-      <button id="save-quick">Save</button>
+      <ul id="quickWinsList"></ul>
     </section>
 
-    <!-- History Section -->
-    <section id="history" class="section" style="display:none">
-      <h2>Your History</h2>
-      <div id="historyLog"></div>
+    <!-- HISTORY -->
+    <section id="history" class="section hidden">
+      <h2>History</h2>
+      <div id="streakDisplayHistory"></div>
+      <ul id="historyList"></ul>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="section" style="display:none">
-      <h2>About This App</h2>
-      <p>The Reset Compass is a free tool by <a href="https://evolutionofwellness.com" target="_blank">Evolution of Wellness</a> to help you reset your mental and physical state fast — wherever you are.</p>
-      <p>Use it to take back control of your energy and momentum, one step at a time.</p>
-    </section>
-
-    <!-- Mode Pages -->
-    <section id="mode-growing" class="section" style="display:none">
-      <h2>🚀 Growing</h2>
-      <p>Choose bold actions that move you forward with purpose.</p>
-      <ul>
-        <li>Start a meaningful project</li>
-        <li>Make that call you've been putting off</li>
-        <li>Ask for feedback</li>
-        <li>Step out of your comfort zone</li>
-      </ul>
-      <textarea id="log-growing" placeholder="What did you do?"></textarea>
-      <button id="save-growing">Save</button>
-    </section>
-
-    <section id="mode-grounded" class="section" style="display:none">
-      <h2>🌿 Grounded</h2>
-      <p>Stay centered and calm by doing something restorative.</p>
-      <ul>
-        <li>Meditate or pray</li>
-        <li>Do light stretching</li>
-        <li>Listen to calming music</li>
-        <li>Step outside into sunlight</li>
-      </ul>
-      <textarea id="log-grounded" placeholder="What did you do?"></textarea>
-      <button id="save-grounded">Save</button>
-    </section>
-
-    <section id="mode-drifting" class="section" style="display:none">
-      <h2>🧭 Drifting</h2>
-      <p>Re-anchor your attention and get back on track.</p>
-      <ul>
-        <li>Clear off your desk</li>
-        <li>Write a to-do list</li>
-        <li>Turn off distractions</li>
-        <li>Reflect on what matters today</li>
-      </ul>
-      <textarea id="log-drifting" placeholder="What did you do?"></textarea>
-      <button id="save-drifting">Save</button>
-    </section>
-
-    <section id="mode-surviving" class="section" style="display:none">
-      <h2>🩺 Surviving</h2>
-      <p>Stabilize the basics and regain control.</p>
-      <ul>
-        <li>Drink water or eat something nourishing</li>
-        <li>Cancel something non-essential</li>
-        <li>Ask for help or support</li>
-        <li>Take a break to rest</li>
-      </ul>
-      <textarea id="log-surviving" placeholder="What did you do?"></textarea>
-      <button id="save-surviving">Save</button>
+    <!-- ABOUT -->
+    <section id="about" class="section hidden">
+      <h2>About</h2>
+      <p>The Reset Compass is a self-guided tool that helps you build awareness of your current energy, mental state, and capacity. Use it daily or as needed to track your patterns and build stronger systems of support.</p>
     </section>
 
   </main>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2025 Evolution of Wellness. All rights reserved.</p>
-  </footer>
-
-  <!-- Scripts -->
-  <script src="app.js?v=12"></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
 </body>
 </html>
