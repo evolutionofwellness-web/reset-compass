@@ -2,11 +2,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splashScreen");
   const welcomeModal = document.getElementById("welcomeModal");
   const appWrapper = document.getElementById("appWrapper");
+  const startBtn = document.getElementById("startApp");
 
-  // Hide splash after delay
+  // Hide splash screen after delay
   setTimeout(() => {
     splash.style.display = "none";
 
+    // Show welcome modal or app
     if (!localStorage.getItem("welcomeSeen")) {
       welcomeModal.classList.remove("hidden");
     } else {
@@ -14,32 +16,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 1200);
 
-  // Start button event
-  document.getElementById("startApp").addEventListener("click", () => {
-    welcomeModal.classList.add("hidden");
-    localStorage.setItem("welcomeSeen", true);
-    appWrapper.classList.remove("hidden");
-  });
+  // Start app button
+  if (startBtn) {
+    startBtn.addEventListener("click", () => {
+      welcomeModal.classList.add("hidden");
+      localStorage.setItem("welcomeSeen", true);
+      appWrapper.classList.remove("hidden");
+    });
+  }
 
   // Navigation
-  window.navigate = function (viewId) {
-    ["homeView", "quickWinsView", "historyView", "aboutView"].forEach(id => {
-      document.getElementById(id).classList.add("hidden");
+  window.navigate = function(viewId) {
+    const views = ["homeView", "quickWinsView", "historyView", "aboutView"];
+    views.forEach(id => {
+      const view = document.getElementById(id);
+      if (view) view.classList.add("hidden");
     });
-    document.getElementById(viewId).classList.remove("hidden");
+
+    const targetView = document.getElementById(viewId);
+    if (targetView) targetView.classList.remove("hidden");
   };
 
-  // Mode wedge and button click logic
+  // Wedge and mode buttons
   document.querySelectorAll(".wedge, .mode-button").forEach(el => {
     el.addEventListener("click", () => {
       const mode = el.getAttribute("data-mode");
-      if (mode) loadMode(mode);
+      if (mode && typeof loadMode === "function") {
+        loadMode(mode);
+      }
     });
   });
 });
-
-// Sample mode load function (must exist elsewhere in your JS)
-function loadMode(mode) {
-  console.log(`Mode selected: ${mode}`);
-  // implement loading logic for mode views
-}
