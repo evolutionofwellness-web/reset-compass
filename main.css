@@ -59,24 +59,36 @@ main {
 
 #streakDisplay {
   text-align: center;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: bold;
-  margin: 1rem auto 1.5rem;
+  margin-bottom: 1rem;
   color: var(--brand-green);
 }
 
-.compass-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1.5rem;
+/* Compass */
+.compass {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  max-width: 300px;
+  margin: 0 auto 1.5rem;
+  text-align: center;
 }
 
-#compass {
-  width: 90%;
-  max-width: 320px;
-  height: auto;
+.wedge {
+  padding: 1.2rem;
+  color: white;
+  font-weight: bold;
+  border-radius: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 5px var(--btn-shadow);
+  font-size: 1rem;
 }
+
+.wedge.red { background-color: var(--mode-surviving); }
+.wedge.yellow { background-color: var(--mode-drifting); }
+.wedge.green { background-color: var(--mode-grounded); }
+.wedge.blue { background-color: var(--mode-growing); }
 
 .mode-buttons {
   display: flex;
@@ -104,8 +116,16 @@ main {
   background-color: #d5d5d5;
 }
 
+/* Views */
 section.hidden {
   display: none;
+}
+
+/* Mode View */
+#modeView {
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .mode-title {
@@ -129,7 +149,7 @@ section.hidden {
   margin-top: 0.5rem;
 }
 
-/* Modal */
+/* Welcome Modal */
 .modal {
   position: fixed;
   z-index: 999;
@@ -143,10 +163,6 @@ section.hidden {
   align-items: center;
 }
 
-.modal.hidden {
-  display: none;
-}
-
 .modal-content {
   background: #fff;
   padding: 2rem;
@@ -157,7 +173,7 @@ section.hidden {
 }
 
 #welcomeModal button {
-  background-color: #0B3D2E;
+  background-color: var(--brand-green);
   color: white;
   border: none;
   padding: 12px 20px;
@@ -179,13 +195,13 @@ section.hidden {
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: fadeOut 1.5s ease-out forwards;
+  animation: fadeOut 1.2s ease-out forwards;
   animation-delay: 2s;
 }
 
-#splashIcon {
-  width: 140px;
-  height: 140px;
+.splash-icon {
+  width: 120px;
+  height: 120px;
   animation: zoomSpinFade 2s ease-in-out forwards;
 }
 
@@ -207,11 +223,30 @@ section.hidden {
   }
 }
 
-/* History & About */
-#aboutView, #historyView {
+/* Other Views */
+#aboutView,
+#historyView,
+#quickWinsView {
   max-width: 700px;
   margin: 0 auto;
   padding: 1rem;
   line-height: 1.6;
   color: var(--text-dark);
+}
+
+#historyContent,
+#quickWinsContent {
+  margin-top: 1rem;
+}
+
+button#backToHome {
+  display: block;
+  margin: 2rem auto 1rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--brand-green);
+  color: white;
+  border: none;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
 }
