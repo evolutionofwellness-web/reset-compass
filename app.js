@@ -1,54 +1,53 @@
-document.addEventListener("DOMContentLoaded", () => {
+// Splash screen removal
+window.addEventListener("load", () => {
   const splash = document.getElementById("splashScreen");
-  const welcomeModal = document.getElementById("welcomeModal");
-  const appWrapper = document.getElementById("appWrapper");
-  const startButton = document.getElementById("startApp");
-
-  // Splash animation
   setTimeout(() => {
     splash.style.display = "none";
-
-    const hasSeen = localStorage.getItem("welcomeSeen");
-    if (!hasSeen) {
-      welcomeModal.classList.remove("hidden");
-    } else {
-      appWrapper.classList.remove("hidden");
-      navigate("homeView");
-    }
+    showWelcomeModalOnce();
   }, 1200);
+});
 
-  // Start App button
-  if (startButton) {
-    startButton.addEventListener("click", () => {
+// Welcome modal logic
+function showWelcomeModalOnce() {
+  const welcomeModal = document.getElementById("welcomeModal");
+  const appWrapper = document.getElementById("appWrapper");
+  const hasSeenModal = localStorage.getItem("hasSeenWelcome");
+
+  if (!hasSeenModal) {
+    welcomeModal.classList.remove("hidden");
+    document.getElementById("startApp").addEventListener("click", () => {
       welcomeModal.classList.add("hidden");
-      localStorage.setItem("welcomeSeen", "true");
       appWrapper.classList.remove("hidden");
-      navigate("homeView");
+      localStorage.setItem("hasSeenWelcome", "true");
     });
+  } else {
+    welcomeModal.classList.add("hidden");
+    appWrapper.classList.remove("hidden");
   }
+}
 
-  // Safe Navigation
-  window.navigate = function(viewId) {
-    const viewIds = ["homeView", "quickWinsView", "historyView", "aboutView"];
-    viewIds.forEach(id => {
-      const section = document.getElementById(id);
-      if (section) section.classList.add("hidden");
-    });
+// Navigation function
+function navigate(viewId) {
+  const views = document.querySelectorAll("main > section");
+  views.forEach((section) => section.classList.add("hidden"));
 
-    const target = document.getElementById(viewId);
-    if (target) target.classList.remove("hidden");
-  };
+  const targetView = document.getElementById(viewId);
+  if (targetView) {
+    targetView.classList.remove("hidden");
+  }
+}
 
-  // TEMP: Click handlers for wedges/buttons
-  const modeElements = document.querySelectorAll(".wedge, .mode-button");
-  modeElements.forEach(el => {
-    el.addEventListener("click", () => {
-      const mode = el.getAttribute("data-mode");
-      if (mode) {
-        console.log("Clicked mode:", mode);
-        // Placeholder logic — full loadMode() coming next
-        alert(`You selected: ${mode}`);
-      }
+// Mode button click handler
+document.addEventListener("DOMContentLoaded", () => {
+  const modeButtons = document.querySelectorAll(".mode-button");
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const mode = button.getAttribute("data-mode");
+      alert(`You selected: ${mode}`);
+      // Future functionality: Navigate to mode page
     });
   });
+
+  // Nav setup for manual reloads
+  navigate("homeView");
 });
