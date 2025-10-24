@@ -1,108 +1,201 @@
 :root {
-  --green: #0B3D2E;
-  --surviving: #FF4C4C;
-  --drifting: #FFD700;
-  --grounded: #4CAF50;
-  --growing: #1E90FF;
-  --white: #FFFFFF;
+  --color-growing: #4A90E2;
+  --color-drifting: #F5A623;
+  --color-surviving: #D0021B;
+  --color-grounded: #7ED321;
+  --brand-green: #0B3D2E;
 }
 
 body {
+  font-family: system-ui, sans-serif;
   margin: 0;
-  font-family: sans-serif;
-  background-color: var(--white);
-}
-
-header {
-  background-color: var(--green);
-  color: var(--white);
-  padding: 1rem;
+  padding: 0;
+  background: #fff;
+  color: #000;
   text-align: center;
 }
 
-nav button {
-  background: var(--white);
-  color: var(--green);
-  margin: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
+h1, h2 {
+  margin-top: 20px;
+  font-size: 1.5em;
+}
+
+.section {
+  display: none;
+  padding: 20px;
+}
+
+.section.active {
+  display: block;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #eee;
+  border-bottom: 1px solid #ccc;
+}
+
+.top-nav button {
+  padding: 10px 15px;
   border: none;
+  background-color: #0B3D2E;
+  color: white;
   font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.top-nav button:hover {
+  background-color: #063122;
+}
+
+.mode-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.mode-button {
+  width: 80%;
+  padding: 14px;
+  font-size: 1em;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+}
+
+.mode-button span {
+  display: block;
+  font-size: 0.85em;
+  font-weight: normal;
+  margin-top: 4px;
+}
+
+.mode-button.growing { background-color: var(--color-growing); }
+.mode-button.drifting { background-color: var(--color-drifting); color: #000; }
+.mode-button.surviving { background-color: var(--color-surviving); }
+.mode-button.grounded { background-color: var(--color-grounded); color: #000; }
+
+.compass-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+#compass {
+  cursor: pointer;
+}
+
+#compass text {
+  dominant-baseline: middle;
+  font-weight: bold;
+  pointer-events: none;
 }
 
 #splashScreen {
-  background-color: var(--green);
   position: fixed;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9999;
+  background-color: var(--brand-green);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  z-index: 10000;
 }
 
 #splashIcon {
-  width: 100px;
-  height: 100px;
-  animation: splashSpin 2s ease-out forwards;
+  width: 120px;
+  animation: splashSpinZoom 2s ease-in-out forwards;
 }
 
-@keyframes splashSpin {
+@keyframes splashSpinZoom {
   0% {
+    transform: scale(1) rotate(0deg);
     opacity: 1;
-    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    transform: scale(2.5) rotate(360deg);
+    opacity: 0.7;
   }
   100% {
+    transform: scale(3.2) rotate(720deg);
     opacity: 0;
-    transform: scale(5) rotate(360deg);
   }
 }
 
 .modal {
+  display: none;
   position: fixed;
-  z-index: 10000;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
 }
 
 .modal-content {
-  background: white;
-  padding: 2rem;
+  background-color: white;
+  margin: 15% auto;
+  padding: 20px;
   border-radius: 12px;
-  text-align: center;
-  max-width: 300px;
+  width: 80%;
+  max-width: 400px;
 }
 
-button {
+#startButton {
+  padding: 12px 20px;
+  font-size: 1em;
+  background-color: var(--brand-green);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin-top: 12px;
   cursor: pointer;
 }
 
-.wedge-label {
-  font-size: 1.1rem;
-  fill: #000;
-  dominant-baseline: middle;
-  text-anchor: middle;
+.stats {
+  margin: 10px 0;
+  font-size: 1.2em;
 }
 
-.mode-button {
-  padding: 1rem;
-  color: white;
-  margin: 1rem;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 1rem;
+#activityList, #quickWinList {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+#activityList li, #quickWinList li {
+  margin-bottom: 20px;
+  background-color: #f8f8f8;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 textarea {
   width: 100%;
+  height: 80px;
   margin-top: 10px;
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
   resize: vertical;
+  font-size: 1em;
+  padding: 8px;
+}
+
+footer {
+  margin-top: 40px;
+  padding: 20px;
+  font-size: 0.9em;
+  background-color: #f1f1f1;
+  color: #333;
 }
