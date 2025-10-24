@@ -7,11 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const welcomeModal = document.getElementById("welcomeModal");
   if (!localStorage.getItem("welcomeSeen")) {
     welcomeModal.classList.remove("hidden");
-  }
   document.getElementById("startApp").addEventListener("click", () => {
-    welcomeModal.classList.add("hidden");
-    localStorage.setItem("welcomeSeen", true);
-  });
+  welcomeModal.classList.add("hidden");
+  localStorage.setItem("welcomeSeen", true);
+  document.getElementById("app").classList.remove("hidden");
+});
+document.getElementById("app").classList.remove("hidden");
 
   // Navigation
   const sections = ["homeView", "quickView", "historyView", "aboutView"];
