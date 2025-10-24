@@ -2,22 +2,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splashScreen");
   const welcomeModal = document.getElementById("welcomeModal");
   const appWrapper = document.getElementById("app");
+  const startButton = document.getElementById("startApp");
 
-  setTimeout(() => splash.style.display = "none", 3000);
+  setTimeout(() => {
+    splash.style.display = "none";
+    if (!localStorage.getItem("welcomeSeen")) {
+      welcomeModal.classList.remove("hidden");
+    } else {
+      appWrapper.classList.remove("hidden");
+    }
+  }, 2500);
 
-  if (!localStorage.getItem("welcomeSeen")) {
-    welcomeModal.classList.remove("hidden");
-  } else {
-    appWrapper.classList.remove("hidden");
-  }
-
-  document.getElementById("startApp").addEventListener("click", () => {
+  startButton.addEventListener("click", () => {
     welcomeModal.classList.add("hidden");
-    localStorage.setItem("welcomeSeen", true);
     appWrapper.classList.remove("hidden");
+    localStorage.setItem("welcomeSeen", "true");
   });
 
-  // Navigation
+  // Navigation logic
   window.navigate = function(viewId) {
     ["homeView", "quickWinsView", "historyView", "aboutView", "modeView"].forEach(id => {
       document.getElementById(id).classList.add("hidden");
@@ -32,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Wedge + Button click handlers
+  // Mode click handlers
   document.querySelectorAll(".wedge, .mode-btn").forEach(el => {
     el.addEventListener("click", () => {
       const mode = el.getAttribute("data-mode");
@@ -103,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderHistory();
 });
 
-// Mode data
 const modeData = {
   Growing: {
     name: "Growing",
