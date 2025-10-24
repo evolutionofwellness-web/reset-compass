@@ -1,153 +1,87 @@
-// Splash & Welcome Popup
-window.addEventListener('load', () => {
-  const hasVisited = localStorage.getItem('visited');
-  const splash = document.getElementById('splashScreen');
-  const popup = document.getElementById('welcomePopup');
+document.addEventListener("DOMContentLoaded", () => {
+  const splash = document.getElementById("splashScreen");
+  const modal = document.getElementById("welcomeModal");
+  const app = document.getElementById("appWrapper");
+  const startBtn = document.getElementById("startApp");
+  const appContent = document.getElementById("appContent");
+  const streakDisplay = document.getElementById("streakDisplay");
 
+  // Show splash, then welcome modal
   setTimeout(() => {
-    splash.style.display = 'none';
-    if (!hasVisited) {
-      popup.style.display = 'flex';
-    }
-  }, 1600);
-});
+    splash.style.display = "none";
 
-document.getElementById('startButton').addEventListener('click', () => {
-  document.getElementById('welcomePopup').style.display = 'none';
-  localStorage.setItem('visited', 'true');
-});
-
-// Navigation
-const sections = ['homeSection', 'quickWinsSection', 'historySection', 'aboutSection'];
-function showSection(id) {
-  sections.forEach(section => {
-    document.getElementById(section).classList.toggle('active-section', section === id);
-    document.getElementById(section).classList.toggle('hidden-section', section !== id);
-  });
-}
-
-document.querySelectorAll('nav button').forEach(button => {
-  button.addEventListener('click', () => {
-    showSection(button.getAttribute('data-target'));
-  });
-});
-
-// Compass + Mode Buttons
-const modeColors = {
-  Growing: 'blue',
-  Grounded: 'green',
-  Drifting: 'yellow',
-  Surviving: 'red'
-};
-
-const modes = Object.keys(modeColors);
-
-// Routing to Mode Pages
-function goToMode(mode) {
-  const sectionId = `${mode.toLowerCase()}Mode`;
-  showSection(sectionId);
-  saveModeChoice(mode);
-}
-
-// Compass Wedges
-modes.forEach(mode => {
-  const wedge = document.getElementById(`${mode.toLowerCase()}Wedge`);
-  if (wedge) {
-    wedge.addEventListener('click', () => goToMode(mode));
-  }
-});
-
-// Mode Buttons
-document.querySelectorAll('.mode-buttons button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const mode = btn.textContent.trim();
-    goToMode(mode);
-  });
-});
-
-// Save User Input per Activity
-document.querySelectorAll('textarea').forEach(textarea => {
-  textarea.addEventListener('change', () => {
-    const key = textarea.getAttribute('data-key');
-    localStorage.setItem(key, textarea.value);
-  });
-});
-
-// Load Saved Inputs
-window.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('textarea').forEach(textarea => {
-    const key = textarea.getAttribute('data-key');
-    textarea.value = localStorage.getItem(key) || '';
-  });
-  renderHistory();
-  renderStreak();
-});
-
-// Logging + History
-function saveModeChoice(mode) {
-  const dateKey = new Date().toISOString().slice(0, 10);
-  localStorage.setItem(`log-${dateKey}`, mode);
-  renderHistory();
-  renderStreak();
-}
-
-function renderHistory() {
-  const historyList = document.getElementById('mode-history');
-  historyList.innerHTML = '';
-
-  const logs = Object.keys(localStorage)
-    .filter(key => key.startsWith('log-'))
-    .sort()
-    .reverse();
-
-  logs.forEach(key => {
-    const date = key.replace('log-', '');
-    const mode = localStorage.getItem(key);
-    const color = modeColors[mode] || 'gray';
-
-    const li = document.createElement('li');
-    li.style.borderLeft = `6px solid ${color}`;
-    li.textContent = `${date}: ${mode}`;
-    historyList.appendChild(li);
-  });
-
-  // Breakdown
-  const counts = {};
-  modes.forEach(mode => counts[mode] = 0);
-  logs.forEach(key => {
-    const mode = localStorage.getItem(key);
-    if (counts[mode] !== undefined) counts[mode]++;
-  });
-
-  const breakdown = document.getElementById('mode-breakdown');
-  const total = logs.length;
-  breakdown.innerHTML = modes.map(mode => {
-    const percent = total > 0 ? ((counts[mode] / total) * 100).toFixed(1) : 0;
-    return `<div><strong>${mode}:</strong> ${percent}%</div>`;
-  }).join('');
-}
-
-// Daily Streak
-function renderStreak() {
-  const logs = Object.keys(localStorage)
-    .filter(k => k.startsWith('log-'))
-    .sort()
-    .reverse();
-
-  if (logs.length === 0) return document.getElementById('dailyStreak').textContent = '';
-
-  let streak = 1;
-  const today = new Date();
-  for (let i = 1; i < logs.length; i++) {
-    const prevDate = new Date(logs[i].replace('log-', ''));
-    const expected = new Date(today);
-    expected.setDate(today.getDate() - i);
-    if (prevDate.toDateString() === expected.toDateString()) {
-      streak++;
+    const hasSeen = localStorage.getItem("seenWelcome");
+    if (!hasSeen) {
+      modal.classList.remove("hidden");
     } else {
-      break;
+      app.classList.remove("hidden");
+      updateStreak();
     }
+  }, 1500);
+
+  // Start app after welcome
+  startBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    localStorage.setItem("seenWelcome", "true");
+    app.classList.remove("hidden");
+    updateStreak();
+  });
+
+  // Page navigation
+  window.navigate = (target) => {
+    const views = appContent.querySelectorAll("section");
+    views.forEach(view => view.classList.add("hidden"));
+    document.getElementById(target).classList.remove("hidden");
+  };
+
+  // Click handlers for compass + buttons
+  const setMode = (mode) => {
+    const today = new Date().toISOString().split("T")[0];
+    const history = JSON.parse(localStorage.getItem("history") || "{}");
+    if (!history[today]) {
+      history[today] = mode;
+      localStorage.setItem("history", JSON.stringify(history));
+    }
+    updateStreak();
+    alert(`You selected "${mode}" mode. Great choice!`);
+  };
+
+  document.querySelectorAll(".mode-button").forEach(button => {
+    button.addEventListener("click", () => {
+      const mode = button.getAttribute("data-mode");
+      setMode(mode);
+    });
+  });
+
+  const compass = document.getElementById("compass");
+  if (compass) {
+    compass.querySelectorAll("path").forEach(path => {
+      path.addEventListener("click", () => {
+        const mode = path.getAttribute("data-mode");
+        setMode(mode);
+      });
+    });
   }
 
-  document.getElementById('dailyStreak').textContent = `🔥 Daily Streak: ${streak} day${streak > 1 ? 's' : ''}`;
-}
+  // Streak Tracker
+  function updateStreak() {
+    const history = JSON.parse(localStorage.getItem("history") || "{}");
+    const dates = Object.keys(history).sort().reverse();
+    let streak = 0;
+    let currentDate = new Date();
+
+    for (let date of dates) {
+      const dateStr = currentDate.toISOString().split("T")[0];
+      if (date === dateStr) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    if (streakDisplay) {
+      streakDisplay.innerHTML = `🔥 ${streak}-day streak`;
+    }
+  }
+});
