@@ -4,43 +4,50 @@ document.addEventListener("DOMContentLoaded", () => {
   const appWrapper = document.getElementById("appWrapper");
   const startButton = document.getElementById("startApp");
 
+  // Splash animation
   setTimeout(() => {
     splash.style.display = "none";
 
-    if (!localStorage.getItem("welcomeSeen")) {
+    const hasSeen = localStorage.getItem("welcomeSeen");
+    if (!hasSeen) {
       welcomeModal.classList.remove("hidden");
     } else {
       appWrapper.classList.remove("hidden");
+      navigate("homeView");
     }
   }, 1200);
 
+  // Start App button
   if (startButton) {
     startButton.addEventListener("click", () => {
       welcomeModal.classList.add("hidden");
       localStorage.setItem("welcomeSeen", "true");
       appWrapper.classList.remove("hidden");
+      navigate("homeView");
     });
   }
 
-  // Navigation
-  window.navigate = function (viewId) {
-    const views = ["homeView", "quickWinsView", "historyView", "aboutView"];
-    views.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.classList.add("hidden");
+  // Safe Navigation
+  window.navigate = function(viewId) {
+    const viewIds = ["homeView", "quickWinsView", "historyView", "aboutView"];
+    viewIds.forEach(id => {
+      const section = document.getElementById(id);
+      if (section) section.classList.add("hidden");
     });
 
-    const targetView = document.getElementById(viewId);
-    if (targetView) targetView.classList.remove("hidden");
+    const target = document.getElementById(viewId);
+    if (target) target.classList.remove("hidden");
   };
 
-  // Wedge + Button click handlers
-  document.querySelectorAll(".wedge, .mode-button").forEach((el) => {
+  // TEMP: Click handlers for wedges/buttons
+  const modeElements = document.querySelectorAll(".wedge, .mode-button");
+  modeElements.forEach(el => {
     el.addEventListener("click", () => {
       const mode = el.getAttribute("data-mode");
       if (mode) {
+        console.log("Clicked mode:", mode);
+        // Placeholder logic — full loadMode() coming next
         alert(`You selected: ${mode}`);
-        // Replace this alert with loadMode(mode) once implemented
       }
     });
   });
