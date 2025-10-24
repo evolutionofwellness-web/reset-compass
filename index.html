@@ -32,12 +32,24 @@
   <main id="appContent">
     <section id="homeSection" class="section">
       <div id="compass">
-        <svg viewBox="0 0 200 200">
-          <path class="wedge surviving" d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" onclick="goToMode('surviving')"/>
-          <path class="wedge drifting" d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" onclick="goToMode('drifting')"/>
-          <path class="wedge grounded" d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" onclick="goToMode('grounded')"/>
-          <path class="wedge growing" d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" onclick="goToMode('growing')"/>
-        </svg>
+        <svg id="compass" viewBox="0 0 200 200">
+  <g class="wedge" id="surviving-wedge">
+    <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#4B9CD3"></path>
+    <text x="150" y="40" text-anchor="middle" class="wedge-label">Surviving</text>
+  </g>
+  <g class="wedge" id="drifting-wedge">
+    <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#C97C7C"></path>
+    <text x="150" y="160" text-anchor="middle" class="wedge-label">Drifting</text>
+  </g>
+  <g class="wedge" id="grounded-wedge">
+    <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#A6D785"></path>
+    <text x="50" y="160" text-anchor="middle" class="wedge-label">Grounded</text>
+  </g>
+  <g class="wedge" id="growing-wedge">
+    <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#F2C57C"></path>
+    <text x="50" y="40" text-anchor="middle" class="wedge-label">Growing</text>
+  </g>
+</svg>
       </div>
       <div id="modeButtons">
         <button onclick="goToMode('surviving')">🩺 Surviving</button>
