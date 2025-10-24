@@ -1,84 +1,183 @@
 document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => {
-    document.getElementById('splashScreen').classList.add('hidden');
+  const splash = document.getElementById("splashScreen");
+  const welcomeModal = document.getElementById("welcomeModal");
+  const startAppBtn = document.getElementById("startApp");
+  const appWrapper = document.getElementById("appWrapper");
+  const appContent = document.getElementById("appContent");
 
-    const seenModal = localStorage.getItem('seenWelcome');
-    if (!seenModal) {
-      document.getElementById('welcomeModal').classList.remove('hidden');
+  const views = {
+    homeView: document.getElementById("homeView"),
+    quickWinsView: document.getElementById("quickWinsView"),
+    historyView: document.getElementById("historyView"),
+    aboutView: document.getElementById("aboutView"),
+  };
+
+  function hideAllViews() {
+    Object.values(views).forEach(view => view.classList.add("hidden"));
+  }
+
+  function navigate(viewId) {
+    hideAllViews();
+    views[viewId].classList.remove("hidden");
+  }
+
+  function getTodayKey() {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  }
+
+  function getLogs() {
+    return JSON.parse(localStorage.getItem("resetLogs") || "[]");
+  }
+
+  function saveLogs(logs) {
+    localStorage.setItem("resetLogs", JSON.stringify(logs));
+  }
+
+  function logActivity(mode, activity, note) {
+    const logs = getLogs();
+    const timestamp = new Date().toISOString();
+    logs.push({ timestamp, mode, activity, note });
+    saveLogs(logs);
+    logStreak();
+  }
+
+  function logStreak() {
+    const key = "lastLoggedDay";
+    const today = getTodayKey();
+    const last = localStorage.getItem(key);
+    if (last !== today) {
+      localStorage.setItem(key, today);
+      let streak = parseInt(localStorage.getItem("streak") || "0", 10);
+      localStorage.setItem("streak", (streak + 1).toString());
+      updateStreakDisplay();
+    }
+  }
+
+  function updateStreakDisplay() {
+    const streakDisplay = document.getElementById("streakDisplay");
+    const streak = parseInt(localStorage.getItem("streak") || "0", 10);
+    streakDisplay.textContent = `🔥 Daily Streak: ${streak}`;
+  }
+
+  function renderHome() {
+    updateStreakDisplay();
+    navigate("homeView");
+  }
+
+  function renderModePage(mode) {
+    hideAllViews();
+    const section = document.createElement("section");
+    section.innerHTML = `<h2 class="mode-title">${mode} Mode</h2>`;
+    const activities = getModeActivities(mode);
+    activities.forEach((activity, i) => {
+      const div = document.createElement("div");
+      div.className = "mode-activity";
+      div.innerHTML = `
+        <p>${activity}</p>
+        <input type="text" id="${mode}-${i}" placeholder="What did you do?">
+        <button onclick="saveActivity('${mode}', '${activity}', '${mode}-${i}')">Save</button>
+      `;
+      section.appendChild(div);
+    });
+    appContent.innerHTML = "";
+    appContent.appendChild(section);
+  }
+
+  window.saveActivity = (mode, activity, inputId) => {
+    const note = document.getElementById(inputId).value;
+    logActivity(mode, activity, note);
+    alert("Saved!");
+  };
+
+  function getModeActivities(mode) {
+    switch (mode) {
+      case "Growing": return ["Read something meaningful", "Set a new goal", "Journal about growth"];
+      case "Grounded": return ["Take a walk", "Do breathwork", "Stretch for 5 minutes"];
+      case "Drifting": return ["Clear a small task", "Limit distractions", "Set a timer"];
+      case "Surviving": return ["Drink water", "Take 3 deep breaths", "Text someone for support"];
+      default: return [];
+    }
+  }
+
+  function renderQuickWins() {
+    hideAllViews();
+    const section = views.quickWinsView;
+    section.innerHTML = "<h2>Quick Wins</h2><p>Fast actions you can take any time.</p>";
+    const wins = [
+      "Stand up and stretch",
+      "Drink a full glass of water",
+      "Write down 1 thing you're grateful for"
+    ];
+    wins.forEach((win, i) => {
+      const div = document.createElement("div");
+      div.className = "mode-activity";
+      div.innerHTML = `
+        <p>${win}</p>
+        <input type="text" id="win-${i}" placeholder="What did you do?">
+        <button onclick="saveActivity('QuickWin', '${win}', 'win-${i}')">Save</button>
+      `;
+      section.appendChild(div);
+    });
+    section.classList.remove("hidden");
+  }
+
+  function renderHistory() {
+    hideAllViews();
+    const section = views.historyView;
+    const logs = getLogs();
+    section.innerHTML = "<h2>History</h2>";
+    if (logs.length === 0) {
+      section.innerHTML += "<p>No activity yet.</p>";
     } else {
-      document.getElementById('appContent').classList.remove('hidden');
+      logs.reverse().forEach(log => {
+        const div = document.createElement("div");
+        div.className = "mode-activity";
+        div.innerHTML = `
+          <strong>${log.mode}</strong> | ${new Date(log.timestamp).toLocaleString()}<br/>
+          <em>${log.activity}</em><br/>
+          Note: ${log.note}
+        `;
+        section.appendChild(div);
+      });
+    }
+  }
+
+  function renderAbout() {
+    navigate("aboutView");
+  }
+
+  document.querySelectorAll(".mode-button, .wedge").forEach(el => {
+    el.addEventListener("click", () => {
+      const mode = el.dataset.mode;
+      renderModePage(mode);
+    });
+  });
+
+  window.navigate = viewId => {
+    switch (viewId) {
+      case "homeView": return renderHome();
+      case "quickWinsView": return renderQuickWins();
+      case "historyView": return renderHistory();
+      case "aboutView": return renderAbout();
+    }
+  };
+
+  startAppBtn.addEventListener("click", () => {
+    welcomeModal.classList.add("hidden");
+    appWrapper.classList.remove("hidden");
+    renderHome();
+  });
+
+  // Initialize Splash + Welcome
+  setTimeout(() => {
+    splash.style.display = "none";
+    if (!localStorage.getItem("hasVisited")) {
+      welcomeModal.classList.remove("hidden");
+      localStorage.setItem("hasVisited", "true");
+    } else {
+      appWrapper.classList.remove("hidden");
       renderHome();
     }
-  }, 1200);
+  }, 2200);
 });
-
-function closeModal() {
-  localStorage.setItem('seenWelcome', 'true');
-  document.getElementById('welcomeModal').classList.add('hidden');
-  document.getElementById('appContent').classList.remove('hidden');
-  renderHome();
-}
-
-function renderHome() {
-  const main = document.getElementById('mainContent');
-  const streak = getStreak();
-
-  main.innerHTML = `
-    <div class="streak">🔥 ${streak}-Day Streak</div>
-    <button class="mode-button mode-growing" onclick="selectMode('Growing')">Growing</button>
-    <button class="mode-button mode-grounded" onclick="selectMode('Grounded')">Grounded</button>
-    <button class="mode-button mode-drifting" onclick="selectMode('Drifting')">Drifting</button>
-    <button class="mode-button mode-surviving" onclick="selectMode('Surviving')">Surviving</button>
-  `;
-}
-
-function selectMode(mode) {
-  logDay(mode);
-  alert(`Mode selected: ${mode}`);
-  renderHome();
-}
-
-function getStreak() {
-  const today = new Date().toISOString().split("T")[0];
-  const stored = JSON.parse(localStorage.getItem('streakData')) || { lastDate: '', count: 0 };
-
-  if (stored.lastDate === today) return stored.count;
-
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yDate = yesterday.toISOString().split("T")[0];
-
-  const newCount = stored.lastDate === yDate ? stored.count + 1 : 1;
-
-  localStorage.setItem('streakData', JSON.stringify({ lastDate: today, count: newCount }));
-  return newCount;
-}
-
-function logDay(mode) {
-  const date = new Date().toISOString().split("T")[0];
-  const logs = JSON.parse(localStorage.getItem('modeLogs')) || [];
-  logs.push({ date, mode });
-  localStorage.setItem('modeLogs', JSON.stringify(logs));
-}
-
-function renderQuickWins() {
-  document.getElementById('mainContent').innerHTML = `<p>Quick Wins section coming soon.</p>`;
-}
-
-function renderHistory() {
-  const logs = JSON.parse(localStorage.getItem('modeLogs')) || [];
-  let html = `<h2>History</h2>`;
-  if (logs.length === 0) {
-    html += `<p>No logs yet.</p>`;
-  } else {
-    html += `<ul>${logs.map(log => `<li>${log.date}: ${log.mode}</li>`).join('')}</ul>`;
-  }
-  document.getElementById('mainContent').innerHTML = html;
-}
-
-function renderAbout() {
-  document.getElementById('mainContent').innerHTML = `
-    <h2>About This App</h2>
-    <p>The Reset Compass helps you take simple, effective actions based on how you feel each day. It’s your daily anchor for better health.</p>
-  `;
-}
