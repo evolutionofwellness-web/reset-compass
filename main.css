@@ -17,39 +17,37 @@ body {
 /* === Splash Screen === */
 #splashScreen {
   position: fixed;
-  background-color: #ffffff;
+  background-color: #0B3D2E; /* brand background */
   z-index: 9999;
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.5s ease;
+  opacity: 1;
+}
+#splashScreen.hide {
+  opacity: 0;
 }
 #splashIcon {
   width: 100px;
-  height: 100px;
-  animation: splashAnim 1.5s ease-out forwards;
+  transition: transform 1.2s ease, opacity 0.6s ease;
 }
-@keyframes splashAnim {
-  0% {
-    opacity: 0;
-    transform: scale(0.6) rotate(0deg);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1.2) rotate(360deg);
-  }
+#splashIcon.animate {
+  transform: scale(3) rotate(360deg);
+  opacity: 0;
 }
 
 /* === Welcome Modal === */
 .modal {
   position: fixed;
-  z-index: 9998;
+  z-index: 10000;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,14 +60,21 @@ body {
   max-width: 400px;
   text-align: center;
 }
-.modal-content button {
-  margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
+.modal-content h2 {
+  color: #0B3D2E;
+  margin-bottom: 1rem;
+}
+.modal-content p {
   font-size: 1rem;
-  background: #1C3B34;
+  margin-bottom: 1.5rem;
+}
+#startButton {
+  background: #0B3D2E;
   color: white;
+  padding: 10px 24px;
+  font-size: 1.1rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
@@ -104,9 +109,9 @@ h1, h2 {
 /* === Daily Streak Display === */
 #streakDisplay {
   text-align: center;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  color: #1C3B34;
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  color: #0B3D2E;
 }
 
 /* === Compass Styling === */
@@ -123,13 +128,18 @@ h1, h2 {
   cursor: pointer;
 }
 #compass path:hover {
-  opacity: 0.8;
-  stroke: #222;
+  opacity: 0.85;
+  stroke: #333;
   stroke-width: 1px;
 }
 #compass text {
   font-family: system-ui, sans-serif;
   font-weight: bold;
+  font-size: 0.9rem;
+  fill: white;
+  pointer-events: none;
+  dominant-baseline: middle;
+  text-anchor: middle;
 }
 
 /* === Mode Buttons === */
@@ -168,4 +178,9 @@ section {
 }
 .mode-activity {
   margin-top: 1rem;
+}
+
+/* === Utility === */
+button:focus {
+  outline: 2px solid #0B3D2E;
 }
