@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Show splash, then welcome modal
   setTimeout(() => {
     splash.style.display = "none";
-
     const hasSeen = localStorage.getItem("seenWelcome");
     if (!hasSeen) {
       modal.classList.remove("hidden");
@@ -63,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Streak Tracker
+  // Daily streak
   function updateStreak() {
     const history = JSON.parse(localStorage.getItem("history") || "{}");
     const dates = Object.keys(history).sort().reverse();
