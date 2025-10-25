@@ -1,251 +1,132 @@
-/* === Base Reset === */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #ffffff;
-  color: #1a1a1a;
-  line-height: 1.6;
-}
-.hidden {
-  display: none;
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const splash = document.getElementById("splashScreen");
+  const modal = document.getElementById("welcomeModal");
+  const app = document.getElementById("appWrapper");
+  const startBtn = document.getElementById("startApp");
+  const appContent = document.getElementById("appContent");
+  const streakDisplay = document.getElementById("streakDisplay");
 
-/* === Splash Screen === */
-#splashScreen {
-  position: fixed;
-  background-color: #0B3D2E;
-  z-index: 9999;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#splashIcon {
-  width: 120px;
-  height: 120px;
-  animation: splashZoomSpin 2s ease-in-out forwards;
-}
-@keyframes splashZoomSpin {
-  0% {
-    transform: scale(0.6) rotate(0deg);
-    opacity: 1;
+  // Splash transition + Welcome Modal
+  setTimeout(() => {
+    splash.style.display = "none";
+    const hasSeen = localStorage.getItem("seenWelcome");
+    if (!hasSeen) {
+      modal.classList.remove("hidden");
+    } else {
+      app.classList.remove("hidden");
+      updateStreak();
+    }
+  }, 2000);
+
+  // Welcome modal -> App
+  startBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    localStorage.setItem("seenWelcome", "true");
+    app.classList.remove("hidden");
+    updateStreak();
+  });
+
+  // Navigation
+  window.navigate = (target) => {
+    const views = appContent.querySelectorAll("section");
+    views.forEach(view => view.classList.add("hidden"));
+    document.getElementById(target).classList.remove("hidden");
+  };
+
+  // Activity logging
+  function logActivity(mode, activityIndex, text) {
+    const today = new Date().toISOString().split("T")[0];
+    const history = JSON.parse(localStorage.getItem("history") || "{}");
+
+    if (!history[today]) {
+      history[today] = { mode, activities: {} };
+    }
+    if (!history[today].activities) {
+      history[today].activities = {};
+    }
+    history[today].activities[activityIndex] = text;
+
+    localStorage.setItem("history", JSON.stringify(history));
+    updateStreak();
   }
-  80% {
-    transform: scale(2.5) rotate(360deg);
-    opacity: 1;
+
+  // Mode button click
+  document.querySelectorAll(".mode-button").forEach(button => {
+    button.addEventListener("click", () => {
+      const mode = button.getAttribute("data-mode");
+      navigate(`${mode.toLowerCase()}Page`);
+    });
+  });
+
+  // Compass click
+  const compass = document.getElementById("compass");
+  if (compass) {
+    compass.querySelectorAll("path").forEach(path => {
+      path.addEventListener("click", () => {
+        const mode = path.getAttribute("data-mode");
+        navigate(`${mode.toLowerCase()}Page`);
+      });
+    });
   }
-  100% {
-    transform: scale(4) rotate(540deg);
-    opacity: 0;
+
+  // Textbox event listeners for all activities
+  document.querySelectorAll("textarea[data-mode][data-activity]").forEach(textarea => {
+    textarea.addEventListener("change", (e) => {
+      const mode = e.target.getAttribute("data-mode");
+      const index = e.target.getAttribute("data-activity");
+      const text = e.target.value.trim();
+      if (text.length > 0) {
+        logActivity(mode, index, text);
+      }
+    });
+  });
+
+  // Streak logic
+  function updateStreak() {
+    const history = JSON.parse(localStorage.getItem("history") || "{}");
+    const today = new Date().toISOString().split("T")[0];
+
+    // Only allow 1 streak update per new day
+    let streak = 0;
+    let currentDate = new Date();
+
+    while (true) {
+      const dateStr = currentDate.toISOString().split("T")[0];
+      if (history[dateStr]) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    if (streakDisplay) {
+      streakDisplay.innerHTML = `🔥 ${streak}-day streak`;
+    }
+
+    updateHistoryUI(history);
   }
-}
 
-/* === Welcome Modal === */
-.modal {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 10px;
-  text-align: center;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-.modal-content h2 {
-  margin-bottom: 1rem;
-  color: #0B3D2E;
-}
-.modal-content button {
-  background-color: #0B3D2E;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  margin-top: 1rem;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.modal-content button:hover {
-  background-color: #09422a;
-}
+  // History view
+  function updateHistoryUI(history) {
+    const list = document.getElementById("historyList");
+    if (!list) return;
+    list.innerHTML = "";
 
-/* === Header and Nav === */
-header {
-  background-color: #0B3D2E;
-  color: #ffffff;
-  text-align: center;
-  padding: 1.2rem 1rem;
-}
-header h1 {
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-}
-nav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-nav button {
-  background: #ffffff;
-  color: #0B3D2E;
-  border: 2px solid #0B3D2E;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  font-weight: 600;
-}
-nav button:hover {
-  background-color: #0B3D2E;
-  color: white;
-}
+    const sortedDates = Object.keys(history).sort().reverse();
+    sortedDates.forEach(date => {
+      const entry = history[date];
+      const activities = entry.activities || {};
+      const activityList = Object.values(activities)
+        .map((val, i) => `• ${val}`)
+        .join("<br>");
 
-/* === Layout === */
-main {
-  padding: 1.5rem;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-/* === Streak Display === */
-#streakDisplay {
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #0B3D2E;
-  margin-bottom: 1rem;
-}
-
-/* === Compass === */
-.compass-container {
-  display: flex;
-  justify-content: center;
-  margin: 1rem 0;
-}
-#compass {
-  width: 300px;
-  height: 300px;
-}
-#compass path {
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-#compass path:hover {
-  transform: scale(1.05);
-  opacity: 0.9;
-}
-#compass text {
-  font-size: 12px;
-  font-weight: 600;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-/* === Mode Buttons === */
-.mode-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-.mode-button {
-  width: 90%;
-  max-width: 350px;
-  padding: 0.8rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: bold;
-  color: white;
-  cursor: pointer;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-.mode-button small {
-  display: block;
-  font-weight: normal;
-  font-size: 0.85rem;
-  opacity: 0.9;
-}
-.mode-button[data-mode="Growing"] {
-  background-color: #0074D9;
-}
-.mode-button[data-mode="Grounded"] {
-  background-color: #2ECC40;
-}
-.mode-button[data-mode="Drifting"] {
-  background-color: #FFDC00;
-  color: #1a1a1a;
-}
-.mode-button[data-mode="Surviving"] {
-  background-color: #FF4136;
-}
-
-/* === Activities === */
-.mode-activity {
-  background-color: #f4f4f4;
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 0.75rem 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-.mode-activity p {
-  font-weight: 500;
-  color: #0B3D2E;
-  margin-bottom: 0.4rem;
-}
-.mode-activity textarea {
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 0.6rem;
-  font-size: 0.95rem;
-  resize: vertical;
-}
-
-/* === History & About === */
-#historyList {
-  list-style-type: none;
-  padding: 0;
-}
-#historyList li {
-  background: #f4f4f4;
-  padding: 0.8rem;
-  border-radius: 6px;
-  margin-bottom: 0.6rem;
-}
-#about {
-  text-align: center;
-  color: #0B3D2E;
-  line-height: 1.8;
-}
-
-/* === Responsive === */
-@media (max-width: 600px) {
-  #compass {
-    width: 220px;
-    height: 220px;
+      const item = document.createElement("li");
+      item.innerHTML = `<strong>${date}</strong><br>Mode: ${entry.mode}<br>${activityList}`;
+      list.appendChild(item);
+    });
   }
-  header h1 {
-    font-size: 1.5rem;
-  }
-  .mode-button {
-    font-size: 0.9rem;
-  }
-}
+
+  // Initialize on load
+  updateStreak();
+});
