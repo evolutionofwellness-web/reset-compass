@@ -17,7 +17,7 @@ body {
 /* === Splash Screen === */
 #splashScreen {
   position: fixed;
-  background-color: #ffffff;
+  background-color: #0B3D2E;
   z-index: 9999;
   width: 100vw;
   height: 100vh;
@@ -33,11 +33,11 @@ body {
 @keyframes splashAnim {
   0% {
     opacity: 0;
-    transform: scale(0.6) rotate(0deg);
+    transform: scale(0.5) rotate(0deg);
   }
   100% {
     opacity: 1;
-    transform: scale(1.2) rotate(360deg);
+    transform: scale(1.6) rotate(360deg);
   }
 }
 
@@ -109,7 +109,7 @@ h1, h2 {
   color: #1C3B34;
 }
 
-/* === Compass === */
+/* === Compass Styling === */
 .compass-container {
   display: flex;
   justify-content: center;
@@ -120,35 +120,38 @@ h1, h2 {
 #compass {
   width: 100%;
   height: auto;
-}
-#compass path {
   cursor: pointer;
 }
 #compass path:hover {
-  opacity: 0.8;
+  opacity: 0.85;
   stroke: #222;
   stroke-width: 1px;
 }
 #compass text {
-  font-size: 10px;
+  font-family: system-ui, sans-serif;
   font-weight: bold;
+  font-size: 10px;
+  pointer-events: none;
 }
 
 /* === Mode Buttons === */
 .mode-buttons {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   gap: 0.75rem;
   margin-top: 1.5rem;
 }
 .mode-button {
-  padding: 0.6rem 1.2rem;
+  padding: 0.75rem 1.25rem;
   border: none;
   border-radius: 8px;
   color: white;
   font-size: 1rem;
   cursor: pointer;
+  width: 90%;
+  max-width: 320px;
+  text-align: center;
 }
 .mode-button[data-mode="Growing"] {
   background-color: #0074D9;
@@ -162,4 +165,29 @@ h1, h2 {
 }
 .mode-button[data-mode="Surviving"] {
   background-color: #FF4136;
+}
+
+/* === Content Sections === */
+section {
+  margin-top: 2rem;
+}
+.mode-activity {
+  margin-top: 1rem;
+}
+.mode-activity textarea {
+  width: 100%;
+  height: 60px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  resize: vertical;
+}
+
+/* === History Section === */
+#historyContent {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f1f1f1;
+  border-radius: 8px;
 }
