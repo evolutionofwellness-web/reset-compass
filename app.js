@@ -6,22 +6,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const appContent = document.getElementById("appContent");
   const streakDisplay = document.getElementById("streakDisplay");
 
-  // === Splash → Welcome → App ===
-  setTimeout(() => {
-    splash.style.display = "none";
+  // Initial screen flow
+  const hasSeen = localStorage.getItem("seenWelcome");
 
-    const hasSeen = localStorage.getItem("seenWelcome");
-    if (!hasSeen) {
+  if (!hasSeen) {
+    // New user: show splash → then welcome modal
+    splash.style.display = "block";
+    setTimeout(() => {
+      splash.style.display = "none";
       modal.classList.remove("hidden");
-    } else {
-      app.classList.remove("hidden");
-      updateStreak();
-    }
-  }, 1500);
-
-  startBtn.addEventListener("click", () => {
+    }, 1500);
+  } else {
+    // Returning user: skip splash & modal
+    splash.style.display = "none";
     modal.classList.add("hidden");
+    app.classList.remove("hidden");
+    updateStreak();
+  }
+
+  // Let’s Start → show app
+  startBtn.addEventListener("click", () => {
     localStorage.setItem("seenWelcome", "true");
+    modal.classList.add("hidden");
     app.classList.remove("hidden");
     updateStreak();
   });
