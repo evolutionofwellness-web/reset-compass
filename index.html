@@ -33,19 +33,22 @@
       </div>
 
       <div class="compass-container">
-        <svg viewBox="0 0 200 200" class="compass">
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0074D9" onclick="showMode('growing')"/>
-          <text x="150" y="40" class="label">Growing</text>
+        <svg id="compass" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Top (North) - Growing (Blue) -->
+  <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="blue"/>
+  <!-- Right (East) - Grounded (Green) -->
+  <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="green"/>
+  <!-- Bottom (South) - Drifting (Yellow) -->
+  <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="yellow"/>
+  <!-- Left (West) - Surviving (Red) -->
+  <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="red"/>
 
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2ECC40" onclick="showMode('grounded')"/>
-          <text x="140" y="160" class="label">Grounded</text>
-
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFDC00" onclick="showMode('drifting')"/>
-          <text x="30" y="170" class="label">Drifting</text>
-
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FF4136" onclick="showMode('surviving')"/>
-          <text x="20" y="40" class="label">Surviving</text>
-        </svg>
+  <!-- Center labels -->
+  <text x="100" y="20" text-anchor="middle" fill="white" font-size="10">Growing</text>
+  <text x="180" y="110" text-anchor="middle" fill="white" font-size="10">Grounded</text>
+  <text x="100" y="195" text-anchor="middle" fill="white" font-size="10">Drifting</text>
+  <text x="20" y="110" text-anchor="middle" fill="white" font-size="10">Surviving</text>
+</svg>
       </div>
 
       <div class="mode-buttons">
