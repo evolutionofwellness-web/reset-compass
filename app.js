@@ -5,49 +5,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const startBtn = document.getElementById("startApp");
   const appContent = document.getElementById("appContent");
   const streakDisplay = document.getElementById("streakDisplay");
-  const historyList = document.getElementById("historyList");
 
-  // Splash > Modal > App
+  // === Splash → Welcome → App ===
   setTimeout(() => {
     splash.style.display = "none";
-    const seen = localStorage.getItem("seenWelcome");
-    if (!seen) {
+
+    const hasSeen = localStorage.getItem("seenWelcome");
+    if (!hasSeen) {
       modal.classList.remove("hidden");
     } else {
       app.classList.remove("hidden");
       updateStreak();
-      loadHistory();
     }
   }, 1500);
 
-  // Start button
   startBtn.addEventListener("click", () => {
     modal.classList.add("hidden");
     localStorage.setItem("seenWelcome", "true");
     app.classList.remove("hidden");
     updateStreak();
-    loadHistory();
   });
 
-  // Navigation
+  // === Page Navigation ===
   window.navigate = (target) => {
     const views = appContent.querySelectorAll("section");
     views.forEach(view => view.classList.add("hidden"));
     document.getElementById(target).classList.remove("hidden");
+    updateStreak();
+    renderHistory();
   };
 
-  // Streak logic
+  // === Streak Logic ===
   function updateStreak() {
     const history = JSON.parse(localStorage.getItem("history") || "{}");
     const dates = Object.keys(history).sort().reverse();
     let streak = 0;
-    let current = new Date();
+    let currentDate = new Date();
 
     for (let date of dates) {
-      const currentStr = current.toISOString().split("T")[0];
-      if (date === currentStr) {
+      const dateStr = currentDate.toISOString().split("T")[0];
+      if (date === dateStr) {
         streak++;
-        current.setDate(current.getDate() - 1);
+        currentDate.setDate(currentDate.getDate() - 1);
       } else {
         break;
       }
@@ -58,64 +57,88 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Logging
-  function logActivity(mode, activityText) {
+  function logActivity(mode, inputText) {
     const today = new Date().toISOString().split("T")[0];
     const history = JSON.parse(localStorage.getItem("history") || "{}");
-
     if (!history[today]) {
-      history[today] = [];
+      history[today] = {};
     }
 
-    const logged = history[today].some(item => item.mode === mode && item.text === activityText);
-    if (!logged && activityText.trim()) {
-      history[today].push({ mode, text: activityText });
+    if (!history[today][mode]) {
+      history[today][mode] = [];
+    }
+
+    if (inputText && !history[today][mode].includes(inputText)) {
+      history[today][mode].push(inputText);
       localStorage.setItem("history", JSON.stringify(history));
       updateStreak();
-      loadHistory();
     }
   }
 
-  // Load history
-  function loadHistory() {
-    const history = JSON.parse(localStorage.getItem("history") || "{}");
-    historyList.innerHTML = "";
-    const dates = Object.keys(history).sort().reverse();
-    dates.forEach(date => {
-      history[date].forEach(entry => {
-        const li = document.createElement("li");
-        li.textContent = `${date} — ${entry.mode}: ${entry.text}`;
-        historyList.appendChild(li);
-      });
-    });
-  }
-
-  // Activity submission
-  document.querySelectorAll(".mode-activity textarea").forEach(textarea => {
-    textarea.addEventListener("blur", () => {
-      const mode = textarea.getAttribute("data-mode");
-      const text = textarea.value;
-      logActivity(mode, text);
-    });
-  });
-
-  // Compass click
+  // === Compass Click ===
   const compass = document.getElementById("compass");
   if (compass) {
     compass.querySelectorAll("path").forEach(path => {
       path.addEventListener("click", () => {
         const mode = path.getAttribute("data-mode");
-        alert(`You selected "${mode}" mode`);
-        window.navigate(mode.toLowerCase() + "View");
+        if (mode) {
+          navigate(mode + "View");
+        }
       });
     });
   }
 
-  // Button click
+  // === Mode Button Clicks ===
   document.querySelectorAll(".mode-button").forEach(button => {
     button.addEventListener("click", () => {
       const mode = button.getAttribute("data-mode");
-      window.navigate(mode.toLowerCase() + "View");
+      if (mode) {
+        navigate(mode + "View");
+      }
     });
   });
+
+  // === Input Logging (Modes + Quick Wins) ===
+  document.querySelectorAll("textarea").forEach(textarea => {
+    textarea.addEventListener("blur", () => {
+      const mode = textarea.dataset.mode;
+      const value = textarea.value.trim();
+      if (mode && value) {
+        logActivity(mode, value);
+      }
+    });
+  });
+
+  // === History Rendering ===
+  function renderHistory() {
+    const historyList = document.getElementById("historyList");
+    if (!historyList) return;
+
+    historyList.innerHTML = "";
+
+    const history = JSON.parse(localStorage.getItem("history") || "{}");
+    const sortedDates = Object.keys(history).sort().reverse();
+
+    sortedDates.forEach(date => {
+      const entry = history[date];
+      const listItem = document.createElement("li");
+      let html = `<strong>${date}</strong><br/>`;
+
+      Object.keys(entry).forEach(mode => {
+        const actions = entry[mode];
+        if (Array.isArray(actions)) {
+          html += `<em>${mode}:</em><ul>`;
+          actions.forEach(action => {
+            html += `<li>${action}</li>`;
+          });
+          html += `</ul>`;
+        }
+      });
+
+      listItem.innerHTML = html;
+      historyList.appendChild(listItem);
+    });
+  }
+
+  renderHistory();
 });
