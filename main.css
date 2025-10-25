@@ -1,4 +1,4 @@
-/* === Reset + Base === */
+/* === Reset & Base === */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -8,7 +8,7 @@ body {
   font-family: system-ui, sans-serif;
   background-color: #f9f9f9;
   color: #222;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 .hidden {
   display: none;
@@ -49,7 +49,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,17 +57,17 @@ body {
 .modal-content {
   background: #fff;
   padding: 1.5rem;
-  border-radius: 12px;
+  border-radius: 10px;
   width: 90%;
-  max-width: 360px;
+  max-width: 340px;
   text-align: center;
 }
 .modal-content h2 {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   margin-bottom: 0.5rem;
 }
 .modal-content p {
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 .modal-content button {
   margin-top: 1rem;
@@ -80,70 +80,75 @@ body {
   cursor: pointer;
 }
 
-/* === Header + Navigation === */
+/* === Header & Navigation === */
 header {
   background-color: #0B3D2E;
   color: white;
-  padding: 0.8rem;
+  padding: 1rem;
   text-align: center;
 }
 nav {
   margin-top: 0.5rem;
 }
 nav button {
-  margin: 0.25rem;
-  padding: 0.5rem 1rem;
-  background: #eee;
-  border: none;
+  margin: 0.2rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  background: white;
+  color: #0B3D2E;
+  border: 1px solid #0B3D2E;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
 }
 nav button:hover {
-  background: #ddd;
+  background-color: #0B3D2E;
+  color: white;
 }
 
-/* === Main App Layout === */
+/* === Main Content === */
 main {
   padding: 1rem;
 }
 h1, h2 {
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
-section {
-  margin-top: 1.5rem;
+h2 {
+  font-size: 1.2rem;
 }
 
-/* === Daily Streak === */
+/* === Daily Streak Display === */
 #streakDisplay {
   text-align: center;
   font-size: 1.1rem;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
   color: #0B3D2E;
 }
 
-/* === Compass === */
+/* === Compass Styling === */
 .compass-container {
   display: flex;
   justify-content: center;
   margin: 1rem auto;
-  width: 100%;
-  max-width: 320px;
+  max-width: 360px;
 }
 #compass {
   width: 100%;
   height: auto;
 }
+#compass path {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 #compass path:hover {
   opacity: 0.85;
-  stroke: #222;
-  stroke-width: 1;
+  stroke: #333;
+  stroke-width: 1px;
 }
 #compass text {
   font-family: system-ui, sans-serif;
   font-weight: bold;
-  font-size: 12px;
+  fill: #000;
 }
 
 /* === Mode Buttons === */
@@ -152,28 +157,30 @@ section {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.75rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 .mode-button {
   padding: 0.75rem 1rem;
   border: none;
   border-radius: 8px;
-  color: white;
   font-size: 1rem;
-  text-align: center;
-  width: 140px;
   cursor: pointer;
+  text-align: center;
+  min-width: 140px;
 }
 .mode-button small {
   display: block;
-  font-size: 0.8rem;
-  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  margin-top: 4px;
 }
 .mode-button[data-mode="Growing"] {
   background-color: #0074D9;
+  color: white;
 }
 .mode-button[data-mode="Grounded"] {
   background-color: #2ECC40;
+  color: white;
 }
 .mode-button[data-mode="Drifting"] {
   background-color: #FFDC00;
@@ -181,35 +188,38 @@ section {
 }
 .mode-button[data-mode="Surviving"] {
   background-color: #FF4136;
+  color: white;
 }
 
-/* === Activity & Quick Wins === */
-.mode-activity {
-  margin-bottom: 1.5rem;
+/* === Mode Views & Textareas === */
+section {
+  margin-top: 2rem;
 }
-.mode-activity p {
-  margin-bottom: 0.3rem;
-  font-weight: 500;
+.mode-activity {
+  margin: 1rem auto;
+  display: flex;
+  justify-content: center;
 }
 .mode-activity textarea {
-  width: 100%;
-  height: 60px;
-  padding: 0.5rem;
+  width: 90%;
+  max-width: 500px;
+  min-height: 80px;
+  padding: 0.75rem;
   border: 1px solid #ccc;
-  border-radius: 6px;
-  resize: vertical;
+  border-radius: 8px;
   font-size: 0.95rem;
+  resize: vertical;
 }
 
-/* === History List === */
-#historyList {
+/* === History View === */
+#historyView ul {
   list-style: none;
-  padding-left: 0;
+  padding: 0;
+  margin: 1rem;
 }
-#historyList li {
-  margin-bottom: 0.5rem;
+#historyView li {
   padding: 0.5rem;
-  background: #f1f1f1;
-  border-radius: 6px;
-  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  background: #eee;
+  border-left: 4px solid #0B3D2E;
 }
