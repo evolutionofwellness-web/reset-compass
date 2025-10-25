@@ -1,126 +1,83 @@
-:root {
-  --brand-green: #0B3D2E;
-  --surviving: #FF3333;
-  --drifting: #FFD700;
-  --grounded: #00AA00;
-  --growing: #0000FF;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Reset Compass</title>
+  <link rel="stylesheet" href="main.css?v=final">
+</head>
+<body>
+  <div id="splashScreen">
+    <img src="splash-icon.png" id="splashIcon" alt="Loading..." />
+  </div>
 
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #fff;
-  color: #111;
-}
+  <header>
+    <h1>The Reset Compass</h1>
+    <nav>
+      <button onclick="navigate('home')">Home</button>
+      <button onclick="navigate('quickWins')">Quick Wins</button>
+      <button onclick="navigate('history')">History</button>
+      <button onclick="navigate('about')">About</button>
+    </nav>
+  </header>
 
-header {
-  background-color: var(--brand-green);
-  color: white;
-  padding: 1rem;
-  text-align: center;
-}
+  <main>
+    <section id="home" class="page active">
+      <div class="streak">
+        <span id="streakCount">🔥 0-day streak</span>
+      </div>
 
-nav {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
+      <div class="how-to">
+        <h2>How to Use This App</h2>
+        <p>Select a mode from the compass or buttons below. Complete an activity. Log it. Build your streak.</p>
+      </div>
 
-nav button {
-  background: var(--brand-green);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  border: none;
-  font-weight: bold;
-}
+      <div class="compass-container">
+        <svg viewBox="0 0 200 200" class="compass">
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0074D9" onclick="showMode('growing')"/>
+          <text x="150" y="40" class="label">Growing</text>
 
-section {
-  display: none;
-  padding: 1rem;
-}
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2ECC40" onclick="showMode('grounded')"/>
+          <text x="140" y="160" class="label">Grounded</text>
 
-section.active {
-  display: block;
-}
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFDC00" onclick="showMode('drifting')"/>
+          <text x="30" y="170" class="label">Drifting</text>
 
-#splashScreen {
-  background: var(--brand-green);
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FF4136" onclick="showMode('surviving')"/>
+          <text x="20" y="40" class="label">Surviving</text>
+        </svg>
+      </div>
 
-#splashIcon {
-  width: 100px;
-  height: 100px;
-  animation: zoomSpinFade 2s ease-in-out forwards;
-}
+      <div class="mode-buttons">
+        <button class="growing" onclick="showMode('growing')">Growing: Push yourself to new heights</button>
+        <button class="grounded" onclick="showMode('grounded')">Grounded: Stay centered and productive</button>
+        <button class="drifting" onclick="showMode('drifting')">Drifting: Gently regain focus and energy</button>
+        <button class="surviving" onclick="showMode('surviving')">Surviving: Just get through the day</button>
+      </div>
+    </section>
 
-@keyframes zoomSpinFade {
-  0% { transform: scale(1) rotate(0deg); opacity: 1; }
-  50% { transform: scale(2) rotate(180deg); }
-  100% { transform: scale(3) rotate(360deg); opacity: 0; }
-}
+    <section id="quickWins" class="page">
+      <h2>Quick Wins</h2>
+      <p>Take a small step to feel better.</p>
+      <textarea placeholder="What quick win did you complete?" onchange="logActivity('quickwin', this.value)"></textarea>
+    </section>
 
-.how-to-box {
-  background: #e6fff2;
-  padding: 1rem;
-  border: 2px dashed var(--brand-green);
-  border-radius: 10px;
-  margin: 1rem 0;
-}
+    <section id="history" class="page">
+      <h2>Activity History</h2>
+      <ul id="historyList"></ul>
+    </section>
 
-#compassContainer {
-  display: flex;
-  justify-content: center;
-  margin: 1.5rem 0;
-}
+    <section id="about" class="page">
+      <h2>About</h2>
+      <p>The Reset Compass helps you reset your day using science-backed actions based on your current energy level.</p>
+    </section>
 
-#compass {
-  width: 220px;
-  height: 220px;
-}
+    <section id="modeSection" class="page">
+      <h2 id="modeTitle"></h2>
+      <div id="activitiesContainer"></div>
+    </section>
+  </main>
 
-.wedge-label {
-  font-size: 0.8rem;
-  text-anchor: middle;
-  fill: white;
-  font-weight: bold;
-}
-
-#growing, .growing { background: var(--growing); }
-#grounded, .grounded { background: var(--grounded); }
-#drifting, .drifting { background: var(--drifting); }
-#surviving, .surviving { background: var(--surviving); }
-
-button {
-  padding: 0.8rem;
-  border-radius: 8px;
-  border: 2px solid var(--brand-green);
-  font-size: 1rem;
-  margin: 0.5rem 0;
-  width: 100%;
-  max-width: 400px;
-  display: block;
-  margin-inline: auto;
-}
-
-textarea {
-  width: 100%;
-  height: 80px;
-  padding: 0.5rem;
-  font-size: 1rem;
-  margin-top: 0.5rem;
-}
-
-#streakDisplay {
-  font-weight: bold;
-  text-align: center;
-  margin: 1rem 0;
-  font-size: 1.2rem;
-}
+  <script src="app.js?v=final"></script>
+</body>
+</html>
