@@ -6,25 +6,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const appContent = document.getElementById("appContent");
   const streakDisplay = document.getElementById("streakDisplay");
 
-  // Initial screen flow
+  // Show splash and modal on first visit
   const hasSeen = localStorage.getItem("seenWelcome");
-
   if (!hasSeen) {
-    // New user: show splash → then welcome modal
     splash.style.display = "block";
     setTimeout(() => {
       splash.style.display = "none";
       modal.classList.remove("hidden");
     }, 1500);
   } else {
-    // Returning user: skip splash & modal
     splash.style.display = "none";
     modal.classList.add("hidden");
     app.classList.remove("hidden");
     updateStreak();
   }
 
-  // Let’s Start → show app
   startBtn.addEventListener("click", () => {
     localStorage.setItem("seenWelcome", "true");
     modal.classList.add("hidden");
@@ -32,16 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
     updateStreak();
   });
 
-  // === Page Navigation ===
   window.navigate = (target) => {
-    const views = appContent.querySelectorAll("section");
-    views.forEach(view => view.classList.add("hidden"));
+    appContent.querySelectorAll("section").forEach(view => view.classList.add("hidden"));
     document.getElementById(target).classList.remove("hidden");
     updateStreak();
     renderHistory();
   };
 
-  // === Streak Logic ===
   function updateStreak() {
     const history = JSON.parse(localStorage.getItem("history") || "{}");
     const dates = Object.keys(history).sort().reverse();
@@ -58,21 +51,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    if (streakDisplay) {
-      streakDisplay.innerHTML = `🔥 ${streak}-day streak`;
-    }
+    streakDisplay.innerHTML = `🔥 ${streak}-day streak`;
   }
 
   function logActivity(mode, inputText) {
     const today = new Date().toISOString().split("T")[0];
     const history = JSON.parse(localStorage.getItem("history") || "{}");
-    if (!history[today]) {
-      history[today] = {};
-    }
-
-    if (!history[today][mode]) {
-      history[today][mode] = [];
-    }
+    if (!history[today]) history[today] = {};
+    if (!history[today][mode]) history[today][mode] = [];
 
     if (inputText && !history[today][mode].includes(inputText)) {
       history[today][mode].push(inputText);
@@ -81,30 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === Compass Click ===
-  const compass = document.getElementById("compass");
-  if (compass) {
-    compass.querySelectorAll("path").forEach(path => {
-      path.addEventListener("click", () => {
-        const mode = path.getAttribute("data-mode");
-        if (mode) {
-          navigate(mode + "View");
-        }
-      });
-    });
-  }
-
-  // === Mode Button Clicks ===
-  document.querySelectorAll(".mode-button").forEach(button => {
-    button.addEventListener("click", () => {
-      const mode = button.getAttribute("data-mode");
-      if (mode) {
-        navigate(mode + "View");
-      }
-    });
-  });
-
-  // === Input Logging (Modes + Quick Wins) ===
   document.querySelectorAll("textarea").forEach(textarea => {
     textarea.addEventListener("blur", () => {
       const mode = textarea.dataset.mode;
@@ -115,13 +77,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // === History Rendering ===
+  const compass = document.getElementById("compass");
+  if (compass) {
+    compass.querySelectorAll("path").forEach(path => {
+      path.addEventListener("click", () => {
+        const mode = path.getAttribute("data-mode");
+        if (mode) navigate(mode + "View");
+      });
+    });
+  }
+
+  document.querySelectorAll(".mode-button").forEach(button => {
+    button.addEventListener("click", () => {
+      const mode = button.getAttribute("data-mode");
+      if (mode) navigate(mode + "View");
+    });
+  });
+
   function renderHistory() {
     const historyList = document.getElementById("historyList");
     if (!historyList) return;
 
     historyList.innerHTML = "";
-
     const history = JSON.parse(localStorage.getItem("history") || "{}");
     const sortedDates = Object.keys(history).sort().reverse();
 
