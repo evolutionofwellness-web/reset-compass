@@ -34,23 +34,25 @@
 
       <div class="compass-container">
         <div id="compass" style="margin: 40px auto; width: 250px; height: 250px;">
+  <div class="compass" style="max-width: 300px; margin: 0 auto;">
   <svg viewBox="0 0 200 200" width="100%" height="100%">
-    <!-- GROWING - TOP (NORTH) -->
+    <!-- GROWING (Top / 0°) -->
     <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="blue" onclick="navigateToMode('growing')" />
-    <text x="150" y="60" text-anchor="middle" fill="white" font-size="14" transform="rotate(45,150,60)">Growing</text>
+    <text x="140" y="40" fill="white" font-size="12" text-anchor="middle" transform="rotate(45 140 40)">Growing</text>
 
-    <!-- GROUNDED - RIGHT (EAST) -->
+    <!-- GROUNDED (Right / 90°) -->
     <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="green" onclick="navigateToMode('grounded')" />
-    <text x="150" y="150" text-anchor="middle" fill="white" font-size="14" transform="rotate(315,150,150)">Grounded</text>
+    <text x="160" y="140" fill="white" font-size="12" text-anchor="middle" transform="rotate(135 160 140)">Grounded</text>
 
-    <!-- DRIFTING - BOTTOM (SOUTH) -->
+    <!-- DRIFTING (Bottom / 180°) -->
     <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="yellow" onclick="navigateToMode('drifting')" />
-    <text x="50" y="160" text-anchor="middle" fill="black" font-size="14" transform="rotate(135,50,160)">Drifting</text>
+    <text x="60" y="165" fill="black" font-size="12" text-anchor="middle" transform="rotate(225 60 165)">Drifting</text>
 
-    <!-- SURVIVING - LEFT (WEST) -->
+    <!-- SURVIVING (Left / 270°) -->
     <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="red" onclick="navigateToMode('surviving')" />
-    <text x="50" y="50" text-anchor="middle" fill="white" font-size="14" transform="rotate(225,50,50)">Surviving</text>
+    <text x="40" y="60" fill="white" font-size="12" text-anchor="middle" transform="rotate(315 40 60)">Surviving</text>
   </svg>
+</div>
 </div>
       </div>
 
