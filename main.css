@@ -17,37 +17,39 @@ body {
 /* === Splash Screen === */
 #splashScreen {
   position: fixed;
-  background-color: #0B3D2E; /* brand background */
+  background-color: #ffffff;
   z-index: 9999;
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.5s ease;
-  opacity: 1;
-}
-#splashScreen.hide {
-  opacity: 0;
 }
 #splashIcon {
   width: 100px;
-  transition: transform 1.2s ease, opacity 0.6s ease;
+  height: 100px;
+  animation: splashAnim 1.5s ease-out forwards;
 }
-#splashIcon.animate {
-  transform: scale(3) rotate(360deg);
-  opacity: 0;
+@keyframes splashAnim {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.2) rotate(360deg);
+  }
 }
 
 /* === Welcome Modal === */
 .modal {
   position: fixed;
-  z-index: 10000;
+  z-index: 9998;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,21 +62,14 @@ body {
   max-width: 400px;
   text-align: center;
 }
-.modal-content h2 {
-  color: #0B3D2E;
-  margin-bottom: 1rem;
-}
-.modal-content p {
+.modal-content button {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
   font-size: 1rem;
-  margin-bottom: 1.5rem;
-}
-#startButton {
-  background: #0B3D2E;
+  background: #1C3B34;
   color: white;
-  padding: 10px 24px;
-  font-size: 1.1rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
 }
 
@@ -109,12 +104,12 @@ h1, h2 {
 /* === Daily Streak Display === */
 #streakDisplay {
   text-align: center;
-  font-size: 1.2rem;
-  margin-bottom: 1.5rem;
-  color: #0B3D2E;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #1C3B34;
 }
 
-/* === Compass Styling === */
+/* === Compass === */
 .compass-container {
   display: flex;
   justify-content: center;
@@ -125,21 +120,18 @@ h1, h2 {
 #compass {
   width: 100%;
   height: auto;
+}
+#compass path {
   cursor: pointer;
 }
 #compass path:hover {
-  opacity: 0.85;
-  stroke: #333;
+  opacity: 0.8;
+  stroke: #222;
   stroke-width: 1px;
 }
 #compass text {
-  font-family: system-ui, sans-serif;
+  font-size: 10px;
   font-weight: bold;
-  font-size: 0.9rem;
-  fill: white;
-  pointer-events: none;
-  dominant-baseline: middle;
-  text-anchor: middle;
 }
 
 /* === Mode Buttons === */
@@ -170,17 +162,4 @@ h1, h2 {
 }
 .mode-button[data-mode="Surviving"] {
   background-color: #FF4136;
-}
-
-/* === Content Sections === */
-section {
-  margin-top: 2rem;
-}
-.mode-activity {
-  margin-top: 1rem;
-}
-
-/* === Utility === */
-button:focus {
-  outline: 2px solid #0B3D2E;
 }
