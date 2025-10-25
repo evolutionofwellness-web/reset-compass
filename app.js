@@ -1,43 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splashScreen");
-  const modal = document.getElementById("welcomeModal");
   const app = document.getElementById("appWrapper");
-  const startBtn = document.getElementById("startApp");
   const appContent = document.getElementById("appContent");
   const streakDisplay = document.getElementById("streakDisplay");
 
-  // === Splash logic ===
+  // Splash → Show app after delay
   setTimeout(() => {
     splash.style.display = "none";
-    const hasSeen = localStorage.getItem("seenWelcome");
-
-    if (!hasSeen) {
-      modal.classList.remove("hidden");
-    } else {
-      app.classList.remove("hidden");
-      updateStreak();
-    }
+    app.classList.remove("hidden");
+    updateStreak();
   }, 1500);
 
-  // === "Let's Start" button logic ===
-  if (startBtn) {
-    startBtn.addEventListener("click", () => {
-      modal.classList.add("hidden");
-      localStorage.setItem("seenWelcome", "true");
-      app.classList.remove("hidden");
-      updateStreak();
-    });
-  }
-
-  // === Navigation ===
+  // Navigation buttons
   window.navigate = (target) => {
     const views = appContent.querySelectorAll("section");
     views.forEach(view => view.classList.add("hidden"));
-    const targetView = document.getElementById(target);
-    if (targetView) targetView.classList.remove("hidden");
+    document.getElementById(target).classList.remove("hidden");
   };
 
-  // === Mode/Wedge selection logic ===
+  // Compass and buttons → log activity
   const setMode = (mode) => {
     const today = new Date().toISOString().split("T")[0];
     const history = JSON.parse(localStorage.getItem("history") || "{}");
@@ -66,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Streak Display ===
+  // Daily Streak
   function updateStreak() {
     const history = JSON.parse(localStorage.getItem("history") || "{}");
     const dates = Object.keys(history).sort().reverse();
