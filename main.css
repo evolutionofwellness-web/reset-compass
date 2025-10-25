@@ -1,139 +1,125 @@
-/* === Base === */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
 body {
-  font-family: system-ui, sans-serif;
-  background-color: #f4f4f4;
-  color: #222;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  color: #0B3D2E;
 }
 
-/* === Splash Screen === */
-#splashScreen {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: #0B3D2E;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-#splashIcon {
-  width: 120px;
-  height: 120px;
-  animation: splashAnim 1.2s ease-out forwards;
-}
-@keyframes splashAnim {
-  0% { transform: scale(0.4) rotate(0); opacity: 0; }
-  100% { transform: scale(1.2) rotate(360deg); opacity: 1; }
-}
-
-/* === Modal === */
-.modal {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9998;
-}
-.modal-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 10px;
-  max-width: 90%;
-  text-align: center;
-}
-.modal-content button {
-  margin-top: 1rem;
-  background: #0B3D2E;
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* === Header + Nav === */
 header {
-  background: #0B3D2E;
-  color: white;
+  background-color: #0B3D2E;
   padding: 1rem;
   text-align: center;
+  color: white;
 }
-nav {
-  margin-top: 0.5rem;
-}
+
 nav button {
-  background: white;
-  color: #0B3D2E;
-  margin: 0.25rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid #0B3D2E;
-  border-radius: 4px;
-  cursor: pointer;
-}
-nav button:hover {
-  background: #eee;
+  margin: 5px;
+  background: #f0f0f0;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
 }
 
-/* === Compass === */
-.compass-container {
-  display: flex;
-  justify-content: center;
-  margin: 1.5rem 0;
-}
-#compass {
-  width: 240px;
-  height: 240px;
-  cursor: pointer;
-}
-#compass path:hover {
-  stroke: #111;
-  stroke-width: 1;
-  opacity: 0.85;
+.stats {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 1.2em;
 }
 
-/* === Mode Buttons === */
 .mode-buttons {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem 0;
 }
-.mode-button {
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 0.9rem;
-  text-align: center;
-}
-.mode-button[data-mode="Growing"] { background: #0074D9; }
-.mode-button[data-mode="Grounded"] { background: #2ECC40; }
-.mode-button[data-mode="Drifting"] { background: #FFDC00; color: #222; }
-.mode-button[data-mode="Surviving"] { background: #FF4136; }
 
-/* === Other Layouts === */
-section { padding: 1rem; }
-textarea {
-  width: 100%;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-top: 0.75rem;
+.mode-btn {
+  margin: 10px;
+  padding: 12px;
+  width: 80%;
+  background-color: #0B3D2E;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1em;
 }
-#streakDisplay {
+
+.mode-btn span {
+  display: block;
+  font-size: 0.85em;
+  color: #c2e0d6;
+}
+
+#compass {
+  display: block;
+  margin: 1rem auto;
+  width: 250px;
+  height: 250px;
+}
+
+#activityList input, #quickWinsList input {
+  width: 90%;
+  margin: 10px auto;
+  display: block;
+  padding: 10px;
+}
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.5);
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
   text-align: center;
-  font-weight: bold;
-  color: #0B3D2E;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+  border-radius: 10px;
 }
-.hidden { display: none; }
+
+.modal button {
+  margin-top: 1rem;
+  padding: 10px 20px;
+  background-color: #0B3D2E;
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
+
+.hidden {
+  display: none;
+}
+
+#splash-screen {
+  background-color: #0B3D2E;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#splash-logo {
+  width: 100px;
+  height: 100px;
+  animation: zoomFade 2s ease-in-out;
+}
+
+@keyframes zoomFade {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
