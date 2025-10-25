@@ -11,7 +11,7 @@ body {
   line-height: 1.6;
 }
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* === Splash Screen === */
@@ -33,11 +33,11 @@ body {
 @keyframes splashAnim {
   0% {
     opacity: 0;
-    transform: scale(0.5) rotate(0deg);
+    transform: scale(0.6) rotate(0deg);
   }
   100% {
     opacity: 1;
-    transform: scale(1.6) rotate(360deg);
+    transform: scale(1.2) rotate(360deg);
   }
 }
 
@@ -49,7 +49,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,6 +82,9 @@ header {
 }
 nav {
   margin-top: 0.5rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 nav button {
   margin: 0.25rem;
@@ -123,15 +126,17 @@ h1, h2 {
   cursor: pointer;
 }
 #compass path:hover {
-  opacity: 0.85;
+  opacity: 0.8;
   stroke: #222;
   stroke-width: 1px;
 }
 #compass text {
   font-family: system-ui, sans-serif;
   font-weight: bold;
-  font-size: 10px;
-  pointer-events: none;
+  font-size: 14px;
+  fill: #fff;
+  text-anchor: middle;
+  dominant-baseline: middle;
 }
 
 /* === Mode Buttons === */
@@ -143,14 +148,14 @@ h1, h2 {
   margin-top: 1.5rem;
 }
 .mode-button {
-  padding: 0.75rem 1.25rem;
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 8px;
   color: white;
   font-size: 1rem;
   cursor: pointer;
   width: 90%;
-  max-width: 320px;
+  max-width: 300px;
   text-align: center;
 }
 .mode-button[data-mode="Growing"] {
@@ -174,20 +179,12 @@ section {
 .mode-activity {
   margin-top: 1rem;
 }
-.mode-activity textarea {
+textarea {
   width: 100%;
-  height: 60px;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 0.6rem;
   margin-top: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
   resize: vertical;
-}
-
-/* === History Section === */
-#historyContent {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: #f1f1f1;
-  border-radius: 8px;
 }
