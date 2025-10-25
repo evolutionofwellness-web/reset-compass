@@ -1,13 +1,13 @@
-/* === Base Styles === */
+/* === Base Reset === */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 body {
-  font-family: system-ui, sans-serif;
-  background-color: #f9f9f9;
-  color: #222;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  color: #1a1a1a;
   line-height: 1.6;
 }
 .hidden {
@@ -26,92 +26,134 @@ body {
   justify-content: center;
 }
 #splashIcon {
-  width: 100px;
-  height: 100px;
-  animation: splashAnim 1.5s ease-out forwards;
+  width: 120px;
+  height: 120px;
+  animation: splashZoomSpin 2s ease-in-out forwards;
 }
-@keyframes splashAnim {
+@keyframes splashZoomSpin {
   0% {
-    opacity: 0;
     transform: scale(0.6) rotate(0deg);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(2.5) rotate(360deg);
+    opacity: 1;
   }
   100% {
-    opacity: 1;
-    transform: scale(1.5) rotate(360deg);
+    transform: scale(4) rotate(540deg);
+    opacity: 0;
   }
 }
 
-/* === App Layout === */
-header {
-  background-color: #1C3B34;
-  color: white;
-  padding: 1rem;
+/* === Welcome Modal === */
+.modal {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
   text-align: center;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
-nav {
-  margin-top: 1rem;
-  text-align: center;
-}
-nav button {
-  margin: 0.25rem;
-  padding: 0.5rem 1rem;
-  background: #eee;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-nav button:hover {
-  background: #ddd;
-}
-main {
-  padding: 1rem;
-}
-h1, h2 {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-p {
-  margin-bottom: 0.5rem;
-}
-
-/* === Welcome Banner === */
-.welcome-banner {
-  background-color: #e6f3ef;
-  border-left: 6px solid #0B3D2E;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 6px;
-}
-
-/* === Daily Streak === */
-#streakDisplay {
-  text-align: center;
-  font-size: 1.1rem;
+.modal-content h2 {
   margin-bottom: 1rem;
   color: #0B3D2E;
 }
+.modal-content button {
+  background-color: #0B3D2E;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 1rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.modal-content button:hover {
+  background-color: #09422a;
+}
 
-/* === Compass SVG === */
+/* === Header and Nav === */
+header {
+  background-color: #0B3D2E;
+  color: #ffffff;
+  text-align: center;
+  padding: 1.2rem 1rem;
+}
+header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+nav button {
+  background: #ffffff;
+  color: #0B3D2E;
+  border: 2px solid #0B3D2E;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+nav button:hover {
+  background-color: #0B3D2E;
+  color: white;
+}
+
+/* === Layout === */
+main {
+  padding: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* === Streak Display === */
+#streakDisplay {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #0B3D2E;
+  margin-bottom: 1rem;
+}
+
+/* === Compass === */
 .compass-container {
   display: flex;
   justify-content: center;
-  margin: 1rem auto;
-  max-width: 360px;
+  margin: 1rem 0;
 }
 #compass {
-  width: 100%;
-  height: auto;
+  width: 300px;
+  height: 300px;
+}
+#compass path {
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 #compass path:hover {
-  opacity: 0.8;
-  stroke: #222;
-  stroke-width: 1px;
+  transform: scale(1.05);
+  opacity: 0.9;
 }
 #compass text {
-  font-family: system-ui, sans-serif;
-  font-weight: bold;
-  pointer-events: none;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 /* === Mode Buttons === */
@@ -119,19 +161,27 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   margin-top: 1.5rem;
 }
 .mode-button {
-  padding: 0.6rem 1.2rem;
+  width: 90%;
+  max-width: 350px;
+  padding: 0.8rem;
   border: none;
   border-radius: 8px;
-  color: white;
   font-size: 1rem;
-  width: 90%;
-  max-width: 400px;
+  font-weight: bold;
+  color: white;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+.mode-button small {
+  display: block;
+  font-weight: normal;
+  font-size: 0.85rem;
+  opacity: 0.9;
 }
 .mode-button[data-mode="Growing"] {
   background-color: #0074D9;
@@ -141,24 +191,61 @@ p {
 }
 .mode-button[data-mode="Drifting"] {
   background-color: #FFDC00;
-  color: #222;
+  color: #1a1a1a;
 }
 .mode-button[data-mode="Surviving"] {
   background-color: #FF4136;
 }
 
-/* === Sections === */
-section {
-  margin-top: 2rem;
-}
+/* === Activities === */
 .mode-activity {
-  margin-top: 1rem;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-textarea {
+.mode-activity p {
+  font-weight: 500;
+  color: #0B3D2E;
+  margin-bottom: 0.4rem;
+}
+.mode-activity textarea {
   width: 100%;
-  min-height: 60px;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
   border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.6rem;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+/* === History & About === */
+#historyList {
+  list-style-type: none;
+  padding: 0;
+}
+#historyList li {
+  background: #f4f4f4;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 0.6rem;
+}
+#about {
+  text-align: center;
+  color: #0B3D2E;
+  line-height: 1.8;
+}
+
+/* === Responsive === */
+@media (max-width: 600px) {
+  #compass {
+    width: 220px;
+    height: 220px;
+  }
+  header h1 {
+    font-size: 1.5rem;
+  }
+  .mode-button {
+    font-size: 0.9rem;
+  }
 }
