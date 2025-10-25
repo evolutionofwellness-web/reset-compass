@@ -1,125 +1,139 @@
-body {
-  font-family: Arial, sans-serif;
+/* === Base === */
+* {
+  box-sizing: border-box;
   margin: 0;
-  background: #f9f9f9;
+  padding: 0;
+}
+body {
+  font-family: system-ui, sans-serif;
+  background-color: #f4f4f4;
   color: #222;
 }
 
+/* === Splash Screen === */
+#splashScreen {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: #0B3D2E;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+#splashIcon {
+  width: 120px;
+  height: 120px;
+  animation: splashAnim 1.2s ease-out forwards;
+}
+@keyframes splashAnim {
+  0% { transform: scale(0.4) rotate(0); opacity: 0; }
+  100% { transform: scale(1.2) rotate(360deg); opacity: 1; }
+}
+
+/* === Modal === */
+.modal {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9998;
+}
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 90%;
+  text-align: center;
+}
+.modal-content button {
+  margin-top: 1rem;
+  background: #0B3D2E;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* === Header + Nav === */
 header {
   background: #0B3D2E;
   color: white;
   padding: 1rem;
   text-align: center;
 }
-
+nav {
+  margin-top: 0.5rem;
+}
 nav button {
   background: white;
-  border: none;
+  color: #0B3D2E;
   margin: 0.25rem;
   padding: 0.5rem 1rem;
-  font-weight: bold;
-  border-radius: 5px;
+  border: 1px solid #0B3D2E;
+  border-radius: 4px;
   cursor: pointer;
 }
-
-h2 {
-  margin-top: 0;
+nav button:hover {
+  background: #eee;
 }
 
-.hidden {
-  display: none;
-}
-
-#splashScreen {
-  background: #0B3D2E;
-  position: fixed;
-  inset: 0;
+/* === Compass === */
+.compass-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  margin: 1.5rem 0;
 }
-
-#splashIcon {
-  width: 120px;
-  height: 120px;
-  animation: spinZoomFade 1.5s ease-in-out forwards;
-}
-
-@keyframes spinZoomFade {
-  0% { transform: scale(0.8) rotate(0deg); opacity: 0; }
-  50% { transform: scale(1.1) rotate(180deg); opacity: 1; }
-  100% { transform: scale(1) rotate(360deg); opacity: 0; }
-}
-
-.modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  text-align: center;
-}
-
-#startApp {
-  background: #0B3D2E;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  margin-top: 1rem;
-  font-size: 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-#streakDisplay {
-  margin: 1rem;
-  font-size: 1.2rem;
-  font-weight: bold;
-  text-align: center;
-}
-
 #compass {
-  display: block;
-  width: 80%;
-  margin: 0 auto;
-  max-width: 300px;
+  width: 240px;
+  height: 240px;
   cursor: pointer;
 }
+#compass path:hover {
+  stroke: #111;
+  stroke-width: 1;
+  opacity: 0.85;
+}
 
+/* === Mode Buttons === */
 .mode-buttons {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
-
 .mode-button {
-  padding: 1rem;
-  font-size: 1rem;
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 8px;
-  background: #0B3D2E;
   color: white;
-  width: 80%;
-  max-width: 300px;
+  font-size: 0.9rem;
   text-align: center;
 }
+.mode-button[data-mode="Growing"] { background: #0074D9; }
+.mode-button[data-mode="Grounded"] { background: #2ECC40; }
+.mode-button[data-mode="Drifting"] { background: #FFDC00; color: #222; }
+.mode-button[data-mode="Surviving"] { background: #FF4136; }
 
+/* === Other Layouts === */
+section { padding: 1rem; }
 textarea {
   width: 100%;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 5px;
+  padding: 1rem;
+  border-radius: 8px;
   border: 1px solid #ccc;
+  margin-top: 0.75rem;
 }
+#streakDisplay {
+  text-align: center;
+  font-weight: bold;
+  color: #0B3D2E;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+.hidden { display: none; }
