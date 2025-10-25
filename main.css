@@ -1,57 +1,18 @@
-/* Root styles */
 :root {
   --brand-green: #0B3D2E;
-  --text-color: #1a1a1a;
-  --bg-color: #ffffff;
-  --border-radius: 8px;
-  --transition-speed: 0.3s;
+  --surviving: #FF3333;
+  --drifting: #FFD700;
+  --grounded: #00AA00;
+  --growing: #0000FF;
 }
 
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background: #fff;
+  color: #111;
 }
 
-/* Splash Screen */
-#splashScreen {
-  background-color: var(--brand-green);
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-#splashIcon {
-  width: 120px;
-  height: 120px;
-  animation: spinZoomFade 2s ease-out forwards;
-}
-
-@keyframes spinZoomFade {
-  0% {
-    transform: rotate(0deg) scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: rotate(180deg) scale(1.5);
-    opacity: 1;
-  }
-  100% {
-    transform: rotate(360deg) scale(2.5);
-    opacity: 0;
-  }
-}
-
-/* App Wrapper */
-#appWrapper {
-  padding-bottom: 40px;
-}
-
-/* Header + Nav */
 header {
   background-color: var(--brand-green);
   color: white;
@@ -60,127 +21,106 @@ header {
 }
 
 nav {
-  background-color: #e6e6e6;
-  padding: 0.5rem;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
 }
 
 nav button {
-  background-color: var(--brand-green);
+  background: var(--brand-green);
   color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
   border: none;
-  padding: 0.6rem 1rem;
-  margin: 0.25rem;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: background var(--transition-speed);
+  font-weight: bold;
 }
 
-nav button:hover {
-  background-color: #064127;
-}
-
-/* Compass */
-.compass-container {
-  width: 100%;
-  max-width: 300px;
-  margin: 1rem auto;
-}
-
-#compass {
-  width: 100%;
-  height: auto;
-  cursor: pointer;
-}
-
-/* Buttons for Modes */
-.mode-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 1rem;
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.mode-button {
-  background-color: #f2f2f2;
-  border: 2px solid var(--brand-green);
-  padding: 0.8rem;
-  border-radius: var(--border-radius);
-  font-size: 1rem;
-  text-align: center;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.mode-button:hover {
-  background-color: #d9fff0;
-}
-
-/* Sections */
 section {
+  display: none;
   padding: 1rem;
+}
+
+section.active {
   display: block;
 }
 
-section.hidden {
-  display: none;
+#splashScreen {
+  background: var(--brand-green);
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-/* Activity Input */
-.mode-activity {
-  background: #f9f9f9;
-  border: 1px solid #ccc;
+#splashIcon {
+  width: 100px;
+  height: 100px;
+  animation: zoomSpinFade 2s ease-in-out forwards;
+}
+
+@keyframes zoomSpinFade {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50% { transform: scale(2) rotate(180deg); }
+  100% { transform: scale(3) rotate(360deg); opacity: 0; }
+}
+
+.how-to-box {
+  background: #e6fff2;
   padding: 1rem;
-  border-radius: var(--border-radius);
-  max-width: 600px;
-  margin: 1rem auto;
-}
-
-.mode-activity textarea {
-  width: 100%;
-  padding: 0.5rem;
-  min-height: 80px;
-  border-radius: var(--border-radius);
-  border: 1px solid #aaa;
-  resize: vertical;
-}
-
-/* Streak Display */
-#streakDisplay {
-  text-align: center;
-  font-size: 1.25rem;
+  border: 2px dashed var(--brand-green);
+  border-radius: 10px;
   margin: 1rem 0;
+}
+
+#compassContainer {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+#compass {
+  width: 220px;
+  height: 220px;
+}
+
+.wedge-label {
+  font-size: 0.8rem;
+  text-anchor: middle;
+  fill: white;
   font-weight: bold;
-  color: var(--brand-green);
 }
 
-/* History List */
-#historyList {
-  list-style: none;
-  padding: 0;
+#growing, .growing { background: var(--growing); }
+#grounded, .grounded { background: var(--grounded); }
+#drifting, .drifting { background: var(--drifting); }
+#surviving, .surviving { background: var(--surviving); }
+
+button {
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 2px solid var(--brand-green);
+  font-size: 1rem;
+  margin: 0.5rem 0;
+  width: 100%;
+  max-width: 400px;
+  display: block;
+  margin-inline: auto;
 }
 
-#historyList li {
-  background: #f3f3f3;
-  border: 1px solid #ccc;
-  border-radius: var(--border-radius);
-  padding: 1rem;
+textarea {
+  width: 100%;
+  height: 80px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+#streakDisplay {
+  font-weight: bold;
+  text-align: center;
   margin: 1rem 0;
-}
-
-/* How-To Section */
-.how-to {
-  max-width: 600px;
-  margin: 1rem auto;
-  padding: 1rem;
-  border: 1px dashed var(--brand-green);
-  background-color: #f6fff8;
-  border-radius: var(--border-radius);
-}
-
-.how-to h2 {
-  margin-top: 0;
-  color: var(--brand-green);
+  font-size: 1.2rem;
 }
