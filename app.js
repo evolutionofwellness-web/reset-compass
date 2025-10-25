@@ -1,129 +1,60 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const splash = document.getElementById("splashScreen");
-  const icon = document.getElementById("splashIcon");
-  const app = document.getElementById("appWrapper");
-  const appContent = document.getElementById("appContent");
-  const streakDisplay = document.getElementById("streakDisplay");
-
-  // Splash logic
-  splash.style.display = "flex";
   setTimeout(() => {
-    splash.style.display = "none";
-    app.classList.remove("hidden");
-    updateStreak();
-    renderHistory();
+    document.getElementById("splashScreen").style.display = "none";
   }, 2000);
 
-  // Navigation
-  window.navigate = (target) => {
-    const sections = appContent.querySelectorAll("section");
-    sections.forEach(sec => sec.classList.add("hidden"));
-    const active = document.getElementById(target);
-    if (active) active.classList.remove("hidden");
-    renderHistory();
-    updateStreak();
+  updateStreak();
+  navigateTo('home');
+});
+
+function navigateTo(sectionId) {
+  document.querySelectorAll("main > section").forEach(s => s.classList.remove("active"));
+  document.getElementById(sectionId).classList.add("active");
+}
+
+function openMode(mode) {
+  const container = document.getElementById('modeView');
+  container.innerHTML = `<h2>${capitalize(mode)} Mode</h2>` + getModeActivities(mode);
+  navigateTo('modeView');
+}
+
+function getModeActivities(mode) {
+  const activities = {
+    growing: ["Do something that scares you", "Make bold progress on a long-term goal", "Reach out for feedback or growth"],
+    grounded: ["Tidy up your space", "Plan your next 3 tasks", "Take a mindful break"],
+    drifting: ["Go for a walk", "Stretch or move lightly", "Do a brain-dump to clear your mind"],
+    surviving: ["Drink a glass of water", "Cancel one nonessential task", "Do a 2-minute reset: breathe + pause"]
   };
 
-  // Mode navigation
-  document.querySelectorAll(".mode-button").forEach(button => {
-    button.addEventListener("click", () => {
-      const mode = button.getAttribute("data-mode");
-      if (mode) {
-        navigate(mode + "View");
-      }
-    });
-  });
+  return activities[mode].map(act =>
+    `<div class="activity"><p>${act}</p>
+    <textarea placeholder="Write what you did..." onchange="logActivity('${mode}', this.value)"></textarea></div>`
+  ).join("");
+}
 
-  // Compass wedges
-  const compass = document.getElementById("compass");
-  if (compass) {
-    compass.querySelectorAll("path").forEach(path => {
-      path.addEventListener("click", () => {
-        const mode = path.getAttribute("data-mode");
-        if (mode) {
-          navigate(mode + "View");
-        }
-      });
-    });
+function logActivity(mode, text) {
+  if (!text.trim()) return;
+  const history = JSON.parse(localStorage.getItem("activityHistory") || "[]");
+  const date = new Date().toISOString().split("T")[0];
+  history.push({ date, mode, text });
+  localStorage.setItem("activityHistory", JSON.stringify(history));
+
+  // streak logic
+  const lastLogged = localStorage.getItem("lastLoggedDate");
+  if (lastLogged !== date) {
+    let streak = parseInt(localStorage.getItem("streak") || "0");
+    streak += 1;
+    localStorage.setItem("streak", streak.toString());
+    localStorage.setItem("lastLoggedDate", date);
+    updateStreak();
   }
+}
 
-  // Activity logging
-  function logActivity(mode, inputText) {
-    const today = new Date().toISOString().split("T")[0];
-    const history = JSON.parse(localStorage.getItem("history") || "{}");
+function updateStreak() {
+  const streak = localStorage.getItem("streak") || "0";
+  document.getElementById("streakDisplay").innerText = `🔥 ${streak}-day streak`;
+}
 
-    if (!history[today]) history[today] = {};
-    if (!history[today][mode]) history[today][mode] = [];
-
-    if (inputText && !history[today][mode].includes(inputText)) {
-      history[today][mode].push(inputText);
-      localStorage.setItem("history", JSON.stringify(history));
-      updateStreak();
-    }
-  }
-
-  // Save activities on blur
-  document.querySelectorAll("textarea").forEach(area => {
-    area.addEventListener("blur", () => {
-      const mode = area.dataset.mode;
-      const value = area.value.trim();
-      if (mode && value) {
-        logActivity(mode, value);
-      }
-    });
-  });
-
-  // Streak tracker
-  function updateStreak() {
-    const history = JSON.parse(localStorage.getItem("history") || "{}");
-    const dates = Object.keys(history).sort().reverse();
-    let streak = 0;
-    let current = new Date();
-
-    for (let date of dates) {
-      const dateStr = current.toISOString().split("T")[0];
-      if (date === dateStr) {
-        streak++;
-        current.setDate(current.getDate() - 1);
-      } else {
-        break;
-      }
-    }
-
-    if (streakDisplay) {
-      streakDisplay.innerHTML = `🔥 ${streak}-day streak`;
-    }
-  }
-
-  // History rendering
-  function renderHistory() {
-    const historyList = document.getElementById("historyList");
-    if (!historyList) return;
-
-    historyList.innerHTML = "";
-    const history = JSON.parse(localStorage.getItem("history") || "{}");
-    const dates = Object.keys(history).sort().reverse();
-
-    dates.forEach(date => {
-      const entry = history[date];
-      const li = document.createElement("li");
-      let html = `<strong>${date}</strong><br/>`;
-
-      Object.keys(entry).forEach(mode => {
-        const actions = entry[mode];
-        html += `<em>${mode}:</em><ul>`;
-        actions.forEach(a => {
-          html += `<li>${a}</li>`;
-        });
-        html += "</ul>";
-      });
-
-      li.innerHTML = html;
-      historyList.appendChild(li);
-    });
-  }
-
-  // Run on load
-  updateStreak();
-  renderHistory();
-});
+function capitalize(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
