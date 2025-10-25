@@ -1,132 +1,215 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const splash = document.getElementById("splashScreen");
-  const modal = document.getElementById("welcomeModal");
-  const app = document.getElementById("appWrapper");
-  const startBtn = document.getElementById("startApp");
-  const appContent = document.getElementById("appContent");
-  const streakDisplay = document.getElementById("streakDisplay");
+/* === Reset + Base === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: system-ui, sans-serif;
+  background-color: #f9f9f9;
+  color: #222;
+  line-height: 1.6;
+}
+.hidden {
+  display: none;
+}
 
-  // Splash transition + Welcome Modal
-  setTimeout(() => {
-    splash.style.display = "none";
-    const hasSeen = localStorage.getItem("seenWelcome");
-    if (!hasSeen) {
-      modal.classList.remove("hidden");
-    } else {
-      app.classList.remove("hidden");
-      updateStreak();
-    }
-  }, 2000);
-
-  // Welcome modal -> App
-  startBtn.addEventListener("click", () => {
-    modal.classList.add("hidden");
-    localStorage.setItem("seenWelcome", "true");
-    app.classList.remove("hidden");
-    updateStreak();
-  });
-
-  // Navigation
-  window.navigate = (target) => {
-    const views = appContent.querySelectorAll("section");
-    views.forEach(view => view.classList.add("hidden"));
-    document.getElementById(target).classList.remove("hidden");
-  };
-
-  // Activity logging
-  function logActivity(mode, activityIndex, text) {
-    const today = new Date().toISOString().split("T")[0];
-    const history = JSON.parse(localStorage.getItem("history") || "{}");
-
-    if (!history[today]) {
-      history[today] = { mode, activities: {} };
-    }
-    if (!history[today].activities) {
-      history[today].activities = {};
-    }
-    history[today].activities[activityIndex] = text;
-
-    localStorage.setItem("history", JSON.stringify(history));
-    updateStreak();
+/* === Splash Screen === */
+#splashScreen {
+  position: fixed;
+  background-color: #0B3D2E;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#splashIcon {
+  width: 100px;
+  height: 100px;
+  animation: splashAnim 1.5s ease-out forwards;
+}
+@keyframes splashAnim {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) rotate(0deg);
   }
-
-  // Mode button click
-  document.querySelectorAll(".mode-button").forEach(button => {
-    button.addEventListener("click", () => {
-      const mode = button.getAttribute("data-mode");
-      navigate(`${mode.toLowerCase()}Page`);
-    });
-  });
-
-  // Compass click
-  const compass = document.getElementById("compass");
-  if (compass) {
-    compass.querySelectorAll("path").forEach(path => {
-      path.addEventListener("click", () => {
-        const mode = path.getAttribute("data-mode");
-        navigate(`${mode.toLowerCase()}Page`);
-      });
-    });
+  100% {
+    opacity: 1;
+    transform: scale(1.2) rotate(360deg);
   }
+}
 
-  // Textbox event listeners for all activities
-  document.querySelectorAll("textarea[data-mode][data-activity]").forEach(textarea => {
-    textarea.addEventListener("change", (e) => {
-      const mode = e.target.getAttribute("data-mode");
-      const index = e.target.getAttribute("data-activity");
-      const text = e.target.value.trim();
-      if (text.length > 0) {
-        logActivity(mode, index, text);
-      }
-    });
-  });
+/* === Welcome Modal === */
+.modal {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 360px;
+  text-align: center;
+}
+.modal-content h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+.modal-content p {
+  font-size: 1rem;
+}
+.modal-content button {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  background: #0B3D2E;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-  // Streak logic
-  function updateStreak() {
-    const history = JSON.parse(localStorage.getItem("history") || "{}");
-    const today = new Date().toISOString().split("T")[0];
+/* === Header + Navigation === */
+header {
+  background-color: #0B3D2E;
+  color: white;
+  padding: 0.8rem;
+  text-align: center;
+}
+nav {
+  margin-top: 0.5rem;
+}
+nav button {
+  margin: 0.25rem;
+  padding: 0.5rem 1rem;
+  background: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+nav button:hover {
+  background: #ddd;
+}
 
-    // Only allow 1 streak update per new day
-    let streak = 0;
-    let currentDate = new Date();
+/* === Main App Layout === */
+main {
+  padding: 1rem;
+}
+h1, h2 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+section {
+  margin-top: 1.5rem;
+}
 
-    while (true) {
-      const dateStr = currentDate.toISOString().split("T")[0];
-      if (history[dateStr]) {
-        streak++;
-        currentDate.setDate(currentDate.getDate() - 1);
-      } else {
-        break;
-      }
-    }
+/* === Daily Streak === */
+#streakDisplay {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #0B3D2E;
+}
 
-    if (streakDisplay) {
-      streakDisplay.innerHTML = `🔥 ${streak}-day streak`;
-    }
+/* === Compass === */
+.compass-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem auto;
+  width: 100%;
+  max-width: 320px;
+}
+#compass {
+  width: 100%;
+  height: auto;
+}
+#compass path:hover {
+  opacity: 0.85;
+  stroke: #222;
+  stroke-width: 1;
+}
+#compass text {
+  font-family: system-ui, sans-serif;
+  font-weight: bold;
+  font-size: 12px;
+}
 
-    updateHistoryUI(history);
-  }
+/* === Mode Buttons === */
+.mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.mode-button {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  text-align: center;
+  width: 140px;
+  cursor: pointer;
+}
+.mode-button small {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+.mode-button[data-mode="Growing"] {
+  background-color: #0074D9;
+}
+.mode-button[data-mode="Grounded"] {
+  background-color: #2ECC40;
+}
+.mode-button[data-mode="Drifting"] {
+  background-color: #FFDC00;
+  color: #222;
+}
+.mode-button[data-mode="Surviving"] {
+  background-color: #FF4136;
+}
 
-  // History view
-  function updateHistoryUI(history) {
-    const list = document.getElementById("historyList");
-    if (!list) return;
-    list.innerHTML = "";
+/* === Activity & Quick Wins === */
+.mode-activity {
+  margin-bottom: 1.5rem;
+}
+.mode-activity p {
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+.mode-activity textarea {
+  width: 100%;
+  height: 60px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+  font-size: 0.95rem;
+}
 
-    const sortedDates = Object.keys(history).sort().reverse();
-    sortedDates.forEach(date => {
-      const entry = history[date];
-      const activities = entry.activities || {};
-      const activityList = Object.values(activities)
-        .map((val, i) => `• ${val}`)
-        .join("<br>");
-
-      const item = document.createElement("li");
-      item.innerHTML = `<strong>${date}</strong><br>Mode: ${entry.mode}<br>${activityList}`;
-      list.appendChild(item);
-    });
-  }
-
-  // Initialize on load
-  updateStreak();
-});
+/* === History List === */
+#historyList {
+  list-style: none;
+  padding-left: 0;
+}
+#historyList li {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: #f1f1f1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
