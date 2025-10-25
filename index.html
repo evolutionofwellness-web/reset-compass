@@ -2,103 +2,122 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
   <link rel="stylesheet" href="main.css?v=100" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="splash-icon.png" />
 </head>
 <body>
+
+  <!-- Splash Animation -->
   <div id="splashScreen">
-    <img src="splash-icon.png" alt="Splash Icon" id="splashIcon" />
+    <img id="splashIcon" src="splash-icon.png" alt="Compass Icon" />
   </div>
 
+  <!-- App Wrapper -->
   <div id="appWrapper" class="hidden">
+
+    <!-- Top Navigation -->
     <header>
       <h1>The Reset Compass</h1>
     </header>
-
     <nav>
-      <button onclick="navigate('home')">Home</button>
+      <button onclick="navigate('homeView')">Home</button>
       <button onclick="navigate('quickWinsView')">Quick Wins</button>
       <button onclick="navigate('historyView')">History</button>
       <button onclick="navigate('aboutView')">About</button>
     </nav>
 
+    <!-- How-To Guide -->
+    <div id="howToUse">
+      <p><strong>How this works:</strong> Tap a mode that matches how you're feeling. Try an activity. Write a note. That’s it. Each day you take action = 🔥 streak increases.</p>
+    </div>
+
+    <!-- Main App Content -->
     <main id="appContent">
-      <section id="home">
+      <!-- Home View -->
+      <section id="homeView">
         <div id="streakDisplay"></div>
-        <div class="how-to">
-          <h2>How to Use This App</h2>
-          <p>Select a mode from the compass or buttons below. Complete an activity. Log it. Build your streak.</p>
-        </div>
         <div class="compass-container">
           <svg id="compass" viewBox="0 0 200 200">
-            <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0074D9" data-mode="Growing"></path>
-            <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2ECC40" data-mode="Grounded"></path>
-            <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFDC00" data-mode="Drifting"></path>
-            <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FF4136" data-mode="Surviving"></path>
+            <!-- Growing (Top) -->
+            <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0074D9" data-mode="Growing"/>
+            <!-- Drifting (Right) -->
+            <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#FFDC00" data-mode="Drifting"/>
+            <!-- Surviving (Bottom) -->
+            <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FF4136" data-mode="Surviving"/>
+            <!-- Grounded (Left) -->
+            <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#2ECC40" data-mode="Grounded"/>
+            <!-- Labels -->
+            <text x="100" y="30" text-anchor="middle" fill="white" font-size="10">Growing</text>
+            <text x="170" y="105" text-anchor="middle" fill="black" font-size="10">Drifting</text>
+            <text x="100" y="185" text-anchor="middle" fill="white" font-size="10">Surviving</text>
+            <text x="30" y="105" text-anchor="middle" fill="white" font-size="10">Grounded</text>
           </svg>
         </div>
 
+        <!-- Mode Buttons -->
         <div class="mode-buttons">
-          <button class="mode-button" data-mode="Growing">Growing: Push yourself to new heights</button>
-          <button class="mode-button" data-mode="Grounded">Grounded: Stay centered and productive</button>
-          <button class="mode-button" data-mode="Drifting">Drifting: Gently regain focus and energy</button>
-          <button class="mode-button" data-mode="Surviving">Surviving: Just get through the day</button>
+          <button class="mode-button" data-mode="Growing">Growing<br/><small>Optimistic & motivated</small></button>
+          <button class="mode-button" data-mode="Grounded">Grounded<br/><small>Calm & focused</small></button>
+          <button class="mode-button" data-mode="Drifting">Drifting<br/><small>Distracted or low-energy</small></button>
+          <button class="mode-button" data-mode="Surviving">Surviving<br/><small>Stressed or overwhelmed</small></button>
         </div>
       </section>
 
+      <!-- Mode Views -->
       <section id="GrowingView" class="hidden">
         <h2>Growing Mode</h2>
-        <div class="mode-activity">
-          <p>Do something that challenges you.</p>
-          <textarea data-mode="Growing" placeholder="What did you do?"></textarea>
-        </div>
+        <div class="mode-activity">✅ Read 1 page of a book <textarea data-mode="Growing"></textarea></div>
+        <div class="mode-activity">✅ Write down 1 goal <textarea data-mode="Growing"></textarea></div>
+        <div class="mode-activity">✅ Visualize your future <textarea data-mode="Growing"></textarea></div>
       </section>
 
       <section id="GroundedView" class="hidden">
         <h2>Grounded Mode</h2>
-        <div class="mode-activity">
-          <p>Stay present, organized, and productive.</p>
-          <textarea data-mode="Grounded" placeholder="What did you do?"></textarea>
-        </div>
+        <div class="mode-activity">✅ Take 5 deep breaths <textarea data-mode="Grounded"></textarea></div>
+        <div class="mode-activity">✅ Do a full-body stretch <textarea data-mode="Grounded"></textarea></div>
+        <div class="mode-activity">✅ Sit quietly for 2 minutes <textarea data-mode="Grounded"></textarea></div>
       </section>
 
       <section id="DriftingView" class="hidden">
         <h2>Drifting Mode</h2>
-        <div class="mode-activity">
-          <p>Gently return to balance and awareness.</p>
-          <textarea data-mode="Drifting" placeholder="What did you do?"></textarea>
-        </div>
+        <div class="mode-activity">✅ Step outside for 2 mins <textarea data-mode="Drifting"></textarea></div>
+        <div class="mode-activity">✅ Drink a glass of water <textarea data-mode="Drifting"></textarea></div>
+        <div class="mode-activity">✅ Clean one small area <textarea data-mode="Drifting"></textarea></div>
       </section>
 
       <section id="SurvivingView" class="hidden">
         <h2>Surviving Mode</h2>
-        <div class="mode-activity">
-          <p>Just get through today with self-compassion.</p>
-          <textarea data-mode="Surviving" placeholder="What did you do?"></textarea>
-        </div>
+        <div class="mode-activity">✅ Name what you're feeling <textarea data-mode="Surviving"></textarea></div>
+        <div class="mode-activity">✅ Sit down and breathe <textarea data-mode="Surviving"></textarea></div>
+        <div class="mode-activity">✅ Do one thing slowly <textarea data-mode="Surviving"></textarea></div>
       </section>
 
+      <!-- Quick Wins -->
       <section id="quickWinsView" class="hidden">
         <h2>Quick Wins</h2>
-        <div class="mode-activity">
-          <p>Take a small step to feel better.</p>
-          <textarea data-mode="QuickWins" placeholder="What quick win did you complete?"></textarea>
-        </div>
+        <div class="mode-activity">✅ Drink a full glass of water <textarea data-mode="QuickWins"></textarea></div>
+        <div class="mode-activity">✅ Open a window <textarea data-mode="QuickWins"></textarea></div>
+        <div class="mode-activity">✅ Stretch for 15 seconds <textarea data-mode="QuickWins"></textarea></div>
       </section>
 
+      <!-- History -->
       <section id="historyView" class="hidden">
         <h2>History</h2>
         <ul id="historyList"></ul>
       </section>
 
+      <!-- About -->
       <section id="aboutView" class="hidden">
         <h2>About</h2>
-        <p>The Reset Compass is a self-guided tool to help you reconnect with your health—one action at a time.</p>
+        <p>This app was designed to help you reset, reflect, and build momentum—no matter what kind of day you’re having.</p>
       </section>
     </main>
   </div>
 
+  <!-- Scripts -->
   <script src="app.js?v=100"></script>
 </body>
 </html>
