@@ -4,79 +4,80 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=60" />
-  <script defer src="app.js?v=60"></script>
+  <link rel="stylesheet" href="main.css?v=final">
 </head>
 <body>
   <div id="splashScreen">
-    <img src="splash-icon.png" alt="Splash Icon" id="splashIcon" />
+    <img src="splash-icon.png" id="splashIcon" alt="Loading..." />
   </div>
 
   <header>
     <h1>The Reset Compass</h1>
     <nav>
-      <button onclick="navigateTo('home')">Home</button>
-      <button onclick="navigateTo('quickwins')">Quick Wins</button>
-      <button onclick="navigateTo('history')">History</button>
-      <button onclick="navigateTo('about')">About</button>
+      <button onclick="navigate('home')">Home</button>
+      <button onclick="navigate('quickWins')">Quick Wins</button>
+      <button onclick="navigate('history')">History</button>
+      <button onclick="navigate('about')">About</button>
     </nav>
   </header>
 
-  <main id="mainContent">
-    <!-- HOME -->
-    <section id="home" class="active">
-      <div id="streakDisplay">🔥 0-day streak</div>
-      <div class="how-to-box">
+  <main>
+    <section id="home" class="page active">
+      <div class="streak">
+        <span id="streakCount">🔥 0-day streak</span>
+      </div>
+
+      <div class="how-to">
         <h2>How to Use This App</h2>
         <p>Select a mode from the compass or buttons below. Complete an activity. Log it. Build your streak.</p>
       </div>
-      <div id="compassContainer">
-        <svg viewBox="0 0 200 200" id="compass">
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0000FF" onclick="openMode('growing')" />
-          <text x="150" y="60" class="wedge-label">Growing</text>
 
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#00AA00" onclick="openMode('grounded')" />
-          <text x="150" y="160" class="wedge-label">Grounded</text>
+      <div class="compass-container">
+        <svg viewBox="0 0 200 200" class="compass">
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0074D9" onclick="showMode('growing')"/>
+          <text x="150" y="40" class="label">Growing</text>
 
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFD700" onclick="openMode('drifting')" />
-          <text x="40" y="160" class="wedge-label">Drifting</text>
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2ECC40" onclick="showMode('grounded')"/>
+          <text x="140" y="160" class="label">Grounded</text>
 
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FF3333" onclick="openMode('surviving')" />
-          <text x="30" y="60" class="wedge-label">Surviving</text>
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFDC00" onclick="showMode('drifting')"/>
+          <text x="30" y="170" class="label">Drifting</text>
+
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FF4136" onclick="showMode('surviving')"/>
+          <text x="20" y="40" class="label">Surviving</text>
         </svg>
       </div>
 
-      <div id="modeButtons">
-        <button class="growing" onclick="openMode('growing')">Growing: Push yourself to new heights</button>
-        <button class="grounded" onclick="openMode('grounded')">Grounded: Stay centered and productive</button>
-        <button class="drifting" onclick="openMode('drifting')">Drifting: Gently regain focus and energy</button>
-        <button class="surviving" onclick="openMode('surviving')">Surviving: Just get through the day</button>
+      <div class="mode-buttons">
+        <button class="growing" onclick="showMode('growing')">Growing: Push yourself to new heights</button>
+        <button class="grounded" onclick="showMode('grounded')">Grounded: Stay centered and productive</button>
+        <button class="drifting" onclick="showMode('drifting')">Drifting: Gently regain focus and energy</button>
+        <button class="surviving" onclick="showMode('surviving')">Surviving: Just get through the day</button>
       </div>
     </section>
 
-    <!-- MODES -->
-    <section id="modeView"></section>
-
-    <!-- QUICK WINS -->
-    <section id="quickwins">
+    <section id="quickWins" class="page">
       <h2>Quick Wins</h2>
-      <div class="activity">
-        <p>Take a small step to feel better.</p>
-        <textarea placeholder="What quick win did you complete?" onchange="logActivity('quickwins', this.value)"></textarea>
-      </div>
+      <p>Take a small step to feel better.</p>
+      <textarea placeholder="What quick win did you complete?" onchange="logActivity('quickwin', this.value)"></textarea>
     </section>
 
-    <!-- HISTORY -->
-    <section id="history">
+    <section id="history" class="page">
       <h2>Activity History</h2>
       <ul id="historyList"></ul>
     </section>
 
-    <!-- ABOUT -->
-    <section id="about">
+    <section id="about" class="page">
       <h2>About</h2>
       <p>The Reset Compass helps you reset your day using science-backed actions based on your current energy level.</p>
     </section>
+
+    <section id="modeSection" class="page">
+      <h2 id="modeTitle"></h2>
+      <div id="activitiesContainer"></div>
+    </section>
   </main>
+
+  <script src="app.js?v=final"></script>
 </body>
 </html>
