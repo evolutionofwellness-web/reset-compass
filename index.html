@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=51" />
-  <script defer src="app.js?v=19"></script>
+  <link rel="stylesheet" href="main.css?v=50" />
+  <script defer src="app.js?v=14"></script>
 </head>
 <body>
   <!-- Splash Screen -->
   <div id="splashScreen">
-    <img src="splash-icon.png" alt="App Icon" class="splash-icon" id="splashIcon" />
+    <img src="splash-icon.png" alt="App Icon" class="splash-icon" id="splashIcon"/>
   </div>
 
   <!-- Welcome Modal -->
@@ -35,87 +35,51 @@
     </header>
 
     <main id="appContent">
-      <!-- HOME -->
       <section id="homeView">
-        <div id="streakDisplay"></div>
+        <div id="streakDisplay">🔥 0-day streak</div>
 
+        <!-- Compass -->
         <div class="compass-container">
           <svg id="compass" viewBox="0 0 200 200">
-            <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0074D9" data-mode="Growing"/>
-            <text x="150" y="45" text-anchor="middle" fill="white">Growing</text>
-
-            <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2ECC40" data-mode="Grounded"/>
-            <text x="155" y="155" text-anchor="middle" fill="white">Grounded</text>
-
-            <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFDC00" data-mode="Drifting"/>
-            <text x="45" y="155" text-anchor="middle" fill="#222">Drifting</text>
-
-            <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FF4136" data-mode="Surviving"/>
-            <text x="45" y="45" text-anchor="middle" fill="white">Surviving</text>
+            <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#0074D9" data-mode="Growing"></path>
+            <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2ECC40" data-mode="Grounded"></path>
+            <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFDC00" data-mode="Drifting"></path>
+            <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#FF4136" data-mode="Surviving"></path>
+            <text x="150" y="50" text-anchor="middle" fill="white" font-size="10">Growing</text>
+            <text x="150" y="150" text-anchor="middle" fill="white" font-size="10">Grounded</text>
+            <text x="50" y="150" text-anchor="middle" fill="black" font-size="10">Drifting</text>
+            <text x="50" y="50" text-anchor="middle" fill="white" font-size="10">Surviving</text>
           </svg>
         </div>
 
+        <!-- Mode Buttons -->
         <div class="mode-buttons">
-          <button class="mode-button" data-mode="Growing">Growing: Ready to challenge yourself</button>
-          <button class="mode-button" data-mode="Grounded">Grounded: Feeling stable and steady</button>
-          <button class="mode-button" data-mode="Drifting">Drifting: Disconnected or aimless</button>
-          <button class="mode-button" data-mode="Surviving">Surviving: Overwhelmed or depleted</button>
+          <button class="mode-button" data-mode="Growing">Growing<br><small>Ready to push yourself</small></button>
+          <button class="mode-button" data-mode="Grounded">Grounded<br><small>Stable, balanced, present</small></button>
+          <button class="mode-button" data-mode="Drifting">Drifting<br><small>Unfocused or disconnected</small></button>
+          <button class="mode-button" data-mode="Surviving">Surviving<br><small>Overwhelmed, low energy</small></button>
         </div>
       </section>
 
-      <!-- QUICK WINS -->
       <section id="quickWinsView" class="hidden">
         <h2>Quick Wins</h2>
+        <p>Fast actions you can take any time.</p>
         <div class="mode-activity">
-          <p>Take 3 deep breaths</p>
-          <textarea placeholder="What did you notice?"></textarea>
+          <p>Example Quick Win 1</p>
+          <textarea placeholder="What did you do?"></textarea>
         </div>
         <div class="mode-activity">
-          <p>Drink a glass of water</p>
-          <textarea placeholder="How do you feel now?"></textarea>
-        </div>
-      </section>
-
-      <!-- MODE SCREENS -->
-      <section id="Growing" class="hidden">
-        <h2>Growing Mode</h2>
-        <div class="mode-activity">
-          <p>Try something new today</p>
-          <textarea placeholder="What did you try?"></textarea>
+          <p>Example Quick Win 2</p>
+          <textarea placeholder="What did you do?"></textarea>
         </div>
       </section>
 
-      <section id="Grounded" class="hidden">
-        <h2>Grounded Mode</h2>
-        <div class="mode-activity">
-          <p>Take a mindful walk</p>
-          <textarea placeholder="Describe the experience"></textarea>
-        </div>
-      </section>
-
-      <section id="Drifting" class="hidden">
-        <h2>Drifting Mode</h2>
-        <div class="mode-activity">
-          <p>Write down what’s distracting you</p>
-          <textarea placeholder="What’s pulling your attention?"></textarea>
-        </div>
-      </section>
-
-      <section id="Surviving" class="hidden">
-        <h2>Surviving Mode</h2>
-        <div class="mode-activity">
-          <p>Do the bare minimum</p>
-          <textarea placeholder="What did you manage today?"></textarea>
-        </div>
-      </section>
-
-      <!-- HISTORY -->
       <section id="historyView" class="hidden">
         <h2>History</h2>
-        <div id="historyContent">No entries yet.</div>
+        <p>Your past resets will appear here.</p>
+        <div id="historyLog"></div>
       </section>
 
-      <!-- ABOUT -->
       <section id="aboutView" class="hidden">
         <h2>About</h2>
         <p>The Reset Compass is your personal reset tool for better wellbeing.</p>
