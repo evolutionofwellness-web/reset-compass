@@ -1,4 +1,4 @@
-/* === Reset + Base === */
+/* === Base Styles === */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -11,7 +11,7 @@ body {
   line-height: 1.6;
 }
 .hidden {
-  display: none !important;
+  display: none;
 }
 
 /* === Splash Screen === */
@@ -37,40 +37,8 @@ body {
   }
   100% {
     opacity: 1;
-    transform: scale(1.2) rotate(360deg);
+    transform: scale(1.5) rotate(360deg);
   }
-}
-
-/* === Welcome Modal === */
-.modal {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-}
-.modal-content button {
-  margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  background: #1C3B34;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
 /* === App Layout === */
@@ -81,10 +49,8 @@ header {
   text-align: center;
 }
 nav {
-  margin-top: 0.5rem;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  margin-top: 1rem;
+  text-align: center;
 }
 nav button {
   margin: 0.25rem;
@@ -102,22 +68,34 @@ main {
 }
 h1, h2 {
   font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+p {
+  margin-bottom: 0.5rem;
 }
 
-/* === Daily Streak Display === */
+/* === Welcome Banner === */
+.welcome-banner {
+  background-color: #e6f3ef;
+  border-left: 6px solid #0B3D2E;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+}
+
+/* === Daily Streak === */
 #streakDisplay {
   text-align: center;
   font-size: 1.1rem;
   margin-bottom: 1rem;
-  color: #1C3B34;
+  color: #0B3D2E;
 }
 
-/* === Compass Styling === */
+/* === Compass SVG === */
 .compass-container {
   display: flex;
   justify-content: center;
   margin: 1rem auto;
-  width: 100%;
   max-width: 360px;
 }
 #compass {
@@ -133,10 +111,7 @@ h1, h2 {
 #compass text {
   font-family: system-ui, sans-serif;
   font-weight: bold;
-  font-size: 14px;
-  fill: #fff;
-  text-anchor: middle;
-  dominant-baseline: middle;
+  pointer-events: none;
 }
 
 /* === Mode Buttons === */
@@ -153,10 +128,10 @@ h1, h2 {
   border-radius: 8px;
   color: white;
   font-size: 1rem;
-  cursor: pointer;
   width: 90%;
-  max-width: 300px;
-  text-align: center;
+  max-width: 400px;
+  cursor: pointer;
+  text-align: left;
 }
 .mode-button[data-mode="Growing"] {
   background-color: #0074D9;
@@ -172,7 +147,7 @@ h1, h2 {
   background-color: #FF4136;
 }
 
-/* === Content Sections === */
+/* === Sections === */
 section {
   margin-top: 2rem;
 }
@@ -181,10 +156,9 @@ section {
 }
 textarea {
   width: 100%;
-  padding: 0.6rem;
+  min-height: 60px;
   margin-top: 0.5rem;
-  border-radius: 6px;
+  padding: 0.5rem;
+  border-radius: 4px;
   border: 1px solid #ccc;
-  font-size: 1rem;
-  resize: vertical;
 }
