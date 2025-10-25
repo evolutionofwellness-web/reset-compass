@@ -33,40 +33,30 @@
       </div>
 
       <div class="compass-container">
-        <svg id="compass" viewBox="0 0 200 200" width="250" height="250">
+        <svg id="compass" viewBox="0 0 200 200" width="250" height="250" style="transform: rotate(-45deg);">
+  <!-- GROWING - Top (North) - Blue -->
+  <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
+        fill="blue"
+        onclick="goToMode('growing')"></path>
+  <text x="150" y="40" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Growing</text>
 
-  <!-- GROWING (Top / North) - Blue -->
-  <g transform="rotate(45, 100, 100)">
-    <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
-          fill="blue" onclick="goToMode('growing')"></path>
-    <text x="150" y="40" text-anchor="middle" fill="white" font-size="14" font-weight="bold"
-          transform="rotate(-45, 150, 40)">Growing</text>
-  </g>
+  <!-- GROUNDED - Right (East) - Green -->
+  <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
+        fill="green"
+        onclick="goToMode('grounded')"></path>
+  <text x="160" y="140" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Grounded</text>
 
-  <!-- GROUNDED (Right / East) - Green -->
-  <g transform="rotate(135, 100, 100)">
-    <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
-          fill="green" onclick="goToMode('grounded')"></path>
-    <text x="160" y="160" text-anchor="middle" fill="white" font-size="14" font-weight="bold"
-          transform="rotate(-135, 160, 160)">Grounded</text>
-  </g>
+  <!-- DRIFTING - Bottom (South) - Yellow -->
+  <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
+        fill="yellow"
+        onclick="goToMode('drifting')"></path>
+  <text x="50" y="165" text-anchor="middle" fill="black" font-size="14" font-weight="bold">Drifting</text>
 
-  <!-- DRIFTING (Bottom / South) - Yellow -->
-  <g transform="rotate(225, 100, 100)">
-    <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
-          fill="yellow" onclick="goToMode('drifting')"></path>
-    <text x="50" y="165" text-anchor="middle" fill="black" font-size="14" font-weight="bold"
-          transform="rotate(-225, 50, 165)">Drifting</text>
-  </g>
-
-  <!-- SURVIVING (Left / West) - Red -->
-  <g transform="rotate(315, 100, 100)">
-    <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
-          fill="red" onclick="goToMode('surviving')"></path>
-    <text x="40" y="60" text-anchor="middle" fill="white" font-size="14" font-weight="bold"
-          transform="rotate(-315, 40, 60)">Surviving</text>
-  </g>
-
+  <!-- SURVIVING - Left (West) - Red -->
+  <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
+        fill="red"
+        onclick="goToMode('surviving')"></path>
+  <text x="40" y="60" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Surviving</text>
 </svg>
       </div>
 
