@@ -35,32 +35,24 @@
       <div class="compass-container">
         <div id="compass" style="margin: 40px auto; width: 250px; height: 250px;">
   <div class="compass" style="max-width: 300px; margin: 0 auto;">
-  <div class="compass" style="max-width: 300px; margin: 0 auto;">
-  <div class="compass" style="max-width: 300px; margin: 0 auto;">
-  <div class="compass" style="max-width: 300px; margin: 0 auto;">
   <svg viewBox="0 0 200 200" width="100%" height="100%">
-    <!-- TOP (North) = Growing -->
-    <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="rgba(0, 0, 255, 0.85)" onclick="navigateToMode('growing')" />
-    <text x="150" y="40" fill="white" font-size="14" text-anchor="middle">Growing</text>
+    <!-- Growing (Top - North) -->
+    <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="blue" fill-opacity="0.85" onclick="navigateToMode('growing')" />
+    <text x="150" y="50" fill="white" font-size="14" text-anchor="middle" alignment-baseline="middle">Growing</text>
 
-    <!-- RIGHT (East) = Grounded -->
-    <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="rgba(0, 128, 0, 0.85)" onclick="navigateToMode('grounded')" />
-    <text x="160" y="150" fill="white" font-size="14" text-anchor="middle">Grounded</text>
+    <!-- Grounded (Right - East) -->
+    <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="green" fill-opacity="0.85" onclick="navigateToMode('grounded')" />
+    <text x="150" y="150" fill="white" font-size="14" text-anchor="middle" alignment-baseline="middle">Grounded</text>
 
-    <!-- BOTTOM (South) = Drifting -->
-    <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="rgba(255, 255, 0, 0.85)" onclick="navigateToMode('drifting')" />
-    <text x="50" y="160" fill="black" font-size="14" text-anchor="middle">Drifting</text>
+    <!-- Drifting (Bottom - South) -->
+    <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="yellow" fill-opacity="0.85" onclick="navigateToMode('drifting')" />
+    <text x="50" y="150" fill="black" font-size="14" text-anchor="middle" alignment-baseline="middle">Drifting</text>
 
-    <!-- LEFT (West) = Surviving -->
-    <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="rgba(255, 0, 0, 0.85)" onclick="navigateToMode('surviving')" />
-    <text x="40" y="50" fill="white" font-size="14" text-anchor="middle">Surviving</text>
+    <!-- Surviving (Left - West) -->
+    <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="red" fill-opacity="0.85" onclick="navigateToMode('surviving')" />
+    <text x="50" y="50" fill="white" font-size="14" text-anchor="middle" alignment-baseline="middle">Surviving</text>
   </svg>
 </div>
-</div>
-</div>
-</div>
-</div>
-      </div>
 
       <div class="mode-buttons">
         <button class="growing" onclick="showMode('growing')">Growing: Push yourself to new heights</button>
