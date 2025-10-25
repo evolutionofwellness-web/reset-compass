@@ -1,87 +1,129 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Splash screen
+  const splash = document.getElementById("splashScreen");
+  const icon = document.getElementById("splashIcon");
+  const app = document.getElementById("appWrapper");
+  const appContent = document.getElementById("appContent");
+  const streakDisplay = document.getElementById("streakDisplay");
+
+  // Splash logic
+  splash.style.display = "flex";
   setTimeout(() => {
-    document.getElementById("splash-screen").style.display = "none";
-    document.getElementById("appContent").classList.remove("hidden");
-    if (!localStorage.getItem("welcomeShown")) {
-      document.getElementById("welcomeModal").style.display = "flex";
-    }
-  }, 1500);
+    splash.style.display = "none";
+    app.classList.remove("hidden");
+    updateStreak();
+    renderHistory();
+  }, 2000);
 
-  loadStreak();
-  renderHistory();
-});
-
-function closeWelcome() {
-  localStorage.setItem("welcomeShown", "true");
-  document.getElementById("welcomeModal").style.display = "none";
-}
-
-function navigateTo(section) {
-  document.querySelectorAll("main, section").forEach(s => s.classList.add("hidden"));
-  document.getElementById(section + "Section").classList.remove("hidden");
-}
-
-function goToMode(mode) {
-  const activities = {
-    surviving: ["Drink a glass of water", "Eat something with protein", "Sit or lie down for 5 minutes"],
-    drifting: ["Make a to-do list", "Write one goal for today", "Take a 10-minute walk"],
-    grounded: ["Stretch your body", "Listen to music", "Text someone you care about"],
-    growing: ["Plan one growth activity", "Read one page of a book", "Do one thing you’ve been avoiding"]
+  // Navigation
+  window.navigate = (target) => {
+    const sections = appContent.querySelectorAll("section");
+    sections.forEach(sec => sec.classList.add("hidden"));
+    const active = document.getElementById(target);
+    if (active) active.classList.remove("hidden");
+    renderHistory();
+    updateStreak();
   };
 
-  const titles = {
-    surviving: "🩺 Surviving",
-    drifting: "🧭 Drifting",
-    grounded: "🌿 Grounded",
-    growing: "🚀 Growing"
-  };
-
-  document.getElementById("modeTitle").textContent = titles[mode];
-  const list = document.getElementById("activityList");
-  list.innerHTML = "";
-
-  activities[mode].forEach(act => {
-    const input = document.createElement("input");
-    input.type = "text";
-    input.placeholder = act;
-    input.onblur = () => logAction(mode, act);
-    list.appendChild(input);
+  // Mode navigation
+  document.querySelectorAll(".mode-button").forEach(button => {
+    button.addEventListener("click", () => {
+      const mode = button.getAttribute("data-mode");
+      if (mode) {
+        navigate(mode + "View");
+      }
+    });
   });
 
-  navigateTo("mode");
-}
-
-function logAction(mode, activity) {
-  const today = new Date().toISOString().split("T")[0];
-  const history = JSON.parse(localStorage.getItem("history") || "[]");
-
-  if (!localStorage.getItem("lastStreakDate") || localStorage.getItem("lastStreakDate") !== today) {
-    let streak = parseInt(localStorage.getItem("streak") || "0");
-    streak++;
-    localStorage.setItem("streak", streak);
-    localStorage.setItem("lastStreakDate", today);
+  // Compass wedges
+  const compass = document.getElementById("compass");
+  if (compass) {
+    compass.querySelectorAll("path").forEach(path => {
+      path.addEventListener("click", () => {
+        const mode = path.getAttribute("data-mode");
+        if (mode) {
+          navigate(mode + "View");
+        }
+      });
+    });
   }
 
-  history.push({ date: today, mode, activity });
-  localStorage.setItem("history", JSON.stringify(history));
-  loadStreak();
-  renderHistory();
-}
+  // Activity logging
+  function logActivity(mode, inputText) {
+    const today = new Date().toISOString().split("T")[0];
+    const history = JSON.parse(localStorage.getItem("history") || "{}");
 
-function loadStreak() {
-  const streak = localStorage.getItem("streak") || 0;
-  document.getElementById("streak").textContent = `🔥 ${streak}-day streak`;
-}
+    if (!history[today]) history[today] = {};
+    if (!history[today][mode]) history[today][mode] = [];
 
-function renderHistory() {
-  const log = JSON.parse(localStorage.getItem("history") || "[]");
-  const list = document.getElementById("historyLog");
-  list.innerHTML = "";
+    if (inputText && !history[today][mode].includes(inputText)) {
+      history[today][mode].push(inputText);
+      localStorage.setItem("history", JSON.stringify(history));
+      updateStreak();
+    }
+  }
 
-  log.slice().reverse().forEach(entry => {
-    const item = document.createElement("li");
-    item.textContent = `${entry.date}: [${entry.mode}] ${entry.activity}`;
-    list.appendChild(item);
+  // Save activities on blur
+  document.querySelectorAll("textarea").forEach(area => {
+    area.addEventListener("blur", () => {
+      const mode = area.dataset.mode;
+      const value = area.value.trim();
+      if (mode && value) {
+        logActivity(mode, value);
+      }
+    });
   });
-}
+
+  // Streak tracker
+  function updateStreak() {
+    const history = JSON.parse(localStorage.getItem("history") || "{}");
+    const dates = Object.keys(history).sort().reverse();
+    let streak = 0;
+    let current = new Date();
+
+    for (let date of dates) {
+      const dateStr = current.toISOString().split("T")[0];
+      if (date === dateStr) {
+        streak++;
+        current.setDate(current.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    if (streakDisplay) {
+      streakDisplay.innerHTML = `🔥 ${streak}-day streak`;
+    }
+  }
+
+  // History rendering
+  function renderHistory() {
+    const historyList = document.getElementById("historyList");
+    if (!historyList) return;
+
+    historyList.innerHTML = "";
+    const history = JSON.parse(localStorage.getItem("history") || "{}");
+    const dates = Object.keys(history).sort().reverse();
+
+    dates.forEach(date => {
+      const entry = history[date];
+      const li = document.createElement("li");
+      let html = `<strong>${date}</strong><br/>`;
+
+      Object.keys(entry).forEach(mode => {
+        const actions = entry[mode];
+        html += `<em>${mode}:</em><ul>`;
+        actions.forEach(a => {
+          html += `<li>${a}</li>`;
+        });
+        html += "</ul>";
+      });
+
+      li.innerHTML = html;
+      historyList.appendChild(li);
+    });
+  }
+
+  // Run on load
+  updateStreak();
+  renderHistory();
+});
