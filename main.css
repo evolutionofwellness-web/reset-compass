@@ -1,225 +1,125 @@
-/* === Reset & Base === */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
 body {
-  font-family: system-ui, sans-serif;
-  background-color: #f9f9f9;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f9f9f9;
   color: #222;
-  line-height: 1.5;
 }
+
+header {
+  background: #0B3D2E;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+nav button {
+  background: white;
+  border: none;
+  margin: 0.25rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+h2 {
+  margin-top: 0;
+}
+
 .hidden {
   display: none;
 }
 
-/* === Splash Screen === */
 #splashScreen {
+  background: #0B3D2E;
   position: fixed;
-  background-color: #0B3D2E;
-  z-index: 9999;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   display: flex;
-  align-items: center;
   justify-content: center;
-}
-#splashIcon {
-  width: 100px;
-  height: 100px;
-  animation: splashAnim 1.5s ease-out forwards;
-}
-@keyframes splashAnim {
-  0% {
-    opacity: 0;
-    transform: scale(0.6) rotate(0deg);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1.2) rotate(360deg);
-  }
+  align-items: center;
+  z-index: 1000;
 }
 
-/* === Welcome Modal === */
+#splashIcon {
+  width: 120px;
+  height: 120px;
+  animation: spinZoomFade 1.5s ease-in-out forwards;
+}
+
+@keyframes spinZoomFade {
+  0% { transform: scale(0.8) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+  100% { transform: scale(1) rotate(360deg); opacity: 0; }
+}
+
 .modal {
   position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  z-index: 999;
 }
+
 .modal-content {
-  background: #fff;
-  padding: 1.5rem;
+  background: white;
+  padding: 2rem;
   border-radius: 10px;
-  width: 90%;
-  max-width: 340px;
   text-align: center;
 }
-.modal-content h2 {
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
-}
-.modal-content p {
-  font-size: 0.95rem;
-}
-.modal-content button {
-  margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
+
+#startApp {
   background: #0B3D2E;
   color: white;
   border: none;
-  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-/* === Header & Navigation === */
-header {
-  background-color: #0B3D2E;
-  color: white;
-  padding: 1rem;
-  text-align: center;
-}
-nav {
-  margin-top: 0.5rem;
-}
-nav button {
-  margin: 0.2rem;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.9rem;
-  background: white;
-  color: #0B3D2E;
-  border: 1px solid #0B3D2E;
-  border-radius: 4px;
-  cursor: pointer;
-}
-nav button:hover {
-  background-color: #0B3D2E;
-  color: white;
-}
-
-/* === Main Content === */
-main {
-  padding: 1rem;
-}
-h1, h2 {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-h2 {
-  font-size: 1.2rem;
-}
-
-/* === Daily Streak Display === */
 #streakDisplay {
-  text-align: center;
-  font-size: 1.1rem;
-  margin: 1rem 0;
-  color: #0B3D2E;
-}
-
-/* === Compass Styling === */
-.compass-container {
-  display: flex;
-  justify-content: center;
-  margin: 1rem auto;
-  max-width: 360px;
-}
-#compass {
-  width: 100%;
-  height: auto;
-}
-#compass path {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-#compass path:hover {
-  opacity: 0.85;
-  stroke: #333;
-  stroke-width: 1px;
-}
-#compass text {
-  font-family: system-ui, sans-serif;
+  margin: 1rem;
+  font-size: 1.2rem;
   font-weight: bold;
-  fill: #000;
+  text-align: center;
 }
 
-/* === Mode Buttons === */
+#compass {
+  display: block;
+  width: 80%;
+  margin: 0 auto;
+  max-width: 300px;
+  cursor: pointer;
+}
+
 .mode-buttons {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   gap: 0.75rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
+
 .mode-button {
-  padding: 0.75rem 1rem;
+  padding: 1rem;
+  font-size: 1rem;
   border: none;
   border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
+  background: #0B3D2E;
+  color: white;
+  width: 80%;
+  max-width: 300px;
   text-align: center;
-  min-width: 140px;
-}
-.mode-button small {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 400;
-  margin-top: 4px;
-}
-.mode-button[data-mode="Growing"] {
-  background-color: #0074D9;
-  color: white;
-}
-.mode-button[data-mode="Grounded"] {
-  background-color: #2ECC40;
-  color: white;
-}
-.mode-button[data-mode="Drifting"] {
-  background-color: #FFDC00;
-  color: #222;
-}
-.mode-button[data-mode="Surviving"] {
-  background-color: #FF4136;
-  color: white;
 }
 
-/* === Mode Views & Textareas === */
-section {
-  margin-top: 2rem;
-}
-.mode-activity {
-  margin: 1rem auto;
-  display: flex;
-  justify-content: center;
-}
-.mode-activity textarea {
-  width: 90%;
-  max-width: 500px;
-  min-height: 80px;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  resize: vertical;
-}
-
-/* === History View === */
-#historyView ul {
-  list-style: none;
-  padding: 0;
-  margin: 1rem;
-}
-#historyView li {
+textarea {
+  width: 100%;
+  margin-top: 0.5rem;
   padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  background: #eee;
-  border-left: 4px solid #0B3D2E;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
