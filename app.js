@@ -1,60 +1,79 @@
 document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => {
-    document.getElementById("splashScreen").style.display = "none";
-  }, 2000);
+  const pages = document.querySelectorAll(".page");
+  const historyList = document.getElementById("historyList");
+  const streakCount = document.getElementById("streakCount");
 
-  updateStreak();
-  navigateTo('home');
-});
-
-function navigateTo(sectionId) {
-  document.querySelectorAll("main > section").forEach(s => s.classList.remove("active"));
-  document.getElementById(sectionId).classList.add("active");
-}
-
-function openMode(mode) {
-  const container = document.getElementById('modeView');
-  container.innerHTML = `<h2>${capitalize(mode)} Mode</h2>` + getModeActivities(mode);
-  navigateTo('modeView');
-}
-
-function getModeActivities(mode) {
-  const activities = {
-    growing: ["Do something that scares you", "Make bold progress on a long-term goal", "Reach out for feedback or growth"],
-    grounded: ["Tidy up your space", "Plan your next 3 tasks", "Take a mindful break"],
-    drifting: ["Go for a walk", "Stretch or move lightly", "Do a brain-dump to clear your mind"],
-    surviving: ["Drink a glass of water", "Cancel one nonessential task", "Do a 2-minute reset: breathe + pause"]
+  const MODES = {
+    growing: [
+      "Do a challenging workout",
+      "Apply to a new opportunity",
+      "Pitch your idea to someone"
+    ],
+    grounded: [
+      "Clean your space",
+      "Prioritize your top 3 tasks",
+      "Finish something you’ve been putting off"
+    ],
+    drifting: [
+      "Take a walk",
+      "Do 5 minutes of deep breathing",
+      "Write freely for 10 minutes"
+    ],
+    surviving: [
+      "Drink water",
+      "Lie down with no screens for 10 minutes",
+      "Text someone you trust"
+    ]
   };
 
-  return activities[mode].map(act =>
-    `<div class="activity"><p>${act}</p>
-    <textarea placeholder="Write what you did..." onchange="logActivity('${mode}', this.value)"></textarea></div>`
-  ).join("");
-}
-
-function logActivity(mode, text) {
-  if (!text.trim()) return;
-  const history = JSON.parse(localStorage.getItem("activityHistory") || "[]");
-  const date = new Date().toISOString().split("T")[0];
-  history.push({ date, mode, text });
-  localStorage.setItem("activityHistory", JSON.stringify(history));
-
-  // streak logic
-  const lastLogged = localStorage.getItem("lastLoggedDate");
-  if (lastLogged !== date) {
-    let streak = parseInt(localStorage.getItem("streak") || "0");
-    streak += 1;
-    localStorage.setItem("streak", streak.toString());
-    localStorage.setItem("lastLoggedDate", date);
-    updateStreak();
+  function navigate(id) {
+    pages.forEach(p => p.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
   }
-}
 
-function updateStreak() {
-  const streak = localStorage.getItem("streak") || "0";
-  document.getElementById("streakDisplay").innerText = `🔥 ${streak}-day streak`;
-}
+  function showMode(mode) {
+    navigate("modeSection");
+    document.getElementById("modeTitle").innerText = mode.charAt(0).toUpperCase() + mode.slice(1);
+    const container = document.getElementById("activitiesContainer");
+    container.innerHTML = "";
+    MODES[mode].forEach(activity => {
+      const div = document.createElement("div");
+      div.className = "activity";
+      div.innerHTML = `
+        <strong>${activity}</strong>
+        <textarea placeholder="What did you do?" onchange="logActivity('${mode}', this.value)"></textarea>
+      `;
+      container.appendChild(div);
+    });
+  }
 
-function capitalize(word) {
-  return word.charAt(0).toUpperCase() + word.slice(1);
-}
+  function logActivity(type, text) {
+    if (!text.trim()) return;
+    const item = document.createElement("li");
+    const now = new Date().toLocaleString();
+    item.textContent = `[${now}] (${type}) ${text}`;
+    historyList.appendChild(item);
+
+    const today = new Date().toDateString();
+    if (localStorage.getItem("lastLoggedDate") !== today) {
+      localStorage.setItem("lastLoggedDate", today);
+      let streak = parseInt(localStorage.getItem("streak") || "0") + 1;
+      localStorage.setItem("streak", streak);
+      updateStreak();
+    }
+  }
+
+  function updateStreak() {
+    const count = localStorage.getItem("streak") || "0";
+    streakCount.textContent = `🔥 ${count}-day streak`;
+  }
+
+  updateStreak();
+  setTimeout(() => {
+    document.getElementById("splashScreen").style.display = "none";
+  }, 1500);
+
+  window.navigate = navigate;
+  window.showMode = showMode;
+  window.logActivity = logActivity;
+});
