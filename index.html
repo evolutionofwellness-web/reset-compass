@@ -33,33 +33,33 @@
       </div>
 
     <div class="compass-container">
-  <div id="compass" style="margin: 40px auto; width: 250px; height: 250px;">
-    <svg viewBox="0 0 200 200" width="100%" height="100%">
-      <!-- GROWING - Top (North) -->
-      <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
-            fill="blue" fill-opacity="0.85" onclick="showMode('growing')" />
-      <text x="150" y="50" fill="white" font-size="14"
-            text-anchor="middle" alignment-baseline="middle">Growing</text>
+  <div class="compass-container">
+  <svg viewBox="0 0 200 200" width="250" height="250" style="display: block; margin: 0 auto;">
+    <!-- GROWING (Top) -->
+    <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
+          fill="#1E90FF" fill-opacity="0.9" onclick="showMode('growing')" style="cursor:pointer;" />
+    <text x="150" y="50" fill="white" font-size="12" font-family="Arial"
+          text-anchor="middle" dominant-baseline="middle">Growing</text>
 
-      <!-- GROUNDED - Right (East) -->
-      <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
-            fill="green" fill-opacity="0.85" onclick="showMode('grounded')" />
-      <text x="150" y="150" fill="white" font-size="14"
-            text-anchor="middle" alignment-baseline="middle">Grounded</text>
+    <!-- GROUNDED (Right) -->
+    <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
+          fill="#28a745" fill-opacity="0.9" onclick="showMode('grounded')" style="cursor:pointer;" />
+    <text x="150" y="150" fill="white" font-size="12" font-family="Arial"
+          text-anchor="middle" dominant-baseline="middle">Grounded</text>
 
-      <!-- DRIFTING - Bottom (South) -->
-      <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
-            fill="yellow" fill-opacity="0.85" onclick="showMode('drifting')" />
-      <text x="50" y="150" fill="black" font-size="14"
-            text-anchor="middle" alignment-baseline="middle">Drifting</text>
+    <!-- DRIFTING (Bottom) -->
+    <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
+          fill="#f4d03f" fill-opacity="0.95" onclick="showMode('drifting')" style="cursor:pointer;" />
+    <text x="50" y="150" fill="#333" font-size="12" font-family="Arial"
+          text-anchor="middle" dominant-baseline="middle">Drifting</text>
 
-      <!-- SURVIVING - Left (West) -->
-      <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
-            fill="red" fill-opacity="0.85" onclick="showMode('surviving')" />
-      <text x="50" y="50" fill="white" font-size="14"
-            text-anchor="middle" alignment-baseline="middle">Surviving</text>
-    </svg>
-  </div>
+    <!-- SURVIVING (Left) -->
+    <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
+          fill="#dc3545" fill-opacity="0.9" onclick="showMode('surviving')" style="cursor:pointer;" />
+    <text x="50" y="50" fill="white" font-size="12" font-family="Arial"
+          text-anchor="middle" dominant-baseline="middle">Surviving</text>
+  </svg>
+</div>
 </div>
 
       <div class="mode-buttons">
