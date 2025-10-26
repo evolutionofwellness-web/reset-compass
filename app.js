@@ -1,96 +1,81 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const splash = document.getElementById("splash-screen");
-  setTimeout(() => splash.style.display = "none", 2000);
-  updateStreakDisplay();
+  setTimeout(() => {
+    document.getElementById("splash-screen").style.display = "none";
+  }, 1500);
+
+  document.querySelectorAll("#compass path").forEach(path => {
+    path.addEventListener("click", e => {
+      const mode = e.target.getAttribute("data-mode");
+      if (mode) {
+        goToMode(mode);
+      }
+    });
+  });
+
+  updateStreak();
 });
 
-function navigate(view) {
-  document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
-  document.getElementById(view).classList.remove("hidden");
-  if (view === 'history') renderHistory();
-  if (view === 'quickwins') renderQuickWins();
+const activities = {
+  growing: ["Write a goal", "Tackle a challenge", "Start a new project"],
+  grounded: ["Declutter a space", "Complete a task", "Plan your day"],
+  drifting: ["Go for a walk", "Journal your thoughts", "Listen to calming music"],
+  surviving: ["Drink water", "Breathe deeply", "Rest for 5 minutes"]
+};
+
+function goToMode(mode) {
+  const container = document.getElementById("content");
+  container.innerHTML = `<h2>${capitalize(mode)}</h2>` + activities[mode].map(activity =>
+    `<div><label>${activity}</label><input type="text"><button onclick="logActivity('${mode}', '${activity}')">Log</button></div>`
+  ).join("") + `<br><a href="#" onclick="navigateHome()">← Back</a>`;
 }
 
-function openMode(mode) {
-  navigate('mode-view');
-  const container = document.getElementById("mode-view");
-  container.innerHTML = `<h2>${mode}</h2>`;
-  const activities = getActivitiesForMode(mode);
-  activities.forEach((act, idx) => {
-    const inputId = `${mode}-${idx}`;
-    container.innerHTML += `
-      <label>${act}</label>
-      <input type="text" id="${inputId}" />
-      <button class="log-button" onclick="logActivity('${mode}', '${act}', '${inputId}')">Log</button>
-    `;
-  });
-  container.innerHTML += `<button onclick="navigate('home')">← Back</button>`;
-}
-
-function renderQuickWins() {
-  const quickWins = ["Drink water", "Do 5 squats", "Take 3 deep breaths"];
-  const container = document.getElementById("quickwins");
-  container.innerHTML = `<h2>Quick Wins</h2>`;
-  quickWins.forEach((act, idx) => {
-    const inputId = `quick-${idx}`;
-    container.innerHTML += `
-      <label>${act}</label>
-      <input type="text" id="${inputId}" />
-      <button class="log-button" onclick="logActivity('Quick Win', '${act}', '${inputId}')">Log</button>
-    `;
-  });
-  container.innerHTML += `<button onclick="navigate('home')">← Back</button>`;
-}
-
-function logActivity(mode, activity, inputId) {
-  const text = document.getElementById(inputId).value.trim();
-  if (!text) return;
-  const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
-  const timestamp = new Date().toISOString();
-  history.push({ mode, activity, text, timestamp });
+function logActivity(mode, activity) {
+  const date = new Date().toLocaleDateString();
+  let history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
+  history.push({ date, mode, activity });
   localStorage.setItem("resetHistory", JSON.stringify(history));
-  updateStreak();
-  alert("Activity logged!");
-  navigate('home');
-}
 
-function renderHistory() {
-  const container = document.getElementById("history");
-  const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
-  if (!history.length) {
-    container.innerHTML = `<h2>History</h2><p>No activities logged yet.</p><button onclick="navigate('home')">← Back</button>`;
-    return;
+  const lastLogged = localStorage.getItem("lastLogged");
+  if (lastLogged !== date) {
+    let streak = parseInt(localStorage.getItem("streak") || "0");
+    localStorage.setItem("streak", streak + 1);
+    localStorage.setItem("lastLogged", date);
+    updateStreak();
   }
-  container.innerHTML = `<h2>History</h2>`;
-  history.slice(-10).reverse().forEach(item => {
-    const date = new Date(item.timestamp).toLocaleString();
-    container.innerHTML += `<p><strong>${item.mode}:</strong> ${item.activity} – "${item.text}" <em>(${date})</em></p>`;
-  });
-  container.innerHTML += `<button onclick="navigate('home')">← Back</button>`;
 }
 
 function updateStreak() {
-  const today = new Date().toISOString().split("T")[0];
-  let streakData = JSON.parse(localStorage.getItem("streakData") || "{}");
-  if (streakData.lastDate !== today) {
-    streakData.count = (streakData.count || 0) + 1;
-    streakData.lastDate = today;
-    localStorage.setItem("streakData", JSON.stringify(streakData));
-  }
-  updateStreakDisplay();
+  document.getElementById("streak-count").textContent = localStorage.getItem("streak") || "0";
 }
 
-function updateStreakDisplay() {
-  const data = JSON.parse(localStorage.getItem("streakData") || "{}");
-  document.getElementById("streak-display").innerText = `Daily Streak: ${data.count || 0} 🔥`;
+function navigateHome() {
+  location.reload();
 }
 
-function getActivitiesForMode(mode) {
-  const activities = {
-    "Growing": ["Write a goal", "Tackle a challenge", "Start a new project"],
-    "Grounded": ["Organize your space", "Create a checklist", "Do a focused task"],
-    "Drifting": ["Stretch for 1 minute", "Walk around the block", "Journal your thoughts"],
-    "Surviving": ["Eat something nourishing", "Take a break", "Message a friend"]
-  };
-  return activities[mode] || [];
+function navigateQuickWins() {
+  const container = document.getElementById("content");
+  container.innerHTML = "<h2>Quick Wins</h2>" + ["Drink water", "Stand up and stretch", "Take 3 deep breaths"].map(qw =>
+    `<div><label>${qw}</label><input type="text"><button onclick="logActivity('quick', '${qw}')">Log</button></div>`
+  ).join("") + `<br><a href="#" onclick="navigateHome()">← Back</a>`;
+}
+
+function navigateHistory() {
+  const container = document.getElementById("content");
+  const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
+  container.innerHTML = "<h2>History</h2>" + (history.length ? history.map(entry =>
+    `<p><strong>${entry.date}</strong>: ${entry.mode} — ${entry.activity}</p>`
+  ).join("") : "<p>No history yet.</p>") + `<br><a href="#" onclick="navigateHome()">← Back</a>`;
+}
+
+function navigateAbout() {
+  const container = document.getElementById("content");
+  container.innerHTML = `
+    <h2>About</h2>
+    <p>The Reset Compass was created by Marcus Clark to help you align your energy and actions with your current state. It’s a tool for navigating burnout, overwhelm, and progress—one small step at a time.</p>
+    <p>Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p>
+    <br><a href="#" onclick="navigateHome()">← Back</a>`;
+}
+
+function capitalize(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
 }
