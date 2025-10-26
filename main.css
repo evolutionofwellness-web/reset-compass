@@ -5,8 +5,9 @@
   --radius: 12px;
   --accent: #007BFF;
   --text-strong:#0B3D2E;
-  --return-bg: #0B6A44; /* brand green accent for return button */
+  --return-bg: #0B3D2E; /* brand green for return button */
   --return-text: #ffffff;
+  --control-border: rgba(11,61,46,0.08);
 }
 
 /* Reset */
@@ -54,24 +55,19 @@ body {
   text-align:center;
 }
 
-/* Splash overlay - larger zoom and fade; don't force gray */
+/* Splash overlay */
 #splash-screen{
   position:fixed;left:0;right:0;top:0;bottom:0;
   display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), rgba(0,0,0,0.02)), var(--brand-green);
+  background:var(--brand-green);
   z-index:9999;pointer-events:auto;
 }
-#splash-icon{
-  width:110px;
-  height:110px;
-  object-fit:contain;
-  border-radius:18px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  /* Remove grayscale/tint filter - prefer white/transparent icon asset */
-  filter: none;
-  animation: spinZoomFade 1.4s cubic-bezier(.2,.8,.2,1) forwards;
+#splash-svg{
+  width:140px;height:140px;
+  transform-origin:center;
+  animation: splashZoom 1.35s cubic-bezier(.2,.8,.2,1) forwards;
 }
-@keyframes spinZoomFade {
+@keyframes splashZoom {
   0% { opacity:1; transform: scale(1) rotate(0deg); }
   70% { opacity:1; transform: scale(2.2) rotate(420deg); }
   100% { opacity:0; transform: scale(3.8) rotate(720deg); }
@@ -96,16 +92,16 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   text-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-/* Lower touch sensitivity: avoid accidental activations while scrolling by using tap detection logic;
-   keep pointer-events default on paths and use JS to check movement/time thresholds. */
+/* Lower accidental activation sensitivity handled in JS. Keep nice active state */
 #compass path{cursor:pointer;transition:transform .14s ease, filter .14s ease}
 #compass path:active, #compass path:focus{outline:none; transform:translateY(-3px); filter:drop-shadow(0 8px 14px rgba(0,0,0,0.12))}
 
 /* Buttons (list) */
-.buttons{margin:12px 0 36px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.buttons{margin:12px 0 28px;display:flex;flex-direction:column;gap:14px;align-items:center}
 .mode-button{
   width:94%;max-width:720px;padding:14px 18px;border-radius:12px;border:2px solid rgba(0,0,0,0.06);
-  background:white;font-weight:700;box-shadow: 0 6px 18px rgba(2,10,8,0.06);transition:transform .12s ease;
+  background:linear-gradient(180deg,#ffffff,#fbfbfb);font-weight:700;box-shadow: 0 10px 30px rgba(6,20,12,0.06);transition:transform .12s ease;
+  text-align:center;color:var(--text-strong);
 }
 .mode-button:hover{transform:translateY(-3px)}
 .mode-button.growing{border-color:#007BFF;color:#007BFF}
@@ -113,41 +109,49 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 .mode-button.drifting{border-color:#DAA520;color:#6f550b}
 .mode-button.surviving{border-color:#D9534F;color:#b93b33}
 
-/* content area and mode pages */
+/* content area and mode pages - more brand presence */
 .content-area{margin-top:20px}
 .mode-page{
-  background:var(--card-bg);
-  border-radius:12px;
-  padding:18px;
+  background:linear-gradient(180deg,#ffffff,#fbfffb);
+  border-radius:16px;
+  padding:22px;
   border:1px solid rgba(0,0,0,0.04);
-  box-shadow: 0 10px 30px rgba(6,20,12,0.06);
-  margin: 14px 0;
+  box-shadow: 0 18px 40px rgba(6,20,12,0.06);
+  margin: 18px 0;
 }
-.mode-page h2{margin-top:0;font-size:2rem;color:var(--brand-green)}
-.activity-row{display:flex;gap:8px;align-items:center;margin:12px 0}
-.activity-row label{flex:0 0 36%;font-weight:700;color:var(--text-strong)}
-.activity-row input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)}
-.activity-row button{padding:8px 14px;border-radius:8px;border:none;background:var(--accent);color:white;font-weight:700;cursor:pointer}
+.mode-page h2{
+  margin-top:0;
+  font-size:2.1rem;
+  color:var(--brand-green);
+  letter-spacing:-0.02em;
+  text-shadow: 0 2px 8px rgba(6,20,12,0.04);
+}
 
-/* Return to Compass (brand green) */
-.return-button{
-  display:inline-block;
-  margin-top:14px;
-  padding:12px 18px;
-  background:var(--return-bg);
-  color:var(--return-text);
-  font-weight:800;
-  border-radius:10px;
-  border:none;
-  box-shadow: 0 8px 18px rgba(6,20,12,0.12);
-  cursor:pointer;
-  text-decoration:none;
+/* activity rows: bigger labels, clearer controls */
+.activity-row{display:flex;gap:12px;align-items:center;margin:14px 0}
+.activity-row label{flex:0 0 36%;font-weight:800;color:var(--text-strong);font-size:1rem}
+.activity-row input{
+  flex:1;padding:12px;border-radius:12px;border:1px solid var(--control-border);
+  background:linear-gradient(180deg,#fff,#fbfbfb);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
 }
+.activity-row button{
+  padding:10px 14px;border-radius:10px;border:none;background:var(--brand-green);color:white;font-weight:800;cursor:pointer;
+  box-shadow: 0 8px 18px rgba(6,20,12,0.12);
+}
+
+/* Return to Compass button uses brand green */
+.return-button{
+  display:inline-block;margin-top:18px;padding:12px 18px;background:var(--return-bg);color:var(--return-text);
+  font-weight:800;border-radius:12px;border:none;box-shadow: 0 12px 30px rgba(6,20,12,0.12);cursor:pointer;text-decoration:none;
+}
+
+/* Remove the extra helper text below list buttons by default (home shows no extra content block) */
 
 /* small devices adjustments */
 @media (max-width:420px){
   .brand h1{font-size:1.05rem}
   .compass-label{font-size:13px;stroke-width:1.6}
   .activity-row label{font-size:14px}
-  #splash-icon{width:96px;height:96px}
+  #splash-svg{width:112px;height:112px}
 }
