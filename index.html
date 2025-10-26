@@ -4,14 +4,27 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=49" />
+  <link rel="stylesheet" href="main.css?v=50" />
 </head>
 <body>
-  <!-- Splash overlay -->
+  <!-- Splash overlay: inline SVG so we control color and animation reliably -->
   <div id="splash-screen" aria-hidden="true">
-    <!-- Provide a light/transparent icon file if possible (SVG preferred).
-         CSS will no longer force it to gray; instead the icon should be light-on-transparent. -->
-    <img src="splash-icon.png" id="splash-icon" alt="Reset Compass logo">
+    <!-- Inline compass SVG (light artwork) so it always appears correctly on brand background -->
+    <svg id="splash-svg" viewBox="0 0 200 200" aria-hidden="true" role="img" width="160" height="160" focusable="false">
+      <defs>
+        <filter id="splash-shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#081e12" flood-opacity="0.35"/>
+        </filter>
+      </defs>
+      <rect x="12" y="12" width="176" height="176" rx="24" fill="#083126" opacity="0.06"/>
+      <g transform="translate(20,20)" filter="url(#splash-shadow)">
+        <circle cx="80" cy="80" r="60" fill="#eaf6ef"/>
+        <g transform="translate(80,80)" fill="#0B3D2E">
+          <path d="M-8,0 L12,-18 L20,-10 L-8,8 Z" />
+        </g>
+        <circle cx="80" cy="80" r="52" fill="none" stroke="#0B3D2E" stroke-width="6"/>
+      </g>
+    </svg>
   </div>
 
   <nav class="site-nav" role="navigation" aria-label="Main navigation">
@@ -30,6 +43,7 @@
   <main class="page" id="page">
     <div id="streak" class="streak">🔥 Streak: <span id="streak-count">0</span> days</div>
 
+    <!-- Instruction card (kept small, brand-styled) -->
     <section id="how-to" class="card">
       <h2>How to Use This App</h2>
       <p>Select a mode from the compass or the buttons below. Complete an activity. Log it. Build your streak.</p>
@@ -41,19 +55,19 @@
 
         <defs>
           <linearGradient id="growingGrad" x1="0" x2="1">
-            <stop offset="0" stop-color="#0A84FF"/>
+            <stop offset="0" stop-color="#2FA0FF"/>
             <stop offset="1" stop-color="#007BFF"/>
           </linearGradient>
           <linearGradient id="groundedGrad" x1="0" x2="1">
-            <stop offset="0" stop-color="#2E8B57"/>
+            <stop offset="0" stop-color="#3CA56A"/>
             <stop offset="1" stop-color="#246B45"/>
           </linearGradient>
           <linearGradient id="driftingGrad" x1="0" x2="1">
-            <stop offset="0" stop-color="#E0B23A"/>
+            <stop offset="0" stop-color="#E6C450"/>
             <stop offset="1" stop-color="#DAA520"/>
           </linearGradient>
           <linearGradient id="survivingGrad" x1="0" x2="1">
-            <stop offset="0" stop-color="#E07066"/>
+            <stop offset="0" stop-color="#E78B88"/>
             <stop offset="1" stop-color="#D9534F"/>
           </linearGradient>
 
@@ -62,7 +76,6 @@
           </filter>
         </defs>
 
-        <!-- rotate so wedge-centers land on N/E/S/W -->
         <g transform="rotate(-45 100 100)">
           <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
                 fill="url(#growingGrad)" fill-opacity="0.82"
@@ -81,17 +94,17 @@
                 data-mode="surviving" tabindex="0" role="button" aria-label="Surviving"></path>
         </g>
 
-        <!-- crisp outer ring -->
         <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-        <!-- labels positioned further from center for balance -->
-        <text x="100" y="46" class="compass-label in-wedge" filter="url(#labelShadow)">Growing</text>
-        <text x="152" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Grounded</text>
-        <text x="100" y="156" class="compass-label in-wedge" filter="url(#labelShadow)">Drifting</text>
-        <text x="48" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Surviving</text>
+        <!-- labels positioned slightly further from the center for balance -->
+        <text x="100" y="42" class="compass-label in-wedge" filter="url(#labelShadow)">Growing</text>
+        <text x="156" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Grounded</text>
+        <text x="100" y="160" class="compass-label in-wedge" filter="url(#labelShadow)">Drifting</text>
+        <text x="44" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Surviving</text>
       </svg>
     </section>
 
+    <!-- Mode list buttons -->
     <section id="mode-buttons" class="buttons" aria-hidden="false">
       <button class="mode-button growing" data-mode="growing">Growing: Push yourself to new heights</button>
       <button class="mode-button grounded" data-mode="grounded">Grounded: Stay centered and productive</button>
@@ -99,6 +112,7 @@
       <button class="mode-button surviving" data-mode="surviving">Surviving: Just get through the day</button>
     </section>
 
+    <!-- main dynamic content area (modes, quick wins, history, about) -->
     <div id="content" class="content-area" aria-live="polite"></div>
   </main>
 
