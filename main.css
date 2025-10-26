@@ -71,6 +71,12 @@ svg.compass {
   height: 250px;
 }
 
+svg text {
+  font-family: 'system-ui', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
 .label {
   font-size: 0.7rem;
   fill: black;
