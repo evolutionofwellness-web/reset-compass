@@ -34,29 +34,29 @@
 
     <div class="compass-container">
   <div class="compass-container" style="text-align:center; margin: 20px auto;">
-  <svg viewBox="0 0 200 200" width="260" height="260">
-    <!-- GROWING (Top - Blue) -->
+  <svg viewBox="0 0 200 200" width="260" height="260" style="border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+    <!-- Top (GROWING - Blue) -->
     <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
-          fill="#1E90FF" onclick="showMode('growing')" style="cursor:pointer;" />
-    <text x="150" y="50" fill="white" font-size="13" font-family="system-ui"
+          fill="#1E90FF" onclick="showMode('growing')" style="cursor:pointer;"></path>
+    <text x="150" y="45" fill="white" font-size="13" font-family="system-ui"
           text-anchor="middle" dominant-baseline="middle">Growing</text>
 
-    <!-- GROUNDED (Right - Green) -->
+    <!-- Right (GROUNDED - Green) -->
     <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
-          fill="#28a745" onclick="showMode('grounded')" style="cursor:pointer;" />
-    <text x="150" y="150" fill="white" font-size="13" font-family="system-ui"
+          fill="#28a745" onclick="showMode('grounded')" style="cursor:pointer;"></path>
+    <text x="150" y="155" fill="white" font-size="13" font-family="system-ui"
           text-anchor="middle" dominant-baseline="middle">Grounded</text>
 
-    <!-- DRIFTING (Bottom - Yellow) -->
+    <!-- Bottom (DRIFTING - Yellow) -->
     <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
-          fill="#f4d03f" onclick="showMode('drifting')" style="cursor:pointer;" />
-    <text x="50" y="150" fill="#222" font-size="13" font-family="system-ui"
+          fill="#FFD700" onclick="showMode('drifting')" style="cursor:pointer;"></path>
+    <text x="50" y="155" fill="#222" font-size="13" font-family="system-ui"
           text-anchor="middle" dominant-baseline="middle">Drifting</text>
 
-    <!-- SURVIVING (Left - Red) -->
+    <!-- Left (SURVIVING - Red) -->
     <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
-          fill="#dc3545" onclick="showMode('surviving')" style="cursor:pointer;" />
-    <text x="50" y="50" fill="white" font-size="13" font-family="system-ui"
+          fill="#dc3545" onclick="showMode('surviving')" style="cursor:pointer;"></path>
+    <text x="50" y="45" fill="white" font-size="13" font-family="system-ui"
           text-anchor="middle" dominant-baseline="middle">Surviving</text>
   </svg>
 </div>
