@@ -1,26 +1,18 @@
-// app.js - fixes:
-// - splash animation (animationend hides overlay) and large zoom/fade
-// - nav links wired to routing (click handlers + anchors fallback)
-// - wedges pointer handling + keyboard
-// - labels moved further from center
-// - improved mode page styling and "Return to the Compass" button
+// app.js - improved tap detection, nav wiring, splash handling, styling updates
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Splash overlay: hide after animation ends (or fallback timeout)
   const splash = document.getElementById("splash-screen");
   const splashIcon = document.getElementById("splash-icon");
-
-  // Ensure splash overlay is removed after its animation completes
   if (splashIcon) {
-    splashIcon.addEventListener("animationend", () => {
-      if (splash) splash.style.display = "none";
-    });
-    // fallback in case animationend doesn't fire
-    setTimeout(() => { if (splash) splash.style.display = "none"; }, 1600);
-  } else {
-    if (splash) splash.style.display = "none";
+    splashIcon.addEventListener("animationend", () => { if (splash) splash.style.display = "none"; });
+    // fallback:
+    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2000);
+  } else if (splash) {
+    splash.style.display = "none";
   }
 
-  // Wire top nav links to the router (prevent default but allow anchor fallback)
+  // Wire top nav links (data-hash) to router
   document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -29,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Wire mode buttons (list) using delegation
+  // Wire mode buttons list via delegation
   document.getElementById("mode-buttons")?.addEventListener("click", (e) => {
     const btn = e.target.closest && e.target.closest('button[data-mode]');
     if (btn) {
@@ -38,21 +30,68 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Delegated pointer handler for the SVG compass (works well on mobile)
+  // Compass: delegated tap detection (reduces accidental activation during scroll)
   const compass = document.getElementById("compass");
-  if (compass) {
-    const handleModeClick = (target) => {
-      const path = target.closest && target.closest('path[data-mode]');
-      if (path) {
-        const m = path.getAttribute('data-mode');
-        if (m) navigateMode(m);
-      }
-    };
-    compass.addEventListener("pointerdown", (e) => handleModeClick(e.target));
-    compass.addEventListener("click", (e) => handleModeClick(e.target));
+  let pointerState = null; // {id, startX, startY, startTime, targetPath}
+
+  function findPathElement(el) {
+    return el && el.closest ? el.closest('path[data-mode]') : null;
   }
 
-  // keyboard support - ensure wedge paths are focusable
+  if (compass) {
+    compass.addEventListener("pointerdown", (e) => {
+      // Only track primary pointers
+      if (e.isPrimary === false) return;
+      const path = findPathElement(e.target);
+      pointerState = null;
+      if (path) {
+        pointerState = {
+          id: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          startTime: Date.now(),
+          targetPath: path
+        };
+      }
+    }, {passive: true});
+
+    compass.addEventListener("pointermove", (e) => {
+      // If pointer moved too far, clear pointerState to avoid treating as tap
+      if (!pointerState || pointerState.id !== e.pointerId) return;
+      const dx = e.clientX - pointerState.startX;
+      const dy = e.clientY - pointerState.startY;
+      const distSq = dx*dx + dy*dy;
+      // threshold ~ 12px movement (squared)
+      if (distSq > 12*12) {
+        pointerState = null;
+      }
+    }, {passive: true});
+
+    compass.addEventListener("pointerup", (e) => {
+      if (!pointerState || pointerState.id !== e.pointerId) { pointerState = null; return; }
+      const elapsed = Date.now() - pointerState.startTime;
+      // require short tap (not long press) and low movement
+      if (elapsed < 700) {
+        const path = pointerState.targetPath;
+        const mode = path && path.getAttribute('data-mode');
+        if (mode) navigateMode(mode);
+      }
+      pointerState = null;
+    });
+
+    compass.addEventListener("pointercancel", () => { pointerState = null; });
+    // Click fallback for browsers that don't support pointer events well
+    compass.addEventListener("click", (e) => {
+      const path = findPathElement(e.target);
+      if (path) {
+        // rely on click — but only trigger if no recent pointerState prevented it
+        const mode = path.getAttribute('data-mode');
+        if (mode) navigateMode(mode);
+      }
+    });
+  }
+
+  // Make wedge paths keyboard-focusable for accessibility
   document.querySelectorAll("#compass path[data-mode]").forEach(p => {
     p.setAttribute("tabindex", "0");
     p.addEventListener("keydown", (e) => {
@@ -64,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // hash routing
+  // Hash routing
   window.addEventListener("hashchange", renderRoute);
   renderRoute();
 
@@ -79,13 +118,8 @@ const activities = {
   surviving: ["Drink water", "Breathe deeply", "Rest for 5 minutes"]
 };
 
-function navigateHash(hash){
-  // normalize
-  location.hash = hash;
-}
-function navigateMode(mode){
-  location.hash = `#mode/${mode}`;
-}
+function navigateHash(hash){ location.hash = hash; }
+function navigateMode(mode){ location.hash = `#mode/${mode}`; }
 
 function renderRoute(){
   const h = location.hash || "#home";
@@ -99,6 +133,8 @@ function renderRoute(){
   if (isMode){
     const mode = h.split("/")[1];
     renderModePage(mode);
+    // scroll to top of content for clarity
+    document.getElementById("content")?.scrollIntoView({behavior:"auto",block:"start"});
   } else if (h === "#quick"){
     renderQuickWins();
   } else if (h === "#history"){
@@ -121,7 +157,6 @@ function renderModePage(mode){
   if (!c) return;
   if (!activities[mode]) { c.innerHTML = `<p>Unknown mode</p>`; return; }
 
-  // Build a styled mode page with prominent "Return to the Compass" button
   c.innerHTML = `<div class="mode-page">
       <h2>${capitalize(mode)}</h2>
       ${activities[mode].map((act,i) =>
