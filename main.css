@@ -1,41 +1,62 @@
-/* Reset and base styles */
-body {
-  font-family: system-ui, sans-serif;
+/* main.css v40 — Clean, Polished Reset Compass UI */
+:root {
+  --brand-green: #0B3D2E;
+  --growing-blue: #1E90FF;
+  --grounded-green: #228B22;
+  --drifting-yellow: #FFD700;
+  --surviving-red: #DC143C;
+  --text-dark: #111;
+  --text-light: #fff;
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  background-color: #f5f5f5;
-  color: #0B3D2E;
 }
 
-header {
-  background-color: #0B3D2E;
+body {
+  font-family: system-ui, sans-serif;
+  background: #fff;
+  color: var(--text-dark);
+  line-height: 1.6;
+  padding-bottom: 4rem;
+}
+
+nav.navbar {
+  background: var(--brand-green);
   color: white;
   padding: 1rem;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-nav {
-  margin-top: 1rem;
-}
-
-nav button {
-  margin: 0.25rem;
-  padding: 0.5rem 1rem;
-  background-color: white;
-  color: #0B3D2E;
-  border: 2px solid #0B3D2E;
-  border-radius: 6px;
+nav .app-title {
+  font-size: 1.25rem;
   font-weight: bold;
-  cursor: pointer;
 }
 
-nav button:hover {
-  background-color: #e6f2ef;
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-links li a:hover {
+  text-decoration: underline;
 }
 
 main {
-  padding: 1rem;
-  max-width: 800px;
+  padding: 1.5rem 1rem;
+  max-width: 600px;
   margin: auto;
 }
 
@@ -47,137 +68,82 @@ main {
   display: block;
 }
 
-.streak {
+.streak-display {
   text-align: center;
   font-size: 1.2rem;
   margin-bottom: 1rem;
 }
 
 .how-to {
-  background: #e6f2ef;
+  background: #E6FFF2;
   padding: 1rem;
-  border-radius: 10px;
+  border: 2px dashed var(--brand-green);
+  border-radius: 0.75rem;
   margin-bottom: 1.5rem;
-  border-left: 4px solid #0B3D2E;
+  text-align: center;
 }
 
-#compass {
+.how-to h2 {
+  margin-bottom: 0.5rem;
+}
+
+.compass-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+svg.compass {
   width: 250px;
   height: 250px;
-  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  overflow: visible;
 }
 
-/* Compass SVG tweaks */
-svg {
-  transform: rotate(0deg); /* No tilt */
-}
-
-svg path {
-  cursor: pointer;
-  stroke: #0B3D2E;
-  stroke-width: 1px;
-}
-
-svg text {
+.compass-label {
+  font-size: 0.9rem;
   font-weight: bold;
-  font-size: 13px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
 }
 
-/* Mode colors with transparency */
-path[onclick*="growing"] {
-  fill: rgba(0, 0, 255, 0.15); /* Blue with 15% opacity */
-}
-
-path[onclick*="grounded"] {
-  fill: rgba(0, 128, 0, 0.15); /* Green with 15% opacity */
-}
-
-path[onclick*="drifting"] {
-  fill: rgba(255, 255, 0, 0.15); /* Yellow with 15% opacity */
-}
-
-path[onclick*="surviving"] {
-  fill: rgba(255, 0, 0, 0.15); /* Red with 15% opacity */
-}
-
-/* Mode buttons */
 .mode-buttons {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin: 2rem auto;
-  max-width: 500px;
-}
-
-.mode-buttons button {
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.mode-buttons button.growing {
-  background-color: rgba(0, 0, 255, 0.15);
-  color: #0B3D2E;
-}
-
-.mode-buttons button.grounded {
-  background-color: rgba(0, 128, 0, 0.15);
-  color: #0B3D2E;
-}
-
-.mode-buttons button.drifting {
-  background-color: rgba(255, 255, 0, 0.15);
-  color: #0B3D2E;
-}
-
-.mode-buttons button.surviving {
-  background-color: rgba(255, 0, 0, 0.15);
-  color: #0B3D2E;
-}
-
-/* Activity section */
-#activitiesContainer .activity {
-  margin-bottom: 1.25rem;
-  padding: 0.75rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-}
-
-#activitiesContainer textarea {
-  width: 100%;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  font-size: 1rem;
-  resize: vertical;
-}
-
-/* Quick Wins and History */
-textarea {
-  width: 100%;
-  min-height: 80px;
-  padding: 0.75rem;
-  font-size: 1rem;
   margin-top: 1rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
 }
 
-ul#historyList {
-  list-style-type: none;
-  padding: 0;
+.mode-btn {
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 2px solid var(--brand-green);
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-ul#historyList li {
-  background: #fff;
-  margin: 0.5rem 0;
-  padding: 0.75rem;
-  border-radius: 6px;
-  border: 1px solid #ddd;
+.mode-btn:hover {
+  transform: scale(1.02);
+}
+
+.mode-btn.growing {
+  color: var(--growing-blue);
+}
+
+.mode-btn.grounded {
+  color: var(--grounded-green);
+}
+
+.mode-btn.drifting {
+  color: goldenrod;
+}
+
+.mode-btn.surviving {
+  color: var(--surviving-red);
 }
 
 /* Splash screen */
@@ -188,29 +154,51 @@ ul#historyList li {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #0B3D2E;
+  background: var(--brand-green);
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: fadeOut 1s ease 2s forwards;
 }
 
-#splashScreen img {
-  width: 120px;
-  height: 120px;
-  animation: spinZoom 1.2s ease-out forwards;
+#splashIcon {
+  width: 100px;
+  height: 100px;
+  animation: spinZoomFade 2s ease;
 }
 
-@keyframes spinZoom {
+@keyframes spinZoomFade {
   0% {
-    transform: scale(0.5) rotate(0deg);
     opacity: 0;
+    transform: scale(0.5) rotate(0deg);
   }
   50% {
-    transform: scale(1.2) rotate(360deg);
     opacity: 1;
+    transform: scale(1.25) rotate(360deg);
   }
   100% {
-    transform: scale(1) rotate(360deg);
     opacity: 0;
+    transform: scale(0.8) rotate(720deg);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Section spacing fix on mobile */
+@media (max-width: 500px) {
+  nav .nav-links {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  svg.compass {
+    width: 220px;
+    height: 220px;
   }
 }
