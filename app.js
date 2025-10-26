@@ -26,7 +26,7 @@ function goToMode(mode) {
   const container = document.getElementById("content");
   container.innerHTML = `<h2>${capitalize(mode)}</h2>` + activities[mode].map(activity =>
     `<div><label>${activity}</label><input type="text"><button onclick="logActivity('${mode}', '${activity}')">Log</button></div>`
-  ).join("") + `<br><a href="#" onclick="navigateHome()">← Back</a>`;
+  ).join("") + `<br><a href="#" onclick="navigateHome()">🡐 Back</a>`;
 }
 
 function logActivity(mode, activity) {
@@ -54,26 +54,27 @@ function navigateHome() {
 
 function navigateQuickWins() {
   const container = document.getElementById("content");
-  container.innerHTML = "<h2>Quick Wins</h2>" + ["Drink water", "Stand up and stretch", "Take 3 deep breaths"].map(qw =>
+  container.innerHTML = `<h2>Quick Wins</h2>` + ["Drink water", "Stand up and stretch", "Take 3 deep breaths"].map(qw =>
     `<div><label>${qw}</label><input type="text"><button onclick="logActivity('quick', '${qw}')">Log</button></div>`
-  ).join("") + `<br><a href="#" onclick="navigateHome()">← Back</a>`;
+  ).join("") + `<br><a href="#" onclick="navigateHome()">🡐 Back</a>`;
 }
 
 function navigateHistory() {
   const container = document.getElementById("content");
   const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
-  container.innerHTML = "<h2>History</h2>" + (history.length ? history.map(entry =>
-    `<p><strong>${entry.date}</strong>: ${entry.mode} — ${entry.activity}</p>`
-  ).join("") : "<p>No history yet.</p>") + `<br><a href="#" onclick="navigateHome()">← Back</a>`;
+  container.innerHTML = `<h2>History</h2>` + (history.length ? history.map(entry =>
+    `<p><strong>${entry.date}:</strong> ${entry.mode} — ${entry.activity}</p>`
+  ).join("") : `<p>No history yet.</p>`) + `<br><a href="#" onclick="navigateHome()">🡐 Back</a>`;
 }
 
 function navigateAbout() {
   const container = document.getElementById("content");
   container.innerHTML = `
     <h2>About</h2>
-    <p>The Reset Compass was created by Marcus Clark to help you align your energy and actions with your current state. It’s a tool for navigating burnout, overwhelm, and progress—one small step at a time.</p>
+    <p>The Reset Compass was created by Marcus Clark to help you align your energy and actions with your current state. It's a tool for navigating burnout, overwhelm, and progress—one small step at a time.</p>
     <p>Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p>
-    <br><a href="#" onclick="navigateHome()">← Back</a>`;
+    <br><a href="#" onclick="navigateHome()">🡐 Back</a>
+  `;
 }
 
 function capitalize(word) {
