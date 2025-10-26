@@ -5,7 +5,7 @@
   --radius: 12px;
   --accent: #007BFF;
   --text-strong:#0B3D2E;
-  --return-bg: #065ef0;
+  --return-bg: #0B6A44; /* brand green accent for return button */
   --return-text: #ffffff;
 }
 
@@ -40,7 +40,7 @@ body {
 .nav-links{list-style:none;display:flex;gap:18px;margin:0;padding:0}
 .nav-links a{color:white;text-decoration:none;font-weight:600;opacity:0.95;cursor:pointer}
 
-/* Page */
+/* Page layout */
 .page{max-width:820px;margin:18px auto;padding:0 16px}
 .streak{ text-align:center;font-weight:700;margin:8px 0 18px; }
 
@@ -54,11 +54,12 @@ body {
   text-align:center;
 }
 
-/* Splash overlay - tint icon so it reads on brand background, large zoom & fade */
+/* Splash overlay - larger zoom and fade; don't force gray */
 #splash-screen{
   position:fixed;left:0;right:0;top:0;bottom:0;
   display:flex;align-items:center;justify-content:center;
-  background:var(--brand-green);z-index:9999;pointer-events:auto;
+  background:radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), rgba(0,0,0,0.02)), var(--brand-green);
+  z-index:9999;pointer-events:auto;
 }
 #splash-icon{
   width:110px;
@@ -66,14 +67,14 @@ body {
   object-fit:contain;
   border-radius:18px;
   box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  /* tint icon to white if it is monochrome using filter, otherwise ensure icon artwork is light */
-  filter: brightness(200%) saturate(0%);
-  animation: spinZoomFade 1.2s cubic-bezier(.2,.8,.2,1) forwards;
+  /* Remove grayscale/tint filter - prefer white/transparent icon asset */
+  filter: none;
+  animation: spinZoomFade 1.4s cubic-bezier(.2,.8,.2,1) forwards;
 }
 @keyframes spinZoomFade {
   0% { opacity:1; transform: scale(1) rotate(0deg); }
-  70% { opacity:1; transform: scale(1.9) rotate(420deg); }
-  100% { opacity:0; transform: scale(3.2) rotate(720deg); }
+  70% { opacity:1; transform: scale(2.2) rotate(420deg); }
+  100% { opacity:0; transform: scale(3.8) rotate(720deg); }
 }
 
 /* Compass */
@@ -95,11 +96,12 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   text-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-/* wedge interactivity */
+/* Lower touch sensitivity: avoid accidental activations while scrolling by using tap detection logic;
+   keep pointer-events default on paths and use JS to check movement/time thresholds. */
 #compass path{cursor:pointer;transition:transform .14s ease, filter .14s ease}
 #compass path:active, #compass path:focus{outline:none; transform:translateY(-3px); filter:drop-shadow(0 8px 14px rgba(0,0,0,0.12))}
 
-/* Buttons */
+/* Buttons (list) */
 .buttons{margin:12px 0 36px;display:flex;flex-direction:column;gap:12px;align-items:center}
 .mode-button{
   width:94%;max-width:720px;padding:14px 18px;border-radius:12px;border:2px solid rgba(0,0,0,0.06);
@@ -111,7 +113,7 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 .mode-button.drifting{border-color:#DAA520;color:#6f550b}
 .mode-button.surviving{border-color:#D9534F;color:#b93b33}
 
-/* content area and activity rows */
+/* content area and mode pages */
 .content-area{margin-top:20px}
 .mode-page{
   background:var(--card-bg);
@@ -127,11 +129,11 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 .activity-row input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)}
 .activity-row button{padding:8px 14px;border-radius:8px;border:none;background:var(--accent);color:white;font-weight:700;cursor:pointer}
 
-/* Return to Compass button */
+/* Return to Compass (brand green) */
 .return-button{
   display:inline-block;
   margin-top:14px;
-  padding:10px 16px;
+  padding:12px 18px;
   background:var(--return-bg);
   color:var(--return-text);
   font-weight:800;
@@ -142,7 +144,7 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   text-decoration:none;
 }
 
-/* responsive tweaks */
+/* small devices adjustments */
 @media (max-width:420px){
   .brand h1{font-size:1.05rem}
   .compass-label{font-size:13px;stroke-width:1.6}
