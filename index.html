@@ -4,12 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=48" />
+  <link rel="stylesheet" href="main.css?v=49" />
 </head>
 <body>
   <!-- Splash overlay -->
   <div id="splash-screen" aria-hidden="true">
-    <!-- Use an image with transparent background ideally (SVG/PNG). The CSS will tint and animate it. -->
+    <!-- Provide a light/transparent icon file if possible (SVG preferred).
+         CSS will no longer force it to gray; instead the icon should be light-on-transparent. -->
     <img src="splash-icon.png" id="splash-icon" alt="Reset Compass logo">
   </div>
 
@@ -101,6 +102,6 @@
     <div id="content" class="content-area" aria-live="polite"></div>
   </main>
 
-  <script src="app.js?v=14"></script>
+  <script src="app.js?v=15"></script>
 </body>
 </html>
