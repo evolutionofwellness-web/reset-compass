@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=47" />
+  <link rel="stylesheet" href="main.css?v=48" />
 </head>
 <body>
+  <!-- Splash overlay -->
   <div id="splash-screen" aria-hidden="true">
-    <!-- keep the image but constrain it with CSS so large assets won't break layout -->
+    <!-- Use an image with transparent background ideally (SVG/PNG). The CSS will tint and animate it. -->
     <img src="splash-icon.png" id="splash-icon" alt="Reset Compass logo">
   </div>
 
@@ -18,10 +19,10 @@
     </div>
 
     <ul class="nav-links">
-      <li><a href="#home" onclick="navigateHash('#home')">Home</a></li>
-      <li><a href="#quick" onclick="navigateHash('#quick')">Quick Wins</a></li>
-      <li><a href="#history" onclick="navigateHash('#history')">History</a></li>
-      <li><a href="#about" onclick="navigateHash('#about')">About</a></li>
+      <li><a href="#home" data-hash="#home">Home</a></li>
+      <li><a href="#quick" data-hash="#quick">Quick Wins</a></li>
+      <li><a href="#history" data-hash="#history">History</a></li>
+      <li><a href="#about" data-hash="#about">About</a></li>
     </ul>
   </nav>
 
@@ -60,7 +61,7 @@
           </filter>
         </defs>
 
-        <!-- rotate group so wedge-centers => North/East/South/West -->
+        <!-- rotate so wedge-centers land on N/E/S/W -->
         <g transform="rotate(-45 100 100)">
           <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
                 fill="url(#growingGrad)" fill-opacity="0.82"
@@ -82,24 +83,24 @@
         <!-- crisp outer ring -->
         <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-        <!-- labels inside each wedge. anchored center and positioned so they visually sit inside wedges -->
-        <text x="100" y="54" class="compass-label in-wedge" filter="url(#labelShadow)">Growing</text>
-        <text x="142" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Grounded</text>
-        <text x="100" y="146" class="compass-label in-wedge" filter="url(#labelShadow)">Drifting</text>
-        <text x="58" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Surviving</text>
+        <!-- labels positioned further from center for balance -->
+        <text x="100" y="46" class="compass-label in-wedge" filter="url(#labelShadow)">Growing</text>
+        <text x="152" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Grounded</text>
+        <text x="100" y="156" class="compass-label in-wedge" filter="url(#labelShadow)">Drifting</text>
+        <text x="48" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Surviving</text>
       </svg>
     </section>
 
     <section id="mode-buttons" class="buttons" aria-hidden="false">
-      <button class="mode-button growing" onclick="navigateMode('growing')">Growing: Push yourself to new heights</button>
-      <button class="mode-button grounded" onclick="navigateMode('grounded')">Grounded: Stay centered and productive</button>
-      <button class="mode-button drifting" onclick="navigateMode('drifting')">Drifting: Gently regain focus and energy</button>
-      <button class="mode-button surviving" onclick="navigateMode('surviving')">Surviving: Just get through the day</button>
+      <button class="mode-button growing" data-mode="growing">Growing: Push yourself to new heights</button>
+      <button class="mode-button grounded" data-mode="grounded">Grounded: Stay centered and productive</button>
+      <button class="mode-button drifting" data-mode="drifting">Drifting: Gently regain focus and energy</button>
+      <button class="mode-button surviving" data-mode="surviving">Surviving: Just get through the day</button>
     </section>
 
     <div id="content" class="content-area" aria-live="polite"></div>
   </main>
 
-  <script src="app.js?v=13"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>
