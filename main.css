@@ -2,7 +2,7 @@ body {
   font-family: system-ui, sans-serif;
   margin: 0;
   padding: 0;
-  background: #ffffff;
+  background: #fff;
   color: #000;
 }
 
@@ -35,7 +35,7 @@ nav a {
   background-color: #0B3D2E;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 9999;
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
