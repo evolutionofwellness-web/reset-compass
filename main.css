@@ -1,204 +1,208 @@
-/* main.css v40 — Clean, Polished Reset Compass UI */
-:root {
-  --brand-green: #0B3D2E;
-  --growing-blue: #1E90FF;
-  --grounded-green: #228B22;
-  --drifting-yellow: #FFD700;
-  --surviving-red: #DC143C;
-  --text-dark: #111;
-  --text-light: #fff;
-}
-
+/* ====== GENERAL RESET ====== */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-body {
+  box-sizing: border-box;
   font-family: system-ui, sans-serif;
-  background: #fff;
-  color: var(--text-dark);
-  line-height: 1.6;
-  padding-bottom: 4rem;
 }
 
-nav.navbar {
-  background: var(--brand-green);
+/* ====== BODY ====== */
+body {
+  background-color: #f7f7f7;
+  color: #222;
+  padding-bottom: 80px;
+}
+
+h1, h2 {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+/* ====== NAVIGATION ====== */
+header {
+  background-color: #0B3D2E;
   color: white;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+  padding: 1rem 0;
+  text-align: center;
 }
 
-nav .app-title {
-  font-size: 1.25rem;
+nav {
+  margin-top: 0.5rem;
+}
+
+nav button {
+  margin: 0.25rem;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  border: none;
+  color: #0B3D2E;
   font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.nav-links {
-  list-style: none;
+nav button:hover {
+  background-color: #e0e0e0;
+}
+
+/* ====== SPLASH SCREEN ====== */
+#splashScreen {
+  position: fixed;
+  z-index: 9999;
+  background-color: #0B3D2E;
+  width: 100%;
+  height: 100%;
   display: flex;
-  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
 }
 
-.nav-links li a {
+#splashIcon {
+  width: 120px;
+  height: 120px;
+  animation: spinZoomFade 1.5s ease-out forwards;
+}
+
+@keyframes spinZoomFade {
+  0% {
+    transform: scale(0.5) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ====== HOW TO SECTION ====== */
+.how-to {
+  background-color: #eaf4ec;
+  margin: 1rem auto;
+  padding: 1rem;
+  max-width: 90%;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* ====== STREAK DISPLAY ====== */
+.streak {
+  text-align: center;
+  margin: 1rem 0;
+  font-size: 1.2rem;
+}
+
+/* ====== COMPASS CONTAINER ====== */
+.compass-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+#compass {
+  width: 300px;
+  height: 300px;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+text {
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* ====== MODE BUTTONS ====== */
+.mode-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem auto;
+  max-width: 90%;
+}
+
+.mode-buttons button {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
   color: white;
-  text-decoration: none;
-  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
 }
 
-.nav-links li a:hover {
-  text-decoration: underline;
+button.growing {
+  background-color: rgba(0, 102, 204, 0.85); /* blue */
 }
 
-main {
-  padding: 1.5rem 1rem;
-  max-width: 600px;
-  margin: auto;
+button.grounded {
+  background-color: rgba(0, 153, 76, 0.85); /* green */
 }
 
+button.drifting {
+  background-color: rgba(255, 204, 0, 0.85); /* yellow */
+  color: black;
+}
+
+button.surviving {
+  background-color: rgba(204, 0, 0, 0.85); /* red */
+}
+
+/* ====== PAGE SECTIONS ====== */
 .page {
   display: none;
+  padding: 1rem;
 }
 
 .page.active {
   display: block;
 }
 
-.streak-display {
-  text-align: center;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
-
-.how-to {
-  background: #E6FFF2;
+/* ====== ACTIVITIES ====== */
+.activity {
+  background: #fff;
   padding: 1rem;
-  border: 2px dashed var(--brand-green);
-  border-radius: 0.75rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
 }
 
-.how-to h2 {
-  margin-bottom: 0.5rem;
+.activity textarea {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  font-size: 1rem;
 }
 
-.compass-container {
-  display: flex;
-  justify-content: center;
-  margin: 1rem 0;
-}
-
-svg.compass {
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  overflow: visible;
-}
-
-.compass-label {
-  font-size: 0.9rem;
-  font-weight: bold;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  pointer-events: none;
-}
-
-.mode-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+/* ====== QUICK WINS ====== */
+#quickWins textarea {
+  width: 100%;
+  height: 100px;
+  font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 6px;
   margin-top: 1rem;
 }
 
-.mode-btn {
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  font-size: 1rem;
-  font-weight: 500;
-  border: 2px solid var(--brand-green);
-  background: #f9f9f9;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+/* ====== HISTORY LIST ====== */
+#historyList {
+  list-style-type: none;
+  padding-left: 0;
 }
 
-.mode-btn:hover {
-  transform: scale(1.02);
-}
-
-.mode-btn.growing {
-  color: var(--growing-blue);
-}
-
-.mode-btn.grounded {
-  color: var(--grounded-green);
-}
-
-.mode-btn.drifting {
-  color: goldenrod;
-}
-
-.mode-btn.surviving {
-  color: var(--surviving-red);
-}
-
-/* Splash screen */
-#splashScreen {
-  position: fixed;
-  z-index: 9999;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: var(--brand-green);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: fadeOut 1s ease 2s forwards;
-}
-
-#splashIcon {
-  width: 100px;
-  height: 100px;
-  animation: spinZoomFade 2s ease;
-}
-
-@keyframes spinZoomFade {
-  0% {
-    opacity: 0;
-    transform: scale(0.5) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.25) rotate(360deg);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.8) rotate(720deg);
-  }
-}
-
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
-/* Section spacing fix on mobile */
-@media (max-width: 500px) {
-  nav .nav-links {
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-top: 0.75rem;
-  }
-
-  svg.compass {
-    width: 220px;
-    height: 220px;
-  }
+#historyList li {
+  margin-bottom: 0.75rem;
+  background: #f1f1f1;
+  padding: 0.75rem;
+  border-radius: 5px;
+  font-size: 0.95rem;
 }
