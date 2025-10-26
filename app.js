@@ -1,34 +1,50 @@
+// app.js - stable routing + pointer handling + page hiding
+
 document.addEventListener("DOMContentLoaded", () => {
+  // splash overlay: hidden after animation
   setTimeout(() => {
     const splash = document.getElementById("splash-screen");
     if (splash) splash.style.display = "none";
   }, 1200);
 
-  // Attach click + keyboard handlers to wedge paths (delegation also works)
-  document.querySelectorAll("#compass path[data-mode]").forEach(path => {
-    path.addEventListener("click", (e) => {
-      const mode = e.currentTarget.getAttribute("data-mode");
-      if (mode) navigateMode(mode);
-    });
-    path.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        const mode = e.currentTarget.getAttribute("data-mode");
+  // delegated pointer handler for compass (works on mobile browsers)
+  const compass = document.getElementById("compass");
+  if (compass) {
+    compass.addEventListener("pointerdown", (e) => {
+      const path = e.target.closest && e.target.closest('path[data-mode]');
+      if (path) {
+        const mode = path.getAttribute('data-mode');
         if (mode) navigateMode(mode);
       }
     });
-    // allow programmatic focus style
-    path.setAttribute("tabindex", "0");
+    // fallback click
+    compass.addEventListener("click", (e) => {
+      const path = e.target.closest && e.target.closest('path[data-mode]');
+      if (path) {
+        const mode = path.getAttribute('data-mode');
+        if (mode) navigateMode(mode);
+      }
+    });
+  }
+
+  // keyboard support
+  document.querySelectorAll("#compass path[data-mode]").forEach(p => {
+    p.setAttribute("tabindex", "0");
+    p.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        const m = p.getAttribute("data-mode");
+        if (m) navigateMode(m);
+      }
+    });
   });
 
-  // wire hash routing
   window.addEventListener("hashchange", renderRoute);
-  renderRoute(); // initial render
-
+  renderRoute();
   updateStreak();
 });
 
-/* activities per spec */
+/* activities */
 const activities = {
   growing: ["Write a goal", "Tackle a challenge", "Start a new project"],
   grounded: ["Declutter a space", "Complete a task", "Plan your day"],
@@ -36,25 +52,26 @@ const activities = {
   surviving: ["Drink water", "Breathe deeply", "Rest for 5 minutes"]
 };
 
-function navigateHash(hash){
-  location.hash = hash;
-}
-
-function navigateMode(mode){
-  // push a route for the mode page
-  location.hash = `#mode/${mode}`;
-}
+function navigateHash(hash){ location.hash = hash }
+function navigateMode(mode){ location.hash = `#mode/${mode}` }
 
 function renderRoute(){
   const h = location.hash || "#home";
-  if (h.startsWith("#mode/")){
+  const isMode = h.startsWith("#mode/");
+  // toggle compass + button visibility so mode feels like a separate page
+  const compassContainer = document.getElementById("compass-container");
+  const modeButtons = document.getElementById("mode-buttons");
+  if (compassContainer) compassContainer.style.display = isMode ? "none" : "";
+  if (modeButtons) modeButtons.style.display = isMode ? "none" : "";
+
+  if (isMode){
     const mode = h.split("/")[1];
     renderModePage(mode);
-  } else if (h === "#quick") {
+  } else if (h === "#quick"){
     renderQuickWins();
-  } else if (h === "#history") {
+  } else if (h === "#history"){
     renderHistory();
-  } else if (h === "#about") {
+  } else if (h === "#about"){
     renderAbout();
   } else {
     renderHome();
@@ -62,28 +79,23 @@ function renderRoute(){
 }
 
 function renderHome(){
-  const container = document.getElementById("content");
-  if (!container) return;
-  container.innerHTML = `
-    <p class="card" style="margin-top:10px">Choose a mode from the compass above or the list below to get started.</p>
-  `;
+  const c = document.getElementById("content");
+  if (!c) return;
+  c.innerHTML = `<p class="card" style="margin-top:10px">Choose a mode from the compass above or the list below to get started.</p>`;
 }
 
 function renderModePage(mode){
-  const container = document.getElementById("content");
-  if (!container) return;
-  if (!activities[mode]) {
-    container.innerHTML = `<p>Unknown mode</p>`;
-    return;
-  }
-  container.innerHTML = `<h2>${capitalize(mode)}</h2>` +
-    activities[mode].map((activity, i) =>
+  const c = document.getElementById("content");
+  if (!c) return;
+  if (!activities[mode]) { c.innerHTML = `<p>Unknown mode</p>`; return; }
+  c.innerHTML = `<h2>${capitalize(mode)}</h2>` +
+    activities[mode].map((act,i) =>
       `<div class="activity-row">
-         <label>${escapeHtml(activity)}</label>
+         <label>${escapeHtml(act)}</label>
          <input type="text" id="note-${mode}-${i}" placeholder="Notes (optional)">
-         <button onclick="logActivity('${mode}','${escapeJs(activity)}','note-${mode}-${i}')">Log</button>
+         <button onclick="logActivity('${mode}','${escapeJs(act)}','note-${mode}-${i}')">Log</button>
        </div>`
-    ).join("") +
+    ).join('') +
     `<div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>`;
 }
 
@@ -92,65 +104,52 @@ function logActivity(mode, activity, noteId){
   const note = noteId ? (document.getElementById(noteId)?.value || "") : "";
   const entry = { date, mode, activity, note };
   let history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
-  history.unshift(entry); // newest first
+  history.unshift(entry);
   localStorage.setItem("resetHistory", JSON.stringify(history));
 
   const lastLogged = localStorage.getItem("lastLogged");
   const today = new Date().toLocaleDateString();
-  if (lastLogged !== today) {
-    let streak = parseInt(localStorage.getItem("streak") || "0", 10) || 0;
+  if (lastLogged !== today){
+    let streak = parseInt(localStorage.getItem("streak")||"0",10) || 0;
     streak += 1;
     localStorage.setItem("streak", String(streak));
     localStorage.setItem("lastLogged", today);
     updateStreak();
   }
 
-  // show confirmation on mode page
-  const container = document.getElementById("content");
-  if (container) {
-    container.innerHTML = `<p>Logged: <strong>${escapeHtml(activity)}</strong> (${escapeHtml(mode)}) • ${escapeHtml(date)}</p>
-      <p><a href="#mode/${mode}" onclick="navigateMode('${mode}')">Back to ${capitalize(mode)}</a> • <a href="#home" onclick="navigateHash('#home')">Home</a></p>`;
-  }
+  const c = document.getElementById("content");
+  if (c) c.innerHTML = `<p>Logged: <strong>${escapeHtml(activity)}</strong> (${escapeHtml(mode)}) • ${escapeHtml(date)}</p>
+    <p><a href="#mode/${mode}" onclick="navigateMode('${mode}')">Back to ${capitalize(mode)}</a> • <a href="#home" onclick="navigateHash('#home')">Home</a></p>`;
 }
 
-function updateStreak(){
-  const el = document.getElementById("streak-count");
-  if (el) el.textContent = localStorage.getItem("streak") || "0";
-}
+function updateStreak(){ const el = document.getElementById("streak-count"); if (el) el.textContent = localStorage.getItem("streak") || "0" }
 
 function renderQuickWins(){
-  const container = document.getElementById("content");
-  if (!container) return;
-  const quick = ["Drink water", "Stand up and stretch", "Take 3 deep breaths"];
-  container.innerHTML = `<h2>Quick Wins</h2>` + quick.map((q,i) =>
-    `<div class="activity-row">
-       <label>${escapeHtml(q)}</label>
-       <input type="text" id="qw-${i}" placeholder="Notes (optional)">
-       <button onclick="logActivity('quick','${escapeJs(q)}','qw-${i}')">Log</button>
-     </div>`
-  ).join("") + `<div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>`;
+  const c = document.getElementById("content");
+  if (!c) return;
+  const quick = ["Drink water","Stand up and stretch","Take 3 deep breaths"];
+  c.innerHTML = `<h2>Quick Wins</h2>` + quick.map((q,i) =>
+    `<div class="activity-row"><label>${escapeHtml(q)}</label><input id="qw-${i}" placeholder="Notes (optional)"><button onclick="logActivity('quick','${escapeJs(q)}','qw-${i}')">Log</button></div>`
+  ).join('') + `<div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>`;
 }
 
 function renderHistory(){
-  const container = document.getElementById("content");
-  if (!container) return;
+  const c = document.getElementById("content");
+  if (!c) return;
   const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
-  container.innerHTML = `<h2>History</h2>` + (history.length ? history.map(entry =>
-    `<p><strong>${escapeHtml(entry.date)}:</strong> ${escapeHtml(entry.mode)} — ${escapeHtml(entry.activity)}${entry.note ? ' • <em>'+escapeHtml(entry.note)+'</em>' : ''}</p>`
-  ).join("") : `<p>No history yet.</p>`) + `<div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>`;
+  c.innerHTML = `<h2>History</h2>` + (history.length ? history.map(h =>
+    `<p><strong>${escapeHtml(h.date)}:</strong> ${escapeHtml(h.mode)} — ${escapeHtml(h.activity)}${h.note ? ' • <em>'+escapeHtml(h.note)+'</em>' : ''}</p>`
+  ).join('') : `<p>No history yet.</p>`) + `<div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>`;
 }
 
 function renderAbout(){
-  const container = document.getElementById("content");
-  if (!container) return;
-  container.innerHTML = `
-    <h2>About</h2>
-    <p>The Reset Compass was created by Marcus Clark to help you align your energy and actions with your current state. It's a tool for navigating burnout, overwhelm, and progress—one small step at a time.</p>
-    <p>Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p>
-    <div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>
-  `;
+  const c = document.getElementById("content");
+  if (!c) return;
+  c.innerHTML = `<h2>About</h2>
+    <p>The Reset Compass was created by Marcus Clark to help you align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p>
+    <div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>`;
 }
 
-function capitalize(word){ return word.charAt(0).toUpperCase() + word.slice(1) }
-function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
-function escapeJs(s){ return String(s || '').replace(/'/g, "\\'").replace(/"/g, '\\"') }
+function capitalize(s){ return (s||'').charAt(0).toUpperCase()+ (s||'').slice(1) }
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
+function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
