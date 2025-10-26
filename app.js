@@ -33,7 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showMode(mode) {
     navigate("modeSection");
-    document.getElementById("modeTitle").innerText = mode.charAt(0).toUpperCase() + mode.slice(1);
+    document.getElementById("modeTitle").innerText =
+      mode.charAt(0).toUpperCase() + mode.slice(1);
     const container = document.getElementById("activitiesContainer");
     container.innerHTML = "";
     MODES[mode].forEach(activity => {
@@ -69,10 +70,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   updateStreak();
+
   setTimeout(() => {
     document.getElementById("splashScreen").style.display = "none";
   }, 1500);
 
+  // Expose to global scope so HTML can call these
   window.navigate = navigate;
   window.showMode = showMode;
   window.logActivity = logActivity;
