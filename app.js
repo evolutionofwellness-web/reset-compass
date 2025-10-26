@@ -1,18 +1,23 @@
-// app.js - improved tap detection, nav wiring, splash handling, styling updates
+// app.js - improvements requested:
+// - splash uses animationend to hide overlay; background color is brand (#0B3D2E) set in CSS.
+// - top nav links wired to router
+// - tap detection implemented for compass to reduce accidental navigations while scrolling
+// - Quick Wins / History / About render into content only (not present on home by default)
+// - home no longer shows "text below list buttons"
+// - mode pages styled to reflect brand (see CSS) and include prominent "Return to the Compass"
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Splash overlay: hide after animation ends (or fallback timeout)
+  // Splash handling
   const splash = document.getElementById("splash-screen");
-  const splashIcon = document.getElementById("splash-icon");
-  if (splashIcon) {
-    splashIcon.addEventListener("animationend", () => { if (splash) splash.style.display = "none"; });
-    // fallback:
-    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2000);
+  const splashSvg = document.getElementById("splash-svg");
+  if (splashSvg) {
+    splashSvg.addEventListener("animationend", () => { if (splash) splash.style.display = "none"; });
+    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2200);
   } else if (splash) {
     splash.style.display = "none";
   }
 
-  // Wire top nav links (data-hash) to router
+  // Wire top nav links to router
   document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -21,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Wire mode buttons list via delegation
+  // Mode button list delegation
   document.getElementById("mode-buttons")?.addEventListener("click", (e) => {
     const btn = e.target.closest && e.target.closest('button[data-mode]');
     if (btn) {
@@ -30,17 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Compass: delegated tap detection (reduces accidental activation during scroll)
+  // Compass tap detection to avoid accidental activation while scrolling
   const compass = document.getElementById("compass");
-  let pointerState = null; // {id, startX, startY, startTime, targetPath}
-
-  function findPathElement(el) {
-    return el && el.closest ? el.closest('path[data-mode]') : null;
-  }
+  let pointerState = null;
+  function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
 
   if (compass) {
     compass.addEventListener("pointerdown", (e) => {
-      // Only track primary pointers
       if (e.isPrimary === false) return;
       const path = findPathElement(e.target);
       pointerState = null;
@@ -53,47 +54,40 @@ document.addEventListener("DOMContentLoaded", () => {
           targetPath: path
         };
       }
-    }, {passive: true});
+    }, {passive:true});
 
     compass.addEventListener("pointermove", (e) => {
-      // If pointer moved too far, clear pointerState to avoid treating as tap
       if (!pointerState || pointerState.id !== e.pointerId) return;
       const dx = e.clientX - pointerState.startX;
       const dy = e.clientY - pointerState.startY;
-      const distSq = dx*dx + dy*dy;
-      // threshold ~ 12px movement (squared)
-      if (distSq > 12*12) {
-        pointerState = null;
-      }
-    }, {passive: true});
+      if (dx*dx + dy*dy > 14*14) { pointerState = null; } // ~14px move cancels tap
+    }, {passive:true});
 
     compass.addEventListener("pointerup", (e) => {
       if (!pointerState || pointerState.id !== e.pointerId) { pointerState = null; return; }
       const elapsed = Date.now() - pointerState.startTime;
-      // require short tap (not long press) and low movement
       if (elapsed < 700) {
-        const path = pointerState.targetPath;
-        const mode = path && path.getAttribute('data-mode');
+        const mode = pointerState.targetPath && pointerState.targetPath.getAttribute('data-mode');
         if (mode) navigateMode(mode);
       }
       pointerState = null;
     });
 
     compass.addEventListener("pointercancel", () => { pointerState = null; });
-    // Click fallback for browsers that don't support pointer events well
+
+    // click fallback
     compass.addEventListener("click", (e) => {
       const path = findPathElement(e.target);
       if (path) {
-        // rely on click — but only trigger if no recent pointerState prevented it
         const mode = path.getAttribute('data-mode');
         if (mode) navigateMode(mode);
       }
     });
   }
 
-  // Make wedge paths keyboard-focusable for accessibility
+  // keyboard support for accessibility
   document.querySelectorAll("#compass path[data-mode]").forEach(p => {
-    p.setAttribute("tabindex", "0");
+    p.setAttribute("tabindex","0");
     p.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -103,8 +97,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Hash routing
+  // routing
   window.addEventListener("hashchange", renderRoute);
+  // ensure default route is home if none set
+  if (!location.hash) location.hash = "#home";
   renderRoute();
 
   updateStreak();
@@ -124,22 +120,21 @@ function navigateMode(mode){ location.hash = `#mode/${mode}`; }
 function renderRoute(){
   const h = location.hash || "#home";
   const isMode = h.startsWith("#mode/");
-  // toggle compass + list visibility to make mode feel like separate page
   const compassContainer = document.getElementById("compass-container");
   const modeButtons = document.getElementById("mode-buttons");
+
   if (compassContainer) compassContainer.style.display = isMode ? "none" : "";
   if (modeButtons) modeButtons.style.display = isMode ? "none" : "";
 
-  if (isMode){
+  if (isMode) {
     const mode = h.split("/")[1];
     renderModePage(mode);
-    // scroll to top of content for clarity
     document.getElementById("content")?.scrollIntoView({behavior:"auto",block:"start"});
-  } else if (h === "#quick"){
+  } else if (h === "#quick") {
     renderQuickWins();
-  } else if (h === "#history"){
+  } else if (h === "#history") {
     renderHistory();
-  } else if (h === "#about"){
+  } else if (h === "#about") {
     renderAbout();
   } else {
     renderHome();
@@ -147,9 +142,10 @@ function renderRoute(){
 }
 
 function renderHome(){
+  // Home shows only the instruction card; no extra explanatory text below the list buttons per request
   const c = document.getElementById("content");
   if (!c) return;
-  c.innerHTML = `<p class="card" style="margin-top:10px">Choose a mode from the compass above or the list below to get started.</p>`;
+  c.innerHTML = ""; // intentionally empty to remove the "Choose a mode..." text
 }
 
 function renderModePage(mode){
