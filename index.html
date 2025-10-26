@@ -3,77 +3,89 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#0B3D2E" />
   <title>The Reset Compass</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="stylesheet" href="main.css?v=40" />
-  <script defer src="app.js?v=11"></script>
+  <link rel="stylesheet" href="main.css?v=final">
 </head>
 <body>
-
-  <!-- Splash screen -->
   <div id="splashScreen">
-    <img src="splash-icon.png" alt="App Icon" id="splashIcon">
+    <img src="splash-icon.png" id="splashIcon" alt="Loading..." />
   </div>
 
-  <!-- Top Navigation -->
-  <nav class="navbar">
-    <span class="app-title">The Reset Compass</span>
-    <ul class="nav-links">
-      <li><a href="#/">Home</a></li>
-      <li><a href="#/quick-wins">Quick Wins</a></li>
-      <li><a href="#/history">History</a></li>
-      <li><a href="#/about">About</a></li>
-    </ul>
-  </nav>
+  <header>
+    <h1>The Reset Compass</h1>
+    <nav>
+      <button onclick="navigate('home')">Home</button>
+      <button onclick="navigate('quickWins')">Quick Wins</button>
+      <button onclick="navigate('history')">History</button>
+      <button onclick="navigate('about')">About</button>
+    </nav>
+  </header>
 
-  <!-- Main App -->
-  <main id="app">
+  <main>
     <section id="home" class="page active">
-      <div class="streak-display">🔥 <span id="streakCount">0</span>-day streak</div>
+      <div class="streak">
+        <span id="streakCount">🔥 0-day streak</span>
+      </div>
 
-      <section class="how-to">
+      <div class="how-to">
         <h2>How to Use This App</h2>
         <p>Select a mode from the compass or buttons below. Complete an activity. Log it. Build your streak.</p>
-      </section>
+      </div>
 
-      <!-- Compass -->
-      <div id="compass" class="compass-container">
-        <svg viewBox="0 0 200 200" class="compass">
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#1E90FF" data-mode="growing"/>
-          <text x="150" y="45" class="compass-label" fill="white">Growing</text>
+      <div class="compass-container">
+        <svg viewBox="0 0 200 200" width="250" height="250">
+          <!-- GROWING (North - Top) -->
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
+                fill="rgba(0, 0, 255, 0.85)" onclick="showMode('growing')" />
+          <text x="150" y="50" fill="white" font-size="14" text-anchor="middle">Growing</text>
 
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#228B22" data-mode="grounded"/>
-          <text x="150" y="155" class="compass-label" fill="white">Grounded</text>
+          <!-- GROUNDED (East - Right) -->
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
+                fill="rgba(0, 128, 0, 0.85)" onclick="showMode('grounded')" />
+          <text x="150" y="150" fill="white" font-size="14" text-anchor="middle">Grounded</text>
 
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#FFD700" data-mode="drifting"/>
-          <text x="25" y="155" class="compass-label" fill="black">Drifting</text>
+          <!-- DRIFTING (South - Bottom) -->
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
+                fill="rgba(255, 255, 0, 0.85)" onclick="showMode('drifting')" />
+          <text x="50" y="150" fill="black" font-size="14" text-anchor="middle">Drifting</text>
 
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#DC143C" data-mode="surviving"/>
-          <text x="25" y="45" class="compass-label" fill="white">Surviving</text>
+          <!-- SURVIVING (West - Left) -->
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
+                fill="rgba(255, 0, 0, 0.85)" onclick="showMode('surviving')" />
+          <text x="50" y="50" fill="white" font-size="14" text-anchor="middle">Surviving</text>
         </svg>
       </div>
 
-      <!-- Mode Buttons -->
       <div class="mode-buttons">
-        <button class="mode-btn growing" data-mode="growing">Growing: Push yourself to new heights</button>
-        <button class="mode-btn grounded" data-mode="grounded">Grounded: Stay centered and productive</button>
-        <button class="mode-btn drifting" data-mode="drifting">Drifting: Gently regain focus and energy</button>
-        <button class="mode-btn surviving" data-mode="surviving">Surviving: Just get through the day</button>
+        <button class="growing" onclick="showMode('growing')">Growing: Push yourself to new heights</button>
+        <button class="grounded" onclick="showMode('grounded')">Grounded: Stay centered and productive</button>
+        <button class="drifting" onclick="showMode('drifting')">Drifting: Gently regain focus and energy</button>
+        <button class="surviving" onclick="showMode('surviving')">Surviving: Just get through the day</button>
       </div>
     </section>
 
-    <!-- Mode pages -->
-    <section id="growing" class="page"></section>
-    <section id="grounded" class="page"></section>
-    <section id="drifting" class="page"></section>
-    <section id="surviving" class="page"></section>
-    <section id="quick-wins" class="page"></section>
-    <section id="history" class="page"></section>
+    <section id="quickWins" class="page">
+      <h2>Quick Wins</h2>
+      <p>Take a small step to feel better.</p>
+      <textarea placeholder="What quick win did you complete?" onchange="logActivity('quickwin', this.value)"></textarea>
+    </section>
+
+    <section id="history" class="page">
+      <h2>Activity History</h2>
+      <ul id="historyList"></ul>
+    </section>
+
     <section id="about" class="page">
       <h2>About</h2>
-      <p>This app was created by Marcus Clark to help people reset their health, one small step at a time. For support, email <a href="mailto:marcus@evolutionofwellness.com">marcus@evolutionofwellness.com</a></p>
+      <p>The Reset Compass helps you reset your day using science-backed actions based on your current energy level.</p>
+    </section>
+
+    <section id="modeSection" class="page">
+      <h2 id="modeTitle"></h2>
+      <div id="activitiesContainer"></div>
     </section>
   </main>
+
+  <script src="app.js?v=final"></script>
 </body>
 </html>
