@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=41">
+  <link rel="stylesheet" href="main.css?v=42"/>
 </head>
 <body>
   <div id="splash-screen">
@@ -21,7 +21,7 @@
     </ul>
   </nav>
 
-  <div id="streak">Streak: <span id="streak-count">0</span> days</div>
+  <div id="streak">🔥 Streak: <span id="streak-count">0</span> days</div>
 
   <div id="how-to">
     <h2>How to Use This App</h2>
@@ -30,13 +30,13 @@
 
   <div id="compass-container">
     <svg id="compass" viewBox="0 0 200 200">
-      <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="blue" data-mode="growing"></path>
-      <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="green" data-mode="grounded"></path>
-      <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="yellow" data-mode="drifting"></path>
-      <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="red" data-mode="surviving"></path>
+      <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#007BFF" data-mode="growing"></path>
+      <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2E8B57" data-mode="grounded"></path>
+      <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#DAA520" data-mode="drifting"></path>
+      <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#D9534F" data-mode="surviving"></path>
 
       <text x="150" y="50" class="compass-label">Growing</text>
-      <text x="150" y="160" class="compass-label">Grounded</text>
+      <text x="170" y="160" class="compass-label">Grounded</text>
       <text x="30" y="160" class="compass-label">Drifting</text>
       <text x="30" y="50" class="compass-label">Surviving</text>
     </svg>
@@ -51,6 +51,6 @@
 
   <div id="content"></div>
 
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
