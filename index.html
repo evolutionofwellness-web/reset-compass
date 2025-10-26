@@ -4,16 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=42"/>
+  <link rel="stylesheet" href="main.css?v=43"/>
 </head>
 <body>
-  <div id="splash-screen">
+  <div id="splash-screen" aria-hidden="true">
     <img src="splash-icon.png" id="splash-icon" alt="Splash Icon">
   </div>
 
-  <nav>
-    <h1>The Reset Compass</h1>
-    <ul>
+  <nav class="site-nav">
+    <div class="brand">
+      <h1>The Reset Compass</h1>
+    </div>
+    <ul class="nav-links" role="navigation" aria-label="Main">
       <li><a href="#" onclick="navigateHome()">Home</a></li>
       <li><a href="#" onclick="navigateQuickWins()">Quick Wins</a></li>
       <li><a href="#" onclick="navigateHistory()">History</a></li>
@@ -21,36 +23,67 @@
     </ul>
   </nav>
 
-  <div id="streak">🔥 Streak: <span id="streak-count">0</span> days</div>
+  <main class="page">
+    <div id="streak" class="streak">🔥 Streak: <span id="streak-count">0</span> days</div>
 
-  <div id="how-to">
-    <h2>How to Use This App</h2>
-    <p>Select a mode from the compass or buttons below. Complete an activity. Log it. Build your streak.</p>
-  </div>
+    <section id="how-to" class="card">
+      <h2>How to Use This App</h2>
+      <p>Select a mode from the compass or the buttons below. Complete an activity. Log it. Build your streak.</p>
+    </section>
 
-  <div id="compass-container">
-    <svg id="compass" viewBox="0 0 200 200">
-      <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="#007BFF" data-mode="growing"></path>
-      <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="#2E8B57" data-mode="grounded"></path>
-      <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="#DAA520" data-mode="drifting"></path>
-      <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="#D9534F" data-mode="surviving"></path>
+    <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
+      <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle">
+        <title id="compassTitle">Mode compass: tap a wedge to choose a mode</title>
+        <defs>
+          <linearGradient id="growingGrad" x1="0" x2="1">
+            <stop offset="0" stop-color="#0A84FF"/>
+            <stop offset="1" stop-color="#007BFF"/>
+          </linearGradient>
+          <linearGradient id="groundedGrad" x1="0" x2="1">
+            <stop offset="0" stop-color="#2E8B57"/>
+            <stop offset="1" stop-color="#246B45"/>
+          </linearGradient>
+          <linearGradient id="driftingGrad" x1="0" x2="1">
+            <stop offset="0" stop-color="#E0B23A"/>
+            <stop offset="1" stop-color="#DAA520"/>
+          </linearGradient>
+          <linearGradient id="survivingGrad" x1="0" x2="1">
+            <stop offset="0" stop-color="#E07066"/>
+            <stop offset="1" stop-color="#D9534F"/>
+          </linearGradient>
 
-      <text x="150" y="50" class="compass-label">Growing</text>
-      <text x="170" y="160" class="compass-label">Grounded</text>
-      <text x="30" y="160" class="compass-label">Drifting</text>
-      <text x="30" y="50" class="compass-label">Surviving</text>
-    </svg>
-  </div>
+          <filter id="labelShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.45"/>
+          </filter>
+        </defs>
 
-  <div id="mode-buttons">
-    <button class="mode-button growing" onclick="goToMode('growing')">Growing: Push yourself to new heights</button>
-    <button class="mode-button grounded" onclick="goToMode('grounded')">Grounded: Stay centered and productive</button>
-    <button class="mode-button drifting" onclick="goToMode('drifting')">Drifting: Gently regain focus and energy</button>
-    <button class="mode-button surviving" onclick="goToMode('surviving')">Surviving: Just get through the day</button>
-  </div>
+        <!-- wedges -->
+        <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="url(#growingGrad)" data-mode="growing" tabindex="0" role="button" aria-label="Growing"></path>
+        <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="url(#groundedGrad)" data-mode="grounded" tabindex="0" role="button" aria-label="Grounded"></path>
+        <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="url(#driftingGrad)" data-mode="drifting" tabindex="0" role="button" aria-label="Drifting"></path>
+        <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="url(#survivingGrad)" data-mode="surviving" tabindex="0" role="button" aria-label="Surviving"></path>
 
-  <div id="content"></div>
+        <!-- thin ring + subtle shadow to look professional -->
+        <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-  <script src="app.js?v=8"></script>
+        <!-- labels positioned closer to wedge centers; stroke + paint-order for contrast -->
+        <text x="150" y="62" class="compass-label" filter="url(#labelShadow)">Growing</text>
+        <text x="150" y="144" class="compass-label" filter="url(#labelShadow)">Grounded</text>
+        <text x="50" y="144" class="compass-label" filter="url(#labelShadow)">Drifting</text>
+        <text x="50" y="62" class="compass-label" filter="url(#labelShadow)">Surviving</text>
+      </svg>
+    </section>
+
+    <section id="mode-buttons" class="buttons">
+      <button class="mode-button growing" onclick="goToMode('growing')">Growing: Push yourself to new heights</button>
+      <button class="mode-button grounded" onclick="goToMode('grounded')">Grounded: Stay centered and productive</button>
+      <button class="mode-button drifting" onclick="goToMode('drifting')">Drifting: Gently regain focus and energy</button>
+      <button class="mode-button surviving" onclick="goToMode('surviving')">Surviving: Just get through the day</button>
+    </section>
+
+    <div id="content" class="content-area" aria-live="polite"></div>
+  </main>
+
+  <script src="app.js?v=9"></script>
 </body>
 </html>
