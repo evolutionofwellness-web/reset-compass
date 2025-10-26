@@ -5,7 +5,7 @@
   --radius: 12px;
   --accent: #007BFF;
   --text-strong:#0B3D2E;
-  --return-bg: #0B3D2E; /* brand green for return button */
+  --return-bg: #0B3D2E;
   --return-text: #ffffff;
   --control-border: rgba(11,61,46,0.08);
 }
@@ -41,7 +41,7 @@ body {
 .nav-links{list-style:none;display:flex;gap:18px;margin:0;padding:0}
 .nav-links a{color:white;text-decoration:none;font-weight:600;opacity:0.95;cursor:pointer}
 
-/* Page layout */
+/* Page */
 .page{max-width:820px;margin:18px auto;padding:0 16px}
 .streak{ text-align:center;font-weight:700;margin:8px 0 18px; }
 
@@ -92,11 +92,12 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   text-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-/* Lower accidental activation sensitivity handled in JS. Keep nice active state */
+.hidden{display:none !important}
+
 #compass path{cursor:pointer;transition:transform .14s ease, filter .14s ease}
 #compass path:active, #compass path:focus{outline:none; transform:translateY(-3px); filter:drop-shadow(0 8px 14px rgba(0,0,0,0.12))}
 
-/* Buttons (list) */
+/* Buttons */
 .buttons{margin:12px 0 28px;display:flex;flex-direction:column;gap:14px;align-items:center}
 .mode-button{
   width:94%;max-width:720px;padding:14px 18px;border-radius:12px;border:2px solid rgba(0,0,0,0.06);
@@ -109,7 +110,7 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 .mode-button.drifting{border-color:#DAA520;color:#6f550b}
 .mode-button.surviving{border-color:#D9534F;color:#b93b33}
 
-/* content area and mode pages - more brand presence */
+/* content area and mode pages */
 .content-area{margin-top:20px}
 .mode-page{
   background:linear-gradient(180deg,#ffffff,#fbfffb);
@@ -127,7 +128,7 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   text-shadow: 0 2px 8px rgba(6,20,12,0.04);
 }
 
-/* activity rows: bigger labels, clearer controls */
+/* activity rows */
 .activity-row{display:flex;gap:12px;align-items:center;margin:14px 0}
 .activity-row label{flex:0 0 36%;font-weight:800;color:var(--text-strong);font-size:1rem}
 .activity-row input{
@@ -140,13 +141,11 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   box-shadow: 0 8px 18px rgba(6,20,12,0.12);
 }
 
-/* Return to Compass button uses brand green */
+/* Return to Compass button */
 .return-button{
   display:inline-block;margin-top:18px;padding:12px 18px;background:var(--return-bg);color:var(--return-text);
   font-weight:800;border-radius:12px;border:none;box-shadow: 0 12px 30px rgba(6,20,12,0.12);cursor:pointer;text-decoration:none;
 }
-
-/* Remove the extra helper text below list buttons by default (home shows no extra content block) */
 
 /* small devices adjustments */
 @media (max-width:420px){
