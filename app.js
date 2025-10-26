@@ -1,133 +1,96 @@
-console.log("✅ JavaScript loaded");
-
 document.addEventListener("DOMContentLoaded", () => {
-  const wedges = document.querySelectorAll("path");
-  wedges.forEach(wedge => {
-    wedge.addEventListener("click", () => {
-      alert(`You clicked: ${wedge.dataset.mode}`);
-    });
-  });
-
-  const buttons = document.querySelectorAll(".mode-button");
-  buttons.forEach(button => {
-    button.addEventListener("click", () => {
-      alert(`You clicked: ${button.dataset.mode}`);
-    });
-  });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  const container = document.querySelector(".container");
   const splash = document.getElementById("splash-screen");
-  setTimeout(() => {
-    splash.style.display = "none";
-    container.style.display = "block";
-  }, 2500);
-
-  updateStreak();
-  renderHistory();
+  setTimeout(() => splash.style.display = "none", 2000);
+  updateStreakDisplay();
 });
 
-function selectMode(mode) {
-  const titles = {
-    growing: "Growing",
-    grounded: "Grounded",
-    drifting: "Drifting",
-    surviving: "Surviving"
-  };
-  const activities = {
-    growing: ["Write a goal", "Tackle a challenge", "Start a new project"],
-    grounded: ["Organize your space", "Do deep breathing", "Plan your day"],
-    drifting: ["Take a walk", "Journal for 5 minutes", "Drink water"],
-    surviving: ["Stretch", "Take a break", "Do nothing for 5 minutes"]
-  };
+function navigate(view) {
+  document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
+  document.getElementById(view).classList.remove("hidden");
+  if (view === 'history') renderHistory();
+  if (view === 'quickwins') renderQuickWins();
+}
 
-  document.getElementById("home").style.display = "none";
-  const view = document.getElementById("mode-view");
-  view.style.display = "block";
-  document.getElementById("mode-title").textContent = titles[mode];
-
-  const actList = document.getElementById("activities");
-  actList.innerHTML = "";
-  activities[mode].forEach(text => {
-    const div = document.createElement("div");
-    div.className = "activity-box";
-    div.innerHTML = `<p>${text}</p><textarea></textarea><button onclick="logActivity('${text}')">Log</button>`;
-    actList.appendChild(div);
+function openMode(mode) {
+  navigate('mode-view');
+  const container = document.getElementById("mode-view");
+  container.innerHTML = `<h2>${mode}</h2>`;
+  const activities = getActivitiesForMode(mode);
+  activities.forEach((act, idx) => {
+    const inputId = `${mode}-${idx}`;
+    container.innerHTML += `
+      <label>${act}</label>
+      <input type="text" id="${inputId}" />
+      <button class="log-button" onclick="logActivity('${mode}', '${act}', '${inputId}')">Log</button>
+    `;
   });
+  container.innerHTML += `<button onclick="navigate('home')">← Back</button>`;
 }
 
-function showHome() {
-  hideAll();
-  document.getElementById("home").style.display = "block";
+function renderQuickWins() {
+  const quickWins = ["Drink water", "Do 5 squats", "Take 3 deep breaths"];
+  const container = document.getElementById("quickwins");
+  container.innerHTML = `<h2>Quick Wins</h2>`;
+  quickWins.forEach((act, idx) => {
+    const inputId = `quick-${idx}`;
+    container.innerHTML += `
+      <label>${act}</label>
+      <input type="text" id="${inputId}" />
+      <button class="log-button" onclick="logActivity('Quick Win', '${act}', '${inputId}')">Log</button>
+    `;
+  });
+  container.innerHTML += `<button onclick="navigate('home')">← Back</button>`;
 }
 
-function showQuickWins() {
-  hideAll();
-  document.getElementById("quickwins").style.display = "block";
-  document.getElementById("quickwins-list").innerHTML = `
-    <p>Drink water</p>
-    <p>Do 5 squats</p>
-    <p>Take 3 deep breaths</p>
-  `;
-}
-
-function showHistory() {
-  hideAll();
-  document.getElementById("history").style.display = "block";
-  renderHistory();
-}
-
-function showAbout() {
-  hideAll();
-  document.getElementById("about").style.display = "block";
-}
-
-function goBack() {
-  hideAll();
-  document.getElementById("home").style.display = "block";
-}
-
-function hideAll() {
-  document.querySelectorAll("#home, #mode-view, #quickwins, #history, #about").forEach(el => el.style.display = "none");
-}
-
-function logActivity(activity) {
-  const logs = JSON.parse(localStorage.getItem("logs") || "[]");
-  const today = new Date().toISOString().slice(0, 10);
-  logs.push({ date: today, activity });
-  localStorage.setItem("logs", JSON.stringify(logs));
-  localStorage.setItem("lastLogged", today);
+function logActivity(mode, activity, inputId) {
+  const text = document.getElementById(inputId).value.trim();
+  if (!text) return;
+  const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
+  const timestamp = new Date().toISOString();
+  history.push({ mode, activity, text, timestamp });
+  localStorage.setItem("resetHistory", JSON.stringify(history));
   updateStreak();
   alert("Activity logged!");
-}
-
-function updateStreak() {
-  const logs = JSON.parse(localStorage.getItem("logs") || "[]");
-  const today = new Date().toISOString().slice(0, 10);
-  const days = [...new Set(logs.map(log => log.date))];
-  let streak = 0;
-  for (let i = 0; i < days.length; i++) {
-    if (days[days.length - 1 - i] === getPastDate(i)) {
-      streak++;
-    } else break;
-  }
-  document.getElementById("streak-count").textContent = streak;
+  navigate('home');
 }
 
 function renderHistory() {
-  const logs = JSON.parse(localStorage.getItem("logs") || "[]");
-  const container = document.getElementById("history-log");
-  container.innerHTML = "";
-  logs.slice(-20).reverse().forEach(entry => {
-    const div = document.createElement("div");
-    div.textContent = `${entry.date}: ${entry.activity}`;
-    container.appendChild(div);
+  const container = document.getElementById("history");
+  const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
+  if (!history.length) {
+    container.innerHTML = `<h2>History</h2><p>No activities logged yet.</p><button onclick="navigate('home')">← Back</button>`;
+    return;
+  }
+  container.innerHTML = `<h2>History</h2>`;
+  history.slice(-10).reverse().forEach(item => {
+    const date = new Date(item.timestamp).toLocaleString();
+    container.innerHTML += `<p><strong>${item.mode}:</strong> ${item.activity} – "${item.text}" <em>(${date})</em></p>`;
   });
+  container.innerHTML += `<button onclick="navigate('home')">← Back</button>`;
 }
 
-function getPastDate(offset) {
-  const d = new Date();
-  d.setDate(d.getDate() - offset);
-  return d.toISOString().slice(0, 10);
+function updateStreak() {
+  const today = new Date().toISOString().split("T")[0];
+  let streakData = JSON.parse(localStorage.getItem("streakData") || "{}");
+  if (streakData.lastDate !== today) {
+    streakData.count = (streakData.count || 0) + 1;
+    streakData.lastDate = today;
+    localStorage.setItem("streakData", JSON.stringify(streakData));
+  }
+  updateStreakDisplay();
+}
+
+function updateStreakDisplay() {
+  const data = JSON.parse(localStorage.getItem("streakData") || "{}");
+  document.getElementById("streak-display").innerText = `Daily Streak: ${data.count || 0} 🔥`;
+}
+
+function getActivitiesForMode(mode) {
+  const activities = {
+    "Growing": ["Write a goal", "Tackle a challenge", "Start a new project"],
+    "Grounded": ["Organize your space", "Create a checklist", "Do a focused task"],
+    "Drifting": ["Stretch for 1 minute", "Walk around the block", "Journal your thoughts"],
+    "Surviving": ["Eat something nourishing", "Take a break", "Message a friend"]
+  };
+  return activities[mode] || [];
 }
