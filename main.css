@@ -55,16 +55,19 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 
 /* SVG labels: stroke + fill for legibility */
 .compass-label{
-  font-size:18px;
+  font-size:14px;         /* reduced size for better fit inside wedges */
   font-weight:700;
   fill:#ffffff;
-  stroke:rgba(0,0,0,0.35);
-  stroke-width:2;
+  stroke:rgba(0,0,0,0.38);
+  stroke-width:1.6;       /* slightly reduced stroke so letters remain crisp */
   paint-order:stroke fill;
   text-anchor:middle;
   dominant-baseline:middle;
   pointer-events:none;
 }
+
+/* additional helper class for labels inside wedges - slight letter spacing and subtle opacity */
+.compass-label.in-wedge{letter-spacing:-0.01em; opacity:0.98}
 
 /* wedge interactivity */
 #compass path{cursor:pointer;transition:transform .14s ease, filter .14s ease}
@@ -101,5 +104,5 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 /* responsive */
 @media (min-width:960px){
   svg{width:420px;height:420px}
-  .compass-label{font-size:20px}
+  .compass-label{font-size:15px}
 }
