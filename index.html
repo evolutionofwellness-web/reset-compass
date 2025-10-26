@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=43"/>
+  <link rel="stylesheet" href="main.css?v=45"/>
 </head>
 <body>
   <div id="splash-screen" aria-hidden="true">
@@ -16,14 +16,14 @@
       <h1>The Reset Compass</h1>
     </div>
     <ul class="nav-links" role="navigation" aria-label="Main">
-      <li><a href="#" onclick="navigateHome()">Home</a></li>
-      <li><a href="#" onclick="navigateQuickWins()">Quick Wins</a></li>
-      <li><a href="#" onclick="navigateHistory()">History</a></li>
-      <li><a href="#" onclick="navigateAbout()">About</a></li>
+      <li><a href="#home" onclick="navigateHash('#home')">Home</a></li>
+      <li><a href="#quick" onclick="navigateHash('#quick')">Quick Wins</a></li>
+      <li><a href="#history" onclick="navigateHash('#history')">History</a></li>
+      <li><a href="#about" onclick="navigateHash('#about')">About</a></li>
     </ul>
   </nav>
 
-  <main class="page">
+  <main class="page" id="page">
     <div id="streak" class="streak">🔥 Streak: <span id="streak-count">0</span> days</div>
 
     <section id="how-to" class="card">
@@ -32,7 +32,7 @@
     </section>
 
     <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
-      <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle">
+      <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0">
         <title id="compassTitle">Mode compass: tap a wedge to choose a mode</title>
         <defs>
           <linearGradient id="growingGrad" x1="0" x2="1">
@@ -57,33 +57,47 @@
           </filter>
         </defs>
 
-        <!-- wedges -->
-        <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="url(#growingGrad)" data-mode="growing" tabindex="0" role="button" aria-label="Growing"></path>
-        <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="url(#groundedGrad)" data-mode="grounded" tabindex="0" role="button" aria-label="Grounded"></path>
-        <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="url(#driftingGrad)" data-mode="drifting" tabindex="0" role="button" aria-label="Drifting"></path>
-        <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="url(#survivingGrad)" data-mode="surviving" tabindex="0" role="button" aria-label="Surviving"></path>
+        <!-- rotate the wedge group so wedge-centers line up with N/E/S/W -->
+        <g transform="rotate(-45 100 100)">
+          <!-- wedges: fill-opacity added for transparency -->
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
+                fill="url(#growingGrad)" fill-opacity="0.84"
+                data-mode="growing" tabindex="0" role="button" aria-label="Growing"></path>
 
-        <!-- thin ring + subtle shadow to look professional -->
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
+                fill="url(#groundedGrad)" fill-opacity="0.84"
+                data-mode="grounded" tabindex="0" role="button" aria-label="Grounded"></path>
+
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
+                fill="url(#driftingGrad)" fill-opacity="0.84"
+                data-mode="drifting" tabindex="0" role="button" aria-label="Drifting"></path>
+
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
+                fill="url(#survivingGrad)" fill-opacity="0.84"
+                data-mode="surviving" tabindex="0" role="button" aria-label="Surviving"></path>
+        </g>
+
+        <!-- thin ring + subtle shadow for polish -->
         <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-        <!-- labels positioned closer to wedge centers; stroke + paint-order for contrast -->
-        <text x="150" y="62" class="compass-label" filter="url(#labelShadow)">Growing</text>
-        <text x="150" y="144" class="compass-label" filter="url(#labelShadow)">Grounded</text>
-        <text x="50" y="144" class="compass-label" filter="url(#labelShadow)">Drifting</text>
-        <text x="50" y="62" class="compass-label" filter="url(#labelShadow)">Surviving</text>
+        <!-- labels positioned at the exact cardinal points (not rotated) -->
+        <text x="100" y="34" class="compass-label" filter="url(#labelShadow)">Growing</text>
+        <text x="170" y="100" class="compass-label" filter="url(#labelShadow)">Grounded</text>
+        <text x="100" y="168" class="compass-label" filter="url(#labelShadow)">Drifting</text>
+        <text x="30" y="100" class="compass-label" filter="url(#labelShadow)">Surviving</text>
       </svg>
     </section>
 
     <section id="mode-buttons" class="buttons">
-      <button class="mode-button growing" onclick="goToMode('growing')">Growing: Push yourself to new heights</button>
-      <button class="mode-button grounded" onclick="goToMode('grounded')">Grounded: Stay centered and productive</button>
-      <button class="mode-button drifting" onclick="goToMode('drifting')">Drifting: Gently regain focus and energy</button>
-      <button class="mode-button surviving" onclick="goToMode('surviving')">Surviving: Just get through the day</button>
+      <button class="mode-button growing" onclick="navigateMode('growing')">Growing: Push yourself to new heights</button>
+      <button class="mode-button grounded" onclick="navigateMode('grounded')">Grounded: Stay centered and productive</button>
+      <button class="mode-button drifting" onclick="navigateMode('drifting')">Drifting: Gently regain focus and energy</button>
+      <button class="mode-button surviving" onclick="navigateMode('surviving')">Surviving: Just get through the day</button>
     </section>
 
     <div id="content" class="content-area" aria-live="polite"></div>
   </main>
 
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>
