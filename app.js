@@ -1,20 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
-    document.getElementById("splash-screen").style.display = "none";
-  }, 1500);
+    const splash = document.getElementById("splash-screen");
+    if (splash) splash.style.display = "none";
+  }, 1200);
 
-  document.querySelectorAll("#compass path").forEach(path => {
-    path.addEventListener("click", e => {
-      const mode = e.target.getAttribute("data-mode");
-      if (mode) {
-        goToMode(mode);
+  // Attach click + keyboard handlers to wedge paths (delegation also works)
+  document.querySelectorAll("#compass path[data-mode]").forEach(path => {
+    path.addEventListener("click", (e) => {
+      const mode = e.currentTarget.getAttribute("data-mode");
+      if (mode) navigateMode(mode);
+    });
+    path.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        const mode = e.currentTarget.getAttribute("data-mode");
+        if (mode) navigateMode(mode);
       }
     });
+    // allow programmatic focus style
+    path.setAttribute("tabindex", "0");
   });
+
+  // wire hash routing
+  window.addEventListener("hashchange", renderRoute);
+  renderRoute(); // initial render
 
   updateStreak();
 });
 
+/* activities per spec */
 const activities = {
   growing: ["Write a goal", "Tackle a challenge", "Start a new project"],
   grounded: ["Declutter a space", "Complete a task", "Plan your day"],
@@ -22,61 +36,121 @@ const activities = {
   surviving: ["Drink water", "Breathe deeply", "Rest for 5 minutes"]
 };
 
-function goToMode(mode) {
-  const container = document.getElementById("content");
-  container.innerHTML = `<h2>${capitalize(mode)}</h2>` + activities[mode].map(activity =>
-    `<div><label>${activity}</label><input type="text"><button onclick="logActivity('${mode}', '${activity}')">Log</button></div>`
-  ).join("") + `<br><a href="#" onclick="navigateHome()">🡐 Back</a>`;
+function navigateHash(hash){
+  location.hash = hash;
 }
 
-function logActivity(mode, activity) {
-  const date = new Date().toLocaleDateString();
-  let history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
-  history.push({ date, mode, activity });
-  localStorage.setItem("resetHistory", JSON.stringify(history));
+function navigateMode(mode){
+  // push a route for the mode page
+  location.hash = `#mode/${mode}`;
+}
 
-  const lastLogged = localStorage.getItem("lastLogged");
-  if (lastLogged !== date) {
-    let streak = parseInt(localStorage.getItem("streak") || "0");
-    localStorage.setItem("streak", streak + 1);
-    localStorage.setItem("lastLogged", date);
-    updateStreak();
+function renderRoute(){
+  const h = location.hash || "#home";
+  if (h.startsWith("#mode/")){
+    const mode = h.split("/")[1];
+    renderModePage(mode);
+  } else if (h === "#quick") {
+    renderQuickWins();
+  } else if (h === "#history") {
+    renderHistory();
+  } else if (h === "#about") {
+    renderAbout();
+  } else {
+    renderHome();
   }
 }
 
-function updateStreak() {
-  document.getElementById("streak-count").textContent = localStorage.getItem("streak") || "0";
-}
-
-function navigateHome() {
-  location.reload();
-}
-
-function navigateQuickWins() {
+function renderHome(){
   const container = document.getElementById("content");
-  container.innerHTML = `<h2>Quick Wins</h2>` + ["Drink water", "Stand up and stretch", "Take 3 deep breaths"].map(qw =>
-    `<div><label>${qw}</label><input type="text"><button onclick="logActivity('quick', '${qw}')">Log</button></div>`
-  ).join("") + `<br><a href="#" onclick="navigateHome()">🡐 Back</a>`;
+  if (!container) return;
+  container.innerHTML = `
+    <p class="card" style="margin-top:10px">Choose a mode from the compass above or the list below to get started.</p>
+  `;
 }
 
-function navigateHistory() {
+function renderModePage(mode){
   const container = document.getElementById("content");
+  if (!container) return;
+  if (!activities[mode]) {
+    container.innerHTML = `<p>Unknown mode</p>`;
+    return;
+  }
+  container.innerHTML = `<h2>${capitalize(mode)}</h2>` +
+    activities[mode].map((activity, i) =>
+      `<div class="activity-row">
+         <label>${escapeHtml(activity)}</label>
+         <input type="text" id="note-${mode}-${i}" placeholder="Notes (optional)">
+         <button onclick="logActivity('${mode}','${escapeJs(activity)}','note-${mode}-${i}')">Log</button>
+       </div>`
+    ).join("") +
+    `<div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>`;
+}
+
+function logActivity(mode, activity, noteId){
+  const date = new Date().toLocaleDateString();
+  const note = noteId ? (document.getElementById(noteId)?.value || "") : "";
+  const entry = { date, mode, activity, note };
+  let history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
+  history.unshift(entry); // newest first
+  localStorage.setItem("resetHistory", JSON.stringify(history));
+
+  const lastLogged = localStorage.getItem("lastLogged");
+  const today = new Date().toLocaleDateString();
+  if (lastLogged !== today) {
+    let streak = parseInt(localStorage.getItem("streak") || "0", 10) || 0;
+    streak += 1;
+    localStorage.setItem("streak", String(streak));
+    localStorage.setItem("lastLogged", today);
+    updateStreak();
+  }
+
+  // show confirmation on mode page
+  const container = document.getElementById("content");
+  if (container) {
+    container.innerHTML = `<p>Logged: <strong>${escapeHtml(activity)}</strong> (${escapeHtml(mode)}) • ${escapeHtml(date)}</p>
+      <p><a href="#mode/${mode}" onclick="navigateMode('${mode}')">Back to ${capitalize(mode)}</a> • <a href="#home" onclick="navigateHash('#home')">Home</a></p>`;
+  }
+}
+
+function updateStreak(){
+  const el = document.getElementById("streak-count");
+  if (el) el.textContent = localStorage.getItem("streak") || "0";
+}
+
+function renderQuickWins(){
+  const container = document.getElementById("content");
+  if (!container) return;
+  const quick = ["Drink water", "Stand up and stretch", "Take 3 deep breaths"];
+  container.innerHTML = `<h2>Quick Wins</h2>` + quick.map((q,i) =>
+    `<div class="activity-row">
+       <label>${escapeHtml(q)}</label>
+       <input type="text" id="qw-${i}" placeholder="Notes (optional)">
+       <button onclick="logActivity('quick','${escapeJs(q)}','qw-${i}')">Log</button>
+     </div>`
+  ).join("") + `<div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>`;
+}
+
+function renderHistory(){
+  const container = document.getElementById("content");
+  if (!container) return;
   const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
   container.innerHTML = `<h2>History</h2>` + (history.length ? history.map(entry =>
-    `<p><strong>${entry.date}:</strong> ${entry.mode} — ${entry.activity}</p>`
-  ).join("") : `<p>No history yet.</p>`) + `<br><a href="#" onclick="navigateHome()">🡐 Back</a>`;
+    `<p><strong>${escapeHtml(entry.date)}:</strong> ${escapeHtml(entry.mode)} — ${escapeHtml(entry.activity)}${entry.note ? ' • <em>'+escapeHtml(entry.note)+'</em>' : ''}</p>`
+  ).join("") : `<p>No history yet.</p>`) + `<div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>`;
 }
 
-function navigateAbout() {
+function renderAbout(){
   const container = document.getElementById("content");
+  if (!container) return;
   container.innerHTML = `
     <h2>About</h2>
     <p>The Reset Compass was created by Marcus Clark to help you align your energy and actions with your current state. It's a tool for navigating burnout, overwhelm, and progress—one small step at a time.</p>
     <p>Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p>
-    <br><a href="#" onclick="navigateHome()">🡐 Back</a>
+    <div style="margin-top:12px"><a href="#home" onclick="navigateHash('#home')">🡐 Back</a></div>
   `;
 }
 
-function capitalize(word) {
-  return word.charAt(0).toUpperCase() + word.slice(1);
-}
+function capitalize(word){ return word.charAt(0).toUpperCase() + word.slice(1) }
+function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
+function escapeJs(s){ return String(s || '').replace(/'/g, "\\'").replace(/"/g, '\\"') }
