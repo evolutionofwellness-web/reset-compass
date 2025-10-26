@@ -1,23 +1,22 @@
-// app.js - improvements requested:
-// - splash uses animationend to hide overlay; background color is brand (#0B3D2E) set in CSS.
-// - top nav links wired to router
-// - tap detection implemented for compass to reduce accidental navigations while scrolling
-// - Quick Wins / History / About render into content only (not present on home by default)
-// - home no longer shows "text below list buttons"
-// - mode pages styled to reflect brand (see CSS) and include prominent "Return to the Compass"
+// app.js: robust tap-detection, route logging for debug, splash animation handling
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Splash handling
   const splash = document.getElementById("splash-screen");
   const splashSvg = document.getElementById("splash-svg");
   if (splashSvg) {
-    splashSvg.addEventListener("animationend", () => { if (splash) splash.style.display = "none"; });
-    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2200);
+    splashSvg.addEventListener("animationend", () => {
+      if (splash) splash.style.display = "none";
+      console.log("[reset] splash animationend -> hidden");
+    });
+    // fallback
+    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2400);
   } else if (splash) {
     splash.style.display = "none";
   }
 
-  // Wire top nav links to router
+  console.log("[reset] script loaded. app.js?v=52");
+
+  // top nav wiring
   document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -26,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Mode button list delegation
+  // mode list delegation
   document.getElementById("mode-buttons")?.addEventListener("click", (e) => {
     const btn = e.target.closest && e.target.closest('button[data-mode]');
     if (btn) {
@@ -35,12 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Compass tap detection to avoid accidental activation while scrolling
+  // Compass: tap-detection (reduce accidental activations while scrolling)
   const compass = document.getElementById("compass");
   let pointerState = null;
   function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
 
   if (compass) {
+    console.log("[reset] compass element found");
     compass.addEventListener("pointerdown", (e) => {
       if (e.isPrimary === false) return;
       const path = findPathElement(e.target);
@@ -56,11 +56,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }, {passive:true});
 
+    // larger movement threshold (28px) to avoid accidental triggers while scrolling
     compass.addEventListener("pointermove", (e) => {
       if (!pointerState || pointerState.id !== e.pointerId) return;
       const dx = e.clientX - pointerState.startX;
       const dy = e.clientY - pointerState.startY;
-      if (dx*dx + dy*dy > 14*14) { pointerState = null; } // ~14px move cancels tap
+      if (dx*dx + dy*dy > 28*28) { // cancel if moved > 28px
+        pointerState = null;
+      }
     }, {passive:true});
 
     compass.addEventListener("pointerup", (e) => {
@@ -74,8 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     compass.addEventListener("pointercancel", () => { pointerState = null; });
-
-    // click fallback
     compass.addEventListener("click", (e) => {
       const path = findPathElement(e.target);
       if (path) {
@@ -83,9 +84,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (mode) navigateMode(mode);
       }
     });
+  } else {
+    console.warn("[reset] compass element NOT found");
   }
 
-  // keyboard support for accessibility
+  // keyboard accessibility
   document.querySelectorAll("#compass path[data-mode]").forEach(p => {
     p.setAttribute("tabindex","0");
     p.addEventListener("keydown", (e) => {
@@ -97,12 +100,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // routing
   window.addEventListener("hashchange", renderRoute);
-  // ensure default route is home if none set
   if (!location.hash) location.hash = "#home";
   renderRoute();
-
   updateStreak();
 });
 
@@ -119,12 +119,13 @@ function navigateMode(mode){ location.hash = `#mode/${mode}`; }
 
 function renderRoute(){
   const h = location.hash || "#home";
+  console.log("[reset] renderRoute:", h);
   const isMode = h.startsWith("#mode/");
   const compassContainer = document.getElementById("compass-container");
   const modeButtons = document.getElementById("mode-buttons");
 
-  if (compassContainer) compassContainer.style.display = isMode ? "none" : "";
-  if (modeButtons) modeButtons.style.display = isMode ? "none" : "";
+  if (compassContainer) { compassContainer.classList.toggle('hidden', isMode); compassContainer.setAttribute('aria-hidden', isMode ? 'true' : 'false'); }
+  if (modeButtons) { modeButtons.classList.toggle('hidden', isMode); modeButtons.setAttribute('aria-hidden', isMode ? 'true' : 'false'); }
 
   if (isMode) {
     const mode = h.split("/")[1];
@@ -142,17 +143,15 @@ function renderRoute(){
 }
 
 function renderHome(){
-  // Home shows only the instruction card; no extra explanatory text below the list buttons per request
   const c = document.getElementById("content");
   if (!c) return;
-  c.innerHTML = ""; // intentionally empty to remove the "Choose a mode..." text
+  c.innerHTML = ""; // intentionally empty (no helper text)
 }
 
 function renderModePage(mode){
   const c = document.getElementById("content");
   if (!c) return;
   if (!activities[mode]) { c.innerHTML = `<p>Unknown mode</p>`; return; }
-
   c.innerHTML = `<div class="mode-page">
       <h2>${capitalize(mode)}</h2>
       ${activities[mode].map((act,i) =>
