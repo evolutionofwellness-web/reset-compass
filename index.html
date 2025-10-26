@@ -3,81 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#0B3D2E"/>
-  <link rel="stylesheet" href="main.css?v=40" />
-  <script defer src="app.js?v=40"></script>
   <title>The Reset Compass</title>
+  <link rel="stylesheet" href="main.css?v=41">
 </head>
 <body>
   <div id="splash-screen">
-    <img src="splash-icon.png" alt="Splash Icon" class="splash-icon" />
+    <img src="splash-icon.png" id="splash-icon" alt="Splash Icon">
   </div>
 
-  <header>
+  <nav>
     <h1>The Reset Compass</h1>
-    <nav>
-      <a href="#" onclick="navigate('home')">Home</a>
-      <a href="#" onclick="navigate('quickwins')">Quick Wins</a>
-      <a href="#" onclick="navigate('history')">History</a>
-      <a href="#" onclick="navigate('about')">About</a>
-    </nav>
-  </header>
+    <ul>
+      <li><a href="#" onclick="navigateHome()">Home</a></li>
+      <li><a href="#" onclick="navigateQuickWins()">Quick Wins</a></li>
+      <li><a href="#" onclick="navigateHistory()">History</a></li>
+      <li><a href="#" onclick="navigateAbout()">About</a></li>
+    </ul>
+  </nav>
 
-  <main>
-    <section id="how-to" class="section-box">
-      <h2>How to Use This App</h2>
-      <p>Select a mode from the compass or buttons below. Complete an activity. Log it. Build your streak.</p>
-    </section>
+  <div id="streak">Streak: <span id="streak-count">0</span> days</div>
 
-    <section id="streak-display" class="streak">Daily Streak: 0 🔥</section>
+  <div id="how-to">
+    <h2>How to Use This App</h2>
+    <p>Select a mode from the compass or buttons below. Complete an activity. Log it. Build your streak.</p>
+  </div>
 
-    <section id="compass-section">
-      <svg id="compass" viewBox="0 0 200 200">
-        <g id="wedges">
-          <path id="wedge-growing" d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="blue"/>
-          <path id="wedge-grounded" d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="green"/>
-          <path id="wedge-drifting" d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="yellow"/>
-          <path id="wedge-surviving" d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="red"/>
-        </g>
-        <text x="150" y="60" class="wedge-label">Growing</text>
-        <text x="150" y="160" class="wedge-label">Grounded</text>
-        <text x="30" y="160" class="wedge-label">Drifting</text>
-        <text x="30" y="60" class="wedge-label">Surviving</text>
-      </svg>
-    </section>
+  <div id="compass-container">
+    <svg id="compass" viewBox="0 0 200 200">
+      <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="blue" data-mode="growing"></path>
+      <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="green" data-mode="grounded"></path>
+      <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="yellow" data-mode="drifting"></path>
+      <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="red" data-mode="surviving"></path>
 
-    <section id="mode-buttons">
-      <button class="mode-button growing" onclick="openMode('Growing')">Growing: Push yourself to new heights</button>
-      <button class="mode-button grounded" onclick="openMode('Grounded')">Grounded: Stay centered and productive</button>
-      <button class="mode-button drifting" onclick="openMode('Drifting')">Drifting: Gently regain focus and energy</button>
-      <button class="mode-button surviving" onclick="openMode('Surviving')">Surviving: Just get through the day</button>
-    </section>
+      <text x="150" y="50" class="compass-label">Growing</text>
+      <text x="150" y="160" class="compass-label">Grounded</text>
+      <text x="30" y="160" class="compass-label">Drifting</text>
+      <text x="30" y="50" class="compass-label">Surviving</text>
+    </svg>
+  </div>
 
-    <section id="mode-view" class="hidden"></section>
-    <section id="quickwins" class="hidden"></section>
-    <section id="history" class="hidden"></section>
-    <section id="about" class="hidden">
-      <h2>About</h2>
-      <p>Created by Marcus Clark for Evolution of Wellness.</p>
-      <p>For questions or support, contact: <a href="mailto:marcus@evolutionofwellness.com">marcus@evolutionofwellness.com</a></p>
-    </section>
-  </main>
+  <div id="mode-buttons">
+    <button class="mode-button growing" onclick="goToMode('growing')">Growing: Push yourself to new heights</button>
+    <button class="mode-button grounded" onclick="goToMode('grounded')">Grounded: Stay centered and productive</button>
+    <button class="mode-button drifting" onclick="goToMode('drifting')">Drifting: Gently regain focus and energy</button>
+    <button class="mode-button surviving" onclick="goToMode('surviving')">Surviving: Just get through the day</button>
+  </div>
 
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B2X2C50LCN"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-B2X2C50LCN');
-  </script>
+  <div id="content"></div>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1872912961545776" crossorigin="anonymous"></script>
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-1872912961545776"
-       data-ad-slot="2800873106"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>
