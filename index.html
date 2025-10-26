@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=42">
+  <link rel="stylesheet" href="main.css?v=43">
 </head>
 <body>
   <div id="splashScreen">
@@ -34,30 +34,26 @@
 
       <div class="compass-container">
         <div id="compass" style="margin: 40px auto; width: 250px; height: 250px;">
-          <svg viewBox="0 0 200 200" width="100%" height="100%">
-            <!-- TOP (North) = Growing -->
+          <svg viewBox="0 0 200 200" width="100%" height="100%" transform="rotate(45)">
+            <!-- TOP = GROWING (Blue) -->
             <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
                   fill="blue" fill-opacity="0.85" onclick="showMode('growing')" />
-            <text x="150" y="50" fill="white" font-size="14"
-                  text-anchor="middle" alignment-baseline="middle">Growing</text>
+            <text x="150" y="50" fill="white" font-size="14" text-anchor="middle" alignment-baseline="middle">Growing</text>
 
-            <!-- RIGHT (East) = Grounded -->
+            <!-- RIGHT = GROUNDED (Green) -->
             <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
                   fill="green" fill-opacity="0.85" onclick="showMode('grounded')" />
-            <text x="150" y="150" fill="white" font-size="14"
-                  text-anchor="middle" alignment-baseline="middle">Grounded</text>
+            <text x="150" y="150" fill="white" font-size="14" text-anchor="middle" alignment-baseline="middle">Grounded</text>
 
-            <!-- BOTTOM (South) = Drifting -->
+            <!-- BOTTOM = DRIFTING (Yellow) -->
             <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
                   fill="yellow" fill-opacity="0.85" onclick="showMode('drifting')" />
-            <text x="50" y="150" fill="black" font-size="14"
-                  text-anchor="middle" alignment-baseline="middle">Drifting</text>
+            <text x="50" y="150" fill="black" font-size="14" text-anchor="middle" alignment-baseline="middle">Drifting</text>
 
-            <!-- LEFT (West) = Surviving -->
+            <!-- LEFT = SURVIVING (Red) -->
             <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
                   fill="red" fill-opacity="0.85" onclick="showMode('surviving')" />
-            <text x="50" y="50" fill="white" font-size="14"
-                  text-anchor="middle" alignment-baseline="middle">Surviving</text>
+            <text x="50" y="50" fill="white" font-size="14" text-anchor="middle" alignment-baseline="middle">Surviving</text>
           </svg>
         </div>
       </div>
@@ -92,6 +88,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=42"></script>
+  <script src="app.js?v=43"></script>
 </body>
 </html>
