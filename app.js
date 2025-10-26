@@ -1,82 +1,99 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const pages = document.querySelectorAll(".page");
-  const historyList = document.getElementById("historyList");
-  const streakCount = document.getElementById("streakCount");
+// app.js v12 — Fully working, polished Reset Compass logic
 
-  const MODES = {
-    growing: [
-      "Do a challenging workout",
-      "Apply to a new opportunity",
-      "Pitch your idea to someone"
-    ],
-    grounded: [
-      "Clean your space",
-      "Prioritize your top 3 tasks",
-      "Finish something you’ve been putting off"
-    ],
-    drifting: [
-      "Take a walk",
-      "Do 5 minutes of deep breathing",
-      "Write freely for 10 minutes"
-    ],
-    surviving: [
-      "Drink water",
-      "Lie down with no screens for 10 minutes",
-      "Text someone you trust"
-    ]
-  };
-
-  function navigate(id) {
-    pages.forEach(p => p.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
+document.addEventListener('DOMContentLoaded', () => {
+  // Splash screen auto-hide
+  const splash = document.getElementById('splashScreen');
+  if (splash) {
+    setTimeout(() => splash.style.display = 'none', 2000);
   }
 
-  function showMode(mode) {
-    navigate("modeSection");
-    document.getElementById("modeTitle").innerText =
-      mode.charAt(0).toUpperCase() + mode.slice(1);
-    const container = document.getElementById("activitiesContainer");
-    container.innerHTML = "";
-    MODES[mode].forEach(activity => {
-      const div = document.createElement("div");
-      div.className = "activity";
-      div.innerHTML = `
-        <strong>${activity}</strong>
-        <textarea placeholder="What did you do?" onchange="logActivity('${mode}', this.value)"></textarea>
-      `;
-      container.appendChild(div);
-    });
+  // Daily streak
+  const streakDisplay = document.getElementById('streakDisplay');
+  const today = new Date().toDateString();
+  let streak = Number(localStorage.getItem('streak')) || 0;
+  let lastLogged = localStorage.getItem('lastLogged');
+
+  function updateStreakDisplay() {
+    streakDisplay.textContent = `🔥 ${streak}-day streak`;
   }
 
-  function logActivity(type, text) {
-    if (!text.trim()) return;
-    const item = document.createElement("li");
-    const now = new Date().toLocaleString();
-    item.textContent = `[${now}] (${type}) ${text}`;
-    historyList.appendChild(item);
-
-    const today = new Date().toDateString();
-    if (localStorage.getItem("lastLoggedDate") !== today) {
-      localStorage.setItem("lastLoggedDate", today);
-      let streak = parseInt(localStorage.getItem("streak") || "0") + 1;
-      localStorage.setItem("streak", streak);
-      updateStreak();
+  function logTodayIfNew() {
+    if (lastLogged !== today) {
+      streak += 1;
+      localStorage.setItem('streak', streak);
+      localStorage.setItem('lastLogged', today);
+      updateStreakDisplay();
     }
   }
 
-  function updateStreak() {
-    const count = localStorage.getItem("streak") || "0";
-    streakCount.textContent = `🔥 ${count}-day streak`;
+  updateStreakDisplay();
+
+  // Mode navigation
+  const pages = document.querySelectorAll('.page');
+  const links = document.querySelectorAll('.nav-link');
+  const compassLinks = document.querySelectorAll('.compass-wedge, .mode-btn');
+
+  function showPage(id) {
+    pages.forEach(p => p.classList.remove('active'));
+    const page = document.getElementById(id);
+    if (page) page.classList.add('active');
   }
 
-  updateStreak();
+  links.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = link.getAttribute('data-target');
+      if (target) showPage(target);
+    });
+  });
 
-  setTimeout(() => {
-    document.getElementById("splashScreen").style.display = "none";
-  }, 1500);
+  compassLinks.forEach(el => {
+    el.addEventListener('click', () => {
+      const mode = el.getAttribute('data-mode');
+      if (mode) showPage(`${mode}-page`);
+    });
+  });
 
-  // Expose to global scope so HTML can call these
-  window.navigate = navigate;
-  window.showMode = showMode;
-  window.logActivity = logActivity;
+  // Activity logging
+  const logButtons = document.querySelectorAll('.log-btn');
+
+  logButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.getAttribute('data-mode');
+      const textarea = document.querySelector(`#${mode}-text`);
+      const log = textarea.value.trim();
+      if (log !== '') {
+        const timestamp = new Date().toLocaleString();
+        const entry = { mode, log, timestamp };
+        let history = JSON.parse(localStorage.getItem('history')) || [];
+        history.unshift(entry);
+        localStorage.setItem('history', JSON.stringify(history));
+        textarea.value = '';
+        logTodayIfNew();
+        alert('Activity logged!');
+      }
+    });
+  });
+
+  // Load history
+  const historyContainer = document.getElementById('historyList');
+  function renderHistory() {
+    const data = JSON.parse(localStorage.getItem('history')) || [];
+    historyContainer.innerHTML = '';
+    if (data.length === 0) {
+      historyContainer.innerHTML = '<p>No activity logged yet.</p>';
+    } else {
+      data.forEach(entry => {
+        const div = document.createElement('div');
+        div.className = 'history-entry';
+        div.innerHTML = `
+          <strong>${entry.mode.toUpperCase()}</strong>: ${entry.log}
+          <br><small>${entry.timestamp}</small>
+        `;
+        historyContainer.appendChild(div);
+      });
+    }
+  }
+
+  renderHistory();
 });
