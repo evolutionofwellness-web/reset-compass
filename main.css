@@ -71,6 +71,11 @@ svg.compass {
   height: 250px;
 }
 
+.compass-container svg {
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 svg text {
   font-family: 'system-ui', sans-serif;
   font-weight: 500;
