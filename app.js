@@ -1,3 +1,21 @@
+console.log("✅ JavaScript loaded");
+
+document.addEventListener("DOMContentLoaded", () => {
+  const wedges = document.querySelectorAll("path");
+  wedges.forEach(wedge => {
+    wedge.addEventListener("click", () => {
+      alert(`You clicked: ${wedge.dataset.mode}`);
+    });
+  });
+
+  const buttons = document.querySelectorAll(".mode-button");
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      alert(`You clicked: ${button.dataset.mode}`);
+    });
+  });
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.querySelector(".container");
   const splash = document.getElementById("splash-screen");
