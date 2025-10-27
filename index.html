@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=65" />
+  <link rel="stylesheet" href="main.css?v=66" />
 </head>
 <body>
   <!-- Full-screen splash overlay (uses your splash-icon.png) -->
@@ -89,9 +89,23 @@
         <!-- outer ring -->
         <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-        <!-- pivot dot and slim needle (replaces large triangular arrow) -->
+        <!-- center decorative compass-rose & needle group -->
         <g id="needle-group" class="idle" style="transform-origin:100px 100px;">
+          <!-- decorative compass rose (simple, lightweight) -->
+          <g id="central-rose" transform="translate(100,100)">
+            <circle cx="0" cy="0" r="12" fill="#063827" />
+            <g id="rose-points" fill="#0B3D2E" opacity="0.98">
+              <path d="M0,-28 L6,-6 L-6,-6 Z" transform="rotate(0)"/>
+              <path d="M0,28 L6,6 L-6,6 Z" transform="rotate(180)"/>
+              <path d="M-28,0 L-6,6 L-6,-6 Z" transform="rotate(270)"/>
+              <path d="M28,0 L6,6 L6,-6 Z" transform="rotate(90)"/>
+            </g>
+          </g>
+
+          <!-- thin needle overlay for pointing -->
           <rect id="compass-needle" x="99" y="60" width="2" height="36" rx="1" ry="1" fill="#063827"></rect>
+
+          <!-- pivot detail -->
           <circle id="compass-pivot" cx="100" cy="100" r="4" fill="#063827" />
         </g>
 
