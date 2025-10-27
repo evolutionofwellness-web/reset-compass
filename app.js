@@ -1,19 +1,32 @@
-// app.js v20
-// - Restores wedge labels visibility
-// - Adds Quick Done (quickMarkDone) + Done+Note (logActivity) actions for activities
-// - Restores list button color accents
-// - Keeps reduced-motion respect
+// app.js v22
+// - Restores and improves splash intro with inline SVG animation handling
+// - Ensures header padding is applied (prevents overlap)
+// - Keeps activity spacing fixes and done/log actions
+// - Respects reduced-motion
 
 document.addEventListener("DOMContentLoaded", () => {
-  // splash safety
   const splash = document.getElementById("splash-screen");
   const splashSvg = document.getElementById("splash-svg");
+
+  // Hide splash when animation ends; fallback timeout
   if (splashSvg) {
-    splashSvg.addEventListener("animationend", () => { if (splash) splash.style.display = "none"; });
-    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2200);
+    splashSvg.addEventListener("animationend", () => {
+      if (splash) splash.style.display = "none";
+    }, { once: true });
+    // fallback in case animationend doesn't fire
+    setTimeout(() => { if (splash) splash.style.display = "none"; }, 1800);
   } else if (splash) {
     splash.style.display = "none";
   }
+
+  // compute header height and apply body padding (prevents overlap)
+  try {
+    const nav = document.querySelector('.site-nav');
+    if (nav) {
+      const h = nav.getBoundingClientRect().height;
+      document.body.style.paddingTop = (h + 6) + 'px';
+    }
+  } catch (e) { /* ignore */ }
 
   // nav wiring
   document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
@@ -24,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // mode list delegation
+  // mode buttons delegation
   document.getElementById("mode-buttons")?.addEventListener("click", (e) => {
     const btn = e.target.closest && e.target.closest('button[data-mode]');
     if (btn) {
@@ -33,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // compass tap detection
+  // compass tap detection (to avoid accidental taps during scroll)
   const compass = document.getElementById("compass");
   let pointerState = null;
   function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
@@ -43,16 +56,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.isPrimary === false) return;
       const path = findPathElement(e.target);
       pointerState = null;
-      if (path) {
-        pointerState = { id: e.pointerId, startX: e.clientX, startY: e.clientY, startTime: Date.now(), targetPath: path };
-      }
+      if (path) pointerState = { id: e.pointerId, startX: e.clientX, startY: e.clientY, startTime: Date.now(), targetPath: path };
     }, {passive:true});
 
     compass.addEventListener("pointermove", (e) => {
       if (!pointerState || pointerState.id !== e.pointerId) return;
-      const dx = e.clientX - pointerState.startX;
-      const dy = e.clientY - pointerState.startY;
-      if (dx*dx + dy*dy > 28*28) { pointerState = null; }
+      const dx = e.clientX - pointerState.startX; const dy = e.clientY - pointerState.startY;
+      if (dx*dx + dy*dy > 28*28) pointerState = null;
     }, {passive:true});
 
     compass.addEventListener("pointerup", (e) => {
@@ -75,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // keyboard accessibility
+  // keyboard support
   document.querySelectorAll("#compass path[data-mode]").forEach(p => {
     p.setAttribute("tabindex","0");
     p.addEventListener("keydown", (e) => {
@@ -93,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateStreak();
 });
 
-/* activities with icons */
+/* activities */
 const activities = {
   growing: [
     { label: "Write a goal", icon: "🎯" },
@@ -146,7 +156,7 @@ function renderRoute(){
 function renderHome(){
   const c = document.getElementById("content");
   if (!c) return;
-  c.innerHTML = "";
+  c.innerHTML = ""; // hero + nav already visible
 }
 
 function renderModePage(mode){
@@ -160,18 +170,20 @@ function renderModePage(mode){
         `<div class="activity-row">
            <div class="activity-label-wrap"><span class="activity-icon">${escapeHtml(act.icon)}</span><label>${escapeHtml(act.label)}</label></div>
            <input type="text" id="note-${mode}-${i}" placeholder="Notes (optional)">
-           <button class="quick-btn" onclick="quickMarkDone('${mode}','${escapeJs(act.label)}')">✓</button>
-           <button class="log-btn" onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')">Done + Note</button>
+           <div class="activity-controls">
+             <button class="quick-btn" onclick="quickMarkDone('${mode}','${escapeJs(act.label)}')">✓</button>
+             <button class="log-btn" onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')">Done + Note</button>
+           </div>
          </div>`
       ).join("")}
       <button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button>
     </div>`;
 
-  // animate rows lightly if allowed
+  // stagger animation if allowed
   const container = c.querySelector('.mode-page');
   if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
-      row.style.animation = `fadeRow 420ms ease ${i*70}ms both`;
+      row.style.animation = `fadeRow 420ms ease ${i*60}ms both`;
     });
   }
 }
@@ -182,7 +194,6 @@ function quickMarkDone(mode, activity){
   let history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
   history.unshift(entry);
   localStorage.setItem("resetHistory", JSON.stringify(history));
-  // update streak once per day
   const lastLogged = localStorage.getItem("lastLogged");
   const today = new Date().toLocaleDateString();
   if (lastLogged !== today){
@@ -192,11 +203,11 @@ function quickMarkDone(mode, activity){
     localStorage.setItem("lastLogged", today);
     updateStreak();
   }
-  // brief visual feedback (toast-like) — simple alert fallback
+  // toast feedback
   try {
     const toast = document.createElement('div');
     toast.textContent = 'Marked done ✓';
-    toast.style.position='fixed'; toast.style.right='14px'; toast.style.bottom='80px';
+    toast.style.position='fixed'; toast.style.right='14px'; toast.style.bottom='86px';
     toast.style.background='rgba(11,61,46,0.95)'; toast.style.color='white'; toast.style.padding='8px 12px';
     toast.style.borderRadius='10px'; toast.style.zIndex=99999; document.body.appendChild(toast);
     setTimeout(()=>toast.remove(),900);
@@ -238,13 +249,13 @@ function renderQuickWins(){
     { label: "Take 3 deep breaths", icon: "🌬️" }
   ];
   c.innerHTML = `<div class="mode-page"><h2>Quick Wins</h2>` + quick.map((q,i) =>
-    `<div class="activity-row"><div class="activity-label-wrap"><span class="activity-icon">${escapeHtml(q.icon)}</span><label>${escapeHtml(q.label)}</label></div><input id="qw-${i}" placeholder="Notes (optional)"><button class="quick-btn" onclick="quickMarkDone('quick','${escapeJs(q.label)}')">✓</button><button class="log-btn" onclick="logActivity('quick','${escapeJs(q.label)}','qw-${i}')">Done + Note</button></div>`
+    `<div class="activity-row"><div class="activity-label-wrap"><span class="activity-icon">${escapeHtml(q.icon)}</span><label>${escapeHtml(q.label)}</label></div><input id="qw-${i}" placeholder="Notes (optional)"><div class="activity-controls"><button class="quick-btn" onclick="quickMarkDone('quick','${escapeJs(q.label)}')">✓</button><button class="log-btn" onclick="logActivity('quick','${escapeJs(q.label)}','qw-${i}')">Done + Note</button></div></div>`
   ).join('') + `<button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
 
   const container = c.querySelector('.mode-page');
   if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
-      row.style.animation = `fadeRow 420ms ease ${i*70}ms both`;
+      row.style.animation = `fadeRow 420ms ease ${i*60}ms both`;
     });
   }
 }
@@ -256,11 +267,6 @@ function renderHistory(){
   c.innerHTML = `<div class="mode-page"><h2>History</h2>` + (history.length ? history.map(h =>
     `<p><strong>${escapeHtml(h.date)}:</strong> ${escapeHtml(h.mode)} — ${escapeHtml(h.activity)}${h.note ? ' • <em>'+escapeHtml(h.note)+'</em>' : ''}${h.quick ? ' • (quick)' : ''}</p>`
   ).join('') : `<p>No history yet.</p>`) + `<button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
-
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const page = c.querySelector('.mode-page');
-    if (page) page.style.animation = 'fadeRow 420ms ease both';
-  }
 }
 
 function renderAbout(){
@@ -269,21 +275,17 @@ function renderAbout(){
   c.innerHTML = `<div class="mode-page"><h2>About</h2>
     <p>The Reset Compass was created by Marcus Clark to help you align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p>
     <button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
-
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const page = c.querySelector('.mode-page');
-    if (page) page.style.animation = 'fadeRow 420ms ease both';
-  }
 }
 
 function capitalize(s){ return (s||'').charAt(0).toUpperCase()+ (s||'').slice(1) }
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
 
-/* small animation name used above */
-const sheet = (function(){ try{ return document.styleSheets[0]; } catch(e){return null;} })();
-if (sheet) {
+/* small keyframe appended for row fade */
+(function(){
   try {
-    sheet.insertRule('@keyframes fadeRow { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: none; } }', sheet.cssRules.length);
+    const style = document.createElement('style');
+    style.textContent = `@keyframes fadeRow{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}`;
+    document.head.appendChild(style);
   } catch(e){}
-}
+})();
