@@ -1,34 +1,21 @@
-// app.js v22
-// - Restores and improves splash intro with inline SVG animation handling
-// - Ensures header padding is applied (prevents overlap)
-// - Keeps activity spacing fixes and done/log actions
-// - Respects reduced-motion
+// app.js v23
+// - Uses splash-icon.png intro and hides overlay on animationend (with fallback)
+// - Ensures compass + mode list are hidden for full pages (non-home) via style.display
+// - Improved activity layout and controls group so controls never overlap scrollbar
 
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash-screen");
-  const splashSvg = document.getElementById("splash-svg");
+  const splashIcon = document.getElementById("splash-icon");
 
-  // Hide splash when animation ends; fallback timeout
-  if (splashSvg) {
-    splashSvg.addEventListener("animationend", () => {
-      if (splash) splash.style.display = "none";
-    }, { once: true });
-    // fallback in case animationend doesn't fire
+  // Hide splash when animation completes (or after fallback delay)
+  if (splashIcon) {
+    splashIcon.addEventListener("animationend", () => { if (splash) splash.style.display = "none"; }, { once: true });
     setTimeout(() => { if (splash) splash.style.display = "none"; }, 1800);
   } else if (splash) {
     splash.style.display = "none";
   }
 
-  // compute header height and apply body padding (prevents overlap)
-  try {
-    const nav = document.querySelector('.site-nav');
-    if (nav) {
-      const h = nav.getBoundingClientRect().height;
-      document.body.style.paddingTop = (h + 6) + 'px';
-    }
-  } catch (e) { /* ignore */ }
-
-  // nav wiring
+  // wire nav links
   document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -46,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // compass tap detection (to avoid accidental taps during scroll)
+  // compass tap detection (prevent accidental activation while scrolling)
   const compass = document.getElementById("compass");
   let pointerState = null;
   function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
@@ -85,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // keyboard support
+  // keyboard support for wedges
   document.querySelectorAll("#compass path[data-mode]").forEach(p => {
     p.setAttribute("tabindex","0");
     p.addEventListener("keydown", (e) => {
@@ -135,8 +122,10 @@ function renderRoute(){
   const isFullPage = h !== "#home";
   const compassContainer = document.getElementById("compass-container");
   const modeButtons = document.getElementById("mode-buttons");
-  if (compassContainer) { compassContainer.classList.toggle('hidden', isFullPage); compassContainer.setAttribute('aria-hidden', isFullPage ? 'true' : 'false'); }
-  if (modeButtons) { modeButtons.classList.toggle('hidden', isFullPage); modeButtons.setAttribute('aria-hidden', isFullPage ? 'true' : 'false'); }
+
+  // Use direct style changes so this always wins (robust to cached CSS)
+  if (compassContainer) compassContainer.style.display = isFullPage ? "none" : "";
+  if (modeButtons) modeButtons.style.display = isFullPage ? "none" : "";
 
   if (h.startsWith("#mode/")) {
     const mode = h.split("/")[1];
@@ -156,7 +145,7 @@ function renderRoute(){
 function renderHome(){
   const c = document.getElementById("content");
   if (!c) return;
-  c.innerHTML = ""; // hero + nav already visible
+  c.innerHTML = ""; // home intentionally minimal (hero + compass visible)
 }
 
 function renderModePage(mode){
@@ -179,7 +168,7 @@ function renderModePage(mode){
       <button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button>
     </div>`;
 
-  // stagger animation if allowed
+  // small stagger if allowed
   const container = c.querySelector('.mode-page');
   if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
@@ -281,7 +270,7 @@ function capitalize(s){ return (s||'').charAt(0).toUpperCase()+ (s||'').slice(1)
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
 
-/* small keyframe appended for row fade */
+/* add keyframe for fadeRow if missing */
 (function(){
   try {
     const style = document.createElement('style');
