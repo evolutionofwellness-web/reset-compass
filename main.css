@@ -8,6 +8,8 @@
   --return-bg: #0B3D2E;
   --return-text: #ffffff;
   --control-border: rgba(11,61,46,0.08);
+  --activity-accent: rgba(11,61,46,0.06);
+  --animation-ease: cubic-bezier(.2,.9,.2,1);
 }
 
 /* Reset */
@@ -42,7 +44,7 @@ body {
 .nav-links a{color:white;text-decoration:none;font-weight:600;opacity:0.95;cursor:pointer}
 
 /* Page */
-.page{max-width:820px;margin:18px auto;padding:0 16px}
+.page{max-width:820px;margin:18px auto;padding:0 16px;padding-bottom:96px} /* added bottom breathing */
 .streak{ text-align:center;font-weight:700;margin:8px 0 18px; }
 
 /* Cards */
@@ -65,7 +67,7 @@ body {
 #splash-svg{
   width:140px;height:140px;
   transform-origin:center;
-  animation: splashZoom 1.35s cubic-bezier(.2,.8,.2,1) forwards;
+  animation: splashZoom 1.35s var(--animation-ease) forwards;
 }
 @keyframes splashZoom {
   0% { opacity:1; transform: scale(1) rotate(0deg); }
@@ -92,26 +94,45 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   text-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-.hidden{display:none !important}
+/* Animations (entrance + stagger) */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px) scale(0.995); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes popIn {
+  from { opacity:0; transform: scale(0.92); }
+  60% { transform: scale(1.03); }
+  to { opacity:1; transform: scale(1); }
+}
 
-#compass path{cursor:pointer;transition:transform .14s ease, filter .14s ease}
-#compass path:active, #compass path:focus{outline:none; transform:translateY(-3px); filter:drop-shadow(0 8px 14px rgba(0,0,0,0.12))}
+/* reduced-motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .animate-in, .pop-in { animation: none !important; transition: none !important; }
+}
+
+/* helper classes */
+.hidden{display:none !important}
+.animate-in{ animation: fadeUp 420ms var(--animation-ease) both; }
+.pop-in{ animation: popIn 420ms var(--animation-ease) both; }
+
+/* small entrance for compass labels */
+.in-wedge { opacity: 0; transform-origin: center; transition: opacity .32s var(--animation-ease), transform .32s var(--animation-ease); }
+.content-anim .in-wedge { opacity:1; transform: none; }
 
 /* Buttons */
 .buttons{margin:12px 0 28px;display:flex;flex-direction:column;gap:14px;align-items:center}
 .mode-button{
   width:94%;max-width:720px;padding:16px 18px;border-radius:12px;border:2px solid rgba(0,0,0,0.06);
-  background:linear-gradient(180deg,#ffffff,#fbfbfb);font-weight:800;box-shadow: 0 12px 30px rgba(6,20,12,0.06);transition:transform .12s ease;
+  background:linear-gradient(180deg,#ffffff,#fbfbfb);font-weight:800;box-shadow: 0 12px 30px rgba(6,20,12,0.06);transition:transform .12s var(--animation-ease), box-shadow .12s var(--animation-ease);
   text-align:center;color:var(--text-strong);font-size:1rem;
+  will-change: transform;
 }
-.mode-button:hover{transform:translateY(-3px)}
-.mode-button.growing{border-color:#007BFF;color:#007BFF}
-.mode-button.grounded{border-color:#2E8B57;color:#2E8B57}
-.mode-button.drifting{border-color:#DAA520;color:#6f550b}
-.mode-button.surviving{border-color:#D9534F;color:#b93b33}
+.mode-button:hover{ transform: translateY(-4px); box-shadow: 0 18px 36px rgba(6,20,12,0.10); }
+.mode-button:active{ transform: translateY(-2px) scale(.997); }
+.mode-button:focus{ outline: 3px solid rgba(11,61,46,0.14); outline-offset:3px; }
 
 /* content area and mode pages */
-.content-area{margin-top:20px}
+.content-area{margin-top:20px;padding-bottom:40px}
 .mode-page{
   background:linear-gradient(180deg,#ffffff,#fbfffb);
   border-radius:18px;
@@ -119,6 +140,7 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   border:1px solid rgba(0,0,0,0.04);
   box-shadow: 0 20px 48px rgba(6,20,12,0.07);
   margin: 20px 0;
+  will-change: transform, opacity;
 }
 .mode-page h2{
   margin-top:0;
@@ -128,42 +150,46 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   text-shadow: 0 2px 8px rgba(6,20,12,0.04);
 }
 
-/* activity rows - more padding and spacing to 'pop' */
+/* activity rows - more padding and exciting styling */
 .activity-row{
   display:flex;
   gap:16px;
   align-items:center;
   margin:18px 0;
-  padding:8px 4px; /* inner breathing */
-}
-.activity-row label{
-  flex:0 0 34%;
-  font-weight:800;
-  color:var(--text-strong);
-  font-size:1.02rem;
-  padding-left:6px;
-}
-.activity-row input{
-  flex:1;
-  padding:14px 16px;
+  padding:12px;
   border-radius:12px;
-  border:1px solid var(--control-border);
+  background: linear-gradient(180deg, rgba(11,61,46,0.02), rgba(255,255,255,0.0));
+  border-left:6px solid rgba(11,61,46,0.02);
+  transition: transform .14s var(--animation-ease), box-shadow .14s var(--animation-ease), border-left-color .14s var(--animation-ease);
+}
+.activity-row:hover{ transform:translateY(-6px); box-shadow: 0 18px 38px rgba(6,20,12,0.08); border-left-color:var(--brand-green); }
+
+.activity-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:40px;height:40px;border-radius:10px;background:rgba(11,61,46,0.06);font-size:18px;margin-right:6px;
+  flex:0 0 auto;
+  transform-origin:center;
+}
+.activity-row:hover .activity-icon{ transform:scale(1.06); }
+
+/* label + input */
+.activity-label-wrap{display:flex;align-items:center;gap:12px;flex:0 0 34%}
+.activity-row label{font-weight:900;color:var(--text-strong);font-size:1.05rem;margin:0}
+.activity-row input{
+  flex:1;padding:14px 16px;border-radius:12px;border:1px solid var(--control-border);
   background:linear-gradient(180deg,#fff,#fbfbfb);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-  min-height:48px;
-  font-size:1rem;
+  min-height:48px;font-size:1rem;
 }
 .activity-row button{
-  padding:10px 16px;
-  border-radius:12px;
-  border:none;
-  background:var(--brand-green);
-  color:white;
-  font-weight:900;
-  cursor:pointer;
+  padding:10px 16px;border-radius:12px;border:none;background:var(--brand-green);color:white;font-weight:900;cursor:pointer;
   box-shadow: 0 10px 22px rgba(6,20,12,0.12);
   min-width:68px;
+  transition: transform .12s var(--animation-ease);
 }
+.activity-row button:active{ transform: translateY(1px) scale(.99); }
 
 /* Return to Compass button */
 .return-button{
@@ -178,7 +204,9 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   box-shadow: 0 14px 36px rgba(6,20,12,0.12);
   cursor:pointer;
   text-decoration:none;
+  transition: transform .14s var(--animation-ease), box-shadow .14s var(--animation-ease);
 }
+.return-button:hover{ transform: translateY(-3px); box-shadow: 0 20px 46px rgba(6,20,12,0.14); }
 
 /* small devices adjustments */
 @media (max-width:420px){
