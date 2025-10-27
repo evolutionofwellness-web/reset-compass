@@ -154,12 +154,13 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   max-width:520px;
 }
 
-/* right-side control group */
+/* right-side control group: fixed basis so it cannot overflow the viewport */
 .activity-controls{
   display:flex;
   gap:8px;
   align-items:center;
-  flex:0 0 auto;
+  flex:0 0 110px; /* fixed space reserved */
+  justify-content:flex-end;
   margin-left:6px;
 }
 .quick-btn{
@@ -183,5 +184,6 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   .activity-row label{font-size:14px}
   #splash-icon{width:112px;height:112px}
   .activity-row input{min-width:120px;max-width:260px}
-  .activity-controls{margin-left:4px}
+  .activity-controls{flex:0 0 92px;margin-left:4px}
+  .log-btn{font-size:0.86rem;padding:8px 10px}
 }
