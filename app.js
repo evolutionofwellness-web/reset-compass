@@ -1,6 +1,11 @@
-// app.js - added entrance animations and stagger logic for Chrome on iPhone (respects reduced motion)
+// app.js v20
+// - Restores wedge labels visibility
+// - Adds Quick Done (quickMarkDone) + Done+Note (logActivity) actions for activities
+// - Restores list button color accents
+// - Keeps reduced-motion respect
 
 document.addEventListener("DOMContentLoaded", () => {
+  // splash safety
   const splash = document.getElementById("splash-screen");
   const splashSvg = document.getElementById("splash-svg");
   if (splashSvg) {
@@ -10,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     splash.style.display = "none";
   }
 
-  // top nav wiring
+  // nav wiring
   document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -28,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Compass tap detection (prevent accidental activation while scrolling)
+  // compass tap detection
   const compass = document.getElementById("compass");
   let pointerState = null;
   function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
@@ -70,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // keyboard accessibility for wedges
+  // keyboard accessibility
   document.querySelectorAll("#compass path[data-mode]").forEach(p => {
     p.setAttribute("tabindex","0");
     p.addEventListener("keydown", (e) => {
@@ -88,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateStreak();
 });
 
-/* activities - with emoji icons for quick visual pop */
+/* activities with icons */
 const activities = {
   growing: [
     { label: "Write a goal", icon: "🎯" },
@@ -117,7 +122,6 @@ function navigateMode(mode){ location.hash = `#mode/${mode}`; }
 
 function renderRoute(){
   const h = location.hash || "#home";
-  // treat anything not '#home' as a full page (hide compass/list)
   const isFullPage = h !== "#home";
   const compassContainer = document.getElementById("compass-container");
   const modeButtons = document.getElementById("mode-buttons");
@@ -139,50 +143,10 @@ function renderRoute(){
   }
 }
 
-/* utility: check reduced motion */
-function reducedMotion() {
-  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-function animateContentRows(container) {
-  if (reducedMotion()) return;
-  const rows = Array.from(container.querySelectorAll('.activity-row'));
-  rows.forEach((row, i) => {
-    row.classList.remove('animate-in');
-    row.style.animationDelay = `${i * 70}ms`;
-    // trigger reflow then add class
-    // eslint-disable-next-line no-unused-expressions
-    row.offsetHeight;
-    row.classList.add('animate-in');
-  });
-
-  // animate any icons/labels (compass labels when present)
-  const content = document.getElementById('content');
-  content?.classList.add('content-anim');
-  setTimeout(() => { content?.classList.remove('content-anim'); }, 700);
-}
-
-function animateHomeButtons() {
-  if (reducedMotion()) return;
-  const container = document.getElementById('mode-buttons');
-  if (!container) return;
-  const buttons = Array.from(container.querySelectorAll('.mode-button'));
-  buttons.forEach((btn, i) => {
-    btn.classList.remove('pop-in');
-    btn.style.animationDelay = `${i * 80 + 60}ms`;
-    // reflow
-    // eslint-disable-next-line no-unused-expressions
-    btn.offsetHeight;
-    btn.classList.add('pop-in');
-  });
-}
-
 function renderHome(){
   const c = document.getElementById("content");
   if (!c) return;
-  c.innerHTML = ""; // home intentionally minimal
-  // animate home buttons slightly
-  setTimeout(animateHomeButtons, 80);
+  c.innerHTML = "";
 }
 
 function renderModePage(mode){
@@ -196,21 +160,53 @@ function renderModePage(mode){
         `<div class="activity-row">
            <div class="activity-label-wrap"><span class="activity-icon">${escapeHtml(act.icon)}</span><label>${escapeHtml(act.label)}</label></div>
            <input type="text" id="note-${mode}-${i}" placeholder="Notes (optional)">
-           <button onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')">Log</button>
+           <button class="quick-btn" onclick="quickMarkDone('${mode}','${escapeJs(act.label)}')">✓</button>
+           <button class="log-btn" onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')">Done + Note</button>
          </div>`
       ).join("")}
       <button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button>
     </div>`;
 
-  // stagger animate rows
+  // animate rows lightly if allowed
   const container = c.querySelector('.mode-page');
-  if (container) animateContentRows(container);
+  if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
+      row.style.animation = `fadeRow 420ms ease ${i*70}ms both`;
+    });
+  }
+}
+
+function quickMarkDone(mode, activity){
+  const date = new Date().toLocaleDateString();
+  const entry = { date, mode, activity, note: "", quick: true };
+  let history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
+  history.unshift(entry);
+  localStorage.setItem("resetHistory", JSON.stringify(history));
+  // update streak once per day
+  const lastLogged = localStorage.getItem("lastLogged");
+  const today = new Date().toLocaleDateString();
+  if (lastLogged !== today){
+    let streak = parseInt(localStorage.getItem("streak")||"0",10) || 0;
+    streak += 1;
+    localStorage.setItem("streak", String(streak));
+    localStorage.setItem("lastLogged", today);
+    updateStreak();
+  }
+  // brief visual feedback (toast-like) — simple alert fallback
+  try {
+    const toast = document.createElement('div');
+    toast.textContent = 'Marked done ✓';
+    toast.style.position='fixed'; toast.style.right='14px'; toast.style.bottom='80px';
+    toast.style.background='rgba(11,61,46,0.95)'; toast.style.color='white'; toast.style.padding='8px 12px';
+    toast.style.borderRadius='10px'; toast.style.zIndex=99999; document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(),900);
+  } catch(e){}
 }
 
 function logActivity(mode, activity, noteId){
   const date = new Date().toLocaleDateString();
   const note = noteId ? (document.getElementById(noteId)?.value || "") : "";
-  const entry = { date, mode, activity, note };
+  const entry = { date, mode, activity, note, quick: false };
   let history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
   history.unshift(entry);
   localStorage.setItem("resetHistory", JSON.stringify(history));
@@ -242,11 +238,15 @@ function renderQuickWins(){
     { label: "Take 3 deep breaths", icon: "🌬️" }
   ];
   c.innerHTML = `<div class="mode-page"><h2>Quick Wins</h2>` + quick.map((q,i) =>
-    `<div class="activity-row"><div class="activity-label-wrap"><span class="activity-icon">${escapeHtml(q.icon)}</span><label>${escapeHtml(q.label)}</label></div><input id="qw-${i}" placeholder="Notes (optional)"><button onclick="logActivity('quick','${escapeJs(q.label)}','qw-${i}')">Log</button></div>`
+    `<div class="activity-row"><div class="activity-label-wrap"><span class="activity-icon">${escapeHtml(q.icon)}</span><label>${escapeHtml(q.label)}</label></div><input id="qw-${i}" placeholder="Notes (optional)"><button class="quick-btn" onclick="quickMarkDone('quick','${escapeJs(q.label)}')">✓</button><button class="log-btn" onclick="logActivity('quick','${escapeJs(q.label)}','qw-${i}')">Done + Note</button></div>`
   ).join('') + `<button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
 
   const container = c.querySelector('.mode-page');
-  if (container) animateContentRows(container);
+  if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
+      row.style.animation = `fadeRow 420ms ease ${i*70}ms both`;
+    });
+  }
 }
 
 function renderHistory(){
@@ -254,13 +254,12 @@ function renderHistory(){
   if (!c) return;
   const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
   c.innerHTML = `<div class="mode-page"><h2>History</h2>` + (history.length ? history.map(h =>
-    `<p><strong>${escapeHtml(h.date)}:</strong> ${escapeHtml(h.mode)} — ${escapeHtml(h.activity)}${h.note ? ' • <em>'+escapeHtml(h.note)+'</em>' : ''}</p>`
+    `<p><strong>${escapeHtml(h.date)}:</strong> ${escapeHtml(h.mode)} — ${escapeHtml(h.activity)}${h.note ? ' • <em>'+escapeHtml(h.note)+'</em>' : ''}${h.quick ? ' • (quick)' : ''}</p>`
   ).join('') : `<p>No history yet.</p>`) + `<button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
 
-  // small entrance for the page
-  if (!reducedMotion()) {
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const page = c.querySelector('.mode-page');
-    page?.classList.add('animate-in');
+    if (page) page.style.animation = 'fadeRow 420ms ease both';
   }
 }
 
@@ -271,12 +270,20 @@ function renderAbout(){
     <p>The Reset Compass was created by Marcus Clark to help you align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p>
     <button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
 
-  if (!reducedMotion()) {
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const page = c.querySelector('.mode-page');
-    page?.classList.add('animate-in');
+    if (page) page.style.animation = 'fadeRow 420ms ease both';
   }
 }
 
 function capitalize(s){ return (s||'').charAt(0).toUpperCase()+ (s||'').slice(1) }
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
+
+/* small animation name used above */
+const sheet = (function(){ try{ return document.styleSheets[0]; } catch(e){return null;} })();
+if (sheet) {
+  try {
+    sheet.insertRule('@keyframes fadeRow { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: none; } }', sheet.cssRules.length);
+  } catch(e){}
+}
