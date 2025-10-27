@@ -1,39 +1,43 @@
-// app.js v27
-// - Slim, centered needle with idle sway that pauses on hover/focus
-// - Quick wins stored as 'quick-win' and displayed as 'Quick Win' in history/donut
-// - Removed triangle arrow and any "(quick)" markers in history entries
-// - Splash fade + route-top behavior retained
+// app.js v27 (splash crossfade + wedge bloom improvements)
+// - Smooth splash -> app crossfade (app fades in while splash fades out)
+// - Wedge bloom animation on hover and stronger bloom on select
+// - Needle rotates smoothly, spins on selection, coordinated with bloom
+// - History/donut/quick-win behavior unchanged
 
-function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-}
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
 function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
 
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash-screen");
   const splashIcon = document.getElementById("splash-icon");
+  const appRoot = document.getElementById("app-root");
   const needleGroup = document.getElementById("needle-group");
 
-  // ensure the needle idle class exists at load (so mobile sees idle motion)
-  if (needleGroup && !needleGroup.classList.contains('idle')) {
-    needleGroup.classList.add('idle');
-  }
+  // Ensure app-root starts hidden; when splash hides we'll reveal it with a fade
+  if (appRoot) appRoot.classList.remove('visible');
 
-  // Splash: after the icon animation completes, fade out the overlay for a clean crossfade.
-  if (splashIcon && splash) {
+  // Splash: after the icon animation completes, fade out the overlay AND fade app in for crossfade.
+  if (splashIcon && splash && appRoot) {
     splashIcon.addEventListener("animationend", () => {
+      // fade out splash
       splash.classList.add('hidden');
-      setTimeout(() => { if (splash && splash.parentNode) splash.parentNode.removeChild(splash); }, 420);
+      // fade in app
+      requestAnimationFrame(() => { appRoot.classList.add('visible'); appRoot.setAttribute('aria-hidden','false'); });
+      // remove splash from DOM after fade completes
+      setTimeout(() => { if (splash && splash.parentNode) splash.parentNode.removeChild(splash); }, 520);
     }, { once: true });
 
-    // fallback
+    // fallback in case animation doesn't run
     setTimeout(() => {
       if (splash) {
         splash.classList.add('hidden');
-        setTimeout(()=>{ if (splash && splash.parentNode) splash.parentNode.removeChild(splash); },420);
+        if (appRoot) { appRoot.classList.add('visible'); appRoot.setAttribute('aria-hidden','false'); }
+        setTimeout(()=>{ if (splash && splash.parentNode) splash.parentNode.removeChild(splash); },520);
       }
     }, 2600);
   } else if (splash && splash.parentNode) {
+    // no icon: remove immediately and show app
+    if (appRoot) appRoot.classList.add('visible');
     splash.parentNode.removeChild(splash);
   }
 
@@ -63,41 +67,83 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // compass interactions: hover pop + needle rotation (idle anim paused while hovering)
+  // Compass interactions: rotate needle to wedge on hover/focus/tap, bloom on hover & stronger bloom on select
   const compass = document.getElementById("compass");
-  const needle = document.getElementById("compass-needle");
   function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
 
   if (compass && needleGroup) {
-    document.querySelectorAll('#compass path[data-mode]').forEach(p => {
-      p.addEventListener('mouseenter', (e) => {
-        const angle = Number(p.getAttribute('data-angle') || 0);
-        // pause idle animation and rotate needle-group to wedge
-        needleGroup.classList.remove('idle');
-        needleGroup.style.transform = `rotate(${angle}deg)`;
-        p.style.transform = 'scale(1.04)';
-        p.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.12))';
-      });
-      p.addEventListener('mouseleave', (e) => {
-        // resume idle after a short delay
-        setTimeout(()=> {
-          needleGroup.style.transform = `rotate(0deg)`;
-          needleGroup.classList.add('idle');
-        }, 260);
-        p.style.transform = '';
-        p.style.filter = '';
+    const wedges = Array.from(document.querySelectorAll('#compass path[data-mode]'));
+    wedges.forEach(w => {
+      const angle = Number(w.getAttribute('data-angle') || 0);
+
+      // pointerenter -> bloom (light) and rotate needle
+      w.addEventListener('pointerenter', () => {
+        // light bloom
+        w.classList.remove('bloom-strong');
+        w.classList.add('bloom');
+        setNeedleRotation(angle);
       });
 
-      // accessibility: focus shows same effect
-      p.addEventListener('focus', () => {
-        const angle = Number(p.getAttribute('data-angle') || 0);
-        needleGroup.classList.remove('idle');
-        needleGroup.style.transform = `rotate(${angle}deg)`;
+      // pointerleave -> remove bloom and return needle to neutral
+      w.addEventListener('pointerleave', () => {
+        w.classList.remove('bloom');
+        setTimeout(()=> setNeedleRotation(0), 200);
       });
-      p.addEventListener('blur', () => {
-        needleGroup.style.transform = `rotate(0deg)`;
-        needleGroup.classList.add('idle');
+
+      // pointerdown: immediate feedback on touch
+      w.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        // small immediate bloom
+        w.classList.remove('bloom-strong');
+        w.classList.add('bloom');
+        setNeedleRotation(angle);
+      }, {passive:false});
+
+      // click: strong bloom + spin animation, then navigate
+      w.addEventListener('click', (e) => {
+        e.preventDefault();
+        // stronger bloom for selection
+        w.classList.remove('bloom');
+        w.classList.add('bloom-strong');
+        // spin needle for delight, then navigate when finished
+        runNeedleSpin().then(() => {
+          w.classList.remove('bloom-strong');
+          const mode = w.getAttribute('data-mode');
+          if (mode) navigateMode(mode);
+        });
       });
+
+      // keyboard activation
+      w.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          w.classList.add('bloom-strong');
+          runNeedleSpin().then(()=> {
+            w.classList.remove('bloom-strong');
+            const mode = w.getAttribute('data-mode');
+            if (mode) navigateMode(mode);
+          });
+        }
+      });
+    });
+  }
+
+  // Helper: set rotation (JS relies on CSS transition)
+  function setNeedleRotation(angle){
+    if (!needleGroup) return;
+    needleGroup.style.transform = `rotate(${angle}deg)`;
+  }
+
+  // Helper: run brief spin animation class and resolve when finished
+  function runNeedleSpin(){
+    return new Promise((resolve) => {
+      if (!needleGroup) return resolve();
+      needleGroup.classList.add('needle-spin');
+      setTimeout(() => {
+        needleGroup.classList.remove('needle-spin');
+        setNeedleRotation(0);
+        resolve();
+      }, 560);
     });
   }
 
@@ -114,28 +160,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const dx = e.clientX - pointerState.x, dy = e.clientY - pointerState.y;
       if (dx*dx + dy*dy > 28*28) pointerState = null;
     }, {passive:true});
-    compass.addEventListener("pointerup", (e) => {
-      if (!pointerState || pointerState.id !== e.pointerId) { pointerState = null; return; }
-      if (Date.now() - pointerState.t < 700) {
-        const mode = pointerState.target.getAttribute('data-mode');
-        if (mode) navigateMode(mode);
-      }
-      pointerState = null;
-    }, {passive:true});
+    compass.addEventListener("pointerup", (e) => { pointerState = null; }, {passive:true});
     compass.addEventListener("pointercancel", () => pointerState = null);
   }
 
-  // keyboard accessibility for wedges
-  document.querySelectorAll("#compass path[data-mode]").forEach(p => {
-    p.setAttribute("tabindex","0");
-    p.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        const m = p.getAttribute("data-mode");
-        if (m) navigateMode(m);
-      }
-    });
-  });
+  // ensure path elements are keyboard focusable
+  document.querySelectorAll("#compass path[data-mode]").forEach(p => p.setAttribute("tabindex","0"));
 
   window.addEventListener("hashchange", renderRoute);
   if (!location.hash) location.hash = "#home";
@@ -143,7 +173,9 @@ document.addEventListener("DOMContentLoaded", () => {
   updateStreak();
 });
 
-/* activities */
+/* remaining app functions unchanged (activities, history donut, completeActivity, confetti, etc.)
+   For brevity they are included below intact. */
+
 const activities = {
   growing: [
     { label: "Write a goal", icon: "🎯" },
@@ -233,20 +265,15 @@ function renderModePage(mode){
       <button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button>
     </div>`;
 
-  // animate rows in
   const container = c.querySelector('.mode-page');
   if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
       row.style.animation = `fadeRow 420ms ease ${i*40}ms both`;
     });
   }
-
-  // ensure top
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
-// When completing activities we store the mode exactly as passed.
-// Quick wins are stored as 'quick-win' and displayed as 'Quick Win' in history/donut.
 function completeActivity(mode, activity, noteId, rowId){
   const row = document.getElementById(rowId);
   if (row) {
@@ -262,7 +289,6 @@ function completeActivity(mode, activity, noteId, rowId){
   history.unshift(entry);
   localStorage.setItem("resetHistory", JSON.stringify(history));
 
-  // increment streak if new day
   const lastLogged = localStorage.getItem("lastLogged");
   const today = new Date().toLocaleDateString();
   if (lastLogged !== today){
@@ -270,22 +296,28 @@ function completeActivity(mode, activity, noteId, rowId){
     streak += 1;
     localStorage.setItem("streak", String(streak));
     localStorage.setItem("lastLogged", today);
-    // animate streak emoji
     const streakEmoji = document.getElementById("streak-emoji");
-    if (streakEmoji) {
-      streakEmoji.classList.add('streak-pop');
-      setTimeout(()=>streakEmoji.classList.remove('streak-pop'), 1100);
-    }
+    if (streakEmoji) { streakEmoji.classList.add('streak-pop'); setTimeout(()=>streakEmoji.classList.remove('streak-pop'), 1100); }
     updateStreak();
-    // milestone visual
     runConfettiBurst();
   } else {
-    // small celebration for completing within same day
     runConfettiBurst();
   }
 
-  // after short delay show history so user sees their entry
-  setTimeout(()=>{ navigateHash('#history'); }, 700);
+  // animate a visible needle spin and a bloom on the currently selected wedge for delight
+  const activeWedge = document.querySelector(`#compass path[data-mode="${normalizedMode}"]`);
+  if (activeWedge) {
+    activeWedge.classList.add('bloom-strong');
+    const ng = document.getElementById('needle-group');
+    if (ng) {
+      ng.classList.add('needle-spin');
+      setTimeout(()=>{ ng.classList.remove('needle-spin'); activeWedge.classList.remove('bloom-strong'); navigateHash('#history'); }, 620);
+    } else {
+      setTimeout(()=>{ activeWedge.classList.remove('bloom-strong'); navigateHash('#history'); }, 600);
+    }
+  } else {
+    setTimeout(()=>{ navigateHash('#history'); }, 700);
+  }
 }
 
 function runConfettiBurst(){
@@ -320,7 +352,6 @@ function runConfettiBurst(){
         { transform: `translate(${dx}px, ${dy}px) scale(0.9)`, opacity: 0.9 }
       ], { duration: 700 + Math.random()*300, easing: 'cubic-bezier(.2,.9,.2,1)'});
     }
-
     setTimeout(()=>container.remove(), 1400);
   } catch(e){}
 }
@@ -335,7 +366,6 @@ function renderQuickWins(){
     { label: "Stand up and stretch", icon: "🧘" },
     { label: "Take 3 deep breaths", icon: "🌬️" }
   ];
-  // quick wins use mode 'quick-win' when logged
   c.innerHTML = `<div class="mode-page"><h2>Quick Wins</h2>` + quick.map((q,i) =>
     `<div class="activity-row" id="row-quick-${i}">
        <div class="activity-main"><span class="activity-icon">${escapeHtml(q.icon)}</span><div class="activity-label">${escapeHtml(q.label)}</div></div>
@@ -360,17 +390,13 @@ function renderHistory(){
   });
   const total = counts['growing'] + counts['grounded'] + counts['drifting'] + counts['surviving'] + counts['quick-win'];
 
-  // build donut chart area (Chart.js) - only show if we have any counts
   let statsHtml = '';
   if (total === 0) {
     statsHtml = `<p>No entries yet. Complete an activity to build your stats.</p>`;
   } else {
-    statsHtml = `<div class="history-stats">
-      <div class="history-chart-wrap"><canvas id="history-donut" aria-label="Mode distribution" role="img"></canvas></div>
-    </div>`;
+    statsHtml = `<div class="history-stats"><div class="history-chart-wrap"><canvas id="history-donut" aria-label="Mode distribution" role="img"></canvas></div></div>`;
   }
 
-  // history list: show all entries; display friendly label for mode
   const displayLabel = (m) => {
     if (!m) return '';
     const key = m.toLowerCase();
@@ -387,7 +413,6 @@ function renderHistory(){
 
   c.innerHTML = `<div class="mode-page"><h2>History</h2>${statsHtml}<div>${listHtml}</div><button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
 
-  // if we have data, draw donut via Chart.js
   if (total > 0 && typeof Chart !== 'undefined') {
     const ctx = document.getElementById('history-donut').getContext('2d');
     const labels = ['Growing','Grounded','Drifting','Surviving','Quick Win'];
@@ -399,19 +424,10 @@ function renderHistory(){
       counts['quick-win']||0
     ];
     const bg = ['#007BFF','#246B45','#DAA520','#D9534F','#6c757d'];
-    // destroy existing chart instance if present (prevent duplicate)
     if (window.__historyChart) try { window.__historyChart.destroy(); } catch(e){}
     window.__historyChart = new Chart(ctx, {
       type: 'doughnut',
-      data: {
-        labels,
-        datasets: [{
-          data,
-          backgroundColor: bg,
-          hoverOffset: 10,
-          borderWidth: 0
-        }]
-      },
+      data: { labels, datasets: [{ data, backgroundColor: bg, hoverOffset: 10, borderWidth: 0 }] },
       options: {
         responsive: true,
         maintainAspectRatio: false,
