@@ -4,6 +4,64 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
+
+  <!-- Critical inline CSS (fallback) - ensures page renders correctly even if main.css fails to load -->
+  <style>
+    :root{
+      --brand-green: #0B3D2E;
+      --muted-bg: #F7FBF8;
+      --card-bg: #ffffff;
+      --radius: 12px;
+      --accent: #007BFF;
+      --text-strong:#0B3D2E;
+    }
+
+    /* Basic reset + layout so the page is usable if external CSS fails */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--muted-bg);color:var(--text-strong);font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    a{color:var(--accent)}
+    ul{margin:0;padding:0;list-style:none}
+
+    /* App fading root */
+    .app-root{ opacity: 1; transform: none; transition: opacity 420ms ease, transform 420ms ease; }
+    .app-root[aria-hidden="true"]{ opacity:0; transform: translateY(6px); }
+
+    /* Hero + nav minimal layout */
+    .hero{display:flex;align-items:center;gap:12px;max-width:820px;margin:12px auto 6px;padding:8px 16px}
+    .hero-icon{width:56px;height:56px;border-radius:10px;object-fit:contain}
+    .hero-title{margin:0;font-size:1.25rem;font-weight:800;color:var(--brand-green)}
+    .site-nav{display:flex;align-items:center;justify-content:center;padding:10px 14px;background:linear-gradient(180deg,var(--brand-green),#083126);color:white;position:sticky;top:0;z-index:60}
+    .nav-links{display:flex;gap:26px}
+    .nav-links a{color:white;text-decoration:none;font-weight:800;font-size:1.02rem}
+
+    /* Page and cards */
+    .page{max-width:820px;margin:6px auto;padding:0 16px;padding-bottom:140px}
+    .card{background:var(--card-bg);border-radius:var(--radius);padding:18px;border:1px solid rgba(11,61,46,0.06);box-shadow:0 6px 22px rgba(6,20,12,0.06);margin-bottom:18px}
+
+    /* Compass fallback sizing */
+    .compass-wrap{display:flex;justify-content:center;margin:8px 0 18px;position:relative}
+    svg{width:320px;height:320px;max-width:92vw;display:block}
+
+    /* Wedge basic interaction */
+    .wedge{ cursor:pointer; transition: transform .22s ease, filter .22s ease; transform-origin:100px 100px; }
+    .wedge:hover{ transform: scale(1.02); filter: drop-shadow(0 12px 24px rgba(0,0,0,0.08)); }
+
+    /* Needle fallback (subtle idle spin) */
+    #needle-group{ transform-origin:100px 100px; transition: transform .42s cubic-bezier(.2,.9,.2,1); animation: needleIdle 8s ease-in-out infinite; }
+    @keyframes needleIdle { 0%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}100%{transform:rotate(-1.6deg)} }
+    #compass-needle{filter:drop-shadow(0 10px 18px rgba(0,0,0,0.08));}
+
+    /* Make sure the inner hole of the compass is visibly the app background */
+    circle[fill="var(--muted-bg)"]{ fill: var(--muted-bg); }
+
+    /* Ensure mode pages still have decent defaults */
+    .mode-page{ background:linear-gradient(180deg,#ffffff,#fbfffb); border-radius:18px; padding:18px; margin:14px 0 60px; box-shadow:0 18px 40px rgba(6,20,12,0.06)}
+    .activity-row{ margin:12px 0; padding:12px; border-radius:12px; background:#fff; border:1px solid rgba(0,0,0,0.04)}
+    .activity-note{ width:100%; min-height:64px; padding:10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08) }
+    .btn-complete{ background:var(--brand-green); color:white; padding:8px 12px; border-radius:10px; border:0 }
+  </style>
+
+  <!-- full stylesheet (polish) — still used when it loads -->
   <link rel="stylesheet" href="main.css?v=64" />
 </head>
 <body>
@@ -32,84 +90,39 @@
     </nav>
 
     <main class="page fade-target" id="page">
-      <!-- streak with separate emoji element for animation -->
       <div id="streak" class="streak" aria-live="polite"><span id="streak-emoji" aria-hidden="true">🔥</span> Streak: <span id="streak-count">0</span> days</div>
 
-      <!-- how-to visible only on home; JS will hide it for other pages -->
       <section id="how-to" class="card" aria-labelledby="howto-heading">
         <h2 id="howto-heading">How to Use This App</h2>
         <p>Select a mode from the compass or the buttons below. Complete an activity. Log it. Build your streak.</p>
       </section>
 
       <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
-        <!-- redesigned compass: ring wedges with outward labels and a responsive needle -->
         <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0" aria-describedby="compassDesc">
           <title id="compassTitle">Mode compass — choose a mode</title>
           <desc id="compassDesc">Tap or hover a wedge to select a mode.</desc>
 
           <defs>
-            <linearGradient id="growingGrad" x1="0" x2="1">
-              <stop offset="0" stop-color="#2FA0FF"/>
-              <stop offset="1" stop-color="#007BFF"/>
-            </linearGradient>
-            <linearGradient id="groundedGrad" x1="0" x2="1">
-              <stop offset="0" stop-color="#3CA56A"/>
-              <stop offset="1" stop-color="#246B45"/>
-            </linearGradient>
-            <linearGradient id="driftingGrad" x1="0" x2="1">
-              <stop offset="0" stop-color="#E6C450"/>
-              <stop offset="1" stop-color="#DAA520"/>
-            </linearGradient>
-            <linearGradient id="survivingGrad" x1="0" x2="1">
-              <stop offset="0" stop-color="#E78B88"/>
-              <stop offset="1" stop-color="#D9534F"/>
-            </linearGradient>
-
-            <!-- subtle glow filter for bloom -->
-            <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-              <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
-              <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
+            <linearGradient id="growingGrad" x1="0" x2="1"><stop offset="0" stop-color="#2FA0FF"/><stop offset="1" stop-color="#007BFF"/></linearGradient>
+            <linearGradient id="groundedGrad" x1="0" x2="1"><stop offset="0" stop-color="#3CA56A"/><stop offset="1" stop-color="#246B45"/></linearGradient>
+            <linearGradient id="driftingGrad" x1="0" x2="1"><stop offset="0" stop-color="#E6C450"/><stop offset="1" stop-color="#DAA520"/></linearGradient>
+            <linearGradient id="survivingGrad" x1="0" x2="1"><stop offset="0" stop-color="#E78B88"/><stop offset="1" stop-color="#D9534F"/></linearGradient>
           </defs>
 
-          <!-- ring wedges (outer radius ~94, inner cutout), optimized label positions -->
           <g transform="rotate(-45 100 100)">
-            <path d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z"
-                  class="wedge" fill="url(#growingGrad)" fill-opacity="0.97"
-                  stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                  data-mode="growing" data-angle="-30" tabindex="0"/>
-            <path d="M100,100 L194,100 A94,94 0 0,1 100,194 L100,128 A28,28 0 0,0 128,100 Z"
-                  class="wedge" fill="url(#groundedGrad)" fill-opacity="0.97"
-                  stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                  data-mode="grounded" data-angle="30" tabindex="0"/>
-            <path d="M100,100 L100,194 A94,94 0 0,1 6,100 L72,100 A28,28 0 0,0 100,128 Z"
-                  class="wedge" fill="url(#driftingGrad)" fill-opacity="0.97"
-                  stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                  data-mode="drifting" data-angle="120" tabindex="0"/>
-            <path d="M100,100 L6,100 A94,94 0 0,1 100,6 L100,72 A28,28 0 0,0 72,100 Z"
-                  class="wedge" fill="url(#survivingGrad)" fill-opacity="0.97"
-                  stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                  data-mode="surviving" data-angle="210" tabindex="0"/>
+            <path d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z" class="wedge" fill="url(#growingGrad)" data-mode="growing" data-angle="-30" tabindex="0"/>
+            <path d="M100,100 L194,100 A94,94 0 0,1 100,194 L100,128 A28,28 0 0,0 128,100 Z" class="wedge" fill="url(#groundedGrad)" data-mode="grounded" data-angle="30" tabindex="0"/>
+            <path d="M100,100 L100,194 A94,94 0 0,1 6,100 L72,100 A28,28 0 0,0 100,128 Z" class="wedge" fill="url(#driftingGrad)" data-mode="drifting" data-angle="120" tabindex="0"/>
+            <path d="M100,100 L6,100 A94,94 0 0,1 100,6 L100,72 A28,28 0 0,0 72,100 Z" class="wedge" fill="url(#survivingGrad)" data-mode="surviving" data-angle="210" tabindex="0"/>
           </g>
 
-          <!-- inner hole to make the compass feel like a compass (donut) -->
           <circle cx="100" cy="100" r="44" fill="var(--muted-bg)" stroke="rgba(0,0,0,0.02)"/>
-
-          <!-- outer ring -->
           <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
-
-          <!-- pivot dot -->
           <circle id="compass-pivot" cx="100" cy="100" r="4" fill="#063827" />
-
-          <!-- slender needle: small triangle that rotates smoothly -->
           <g id="needle-group" style="transform-origin:100px 100px;">
             <polygon id="compass-needle" points="100,68 95,100 105,100" fill="#063827" />
           </g>
 
-          <!-- outward labels (moved slightly further out for readability on mobile) -->
           <text x="100" y="28" class="compass-label in-wedge" data-for="growing">Growing</text>
           <text x="162" y="100" class="compass-label in-wedge" data-for="grounded">Grounded</text>
           <text x="100" y="176" class="compass-label in-wedge" data-for="drifting">Drifting</text>
@@ -130,6 +143,6 @@
 
   <!-- Chart.js (for donut chart on History) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js?v=27"></script>
+  <script src="app.js?v=28"></script>
 </body>
 </html>
