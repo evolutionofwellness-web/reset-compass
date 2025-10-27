@@ -1,9 +1,8 @@
-// app.js v25 (updated with donut chart + compass pops & needle)
-// - Uses Chart.js for History donut visualization
-// - Smooth splash overlay fade transition
-// - Compass wedge hover causes needle to rotate and wedge to pop
-// - Route navigation scrolls to top
-// - Streak emoji pulses when incremented
+// app.js v27
+// - Slim, centered needle with idle sway that pauses on hover/focus
+// - Quick wins stored as 'quick-win' and displayed as 'Quick Win' in history/donut
+// - Removed triangle arrow and any "(quick)" markers in history entries
+// - Splash fade + route-top behavior retained
 
 function escapeHtml(s){
   return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -13,6 +12,12 @@ function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash-screen");
   const splashIcon = document.getElementById("splash-icon");
+  const needleGroup = document.getElementById("needle-group");
+
+  // ensure the needle idle class exists at load (so mobile sees idle motion)
+  if (needleGroup && !needleGroup.classList.contains('idle')) {
+    needleGroup.classList.add('idle');
+  }
 
   // Splash: after the icon animation completes, fade out the overlay for a clean crossfade.
   if (splashIcon && splash) {
@@ -58,22 +63,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // compass interactions: hover pop + needle rotation
+  // compass interactions: hover pop + needle rotation (idle anim paused while hovering)
   const compass = document.getElementById("compass");
   const needle = document.getElementById("compass-needle");
   function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
 
-  if (compass && needle) {
+  if (compass && needleGroup) {
     document.querySelectorAll('#compass path[data-mode]').forEach(p => {
       p.addEventListener('mouseenter', (e) => {
         const angle = Number(p.getAttribute('data-angle') || 0);
-        needle.style.transform = `rotate(${angle}deg)`;
-        p.style.transform = 'scale(1.03)';
+        // pause idle animation and rotate needle-group to wedge
+        needleGroup.classList.remove('idle');
+        needleGroup.style.transform = `rotate(${angle}deg)`;
+        p.style.transform = 'scale(1.04)';
         p.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.12))';
       });
       p.addEventListener('mouseleave', (e) => {
-        // relax needle slightly back to no rotation (0) after short delay
-        setTimeout(()=> needle.style.transform = `rotate(0deg)`, 260);
+        // resume idle after a short delay
+        setTimeout(()=> {
+          needleGroup.style.transform = `rotate(0deg)`;
+          needleGroup.classList.add('idle');
+        }, 260);
         p.style.transform = '';
         p.style.filter = '';
       });
@@ -81,9 +91,13 @@ document.addEventListener("DOMContentLoaded", () => {
       // accessibility: focus shows same effect
       p.addEventListener('focus', () => {
         const angle = Number(p.getAttribute('data-angle') || 0);
-        needle.style.transform = `rotate(${angle}deg)`;
+        needleGroup.classList.remove('idle');
+        needleGroup.style.transform = `rotate(${angle}deg)`;
       });
-      p.addEventListener('blur', () => needle.style.transform = `rotate(0deg)`);
+      p.addEventListener('blur', () => {
+        needleGroup.style.transform = `rotate(0deg)`;
+        needleGroup.classList.add('idle');
+      });
     });
   }
 
@@ -129,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateStreak();
 });
 
-/* activities (unchanged source) */
+/* activities */
 const activities = {
   growing: [
     { label: "Write a goal", icon: "🎯" },
@@ -231,6 +245,8 @@ function renderModePage(mode){
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
+// When completing activities we store the mode exactly as passed.
+// Quick wins are stored as 'quick-win' and displayed as 'Quick Win' in history/donut.
 function completeActivity(mode, activity, noteId, rowId){
   const row = document.getElementById(rowId);
   if (row) {
@@ -240,7 +256,8 @@ function completeActivity(mode, activity, noteId, rowId){
 
   const note = noteId ? (document.getElementById(noteId)?.value || "") : "";
   const date = new Date().toLocaleDateString();
-  const entry = { date, mode, activity, note, quick: true };
+  const normalizedMode = (mode === 'quick' || mode === 'quick-win') ? 'quick-win' : mode;
+  const entry = { date, mode: normalizedMode, activity, note };
   let history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
   history.unshift(entry);
   localStorage.setItem("resetHistory", JSON.stringify(history));
@@ -260,10 +277,12 @@ function completeActivity(mode, activity, noteId, rowId){
       setTimeout(()=>streakEmoji.classList.remove('streak-pop'), 1100);
     }
     updateStreak();
+    // milestone visual
+    runConfettiBurst();
+  } else {
+    // small celebration for completing within same day
+    runConfettiBurst();
   }
-
-  // celebratory confetti
-  runConfettiBurst();
 
   // after short delay show history so user sees their entry
   setTimeout(()=>{ navigateHash('#history'); }, 700);
@@ -271,7 +290,7 @@ function completeActivity(mode, activity, noteId, rowId){
 
 function runConfettiBurst(){
   try {
-    const n = 14;
+    const n = 16;
     const container = document.createElement('div');
     container.style.position = 'fixed';
     container.style.left = '50%';
@@ -283,8 +302,8 @@ function runConfettiBurst(){
 
     for (let i=0;i<n;i++){
       const dot = document.createElement('div');
-      dot.style.width = '10px';
-      dot.style.height = '10px';
+      dot.style.width = (8 + Math.round(Math.random()*8)) + 'px';
+      dot.style.height = dot.style.width;
       dot.style.borderRadius = '50%';
       dot.style.background = ['#FFD166','#06D6A0','#118AB2','#EF476F'][i%4];
       dot.style.position = 'absolute';
@@ -293,16 +312,16 @@ function runConfettiBurst(){
       dot.style.opacity = '0.95';
       container.appendChild(dot);
       const angle = (Math.random()*Math.PI*2);
-      const dist = 60 + Math.random()*90;
+      const dist = 60 + Math.random()*100;
       const dx = Math.cos(angle)*dist;
       const dy = Math.sin(angle)*dist;
       dot.animate([
         { transform: 'translate(0,0) scale(1)', opacity: 1 },
         { transform: `translate(${dx}px, ${dy}px) scale(0.9)`, opacity: 0.9 }
-      ], { duration: 650 + Math.random()*240, easing: 'cubic-bezier(.2,.9,.2,1)'});
+      ], { duration: 700 + Math.random()*300, easing: 'cubic-bezier(.2,.9,.2,1)'});
     }
 
-    setTimeout(()=>container.remove(), 1300);
+    setTimeout(()=>container.remove(), 1400);
   } catch(e){}
 }
 
@@ -316,11 +335,12 @@ function renderQuickWins(){
     { label: "Stand up and stretch", icon: "🧘" },
     { label: "Take 3 deep breaths", icon: "🌬️" }
   ];
+  // quick wins use mode 'quick-win' when logged
   c.innerHTML = `<div class="mode-page"><h2>Quick Wins</h2>` + quick.map((q,i) =>
     `<div class="activity-row" id="row-quick-${i}">
        <div class="activity-main"><span class="activity-icon">${escapeHtml(q.icon)}</span><div class="activity-label">${escapeHtml(q.label)}</div></div>
        <textarea id="qw-${i}" class="activity-note" placeholder="Notes (optional)"></textarea>
-       <div class="activity-controls"><button class="btn btn-complete" onclick="completeActivity('quick','${escapeJs(q.label)}','qw-${i}','row-quick-${i}')">Complete</button></div>
+       <div class="activity-controls"><button class="btn btn-complete" onclick="completeActivity('quick-win','${escapeJs(q.label)}','qw-${i}','row-quick-${i}')">Complete</button></div>
      </div>`
   ).join('') + `<button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
 
@@ -332,31 +352,37 @@ function renderHistory(){
   if (!c) return;
   const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
 
-  // compute counts per mode
-  const counts = { growing:0, grounded:0, drifting:0, surviving:0, quick:0 };
+  // compute counts per mode (include quick-win)
+  const counts = { 'growing':0, 'grounded':0, 'drifting':0, 'surviving':0, 'quick-win':0 };
   history.forEach(h => {
     const key = (h.mode||'').toLowerCase();
     if (counts[key] != null) counts[key] += 1;
-    else counts[key] = (counts[key]||0) + 1;
   });
-  const total = history.length || 0;
+  const total = counts['growing'] + counts['grounded'] + counts['drifting'] + counts['surviving'] + counts['quick-win'];
 
-  // build donut chart area (Chart.js)
+  // build donut chart area (Chart.js) - only show if we have any counts
   let statsHtml = '';
   if (total === 0) {
-    statsHtml = `<p>No entries yet. Complete an activity to build your streak and see stats here.</p>`;
+    statsHtml = `<p>No entries yet. Complete an activity to build your stats.</p>`;
   } else {
     statsHtml = `<div class="history-stats">
       <div class="history-chart-wrap"><canvas id="history-donut" aria-label="Mode distribution" role="img"></canvas></div>
     </div>`;
   }
 
-  // history list
+  // history list: show all entries; display friendly label for mode
+  const displayLabel = (m) => {
+    if (!m) return '';
+    const key = m.toLowerCase();
+    if (key === 'quick-win' || key === 'quick') return 'Quick Win';
+    return key.charAt(0).toUpperCase() + key.slice(1);
+  };
+
   let listHtml = '';
   if (history.length === 0) {
     listHtml = '<p>No history yet.</p>';
   } else {
-    listHtml = history.map(h => `<p><strong>${escapeHtml(h.date)}:</strong> ${escapeHtml(h.mode)} — ${escapeHtml(h.activity)}${h.note ? ' • <em>'+escapeHtml(h.note)+'</em>' : ''}${h.quick ? ' • (quick)' : ''}</p>`).join('');
+    listHtml = history.map(h => `<p><strong>${escapeHtml(h.date)}:</strong> ${escapeHtml(displayLabel(h.mode))} — ${escapeHtml(h.activity)}${h.note ? ' • <em>'+escapeHtml(h.note)+'</em>' : ''}</p>`).join('');
   }
 
   c.innerHTML = `<div class="mode-page"><h2>History</h2>${statsHtml}<div>${listHtml}</div><button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
@@ -364,13 +390,13 @@ function renderHistory(){
   // if we have data, draw donut via Chart.js
   if (total > 0 && typeof Chart !== 'undefined') {
     const ctx = document.getElementById('history-donut').getContext('2d');
-    const labels = ['Growing','Grounded','Drifting','Surviving','Quick'];
+    const labels = ['Growing','Grounded','Drifting','Surviving','Quick Win'];
     const data = [
-      counts.growing||0,
-      counts.grounded||0,
-      counts.drifting||0,
-      counts.surviving||0,
-      counts.quick||0
+      counts['growing']||0,
+      counts['grounded']||0,
+      counts['drifting']||0,
+      counts['surviving']||0,
+      counts['quick-win']||0
     ];
     const bg = ['#007BFF','#246B45','#DAA520','#D9534F','#6c757d'];
     // destroy existing chart instance if present (prevent duplicate)
