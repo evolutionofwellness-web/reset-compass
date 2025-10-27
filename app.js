@@ -1,22 +1,29 @@
-// app.js v24
-// - Activity layout changed: icon+label, notes textarea below, controls row (Save / Complete) below that
-// - Hides how-to card for non-home routes
-// - Slower, larger splash animation; reliable hide fallback
-// - Nav items left-aligned via CSS (index.html/main.css)
+// app.js v25
+// - Single "Complete" action per activity which logs the entry (with note), increments streak, animates, then navigates to History.
+// - Nav centered and slightly larger font handled in CSS.
+// - Compass wedges get a thin light stroke to create a visual gap.
+// - Return to Compass fixed (navigateHash('#home')).
+// - Splash animation slowed and grows large; fallback ensures it hides.
+
+// Helper: safe HTML escaping
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
 
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash-screen");
   const splashIcon = document.getElementById("splash-icon");
 
-  // Hide splash when animation completes (or after fallback delay)
   if (splashIcon) {
     splashIcon.addEventListener("animationend", () => { if (splash) splash.style.display = "none"; }, { once: true });
-    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2400);
+    // fallback
+    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2600);
   } else if (splash) {
     splash.style.display = "none";
   }
 
-  // Ensure first-run starts at home (prevents leftover hash showing a mode automatically)
+  // start at home first-run
   if (!sessionStorage.getItem('appStarted')) {
     sessionStorage.setItem('appStarted','true');
     history.replaceState(null,'','#home');
@@ -24,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!location.hash) location.hash = '#home';
   }
 
-  // wire nav links
+  // nav wiring
   document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -33,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // mode buttons delegation
+  // mode button delegation
   document.getElementById("mode-buttons")?.addEventListener("click", (e) => {
     const btn = e.target.closest && e.target.closest('button[data-mode]');
     if (btn) {
@@ -140,7 +147,6 @@ function renderRoute(){
   if (h.startsWith("#mode/")) {
     const mode = h.split("/")[1];
     renderModePage(mode);
-    document.getElementById("content")?.scrollIntoView({behavior:"auto",block:"start"});
   } else if (h === "#quick") {
     renderQuickWins();
   } else if (h === "#history") {
@@ -173,15 +179,14 @@ function renderModePage(mode){
   c.innerHTML = `<div class="mode-page" role="region" aria-labelledby="mode-title">
       <h2 id="mode-title">${capitalize(mode)}</h2>
       ${activities[mode].map((act,i) =>
-        `<div class="activity-row" role="group" aria-label="${escapeHtml(act.label)}">
+        `<div class="activity-row" id="row-${mode}-${i}" role="group" aria-label="${escapeHtml(act.label)}">
            <div class="activity-main">
              <span class="activity-icon" aria-hidden="true">${escapeHtml(act.icon)}</span>
              <div class="activity-label">${escapeHtml(act.label)}</div>
            </div>
            <textarea id="note-${mode}-${i}" class="activity-note" placeholder="Notes (optional)" aria-label="Notes for ${escapeHtml(act.label)}"></textarea>
            <div class="activity-controls">
-             <button class="btn btn-save" onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')">Save</button>
-             <button class="btn btn-complete" onclick="quickMarkDone('${mode}','${escapeJs(act.label)}')">Complete</button>
+             <button class="btn btn-complete" onclick="completeActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}','row-${mode}-${i}')">Complete</button>
            </div>
          </div>`
       ).join("")}
@@ -191,44 +196,29 @@ function renderModePage(mode){
   const container = c.querySelector('.mode-page');
   if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
-      row.style.animation = `fadeRow 420ms ease ${i*50}ms both`;
+      row.style.animation = `fadeRow 420ms ease ${i*40}ms both`;
     });
   }
 }
 
-function quickMarkDone(mode, activity){
-  const date = new Date().toLocaleDateString();
-  const entry = { date, mode, activity, note: "", quick: true };
-  let history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
-  history.unshift(entry);
-  localStorage.setItem("resetHistory", JSON.stringify(history));
-  const lastLogged = localStorage.getItem("lastLogged");
-  const today = new Date().toLocaleDateString();
-  if (lastLogged !== today){
-    let streak = parseInt(localStorage.getItem("streak")||"0",10) || 0;
-    streak += 1;
-    localStorage.setItem("streak", String(streak));
-    localStorage.setItem("lastLogged", today);
-    updateStreak();
+function completeActivity(mode, activity, noteId, rowId){
+  // animate the row immediately
+  const row = document.getElementById(rowId);
+  if (row) {
+    row.classList.add('activity-complete-pop');
   }
-  try {
-    const toast = document.createElement('div');
-    toast.textContent = 'Completed ✓';
-    toast.style.position='fixed'; toast.style.right='14px'; toast.style.bottom='86px';
-    toast.style.background='rgba(11,61,46,0.95)'; toast.style.color='white'; toast.style.padding='8px 12px';
-    toast.style.borderRadius='10px'; toast.style.zIndex=99999; document.body.appendChild(toast);
-    setTimeout(()=>toast.remove(),900);
-  } catch(e){}
-}
 
-function logActivity(mode, activity, noteId){
-  const date = new Date().toLocaleDateString();
+  // pickup note text if present
   const note = noteId ? (document.getElementById(noteId)?.value || "") : "";
+
+  // add a history entry
+  const date = new Date().toLocaleDateString();
   const entry = { date, mode, activity, note, quick: false };
   let history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
   history.unshift(entry);
   localStorage.setItem("resetHistory", JSON.stringify(history));
 
+  // increment streak if a new day
   const lastLogged = localStorage.getItem("lastLogged");
   const today = new Date().toLocaleDateString();
   if (lastLogged !== today){
@@ -236,13 +226,59 @@ function logActivity(mode, activity, noteId){
     streak += 1;
     localStorage.setItem("streak", String(streak));
     localStorage.setItem("lastLogged", today);
-    updateStreak();
+    // animate streak
+    const streakEl = document.getElementById("streak");
+    if (streakEl) {
+      streakEl.classList.add('streak-pop');
+      // brief heart/fire sparkle (we already show the emoji in text)
+      setTimeout(()=>streakEl.classList.remove('streak-pop'), 1100);
+      updateStreak();
+    }
   }
 
-  const c = document.getElementById("content");
-  if (c) c.innerHTML = `<div class="mode-page"><p>Saved: <strong>${escapeHtml(activity)}</strong> (${escapeHtml(mode)}) • ${escapeHtml(date)}</p>
-    <button class="return-button" onclick="navigateHash('#mode/${mode}')">Return to the Compass</button>
-    </div>`;
+  // small confetti burst (simple DOM dots) to make it feel celebratory
+  runConfettiBurst();
+
+  // after a short pause let user see animation, then go to history
+  setTimeout(()=>{ navigateHash('#history'); }, 700);
+}
+
+function runConfettiBurst(){
+  try {
+    const n = 14;
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.left = '50%';
+    container.style.top = '38%';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = 99999;
+    container.style.transform = 'translateX(-50%)';
+    document.body.appendChild(container);
+
+    for (let i=0;i<n;i++){
+      const dot = document.createElement('div');
+      dot.style.width = '10px';
+      dot.style.height = '10px';
+      dot.style.borderRadius = '50%';
+      dot.style.background = ['#FFD166','#06D6A0','#118AB2','#EF476F'][i%4];
+      dot.style.position = 'absolute';
+      dot.style.left = '0';
+      dot.style.top = '0';
+      dot.style.opacity = '0.95';
+      dot.style.transform = `translate(0,0)`;
+      container.appendChild(dot);
+      const angle = (Math.random()*Math.PI*2);
+      const dist = 60 + Math.random()*80;
+      const dx = Math.cos(angle)*dist;
+      const dy = Math.sin(angle)*dist;
+      dot.animate([
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${dx}px, ${dy}px) scale(0.9)`, opacity: 0.9 }
+      ], { duration: 650 + Math.random()*220, easing: 'cubic-bezier(.2,.9,.2,1)'});
+    }
+
+    setTimeout(()=>container.remove(), 1200);
+  } catch(e){}
 }
 
 function updateStreak(){ const el = document.getElementById("streak-count"); if (el) el.textContent = localStorage.getItem("streak") || "0" }
@@ -256,13 +292,17 @@ function renderQuickWins(){
     { label: "Take 3 deep breaths", icon: "🌬️" }
   ];
   c.innerHTML = `<div class="mode-page"><h2>Quick Wins</h2>` + quick.map((q,i) =>
-    `<div class="activity-row"><div class="activity-main"><span class="activity-icon">${escapeHtml(q.icon)}</span><div class="activity-label">${escapeHtml(q.label)}</div></div><textarea id="qw-${i}" class="activity-note" placeholder="Notes (optional)"></textarea><div class="activity-controls"><button class="btn btn-save" onclick="logActivity('quick','${escapeJs(q.label)}','qw-${i}')">Save</button><button class="btn btn-complete" onclick="quickMarkDone('quick','${escapeJs(q.label)}')">Complete</button></div></div>`
+    `<div class="activity-row" id="row-quick-${i}">
+       <div class="activity-main"><span class="activity-icon">${escapeHtml(q.icon)}</span><div class="activity-label">${escapeHtml(q.label)}</div></div>
+       <textarea id="qw-${i}" class="activity-note" placeholder="Notes (optional)"></textarea>
+       <div class="activity-controls"><button class="btn btn-complete" onclick="completeActivity('quick','${escapeJs(q.label)}','qw-${i}','row-quick-${i}')">Complete</button></div>
+     </div>`
   ).join('') + `<button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
 
   const container = c.querySelector('.mode-page');
   if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
-      row.style.animation = `fadeRow 420ms ease ${i*50}ms both`;
+      row.style.animation = `fadeRow 420ms ease ${i*40}ms both`;
     });
   }
 }
@@ -272,7 +312,7 @@ function renderHistory(){
   if (!c) return;
   const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
   c.innerHTML = `<div class="mode-page"><h2>History</h2>` + (history.length ? history.map(h =>
-    `<p><strong>${escapeHtml(h.date)}:</strong> ${escapeHtml(h.mode)} — ${escapeHtml(h.activity)}${h.note ? ' • <em>'+escapeHtml(h.note)+'</em>' : ''}${h.quick ? ' • (quick)' : ''}</p>`
+    `<p><strong>${escapeHtml(h.date)}:</strong> ${escapeHtml(h.mode)} — ${escapeHtml(h.activity)}${h.note ? ' • <em>'+escapeHtml(h.note)+'</em>' : ''}</p>`
   ).join('') : `<p>No history yet.</p>`) + `<button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
 }
 
@@ -285,12 +325,8 @@ function renderAbout(){
 }
 
 function capitalize(s){ return (s||'').charAt(0).toUpperCase()+ (s||'').slice(1) }
-function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-}
-function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
 
-/* add keyframe for row fade if missing */
+/* add fadeRow keyframe if missing */
 (function(){
   try {
     const style = document.createElement('style');
