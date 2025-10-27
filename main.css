@@ -100,9 +100,9 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 /* Buttons */
 .buttons{margin:12px 0 28px;display:flex;flex-direction:column;gap:14px;align-items:center}
 .mode-button{
-  width:94%;max-width:720px;padding:14px 18px;border-radius:12px;border:2px solid rgba(0,0,0,0.06);
-  background:linear-gradient(180deg,#ffffff,#fbfbfb);font-weight:700;box-shadow: 0 10px 30px rgba(6,20,12,0.06);transition:transform .12s ease;
-  text-align:center;color:var(--text-strong);
+  width:94%;max-width:720px;padding:16px 18px;border-radius:12px;border:2px solid rgba(0,0,0,0.06);
+  background:linear-gradient(180deg,#ffffff,#fbfbfb);font-weight:800;box-shadow: 0 12px 30px rgba(6,20,12,0.06);transition:transform .12s ease;
+  text-align:center;color:var(--text-strong);font-size:1rem;
 }
 .mode-button:hover{transform:translateY(-3px)}
 .mode-button.growing{border-color:#007BFF;color:#007BFF}
@@ -114,37 +114,70 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 .content-area{margin-top:20px}
 .mode-page{
   background:linear-gradient(180deg,#ffffff,#fbfffb);
-  border-radius:16px;
-  padding:22px;
+  border-radius:18px;
+  padding:28px;
   border:1px solid rgba(0,0,0,0.04);
-  box-shadow: 0 18px 40px rgba(6,20,12,0.06);
-  margin: 18px 0;
+  box-shadow: 0 20px 48px rgba(6,20,12,0.07);
+  margin: 20px 0;
 }
 .mode-page h2{
   margin-top:0;
-  font-size:2.1rem;
+  font-size:2.15rem;
   color:var(--brand-green);
   letter-spacing:-0.02em;
   text-shadow: 0 2px 8px rgba(6,20,12,0.04);
 }
 
-/* activity rows */
-.activity-row{display:flex;gap:12px;align-items:center;margin:14px 0}
-.activity-row label{flex:0 0 36%;font-weight:800;color:var(--text-strong);font-size:1rem}
+/* activity rows - more padding and spacing to 'pop' */
+.activity-row{
+  display:flex;
+  gap:16px;
+  align-items:center;
+  margin:18px 0;
+  padding:8px 4px; /* inner breathing */
+}
+.activity-row label{
+  flex:0 0 34%;
+  font-weight:800;
+  color:var(--text-strong);
+  font-size:1.02rem;
+  padding-left:6px;
+}
 .activity-row input{
-  flex:1;padding:12px;border-radius:12px;border:1px solid var(--control-border);
+  flex:1;
+  padding:14px 16px;
+  border-radius:12px;
+  border:1px solid var(--control-border);
   background:linear-gradient(180deg,#fff,#fbfbfb);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  min-height:48px;
+  font-size:1rem;
 }
 .activity-row button{
-  padding:10px 14px;border-radius:10px;border:none;background:var(--brand-green);color:white;font-weight:800;cursor:pointer;
-  box-shadow: 0 8px 18px rgba(6,20,12,0.12);
+  padding:10px 16px;
+  border-radius:12px;
+  border:none;
+  background:var(--brand-green);
+  color:white;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow: 0 10px 22px rgba(6,20,12,0.12);
+  min-width:68px;
 }
 
 /* Return to Compass button */
 .return-button{
-  display:inline-block;margin-top:18px;padding:12px 18px;background:var(--return-bg);color:var(--return-text);
-  font-weight:800;border-radius:12px;border:none;box-shadow: 0 12px 30px rgba(6,20,12,0.12);cursor:pointer;text-decoration:none;
+  display:inline-block;
+  margin-top:22px;
+  padding:14px 20px;
+  background:var(--return-bg);
+  color:var(--return-text);
+  font-weight:900;
+  border-radius:14px;
+  border:none;
+  box-shadow: 0 14px 36px rgba(6,20,12,0.12);
+  cursor:pointer;
+  text-decoration:none;
 }
 
 /* small devices adjustments */
