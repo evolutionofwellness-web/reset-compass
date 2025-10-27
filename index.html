@@ -4,47 +4,68 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=54" />
+  <link rel="stylesheet" href="main.css?v=55" />
 </head>
 <body>
-  <!-- Splash overlay (inline SVG ensures correct color & crisp scaling) -->
+  <!-- Full-screen splash overlay (inline SVG for crisp visuals & reliable color) -->
   <div id="splash-screen" aria-hidden="true">
-    <svg id="splash-svg" viewBox="0 0 200 200" aria-hidden="true" role="img" width="160" height="160" focusable="false">
+    <svg id="splash-svg" viewBox="0 0 160 160" role="img" aria-label="Reset Compass splash" width="160" height="160" focusable="false">
       <defs>
+        <radialGradient id="splashGrad" cx="30%" cy="25%">
+          <stop offset="0" stop-color="#EBF8F0"/>
+          <stop offset="1" stop-color="#DFF5E8"/>
+        </radialGradient>
         <filter id="splash-shadow" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="20" stdDeviation="30" flood-color="#081e12" flood-opacity="0.35"/>
+          <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#04210e" flood-opacity="0.35"/>
         </filter>
       </defs>
+
+      <!-- background rounded square -->
+      <rect x="8" y="8" rx="18" width="144" height="144" fill="#0B3D2E" />
+      <!-- inner card with subtle grad -->
       <g filter="url(#splash-shadow)">
-        <rect x="12" y="12" width="176" height="176" rx="28" fill="rgba(0,0,0,0.02)"/>
-        <circle cx="100" cy="100" r="66" fill="#eaf6ef"/>
-        <circle cx="100" cy="100" r="58" fill="none" stroke="#0B3D2E" stroke-width="6"/>
-        <!-- compass needle artwork in brand green -->
-        <g transform="translate(100,100)">
-          <polygon points="-6,-8 26,-2 6,14" fill="#0B3D2E" />
+        <rect x="24" y="24" rx="16" width="112" height="112" fill="url(#splashGrad)" />
+        <!-- compass ring -->
+        <circle cx="80" cy="64" r="36" fill="#eaf6ef" stroke="#0B3D2E" stroke-width="5" />
+        <!-- stylized needle -->
+        <g transform="translate(80,64)">
+          <polygon points="-4,-10 18,-6 6,12" fill="#0B3D2E"/>
         </g>
       </g>
     </svg>
   </div>
 
   <nav class="site-nav" role="navigation" aria-label="Main navigation">
-    <div class="brand">
+    <div class="brand" aria-hidden="false">
       <h1>The Reset Compass</h1>
     </div>
 
-    <ul class="nav-links">
-      <li><a href="#home" data-hash="#home">Home</a></li>
-      <li><a href="#quick" data-hash="#quick">Quick Wins</a></li>
-      <li><a href="#history" data-hash="#history">History</a></li>
-      <li><a href="#about" data-hash="#about">About</a></li>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a role="menuitem" href="#home" data-hash="#home">Home</a></li>
+      <li role="none"><a role="menuitem" href="#quick" data-hash="#quick">Quick Wins</a></li>
+      <li role="none"><a role="menuitem" href="#history" data-hash="#history">History</a></li>
+      <li role="none"><a role="menuitem" href="#about" data-hash="#about">About</a></li>
     </ul>
   </nav>
 
-  <main class="page" id="page">
-    <div id="streak" class="streak">🔥 Streak: <span id="streak-count">0</span> days</div>
+  <!-- compact hero replaces the previous empty top space -->
+  <header class="hero" id="hero">
+    <svg class="hero-icon" viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
+      <circle cx="32" cy="20" r="12" fill="#eaf6ef" stroke="#0B3D2E" stroke-width="2"></circle>
+      <path d="M20 44 L44 44 L32 24 Z" fill="#0B3D2E"/>
+    </svg>
 
-    <section id="how-to" class="card">
-      <h2>How to Use This App</h2>
+    <div class="hero-text">
+      <h2 class="hero-title">The Reset Compass</h2>
+      <p class="hero-sub">A small reset, every day.</p>
+    </div>
+  </header>
+
+  <main class="page" id="page">
+    <div id="streak" class="streak" aria-live="polite">🔥 Streak: <span id="streak-count">0</span> days</div>
+
+    <section id="how-to" class="card" aria-labelledby="howto-heading">
+      <h2 id="howto-heading">How to Use This App</h2>
       <p>Select a mode from the compass or the buttons below. Complete an activity. Log it. Build your streak.</p>
     </section>
 
@@ -69,37 +90,24 @@
             <stop offset="0" stop-color="#E78B88"/>
             <stop offset="1" stop-color="#D9534F"/>
           </linearGradient>
-
           <filter id="labelShadow" x="-50%" y="-50%" width="200%" height="200%">
             <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.45"/>
           </filter>
         </defs>
 
         <g transform="rotate(-45 100 100)">
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
-                fill="url(#growingGrad)" fill-opacity="0.82"
-                data-mode="growing" tabindex="0" role="button" aria-label="Growing"></path>
-
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
-                fill="url(#groundedGrad)" fill-opacity="0.82"
-                data-mode="grounded" tabindex="0" role="button" aria-label="Grounded"></path>
-
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
-                fill="url(#driftingGrad)" fill-opacity="0.82"
-                data-mode="drifting" tabindex="0" role="button" aria-label="Drifting"></path>
-
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
-                fill="url(#survivingGrad)" fill-opacity="0.82"
-                data-mode="surviving" tabindex="0" role="button" aria-label="Surviving"></path>
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="url(#growingGrad)" fill-opacity="0.92" data-mode="growing"/>
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="url(#groundedGrad)" fill-opacity="0.92" data-mode="grounded"/>
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="url(#driftingGrad)" fill-opacity="0.92" data-mode="drifting"/>
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="url(#survivingGrad)" fill-opacity="0.92" data-mode="surviving"/>
         </g>
 
         <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-        <!-- Wedge labels — visible by default (no default opacity:0) -->
         <text x="100" y="46" class="compass-label in-wedge" filter="url(#labelShadow)">Growing</text>
-        <text x="152" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Grounded</text>
+        <text x="156" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Grounded</text>
         <text x="100" y="156" class="compass-label in-wedge" filter="url(#labelShadow)">Drifting</text>
-        <text x="48" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Surviving</text>
+        <text x="44" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Surviving</text>
       </svg>
     </section>
 
@@ -113,28 +121,6 @@
     <div id="content" class="content-area" aria-live="polite"></div>
   </main>
 
-  <!-- Hotfix safety snippet: hide splash quickly if main JS fails and prevent header overlap -->
-  <script id="hotfix-snippet">
-  (function(){
-    try{
-      var s = document.getElementById('splash-screen');
-      if (s) {
-        s.style.transition = 'opacity .25s ease';
-        s.style.opacity = '0';
-        setTimeout(function(){ s.style.display = 'none'; }, 300);
-      }
-      var n = document.querySelector('.site-nav');
-      if (n) {
-        var h = n.getBoundingClientRect().height;
-        document.body.style.paddingTop = (h + 8) + 'px';
-      }
-      console.log('[hotfix] applied');
-    } catch(e) {
-      console.warn('[hotfix] error', e);
-    }
-  })();
-  </script>
-
-  <script src="app.js?v=20"></script>
+  <script src="app.js?v=22"></script>
 </body>
 </html>
