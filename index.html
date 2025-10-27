@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=61" />
+  <link rel="stylesheet" href="main.css?v=62" />
 </head>
 <body>
   <!-- Full-screen splash overlay (uses your splash-icon.png) -->
@@ -31,7 +31,8 @@
   </nav>
 
   <main class="page" id="page">
-    <div id="streak" class="streak" aria-live="polite">🔥 Streak: <span id="streak-count">0</span> days</div>
+    <!-- streak with separate emoji element for animation -->
+    <div id="streak" class="streak" aria-live="polite"><span id="streak-emoji" aria-hidden="true">🔥</span> Streak: <span id="streak-count">0</span> days</div>
 
     <!-- how-to visible only on home; JS will hide it for other pages -->
     <section id="how-to" class="card" aria-labelledby="howto-heading">
@@ -62,27 +63,31 @@
           </linearGradient>
         </defs>
 
-        <!-- four wedges with a thin light stroke to create a small gap between them -->
+        <!-- four wedges with a thin light stroke to create a small gap between them.
+             Each wedge has a data-angle attribute used by the needle rotation logic. -->
         <g transform="rotate(-45 100 100)">
           <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
-                fill="url(#growingGrad)" fill-opacity="0.92"
+                fill="url(#growingGrad)" fill-opacity="0.94"
                 stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="growing"/>
+                data-mode="growing" data-angle="-45"/>
           <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
-                fill="url(#groundedGrad)" fill-opacity="0.92"
+                fill="url(#groundedGrad)" fill-opacity="0.94"
                 stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="grounded"/>
+                data-mode="grounded" data-angle="45"/>
           <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
-                fill="url(#driftingGrad)" fill-opacity="0.92"
+                fill="url(#driftingGrad)" fill-opacity="0.94"
                 stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="drifting"/>
+                data-mode="drifting" data-angle="135"/>
           <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
-                fill="url(#survivingGrad)" fill-opacity="0.92"
+                fill="url(#survivingGrad)" fill-opacity="0.94"
                 stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="surviving"/>
+                data-mode="surviving" data-angle="225"/>
         </g>
 
         <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
+
+        <!-- needle points will rotate around the center (100,100) -->
+        <polygon id="compass-needle" points="100,50 108,100 92,100" fill="#063827" style="transform-origin:100px 100px; transition: transform 300ms ease;"></polygon>
 
         <text x="100" y="46" class="compass-label in-wedge">Growing</text>
         <text x="156" y="100" class="compass-label in-wedge">Grounded</text>
@@ -100,6 +105,9 @@
 
     <div id="content" class="content-area" aria-live="polite"></div>
   </main>
+
+  <!-- Chart.js (for donut chart on History) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script src="app.js?v=25"></script>
 </body>
