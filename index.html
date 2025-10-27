@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=63" />
+  <link rel="stylesheet" href="main.css?v=64" />
 </head>
 <body>
   <!-- Full-screen splash overlay (uses your splash-icon.png) -->
@@ -12,112 +12,124 @@
     <img id="splash-icon" src="splash-icon.png" alt="Reset Compass" width="160" height="160">
   </div>
 
-  <!-- HERO -->
-  <header class="hero" id="hero">
-    <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="56" height="56">
-    <div class="hero-text" aria-hidden="false">
-      <h1 class="hero-title">The Reset Compass</h1>
-      <p class="hero-sub">A small reset, every day.</p>
-    </div>
-  </header>
+  <!-- HERO + APP CONTENT -->
+  <div id="app-root" class="app-root" aria-hidden="true">
+    <header class="hero" id="hero">
+      <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="56" height="56">
+      <div class="hero-text" aria-hidden="false">
+        <h1 class="hero-title">The Reset Compass</h1>
+        <p class="hero-sub">A small reset, every day.</p>
+      </div>
+    </header>
 
-  <nav class="site-nav" role="navigation" aria-label="Main navigation">
-    <ul class="nav-links" role="menubar">
-      <li role="none"><a role="menuitem" href="#home" data-hash="#home">Home</a></li>
-      <li role="none"><a role="menuitem" href="#quick" data-hash="#quick">Quick Wins</a></li>
-      <li role="none"><a role="menuitem" href="#history" data-hash="#history">History</a></li>
-      <li role="none"><a role="menuitem" href="#about" data-hash="#about">About</a></li>
-    </ul>
-  </nav>
+    <nav class="site-nav" role="navigation" aria-label="Main navigation">
+      <ul class="nav-links" role="menubar">
+        <li role="none"><a role="menuitem" href="#home" data-hash="#home">Home</a></li>
+        <li role="none"><a role="menuitem" href="#quick" data-hash="#quick">Quick Wins</a></li>
+        <li role="none"><a role="menuitem" href="#history" data-hash="#history">History</a></li>
+        <li role="none"><a role="menuitem" href="#about" data-hash="#about">About</a></li>
+      </ul>
+    </nav>
 
-  <main class="page" id="page">
-    <!-- streak with separate emoji element for animation -->
-    <div id="streak" class="streak" aria-live="polite"><span id="streak-emoji" aria-hidden="true">🔥</span> Streak: <span id="streak-count">0</span> days</div>
+    <main class="page fade-target" id="page">
+      <!-- streak with separate emoji element for animation -->
+      <div id="streak" class="streak" aria-live="polite"><span id="streak-emoji" aria-hidden="true">🔥</span> Streak: <span id="streak-count">0</span> days</div>
 
-    <!-- how-to visible only on home; JS will hide it for other pages -->
-    <section id="how-to" class="card" aria-labelledby="howto-heading">
-      <h2 id="howto-heading">How to Use This App</h2>
-      <p>Select a mode from the compass or the buttons below. Complete an activity. Log it. Build your streak.</p>
-    </section>
+      <!-- how-to visible only on home; JS will hide it for other pages -->
+      <section id="how-to" class="card" aria-labelledby="howto-heading">
+        <h2 id="howto-heading">How to Use This App</h2>
+        <p>Select a mode from the compass or the buttons below. Complete an activity. Log it. Build your streak.</p>
+      </section>
 
-    <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
-      <!-- redesigned compass: ring-style wedges, inner hole, smaller needle with pivot -->
-      <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0">
-        <title id="compassTitle">Mode compass — choose a mode</title>
+      <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
+        <!-- redesigned compass: ring wedges with outward labels and a responsive needle -->
+        <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0" aria-describedby="compassDesc">
+          <title id="compassTitle">Mode compass — choose a mode</title>
+          <desc id="compassDesc">Tap or hover a wedge to select a mode.</desc>
 
-        <defs>
-          <linearGradient id="growingGrad" x1="0" x2="1">
-            <stop offset="0" stop-color="#2FA0FF"/>
-            <stop offset="1" stop-color="#007BFF"/>
-          </linearGradient>
-          <linearGradient id="groundedGrad" x1="0" x2="1">
-            <stop offset="0" stop-color="#3CA56A"/>
-            <stop offset="1" stop-color="#246B45"/>
-          </linearGradient>
-          <linearGradient id="driftingGrad" x1="0" x2="1">
-            <stop offset="0" stop-color="#E6C450"/>
-            <stop offset="1" stop-color="#DAA520"/>
-          </linearGradient>
-          <linearGradient id="survivingGrad" x1="0" x2="1">
-            <stop offset="0" stop-color="#E78B88"/>
-            <stop offset="1" stop-color="#D9534F"/>
-          </linearGradient>
-        </defs>
+          <defs>
+            <linearGradient id="growingGrad" x1="0" x2="1">
+              <stop offset="0" stop-color="#2FA0FF"/>
+              <stop offset="1" stop-color="#007BFF"/>
+            </linearGradient>
+            <linearGradient id="groundedGrad" x1="0" x2="1">
+              <stop offset="0" stop-color="#3CA56A"/>
+              <stop offset="1" stop-color="#246B45"/>
+            </linearGradient>
+            <linearGradient id="driftingGrad" x1="0" x2="1">
+              <stop offset="0" stop-color="#E6C450"/>
+              <stop offset="1" stop-color="#DAA520"/>
+            </linearGradient>
+            <linearGradient id="survivingGrad" x1="0" x2="1">
+              <stop offset="0" stop-color="#E78B88"/>
+              <stop offset="1" stop-color="#D9534F"/>
+            </linearGradient>
 
-        <!-- ring wedges (outer radius ~94, inner cutout) -->
-        <g transform="rotate(-45 100 100)" aria-hidden="false">
-          <path d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z"
-                fill="url(#growingGrad)" fill-opacity="0.96"
-                stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="growing" data-angle="-45" tabindex="0"/>
-          <path d="M100,100 L194,100 A94,94 0 0,1 100,194 L100,128 A28,28 0 0,0 128,100 Z"
-                fill="url(#groundedGrad)" fill-opacity="0.96"
-                stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="grounded" data-angle="45" tabindex="0"/>
-          <path d="M100,100 L100,194 A94,94 0 0,1 6,100 L72,100 A28,28 0 0,0 100,128 Z"
-                fill="url(#driftingGrad)" fill-opacity="0.96"
-                stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="drifting" data-angle="135" tabindex="0"/>
-          <path d="M100,100 L6,100 A94,94 0 0,1 100,6 L100,72 A28,28 0 0,0 72,100 Z"
-                fill="url(#survivingGrad)" fill-opacity="0.96"
-                stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="surviving" data-angle="225" tabindex="0"/>
-        </g>
+            <!-- subtle glow filter for bloom -->
+            <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
 
-        <!-- inner hole to make the compass feel like a compass (donut) -->
-        <circle cx="100" cy="100" r="44" fill="var(--muted-bg)" stroke="rgba(0,0,0,0.02)"/>
+          <!-- ring wedges (outer radius ~94, inner cutout), optimized label positions -->
+          <g transform="rotate(-45 100 100)">
+            <path d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z"
+                  class="wedge" fill="url(#growingGrad)" fill-opacity="0.97"
+                  stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
+                  data-mode="growing" data-angle="-30" tabindex="0"/>
+            <path d="M100,100 L194,100 A94,94 0 0,1 100,194 L100,128 A28,28 0 0,0 128,100 Z"
+                  class="wedge" fill="url(#groundedGrad)" fill-opacity="0.97"
+                  stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
+                  data-mode="grounded" data-angle="30" tabindex="0"/>
+            <path d="M100,100 L100,194 A94,94 0 0,1 6,100 L72,100 A28,28 0 0,0 100,128 Z"
+                  class="wedge" fill="url(#driftingGrad)" fill-opacity="0.97"
+                  stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
+                  data-mode="drifting" data-angle="120" tabindex="0"/>
+            <path d="M100,100 L6,100 A94,94 0 0,1 100,6 L100,72 A28,28 0 0,0 72,100 Z"
+                  class="wedge" fill="url(#survivingGrad)" fill-opacity="0.97"
+                  stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
+                  data-mode="surviving" data-angle="210" tabindex="0"/>
+          </g>
 
-        <!-- outer ring -->
-        <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
+          <!-- inner hole to make the compass feel like a compass (donut) -->
+          <circle cx="100" cy="100" r="44" fill="var(--muted-bg)" stroke="rgba(0,0,0,0.02)"/>
 
-        <!-- pivot dot -->
-        <circle id="compass-pivot" cx="100" cy="100" r="4" fill="#063827" />
+          <!-- outer ring -->
+          <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-        <!-- smaller, slimmer needle that rotates around the pivot -->
-        <g id="needle-group" class="idle" style="transform-origin:100px 100px;">
-          <rect id="compass-needle" x="98" y="64" width="4" height="36" rx="2" ry="2" fill="#063827"></rect>
-        </g>
+          <!-- pivot dot -->
+          <circle id="compass-pivot" cx="100" cy="100" r="4" fill="#063827" />
 
-        <text x="100" y="36" class="compass-label in-wedge">Growing</text>
-        <text x="156" y="100" class="compass-label in-wedge">Grounded</text>
-        <text x="100" y="164" class="compass-label in-wedge">Drifting</text>
-        <text x="44" y="100" class="compass-label in-wedge">Surviving</text>
-      </svg>
-    </section>
+          <!-- slender needle: small triangle that rotates smoothly -->
+          <g id="needle-group" style="transform-origin:100px 100px;">
+            <polygon id="compass-needle" points="100,68 95,100 105,100" fill="#063827" />
+          </g>
 
-    <section id="mode-buttons" class="buttons" aria-hidden="false">
-      <button class="mode-button growing" data-mode="growing">Growing: Push yourself to new heights</button>
-      <button class="mode-button grounded" data-mode="grounded">Grounded: Stay centered and productive</button>
-      <button class="mode-button drifting" data-mode="drifting">Drifting: Gently regain focus and energy</button>
-      <button class="mode-button surviving" data-mode="surviving">Surviving: Just get through the day</button>
-    </section>
+          <!-- outward labels (moved slightly further out for readability on mobile) -->
+          <text x="100" y="28" class="compass-label in-wedge" data-for="growing">Growing</text>
+          <text x="162" y="100" class="compass-label in-wedge" data-for="grounded">Grounded</text>
+          <text x="100" y="176" class="compass-label in-wedge" data-for="drifting">Drifting</text>
+          <text x="38" y="100" class="compass-label in-wedge" data-for="surviving">Surviving</text>
+        </svg>
+      </section>
 
-    <div id="content" class="content-area" aria-live="polite"></div>
-  </main>
+      <section id="mode-buttons" class="buttons" aria-hidden="false">
+        <button class="mode-button growing" data-mode="growing">Growing: Push yourself to new heights</button>
+        <button class="mode-button grounded" data-mode="grounded">Grounded: Stay centered and productive</button>
+        <button class="mode-button drifting" data-mode="drifting">Drifting: Gently regain focus and energy</button>
+        <button class="mode-button surviving" data-mode="surviving">Surviving: Just get through the day</button>
+      </section>
+
+      <div id="content" class="content-area" aria-live="polite"></div>
+    </main>
+  </div>
 
   <!-- Chart.js (for donut chart on History) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <script src="app.js?v=27"></script>
 </body>
 </html>
