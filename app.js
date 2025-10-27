@@ -1,31 +1,33 @@
-// app.js v23 (corrected escape helpers)
-// - Uses splash-icon.png intro and hides overlay on animationend (with fallback)
-// - Ensures compass + mode list are hidden for full pages (non-home) via style.display
-// - Prevents an initial mode from appearing by forcing home on first load (consistent startup UX)
-// - Improved activity layout and controls group so controls never overlap
+// app.js v24
+// - Hides the "how-to" card when user navigates to any full page (mode/quick/history/about)
+// - Removes brand text from nav (index.html) and keeps hero for identity
+// - Ensures compass + mode list are hidden for full pages via style.display (robust to cached CSS)
+// - Slower splash animation (softened rotation/scale) and reliable hide fallback
+// - Layout improvements so activity rows fit and the right-side controls never overflow the viewport
 
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash-screen");
   const splashIcon = document.getElementById("splash-icon");
+  const howTo = document.getElementById("how-to");
 
   // Hide splash when animation completes (or after fallback delay)
   if (splashIcon) {
     splashIcon.addEventListener("animationend", () => { if (splash) splash.style.display = "none"; }, { once: true });
-    setTimeout(() => { if (splash) splash.style.display = "none"; }, 1800);
+    // fallback in case animation doesn't run
+    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2400);
   } else if (splash) {
     splash.style.display = "none";
   }
 
-  // Always start at the homepage on initial load (prevents leftover hash from showing a mode immediately).
-  // Use replaceState so we don't push a history entry.
+  // Always start on home on first load to avoid showing a mode immediately
   if (!sessionStorage.getItem('appStarted')) {
-    sessionStorage.setItem('appStarted', 'true');
-    history.replaceState(null, '', '#home');
+    sessionStorage.setItem('appStarted','true');
+    history.replaceState(null,'','#home');
   } else {
     if (!location.hash) location.hash = '#home';
   }
 
-  // wire nav links
+  // nav wiring
   document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -34,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // mode buttons delegation
+  // mode list delegation
   document.getElementById("mode-buttons")?.addEventListener("click", (e) => {
     const btn = e.target.closest && e.target.closest('button[data-mode]');
     if (btn) {
@@ -43,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // compass tap detection (prevent accidental activation while scrolling)
+  // compass tap detection
   const compass = document.getElementById("compass");
   let pointerState = null;
   function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
@@ -82,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // keyboard support for wedges
+  // keyboard accessibility for wedges
   document.querySelectorAll("#compass path[data-mode]").forEach(p => {
     p.setAttribute("tabindex","0");
     p.addEventListener("keydown", (e) => {
@@ -94,10 +96,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  window.addEventListener("hashchange", renderRoute);
+  window.addEventListener("hashchange", () => renderRoute());
   if (!location.hash) location.hash = "#home";
   renderRoute();
   updateStreak();
+
+  // helper to show/hide how-to card
+  function setHowToVisible(visible){
+    if (!howTo) return;
+    howTo.style.display = visible ? "" : "none";
+  }
+
+  // expose for debug if needed
+  window.__setHowToVisible = setHowToVisible;
 });
 
 /* activities */
@@ -132,17 +143,18 @@ function renderRoute(){
   const isFullPage = h !== "#home";
   const compassContainer = document.getElementById("compass-container");
   const modeButtons = document.getElementById("mode-buttons");
+  const howTo = document.getElementById("how-to");
 
-  // Direct style changes so hiding/showing is robust even if CSS is cached/overridden.
+  // robust direct style changes
   if (compassContainer) compassContainer.style.display = isFullPage ? "none" : "";
   if (modeButtons) modeButtons.style.display = isFullPage ? "none" : "";
+  if (howTo) howTo.style.display = isFullPage ? "none" : "";
 
   if (h.startsWith("#mode/")) {
     const mode = h.split("/")[1];
     renderModePage(mode);
-    // Ensure the content is scrolled into view and the nav isn't overlapping
+    // ensure content is scrolled into view
     document.getElementById("content")?.scrollIntoView({behavior:"auto",block:"start"});
-    window.scrollTo({ top: document.getElementById('page').offsetTop, behavior: 'auto' });
   } else if (h === "#quick") {
     renderQuickWins();
   } else if (h === "#history") {
@@ -158,12 +170,12 @@ function renderHome(){
   const c = document.getElementById("content");
   if (!c) return;
   c.innerHTML = ""; // home intentionally minimal (hero + compass visible)
-  // ensure compass and buttons are visible in case anything forced them hidden
   const compassContainer = document.getElementById("compass-container");
   const modeButtons = document.getElementById("mode-buttons");
+  const howTo = document.getElementById("how-to");
   if (compassContainer) compassContainer.style.display = "";
   if (modeButtons) modeButtons.style.display = "";
-  // scroll to top of main area so hero + compass are visible
+  if (howTo) howTo.style.display = "";
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
@@ -172,15 +184,15 @@ function renderModePage(mode){
   if (!c) return;
   if (!activities[mode]) { c.innerHTML = `<p>Unknown mode</p>`; return; }
 
-  c.innerHTML = `<div class="mode-page">
-      <h2>${capitalize(mode)}</h2>
+  c.innerHTML = `<div class="mode-page" role="region" aria-labelledby="mode-title">
+      <h2 id="mode-title">${capitalize(mode)}</h2>
       ${activities[mode].map((act,i) =>
-        `<div class="activity-row">
-           <div class="activity-label-wrap"><span class="activity-icon">${escapeHtml(act.icon)}</span><label>${escapeHtml(act.label)}</label></div>
-           <input type="text" id="note-${mode}-${i}" placeholder="Notes (optional)">
-           <div class="activity-controls">
-             <button class="quick-btn" onclick="quickMarkDone('${mode}','${escapeJs(act.label)}')">✓</button>
-             <button class="log-btn" onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')">Note</button>
+        `<div class="activity-row" role="group" aria-label="${escapeHtml(act.label)}">
+           <div class="activity-label-wrap"><span class="activity-icon" aria-hidden="true">${escapeHtml(act.icon)}</span><label>${escapeHtml(act.label)}</label></div>
+           <input type="text" id="note-${mode}-${i}" placeholder="Notes (optional)" aria-label="Notes for ${escapeHtml(act.label)}">
+           <div class="activity-controls" aria-hidden="false">
+             <button class="quick-btn" onclick="quickMarkDone('${mode}','${escapeJs(act.label)}')" aria-label="Quick mark done">✓</button>
+             <button class="log-btn" onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')" aria-label="Add note">Note</button>
            </div>
          </div>`
       ).join("")}
@@ -211,6 +223,7 @@ function quickMarkDone(mode, activity){
     localStorage.setItem("lastLogged", today);
     updateStreak();
   }
+  // toast feedback
   try {
     const toast = document.createElement('div');
     toast.textContent = 'Marked done ✓';
@@ -290,7 +303,7 @@ function escapeHtml(s){
 }
 function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
 
-/* add keyframe for fadeRow if missing */
+/* add keyframe for row fade */
 (function(){
   try {
     const style = document.createElement('style');
