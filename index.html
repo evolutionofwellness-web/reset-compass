@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=59" />
+  <link rel="stylesheet" href="main.css?v=60" />
 </head>
 <body>
   <!-- Full-screen splash overlay (uses your splash-icon.png) -->
@@ -12,7 +12,7 @@
     <img id="splash-icon" src="splash-icon.png" alt="Reset Compass" width="160" height="160">
   </div>
 
-  <!-- HERO is above the nav so there is no blank gap above the header -->
+  <!-- HERO is above the nav -->
   <header class="hero" id="hero">
     <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="56" height="56">
     <div class="hero-text" aria-hidden="false">
@@ -22,8 +22,6 @@
   </header>
 
   <nav class="site-nav" role="navigation" aria-label="Main navigation">
-    <div class="brand" aria-hidden="true"><!-- brand text removed from nav per request --></div>
-
     <ul class="nav-links" role="menubar">
       <li role="none"><a role="menuitem" href="#home" data-hash="#home">Home</a></li>
       <li role="none"><a role="menuitem" href="#quick" data-hash="#quick">Quick Wins</a></li>
@@ -35,7 +33,7 @@
   <main class="page" id="page">
     <div id="streak" class="streak" aria-live="polite">🔥 Streak: <span id="streak-count">0</span> days</div>
 
-    <!-- how-to should be visible only on home; JS will hide it for other pages -->
+    <!-- how-to visible only on home; JS will hide it for other pages -->
     <section id="how-to" class="card" aria-labelledby="howto-heading">
       <h2 id="howto-heading">How to Use This App</h2>
       <p>Select a mode from the compass or the buttons below. Complete an activity. Log it. Build your streak.</p>
