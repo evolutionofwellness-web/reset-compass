@@ -10,6 +10,10 @@
   --control-border: rgba(11,61,46,0.08);
   --activity-accent: rgba(11,61,46,0.06);
   --animation-ease: cubic-bezier(.2,.9,.2,1);
+  --growing-blue: linear-gradient(180deg,#2fa0ff,#007bff);
+  --grounded-green: linear-gradient(180deg,#48b174,#2e8b57);
+  --drifting-gold: linear-gradient(180deg,#f0c95f,#d6a520);
+  --surviving-red: linear-gradient(180deg,#f08f91,#d9534f);
 }
 
 /* Reset */
@@ -69,24 +73,46 @@ body {
   margin-bottom:18px;
 }
 
-/* Splash overlay: bigger final scale, slower */
+/* Splash overlay: fade effect, slower and large */
 #splash-screen{
   position:fixed;left:0;right:0;top:0;bottom:0;
   display:flex;align-items:center;justify-content:center;
   background:var(--brand-green);
   z-index:9999;pointer-events:auto;
+  transition: opacity 360ms ease;
 }
-#splash-icon{ width:160px;height:160px; transform-origin:center; animation: splashIntro 2200ms var(--animation-ease) both; }
+#splash-screen.hidden{ opacity:0; pointer-events:none; }
+#splash-icon{ width:160px;height:160px; transform-origin:center; animation: splashGrow 1400ms var(--animation-ease) both; }
 
-/* splash animation: grow big, moderate rotation */
-@keyframes splashIntro {
+/* icon scale (grow) while overlay fade is handled by JS setting .hidden on container */
+@keyframes splashGrow {
   0% { transform: scale(1) rotate(0deg); opacity: 1; }
-  70% { transform: scale(2.6) rotate(180deg); opacity: 1; }
-  100% { transform: scale(4) rotate(360deg); opacity: 0; }
+  60% { transform: scale(2.2) rotate(120deg); opacity: 1; }
+  100% { transform: scale(3.4) rotate(240deg); opacity: 0.98; }
 }
 
 /* Compass */
-.compass-wrap{display:flex;justify-content:center;margin:8px 0 18px}
+.compass-wrap{
+  display:flex;
+  justify-content:center;
+  margin:8px 0 18px;
+  position:relative;
+  /* subtle radial spotlight behind compass to draw the eye */
+}
+.compass-wrap::before{
+  content: '';
+  position:absolute;
+  inset:auto 50% auto 50%;
+  width:84%;
+  height:84%;
+  max-width:420px;
+  max-height:420px;
+  transform:translate(-50%,-6%);
+  background: radial-gradient(ellipse at center, rgba(11,61,46,0.06) 0%, rgba(11,61,46,0.02) 35%, transparent 60%);
+  border-radius:50%;
+  pointer-events:none;
+  z-index: -1;
+}
 svg{width:320px;height:320px;max-width:92vw;display:block}
 
 /* wedge labels */
@@ -95,14 +121,30 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   text-anchor:middle;dominant-baseline:middle;pointer-events:none;text-shadow:0 4px 10px rgba(0,0,0,0.28);
 }
 
-/* Buttons */
+/* path hover/interactive pop */
+#compass path{
+  transition: transform 220ms var(--animation-ease), filter 220ms var(--animation-ease);
+  transform-origin: 100px 100px; /* center anchor for scale */
+}
+#compass path:hover{
+  transform: scale(1.035);
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12));
+}
+
+/* needle */
+#compass-needle{ transition: transform 320ms cubic-bezier(.2,.9,.2,1); filter: drop-shadow(0 14px 26px rgba(0,0,0,0.12)); }
+
+/* Buttons: colored, readable, and "pop" */
 .buttons{margin:6px 0 22px;display:flex;flex-direction:column;gap:14px;align-items:center}
 .mode-button{
-  width:94%;max-width:720px;padding:14px 16px;border-radius:12px;border:2px solid rgba(0,0,0,0.06);
-  background:linear-gradient(180deg,#ffffff,#fbfbfb);font-weight:800;box-shadow: 0 12px 30px rgba(6,20,12,0.06);
-  text-align:center;color:var(--text-strong);font-size:1rem;
+  width:94%;max-width:720px;padding:14px 16px;border-radius:12px;border:none;
+  color:white;font-weight:800;box-shadow: 0 10px 26px rgba(6,20,12,0.12);
+  text-align:center;font-size:1rem; will-change: transform;
 }
-.mode-button:hover{ transform: translateY(-3px); box-shadow: 0 12px 26px rgba(6,20,12,0.08); }
+.mode-button.growing{ background: var(--growing-blue); }
+.mode-button.grounded{ background: var(--grounded-green); }
+.mode-button.drifting{ background: var(--drifting-gold); color: #2e2a1e; }
+.mode-button.surviving{ background: var(--surviving-red); }
 
 /* content area and mode pages */
 .content-area{margin-top:6px;padding-bottom:48px}
@@ -122,7 +164,7 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   color:var(--brand-green);
 }
 
-/* activity row reflowed: icon+label, note textarea, controls */
+/* activity row reflow */
 .activity-row{
   display:block;
   margin:14px 0;
@@ -171,6 +213,7 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 }
 .btn-complete{ background: var(--brand-green); color: white; box-shadow: 0 10px 22px rgba(6,20,12,0.12); }
 
+/* Return button */
 .return-button{
   display:inline-block;margin-top:18px;padding:14px 20px;background:var(--return-bg);color:var(--return-text);
   font-weight:900;border-radius:14px;border:none;box-shadow: 0 18px 42px rgba(6,20,12,0.14);cursor:pointer;text-decoration:none;
@@ -186,15 +229,19 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   100% { transform: none; box-shadow: 0 12px 28px rgba(6,20,12,0.06); }
 }
 
-/* streak pop */
-.streak-pop{
-  animation: streakPop 900ms cubic-bezier(.2,.9,.2,1) both;
+/* streak emoji pop + glow */
+#streak-emoji.streak-pop{
+  animation: streakPop 1000ms cubic-bezier(.2,.9,.2,1) both;
+  filter: drop-shadow(0 12px 24px rgba(255,120,0,0.18));
 }
 @keyframes streakPop{
-  0% { transform: scale(1); }
-  40% { transform: scale(1.14); filter: drop-shadow(0 8px 18px rgba(11,61,46,0.18)); }
-  100% { transform: scale(1); }
+  0% { transform: scale(1); opacity:1 }
+  35% { transform: scale(1.28); opacity:1; filter: drop-shadow(0 18px 30px rgba(255,130,40,0.25)); }
+  100% { transform: scale(1); opacity:1 }
 }
+
+/* history donut container */
+.history-chart-wrap{ display:flex; align-items:center; justify-content:center; margin: 12px 0 18px; height:320px; }
 
 /* small devices adjustments */
 @media (max-width:420px){
@@ -204,4 +251,5 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
   .mode-page{padding:20px;margin-bottom:36px}
   .activity-note{min-height:64px;max-width:100%}
   .btn{padding:8px 10px}
+  .history-chart-wrap{height:220px}
 }
