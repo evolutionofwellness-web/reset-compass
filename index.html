@@ -112,6 +112,28 @@
     <div id="content" class="content-area" aria-live="polite"></div>
   </main>
 
+  <!-- Hotfix safety snippet: hide splash quickly if main JS fails and prevent header overlap -->
+  <script id="hotfix-snippet">
+  (function(){
+    try{
+      var s = document.getElementById('splash-screen');
+      if (s) {
+        s.style.transition = 'opacity .25s ease';
+        s.style.opacity = '0';
+        setTimeout(function(){ s.style.display = 'none'; }, 300);
+      }
+      var n = document.querySelector('.site-nav');
+      if (n) {
+        var h = n.getBoundingClientRect().height;
+        document.body.style.paddingTop = (h + 8) + 'px';
+      }
+      console.log('[hotfix] applied');
+    } catch(e) {
+      console.warn('[hotfix] error', e);
+    }
+  })();
+  </script>
+
   <script src="app.js?v=19"></script>
 </body>
 </html>
