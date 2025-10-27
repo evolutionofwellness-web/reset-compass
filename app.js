@@ -1,7 +1,8 @@
-// app.js v23
+// app.js v23 (corrected escape helpers)
 // - Uses splash-icon.png intro and hides overlay on animationend (with fallback)
 // - Ensures compass + mode list are hidden for full pages (non-home) via style.display
-// - Improved activity layout and controls group so controls never overlap scrollbar
+// - Prevents an initial mode from appearing by forcing home on first load (consistent startup UX)
+// - Improved activity layout and controls group so controls never overlap
 
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash-screen");
@@ -13,6 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => { if (splash) splash.style.display = "none"; }, 1800);
   } else if (splash) {
     splash.style.display = "none";
+  }
+
+  // Always start at the homepage on initial load (prevents leftover hash from showing a mode immediately).
+  // Use replaceState so we don't push a history entry.
+  if (!sessionStorage.getItem('appStarted')) {
+    sessionStorage.setItem('appStarted', 'true');
+    history.replaceState(null, '', '#home');
+  } else {
+    if (!location.hash) location.hash = '#home';
   }
 
   // wire nav links
@@ -123,14 +133,16 @@ function renderRoute(){
   const compassContainer = document.getElementById("compass-container");
   const modeButtons = document.getElementById("mode-buttons");
 
-  // Use direct style changes so this always wins (robust to cached CSS)
+  // Direct style changes so hiding/showing is robust even if CSS is cached/overridden.
   if (compassContainer) compassContainer.style.display = isFullPage ? "none" : "";
   if (modeButtons) modeButtons.style.display = isFullPage ? "none" : "";
 
   if (h.startsWith("#mode/")) {
     const mode = h.split("/")[1];
     renderModePage(mode);
+    // Ensure the content is scrolled into view and the nav isn't overlapping
     document.getElementById("content")?.scrollIntoView({behavior:"auto",block:"start"});
+    window.scrollTo({ top: document.getElementById('page').offsetTop, behavior: 'auto' });
   } else if (h === "#quick") {
     renderQuickWins();
   } else if (h === "#history") {
@@ -146,6 +158,13 @@ function renderHome(){
   const c = document.getElementById("content");
   if (!c) return;
   c.innerHTML = ""; // home intentionally minimal (hero + compass visible)
+  // ensure compass and buttons are visible in case anything forced them hidden
+  const compassContainer = document.getElementById("compass-container");
+  const modeButtons = document.getElementById("mode-buttons");
+  if (compassContainer) compassContainer.style.display = "";
+  if (modeButtons) modeButtons.style.display = "";
+  // scroll to top of main area so hero + compass are visible
+  window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
 function renderModePage(mode){
@@ -161,14 +180,14 @@ function renderModePage(mode){
            <input type="text" id="note-${mode}-${i}" placeholder="Notes (optional)">
            <div class="activity-controls">
              <button class="quick-btn" onclick="quickMarkDone('${mode}','${escapeJs(act.label)}')">✓</button>
-             <button class="log-btn" onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')">Done + Note</button>
+             <button class="log-btn" onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')">Note</button>
            </div>
          </div>`
       ).join("")}
       <button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button>
     </div>`;
 
-  // small stagger if allowed
+  // stagger animate rows (if allowed)
   const container = c.querySelector('.mode-page');
   if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
@@ -192,7 +211,6 @@ function quickMarkDone(mode, activity){
     localStorage.setItem("lastLogged", today);
     updateStreak();
   }
-  // toast feedback
   try {
     const toast = document.createElement('div');
     toast.textContent = 'Marked done ✓';
@@ -238,7 +256,7 @@ function renderQuickWins(){
     { label: "Take 3 deep breaths", icon: "🌬️" }
   ];
   c.innerHTML = `<div class="mode-page"><h2>Quick Wins</h2>` + quick.map((q,i) =>
-    `<div class="activity-row"><div class="activity-label-wrap"><span class="activity-icon">${escapeHtml(q.icon)}</span><label>${escapeHtml(q.label)}</label></div><input id="qw-${i}" placeholder="Notes (optional)"><div class="activity-controls"><button class="quick-btn" onclick="quickMarkDone('quick','${escapeJs(q.label)}')">✓</button><button class="log-btn" onclick="logActivity('quick','${escapeJs(q.label)}','qw-${i}')">Done + Note</button></div></div>`
+    `<div class="activity-row"><div class="activity-label-wrap"><span class="activity-icon">${escapeHtml(q.icon)}</span><label>${escapeHtml(q.label)}</label></div><input id="qw-${i}" placeholder="Notes (optional)"><div class="activity-controls"><button class="quick-btn" onclick="quickMarkDone('quick','${escapeJs(q.label)}')">✓</button><button class="log-btn" onclick="logActivity('quick','${escapeJs(q.label)}','qw-${i}')">Note</button></div></div>`
   ).join('') + `<button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
 
   const container = c.querySelector('.mode-page');
@@ -267,7 +285,9 @@ function renderAbout(){
 }
 
 function capitalize(s){ return (s||'').charAt(0).toUpperCase()+ (s||'').slice(1) }
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
 function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
 
 /* add keyframe for fadeRow if missing */
