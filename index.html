@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=58" />
+  <link rel="stylesheet" href="main.css?v=59" />
 </head>
 <body>
   <!-- Full-screen splash overlay (uses your splash-icon.png) -->
@@ -22,7 +22,7 @@
   </header>
 
   <nav class="site-nav" role="navigation" aria-label="Main navigation">
-    <div class="brand"><span class="sr-only">The Reset Compass</span></div>
+    <div class="brand" aria-hidden="true"><!-- brand text removed from nav per request --></div>
 
     <ul class="nav-links" role="menubar">
       <li role="none"><a role="menuitem" href="#home" data-hash="#home">Home</a></li>
@@ -35,6 +35,7 @@
   <main class="page" id="page">
     <div id="streak" class="streak" aria-live="polite">🔥 Streak: <span id="streak-count">0</span> days</div>
 
+    <!-- how-to should be visible only on home; JS will hide it for other pages -->
     <section id="how-to" class="card" aria-labelledby="howto-heading">
       <h2 id="howto-heading">How to Use This App</h2>
       <p>Select a mode from the compass or the buttons below. Complete an activity. Log it. Build your streak.</p>
@@ -93,6 +94,6 @@
     <div id="content" class="content-area" aria-live="polite"></div>
   </main>
 
-  <script src="app.js?v=23"></script>
+  <script src="app.js?v=24"></script>
 </body>
 </html>
