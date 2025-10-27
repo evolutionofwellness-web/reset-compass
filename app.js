@@ -1,25 +1,22 @@
 // app.js v24
-// - Hides the "how-to" card when user navigates to any full page (mode/quick/history/about)
-// - Removes brand text from nav (index.html) and keeps hero for identity
-// - Ensures compass + mode list are hidden for full pages via style.display (robust to cached CSS)
-// - Slower splash animation (softened rotation/scale) and reliable hide fallback
-// - Layout improvements so activity rows fit and the right-side controls never overflow the viewport
+// - Activity layout changed: icon+label, notes textarea below, controls row (Save / Complete) below that
+// - Hides how-to card for non-home routes
+// - Slower, larger splash animation; reliable hide fallback
+// - Nav items left-aligned via CSS (index.html/main.css)
 
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash-screen");
   const splashIcon = document.getElementById("splash-icon");
-  const howTo = document.getElementById("how-to");
 
   // Hide splash when animation completes (or after fallback delay)
   if (splashIcon) {
     splashIcon.addEventListener("animationend", () => { if (splash) splash.style.display = "none"; }, { once: true });
-    // fallback in case animation doesn't run
     setTimeout(() => { if (splash) splash.style.display = "none"; }, 2400);
   } else if (splash) {
     splash.style.display = "none";
   }
 
-  // Always start on home on first load to avoid showing a mode immediately
+  // Ensure first-run starts at home (prevents leftover hash showing a mode automatically)
   if (!sessionStorage.getItem('appStarted')) {
     sessionStorage.setItem('appStarted','true');
     history.replaceState(null,'','#home');
@@ -27,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!location.hash) location.hash = '#home';
   }
 
-  // nav wiring
+  // wire nav links
   document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -36,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // mode list delegation
+  // mode buttons delegation
   document.getElementById("mode-buttons")?.addEventListener("click", (e) => {
     const btn = e.target.closest && e.target.closest('button[data-mode]');
     if (btn) {
@@ -45,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // compass tap detection
+  // compass wedge selection (pointer heuristics to avoid accidental activation)
   const compass = document.getElementById("compass");
   let pointerState = null;
   function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
@@ -96,19 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  window.addEventListener("hashchange", () => renderRoute());
+  window.addEventListener("hashchange", renderRoute);
   if (!location.hash) location.hash = "#home";
   renderRoute();
   updateStreak();
-
-  // helper to show/hide how-to card
-  function setHowToVisible(visible){
-    if (!howTo) return;
-    howTo.style.display = visible ? "" : "none";
-  }
-
-  // expose for debug if needed
-  window.__setHowToVisible = setHowToVisible;
 });
 
 /* activities */
@@ -145,7 +133,6 @@ function renderRoute(){
   const modeButtons = document.getElementById("mode-buttons");
   const howTo = document.getElementById("how-to");
 
-  // robust direct style changes
   if (compassContainer) compassContainer.style.display = isFullPage ? "none" : "";
   if (modeButtons) modeButtons.style.display = isFullPage ? "none" : "";
   if (howTo) howTo.style.display = isFullPage ? "none" : "";
@@ -153,7 +140,6 @@ function renderRoute(){
   if (h.startsWith("#mode/")) {
     const mode = h.split("/")[1];
     renderModePage(mode);
-    // ensure content is scrolled into view
     document.getElementById("content")?.scrollIntoView({behavior:"auto",block:"start"});
   } else if (h === "#quick") {
     renderQuickWins();
@@ -169,7 +155,7 @@ function renderRoute(){
 function renderHome(){
   const c = document.getElementById("content");
   if (!c) return;
-  c.innerHTML = ""; // home intentionally minimal (hero + compass visible)
+  c.innerHTML = "";
   const compassContainer = document.getElementById("compass-container");
   const modeButtons = document.getElementById("mode-buttons");
   const howTo = document.getElementById("how-to");
@@ -188,22 +174,24 @@ function renderModePage(mode){
       <h2 id="mode-title">${capitalize(mode)}</h2>
       ${activities[mode].map((act,i) =>
         `<div class="activity-row" role="group" aria-label="${escapeHtml(act.label)}">
-           <div class="activity-label-wrap"><span class="activity-icon" aria-hidden="true">${escapeHtml(act.icon)}</span><label>${escapeHtml(act.label)}</label></div>
-           <input type="text" id="note-${mode}-${i}" placeholder="Notes (optional)" aria-label="Notes for ${escapeHtml(act.label)}">
-           <div class="activity-controls" aria-hidden="false">
-             <button class="quick-btn" onclick="quickMarkDone('${mode}','${escapeJs(act.label)}')" aria-label="Quick mark done">✓</button>
-             <button class="log-btn" onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')" aria-label="Add note">Note</button>
+           <div class="activity-main">
+             <span class="activity-icon" aria-hidden="true">${escapeHtml(act.icon)}</span>
+             <div class="activity-label">${escapeHtml(act.label)}</div>
+           </div>
+           <textarea id="note-${mode}-${i}" class="activity-note" placeholder="Notes (optional)" aria-label="Notes for ${escapeHtml(act.label)}"></textarea>
+           <div class="activity-controls">
+             <button class="btn btn-save" onclick="logActivity('${mode}','${escapeJs(act.label)}','note-${mode}-${i}')">Save</button>
+             <button class="btn btn-complete" onclick="quickMarkDone('${mode}','${escapeJs(act.label)}')">Complete</button>
            </div>
          </div>`
       ).join("")}
       <button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button>
     </div>`;
 
-  // stagger animate rows (if allowed)
   const container = c.querySelector('.mode-page');
   if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
-      row.style.animation = `fadeRow 420ms ease ${i*60}ms both`;
+      row.style.animation = `fadeRow 420ms ease ${i*50}ms both`;
     });
   }
 }
@@ -223,10 +211,9 @@ function quickMarkDone(mode, activity){
     localStorage.setItem("lastLogged", today);
     updateStreak();
   }
-  // toast feedback
   try {
     const toast = document.createElement('div');
-    toast.textContent = 'Marked done ✓';
+    toast.textContent = 'Completed ✓';
     toast.style.position='fixed'; toast.style.right='14px'; toast.style.bottom='86px';
     toast.style.background='rgba(11,61,46,0.95)'; toast.style.color='white'; toast.style.padding='8px 12px';
     toast.style.borderRadius='10px'; toast.style.zIndex=99999; document.body.appendChild(toast);
@@ -253,7 +240,7 @@ function logActivity(mode, activity, noteId){
   }
 
   const c = document.getElementById("content");
-  if (c) c.innerHTML = `<div class="mode-page"><p>Logged: <strong>${escapeHtml(activity)}</strong> (${escapeHtml(mode)}) • ${escapeHtml(date)}</p>
+  if (c) c.innerHTML = `<div class="mode-page"><p>Saved: <strong>${escapeHtml(activity)}</strong> (${escapeHtml(mode)}) • ${escapeHtml(date)}</p>
     <button class="return-button" onclick="navigateHash('#mode/${mode}')">Return to the Compass</button>
     </div>`;
 }
@@ -269,13 +256,13 @@ function renderQuickWins(){
     { label: "Take 3 deep breaths", icon: "🌬️" }
   ];
   c.innerHTML = `<div class="mode-page"><h2>Quick Wins</h2>` + quick.map((q,i) =>
-    `<div class="activity-row"><div class="activity-label-wrap"><span class="activity-icon">${escapeHtml(q.icon)}</span><label>${escapeHtml(q.label)}</label></div><input id="qw-${i}" placeholder="Notes (optional)"><div class="activity-controls"><button class="quick-btn" onclick="quickMarkDone('quick','${escapeJs(q.label)}')">✓</button><button class="log-btn" onclick="logActivity('quick','${escapeJs(q.label)}','qw-${i}')">Note</button></div></div>`
+    `<div class="activity-row"><div class="activity-main"><span class="activity-icon">${escapeHtml(q.icon)}</span><div class="activity-label">${escapeHtml(q.label)}</div></div><textarea id="qw-${i}" class="activity-note" placeholder="Notes (optional)"></textarea><div class="activity-controls"><button class="btn btn-save" onclick="logActivity('quick','${escapeJs(q.label)}','qw-${i}')">Save</button><button class="btn btn-complete" onclick="quickMarkDone('quick','${escapeJs(q.label)}')">Complete</button></div></div>`
   ).join('') + `<button class="return-button" onclick="navigateHash('#home')">Return to the Compass</button></div>`;
 
   const container = c.querySelector('.mode-page');
   if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     Array.from(container.querySelectorAll('.activity-row')).forEach((row,i)=>{
-      row.style.animation = `fadeRow 420ms ease ${i*60}ms both`;
+      row.style.animation = `fadeRow 420ms ease ${i*50}ms both`;
     });
   }
 }
@@ -303,7 +290,7 @@ function escapeHtml(s){
 }
 function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
 
-/* add keyframe for row fade */
+/* add keyframe for row fade if missing */
 (function(){
   try {
     const style = document.createElement('style');
