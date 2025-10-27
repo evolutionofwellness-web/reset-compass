@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=66" />
+  <link rel="stylesheet" href="main.css?v=62" />
 </head>
 <body>
   <!-- Full-screen splash overlay (uses your splash-icon.png) -->
@@ -63,55 +63,35 @@
           </linearGradient>
         </defs>
 
-        <!-- ring wedges (outer radius ~94, inner cutout) -->
+        <!-- four wedges with a thin light stroke to create a small gap between them.
+             Each wedge has a data-angle attribute used by the needle rotation logic. -->
         <g transform="rotate(-45 100 100)">
-          <path class="wedge" d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z"
-                fill="url(#growingGrad)" fill-opacity="0.96"
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
+                fill="url(#growingGrad)" fill-opacity="0.94"
                 stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="growing" data-angle="-45" tabindex="0"/>
-          <path class="wedge" d="M100,100 L194,100 A94,94 0 0,1 100,194 L100,128 A28,28 0 0,0 128,100 Z"
-                fill="url(#groundedGrad)" fill-opacity="0.96"
+                data-mode="growing" data-angle="-45"/>
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
+                fill="url(#groundedGrad)" fill-opacity="0.94"
                 stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="grounded" data-angle="45" tabindex="0"/>
-          <path class="wedge" d="M100,100 L100,194 A94,94 0 0,1 6,100 L72,100 A28,28 0 0,0 100,128 Z"
-                fill="url(#driftingGrad)" fill-opacity="0.96"
+                data-mode="grounded" data-angle="45"/>
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
+                fill="url(#driftingGrad)" fill-opacity="0.94"
                 stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="drifting" data-angle="135" tabindex="0"/>
-          <path class="wedge" d="M100,100 L6,100 A94,94 0 0,1 100,6 L100,72 A28,28 0 0,0 72,100 Z"
-                fill="url(#survivingGrad)" fill-opacity="0.96"
+                data-mode="drifting" data-angle="135"/>
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
+                fill="url(#survivingGrad)" fill-opacity="0.94"
                 stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
-                data-mode="surviving" data-angle="225" tabindex="0"/>
+                data-mode="surviving" data-angle="225"/>
         </g>
 
-        <!-- inner hole to make the compass feel like a compass (donut) -->
-        <circle cx="100" cy="100" r="44" fill="var(--muted-bg)" stroke="rgba(0,0,0,0.02)"/>
-
-        <!-- outer ring -->
         <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-        <!-- center decorative compass-rose & needle group -->
-        <g id="needle-group" class="idle" style="transform-origin:100px 100px;">
-          <!-- decorative compass rose (simple, lightweight) -->
-          <g id="central-rose" transform="translate(100,100)">
-            <circle cx="0" cy="0" r="12" fill="#063827" />
-            <g id="rose-points" fill="#0B3D2E" opacity="0.98">
-              <path d="M0,-28 L6,-6 L-6,-6 Z" transform="rotate(0)"/>
-              <path d="M0,28 L6,6 L-6,6 Z" transform="rotate(180)"/>
-              <path d="M-28,0 L-6,6 L-6,-6 Z" transform="rotate(270)"/>
-              <path d="M28,0 L6,6 L6,-6 Z" transform="rotate(90)"/>
-            </g>
-          </g>
+        <!-- needle points will rotate around the center (100,100) -->
+        <polygon id="compass-needle" points="100,50 108,100 92,100" fill="#063827" style="transform-origin:100px 100px; transition: transform 300ms ease;"></polygon>
 
-          <!-- thin needle overlay for pointing -->
-          <rect id="compass-needle" x="99" y="60" width="2" height="36" rx="1" ry="1" fill="#063827"></rect>
-
-          <!-- pivot detail -->
-          <circle id="compass-pivot" cx="100" cy="100" r="4" fill="#063827" />
-        </g>
-
-        <text x="100" y="36" class="compass-label in-wedge">Growing</text>
+        <text x="100" y="46" class="compass-label in-wedge">Growing</text>
         <text x="156" y="100" class="compass-label in-wedge">Grounded</text>
-        <text x="100" y="164" class="compass-label in-wedge">Drifting</text>
+        <text x="100" y="156" class="compass-label in-wedge">Drifting</text>
         <text x="44" y="100" class="compass-label in-wedge">Surviving</text>
       </svg>
     </section>
@@ -129,6 +109,6 @@
   <!-- Chart.js (for donut chart on History) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <script src="app.js?v=29"></script>
+  <script src="app.js?v=25"></script>
 </body>
 </html>
