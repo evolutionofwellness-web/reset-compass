@@ -1,20 +1,15 @@
-// app.js: robust tap-detection, route logging for debug, splash animation handling
+// app.js - routing updated so non-home routes behave as full pages (compass + list hidden).
+// also increased pointer movement threshold already in repo; this keeps accidental taps low.
 
 document.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash-screen");
   const splashSvg = document.getElementById("splash-svg");
   if (splashSvg) {
-    splashSvg.addEventListener("animationend", () => {
-      if (splash) splash.style.display = "none";
-      console.log("[reset] splash animationend -> hidden");
-    });
-    // fallback
-    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2400);
+    splashSvg.addEventListener("animationend", () => { if (splash) splash.style.display = "none"; });
+    setTimeout(() => { if (splash) splash.style.display = "none"; }, 2200);
   } else if (splash) {
     splash.style.display = "none";
   }
-
-  console.log("[reset] script loaded. app.js?v=52");
 
   // top nav wiring
   document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
@@ -34,36 +29,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Compass: tap-detection (reduce accidental activations while scrolling)
+  // Compass tap detection (higher threshold used previously)
   const compass = document.getElementById("compass");
   let pointerState = null;
   function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
 
   if (compass) {
-    console.log("[reset] compass element found");
     compass.addEventListener("pointerdown", (e) => {
       if (e.isPrimary === false) return;
       const path = findPathElement(e.target);
       pointerState = null;
       if (path) {
-        pointerState = {
-          id: e.pointerId,
-          startX: e.clientX,
-          startY: e.clientY,
-          startTime: Date.now(),
-          targetPath: path
-        };
+        pointerState = { id: e.pointerId, startX: e.clientX, startY: e.clientY, startTime: Date.now(), targetPath: path };
       }
     }, {passive:true});
 
-    // larger movement threshold (28px) to avoid accidental triggers while scrolling
     compass.addEventListener("pointermove", (e) => {
       if (!pointerState || pointerState.id !== e.pointerId) return;
       const dx = e.clientX - pointerState.startX;
       const dy = e.clientY - pointerState.startY;
-      if (dx*dx + dy*dy > 28*28) { // cancel if moved > 28px
-        pointerState = null;
-      }
+      if (dx*dx + dy*dy > 28*28) { pointerState = null; }
     }, {passive:true});
 
     compass.addEventListener("pointerup", (e) => {
@@ -84,8 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (mode) navigateMode(mode);
       }
     });
-  } else {
-    console.warn("[reset] compass element NOT found");
   }
 
   // keyboard accessibility
@@ -119,15 +102,14 @@ function navigateMode(mode){ location.hash = `#mode/${mode}`; }
 
 function renderRoute(){
   const h = location.hash || "#home";
-  console.log("[reset] renderRoute:", h);
-  const isMode = h.startsWith("#mode/");
+  // Treat anything that's not #home as a "full page" that should hide the compass/list
+  const isFullPage = h !== "#home";
   const compassContainer = document.getElementById("compass-container");
   const modeButtons = document.getElementById("mode-buttons");
+  if (compassContainer) { compassContainer.classList.toggle('hidden', isFullPage); compassContainer.setAttribute('aria-hidden', isFullPage ? 'true' : 'false'); }
+  if (modeButtons) { modeButtons.classList.toggle('hidden', isFullPage); modeButtons.setAttribute('aria-hidden', isFullPage ? 'true' : 'false'); }
 
-  if (compassContainer) { compassContainer.classList.toggle('hidden', isMode); compassContainer.setAttribute('aria-hidden', isMode ? 'true' : 'false'); }
-  if (modeButtons) { modeButtons.classList.toggle('hidden', isMode); modeButtons.setAttribute('aria-hidden', isMode ? 'true' : 'false'); }
-
-  if (isMode) {
+  if (h.startsWith("#mode/")) {
     const mode = h.split("/")[1];
     renderModePage(mode);
     document.getElementById("content")?.scrollIntoView({behavior:"auto",block:"start"});
@@ -145,7 +127,7 @@ function renderRoute(){
 function renderHome(){
   const c = document.getElementById("content");
   if (!c) return;
-  c.innerHTML = ""; // intentionally empty (no helper text)
+  c.innerHTML = ""; // home intentionally minimal
 }
 
 function renderModePage(mode){
