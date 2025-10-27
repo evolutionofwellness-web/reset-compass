@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=60" />
+  <link rel="stylesheet" href="main.css?v=61" />
 </head>
 <body>
   <!-- Full-screen splash overlay (uses your splash-icon.png) -->
@@ -12,7 +12,7 @@
     <img id="splash-icon" src="splash-icon.png" alt="Reset Compass" width="160" height="160">
   </div>
 
-  <!-- HERO is above the nav -->
+  <!-- HERO -->
   <header class="hero" id="hero">
     <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="56" height="56">
     <div class="hero-text" aria-hidden="false">
@@ -60,25 +60,34 @@
             <stop offset="0" stop-color="#E78B88"/>
             <stop offset="1" stop-color="#D9534F"/>
           </linearGradient>
-
-          <filter id="labelShadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.45"/>
-          </filter>
         </defs>
 
+        <!-- four wedges with a thin light stroke to create a small gap between them -->
         <g transform="rotate(-45 100 100)">
-          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z" fill="url(#growingGrad)" fill-opacity="0.92" data-mode="growing"/>
-          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z" fill="url(#groundedGrad)" fill-opacity="0.92" data-mode="grounded"/>
-          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z" fill="url(#driftingGrad)" fill-opacity="0.92" data-mode="drifting"/>
-          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z" fill="url(#survivingGrad)" fill-opacity="0.92" data-mode="surviving"/>
+          <path d="M100,100 L100,0 A100,100 0 0,1 200,100 Z"
+                fill="url(#growingGrad)" fill-opacity="0.92"
+                stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
+                data-mode="growing"/>
+          <path d="M100,100 L200,100 A100,100 0 0,1 100,200 Z"
+                fill="url(#groundedGrad)" fill-opacity="0.92"
+                stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
+                data-mode="grounded"/>
+          <path d="M100,100 L100,200 A100,100 0 0,1 0,100 Z"
+                fill="url(#driftingGrad)" fill-opacity="0.92"
+                stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
+                data-mode="drifting"/>
+          <path d="M100,100 L0,100 A100,100 0 0,1 100,0 Z"
+                fill="url(#survivingGrad)" fill-opacity="0.92"
+                stroke="#F7FBF8" stroke-width="3" stroke-linejoin="round"
+                data-mode="surviving"/>
         </g>
 
         <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-        <text x="100" y="46" class="compass-label in-wedge" filter="url(#labelShadow)">Growing</text>
-        <text x="156" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Grounded</text>
-        <text x="100" y="156" class="compass-label in-wedge" filter="url(#labelShadow)">Drifting</text>
-        <text x="44" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Surviving</text>
+        <text x="100" y="46" class="compass-label in-wedge">Growing</text>
+        <text x="156" y="100" class="compass-label in-wedge">Grounded</text>
+        <text x="100" y="156" class="compass-label in-wedge">Drifting</text>
+        <text x="44" y="100" class="compass-label in-wedge">Surviving</text>
       </svg>
     </section>
 
@@ -92,6 +101,6 @@
     <div id="content" class="content-area" aria-live="polite"></div>
   </main>
 
-  <script src="app.js?v=24"></script>
+  <script src="app.js?v=25"></script>
 </body>
 </html>
