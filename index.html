@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=53" />
+  <link rel="stylesheet" href="main.css?v=54" />
 </head>
 <body>
   <!-- Splash overlay (inline SVG ensures correct color & crisp scaling) -->
@@ -95,10 +95,11 @@
 
         <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-        <text x="100" y="42" class="compass-label in-wedge" filter="url(#labelShadow)">Growing</text>
-        <text x="156" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Grounded</text>
-        <text x="100" y="160" class="compass-label in-wedge" filter="url(#labelShadow)">Drifting</text>
-        <text x="44" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Surviving</text>
+        <!-- Wedge labels — visible by default (no default opacity:0) -->
+        <text x="100" y="46" class="compass-label in-wedge" filter="url(#labelShadow)">Growing</text>
+        <text x="152" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Grounded</text>
+        <text x="100" y="156" class="compass-label in-wedge" filter="url(#labelShadow)">Drifting</text>
+        <text x="48" y="100" class="compass-label in-wedge" filter="url(#labelShadow)">Surviving</text>
       </svg>
     </section>
 
@@ -134,6 +135,6 @@
   })();
   </script>
 
-  <script src="app.js?v=19"></script>
+  <script src="app.js?v=20"></script>
 </body>
 </html>
