@@ -1,180 +1,218 @@
-// app.js v27 (splash crossfade + wedge bloom improvements)
-// - Smooth splash -> app crossfade (app fades in while splash fades out)
-// - Wedge bloom animation on hover and stronger bloom on select
-// - Needle rotates smoothly, spins on selection, coordinated with bloom
-// - History/donut/quick-win behavior unchanged
+// app.js v28 (fix: robust splash -> app crossfade fallback + error handling)
+// - Ensures app-root is revealed even if animationend never fires or a JS error occurs
+// - Wraps splash/show logic in try/catch and logs errors to console
+// - Keeps bloom + needle behavior and history/donut behavior unchanged
 
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
 function escapeJs(s){ return String(s||'').replace(/'/g,"\\'").replace(/\"/g,'\\"') }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const splash = document.getElementById("splash-screen");
-  const splashIcon = document.getElementById("splash-icon");
-  const appRoot = document.getElementById("app-root");
-  const needleGroup = document.getElementById("needle-group");
+  // Defensive wrapper: if anything throws below, we catch and still reveal the app.
+  try {
+    const splash = document.getElementById("splash-screen");
+    const splashIcon = document.getElementById("splash-icon");
+    const appRoot = document.getElementById("app-root");
+    const needleGroup = document.getElementById("needle-group");
 
-  // Ensure app-root starts hidden; when splash hides we'll reveal it with a fade
-  if (appRoot) appRoot.classList.remove('visible');
-
-  // Splash: after the icon animation completes, fade out the overlay AND fade app in for crossfade.
-  if (splashIcon && splash && appRoot) {
-    splashIcon.addEventListener("animationend", () => {
-      // fade out splash
-      splash.classList.add('hidden');
-      // fade in app
-      requestAnimationFrame(() => { appRoot.classList.add('visible'); appRoot.setAttribute('aria-hidden','false'); });
-      // remove splash from DOM after fade completes
-      setTimeout(() => { if (splash && splash.parentNode) splash.parentNode.removeChild(splash); }, 520);
-    }, { once: true });
-
-    // fallback in case animation doesn't run
-    setTimeout(() => {
-      if (splash) {
-        splash.classList.add('hidden');
-        if (appRoot) { appRoot.classList.add('visible'); appRoot.setAttribute('aria-hidden','false'); }
-        setTimeout(()=>{ if (splash && splash.parentNode) splash.parentNode.removeChild(splash); },520);
-      }
-    }, 2600);
-  } else if (splash && splash.parentNode) {
-    // no icon: remove immediately and show app
-    if (appRoot) appRoot.classList.add('visible');
-    splash.parentNode.removeChild(splash);
-  }
-
-  // first-run start at home
-  if (!sessionStorage.getItem('appStarted')) {
-    sessionStorage.setItem('appStarted','true');
-    history.replaceState(null,'','#home');
-  } else {
-    if (!location.hash) location.hash = '#home';
-  }
-
-  // nav wiring
-  document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
-    a.addEventListener("click", (e) => {
-      e.preventDefault();
-      const h = a.getAttribute("data-hash") || a.getAttribute("href");
-      if (h) navigateHash(h);
-    });
-  });
-
-  // mode buttons delegation
-  document.getElementById("mode-buttons")?.addEventListener("click", (e) => {
-    const btn = e.target.closest && e.target.closest('button[data-mode]');
-    if (btn) {
-      const mode = btn.getAttribute('data-mode');
-      if (mode) navigateMode(mode);
+    // Make sure app-root is in the expected initial state
+    if (appRoot && !appRoot.classList.contains('visible')) {
+      appRoot.classList.remove('visible');
+      appRoot.setAttribute('aria-hidden','true');
     }
-  });
 
-  // Compass interactions: rotate needle to wedge on hover/focus/tap, bloom on hover & stronger bloom on select
-  const compass = document.getElementById("compass");
-  function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
+    // Ensure needle-group exists and set neutral rotation (no idle sway)
+    if (needleGroup && !needleGroup.style.transform) needleGroup.style.transform = 'rotate(0deg)';
 
-  if (compass && needleGroup) {
-    const wedges = Array.from(document.querySelectorAll('#compass path[data-mode]'));
-    wedges.forEach(w => {
-      const angle = Number(w.getAttribute('data-angle') || 0);
+    // Splash: after the icon animation completes, fade out the overlay AND fade app in for crossfade.
+    // Wrapped in try/catch to avoid blocking the show behavior if any DOM access issues happen.
+    if (splashIcon && splash && appRoot) {
+      try {
+        splashIcon.addEventListener("animationend", () => {
+          // fade out splash
+          splash.classList.add('hidden');
+          // fade in app
+          requestAnimationFrame(() => {
+            appRoot.classList.add('visible');
+            appRoot.setAttribute('aria-hidden','false');
+          });
+          // remove splash from DOM after fade completes
+          setTimeout(() => { if (splash && splash.parentNode) splash.parentNode.removeChild(splash); }, 520);
+        }, { once: true });
+      } catch (err) {
+        console.error('Error attaching animationend listener on splashIcon:', err);
+        // Fall through to fallback below
+      }
 
-      // pointerenter -> bloom (light) and rotate needle
-      w.addEventListener('pointerenter', () => {
-        // light bloom
-        w.classList.remove('bloom-strong');
-        w.classList.add('bloom');
-        setNeedleRotation(angle);
-      });
+      // fallback in case animation doesn't run or animationend never fires:
+      // after 2800ms ensure app is visible and remove the splash.
+      setTimeout(() => {
+        try {
+          if (splash && splash.parentNode) {
+            splash.classList.add('hidden');
+            if (appRoot) {
+              appRoot.classList.add('visible');
+              appRoot.setAttribute('aria-hidden','false');
+            }
+            // remove splash after fade
+            setTimeout(()=>{ if (splash && splash.parentNode) splash.parentNode.removeChild(splash); },520);
+          }
+        } catch (err) {
+          console.error('Fallback splash removal error:', err);
+          // Ensure app is visible even if DOM removal failed
+          if (appRoot) { appRoot.classList.add('visible'); appRoot.setAttribute('aria-hidden','false'); }
+        }
+      }, 2800);
+    } else {
+      // If any of the elements are missing, reveal app immediately so users are not left staring at a blank screen.
+      if (appRoot) { appRoot.classList.add('visible'); appRoot.setAttribute('aria-hidden','false'); }
+      if (splash && splash.parentNode) {
+        try { splash.parentNode.removeChild(splash); } catch(e){ /* ignore */ }
+      }
+    }
 
-      // pointerleave -> remove bloom and return needle to neutral
-      w.addEventListener('pointerleave', () => {
-        w.classList.remove('bloom');
-        setTimeout(()=> setNeedleRotation(0), 200);
-      });
+    // --- Rest of initialization below (unchanged behavior) ---
 
-      // pointerdown: immediate feedback on touch
-      w.addEventListener('pointerdown', (e) => {
+    // first-run start at home
+    if (!sessionStorage.getItem('appStarted')) {
+      sessionStorage.setItem('appStarted','true');
+      history.replaceState(null,'','#home');
+    } else {
+      if (!location.hash) location.hash = '#home';
+    }
+
+    // nav wiring
+    document.querySelectorAll(".nav-links a[data-hash]").forEach(a => {
+      a.addEventListener("click", (e) => {
         e.preventDefault();
-        // small immediate bloom
-        w.classList.remove('bloom-strong');
-        w.classList.add('bloom');
-        setNeedleRotation(angle);
-      }, {passive:false});
+        const h = a.getAttribute("data-hash") || a.getAttribute("href");
+        if (h) navigateHash(h);
+      });
+    });
 
-      // click: strong bloom + spin animation, then navigate
-      w.addEventListener('click', (e) => {
-        e.preventDefault();
-        // stronger bloom for selection
-        w.classList.remove('bloom');
-        w.classList.add('bloom-strong');
-        // spin needle for delight, then navigate when finished
-        runNeedleSpin().then(() => {
+    // mode buttons delegation
+    document.getElementById("mode-buttons")?.addEventListener("click", (e) => {
+      const btn = e.target.closest && e.target.closest('button[data-mode]');
+      if (btn) {
+        const mode = btn.getAttribute('data-mode');
+        if (mode) navigateMode(mode);
+      }
+    });
+
+    // Compass interactions: rotate needle to wedge on hover/focus/tap, bloom on hover & stronger bloom on select
+    const compass = document.getElementById("compass");
+    function findPathElement(el){ return el && el.closest ? el.closest('path[data-mode]') : null; }
+
+    if (compass && needleGroup) {
+      const wedges = Array.from(document.querySelectorAll('#compass path[data-mode]'));
+      wedges.forEach(w => {
+        const angle = Number(w.getAttribute('data-angle') || 0);
+
+        // pointerenter -> bloom (light) and rotate needle
+        w.addEventListener('pointerenter', () => {
           w.classList.remove('bloom-strong');
-          const mode = w.getAttribute('data-mode');
-          if (mode) navigateMode(mode);
+          w.classList.add('bloom');
+          setNeedleRotation(angle);
         });
-      });
 
-      // keyboard activation
-      w.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        // pointerleave -> remove bloom and return needle to neutral
+        w.addEventListener('pointerleave', () => {
+          w.classList.remove('bloom');
+          setTimeout(()=> setNeedleRotation(0), 200);
+        });
+
+        // pointerdown: immediate feedback on touch
+        w.addEventListener('pointerdown', (e) => {
           e.preventDefault();
+          w.classList.remove('bloom-strong');
+          w.classList.add('bloom');
+          setNeedleRotation(angle);
+        }, {passive:false});
+
+        // click: strong bloom + spin animation, then navigate
+        w.addEventListener('click', (e) => {
+          e.preventDefault();
+          w.classList.remove('bloom');
           w.classList.add('bloom-strong');
-          runNeedleSpin().then(()=> {
+          runNeedleSpin().then(() => {
             w.classList.remove('bloom-strong');
             const mode = w.getAttribute('data-mode');
             if (mode) navigateMode(mode);
           });
-        }
+        });
+
+        // keyboard activation
+        w.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            w.classList.add('bloom-strong');
+            runNeedleSpin().then(()=> {
+              w.classList.remove('bloom-strong');
+              const mode = w.getAttribute('data-mode');
+              if (mode) navigateMode(mode);
+            });
+          }
+        });
       });
-    });
+    }
+
+    // Helper: set rotation (JS relies on CSS transition)
+    function setNeedleRotation(angle){
+      if (!needleGroup) return;
+      needleGroup.style.transform = `rotate(${angle}deg)`;
+    }
+
+    // Helper: run brief spin animation class and resolve when finished
+    function runNeedleSpin(){
+      return new Promise((resolve) => {
+        if (!needleGroup) return resolve();
+        needleGroup.classList.add('needle-spin');
+        setTimeout(() => {
+          needleGroup.classList.remove('needle-spin');
+          setNeedleRotation(0);
+          resolve();
+        }, 560);
+      });
+    }
+
+    // pointer heuristics for wedge tapping (avoid accidental activations)
+    if (compass) {
+      let pointerState = null;
+      compass.addEventListener("pointerdown", (e) => {
+        if (e.isPrimary === false) return;
+        const path = findPathElement(e.target);
+        if (path) pointerState = { id: e.pointerId, x: e.clientX, y: e.clientY, t: Date.now(), target: path };
+      }, {passive:true});
+      compass.addEventListener("pointermove", (e) => {
+        if (!pointerState || pointerState.id !== e.pointerId) return;
+        const dx = e.clientX - pointerState.x, dy = e.clientY - pointerState.y;
+        if (dx*dx + dy*dy > 28*28) pointerState = null;
+      }, {passive:true});
+      compass.addEventListener("pointerup", (e) => { pointerState = null; }, {passive:true});
+      compass.addEventListener("pointercancel", () => pointerState = null);
+    }
+
+    // ensure path elements are keyboard focusable
+    document.querySelectorAll("#compass path[data-mode]").forEach(p => p.setAttribute("tabindex","0"));
+
+    window.addEventListener("hashchange", renderRoute);
+    if (!location.hash) location.hash = "#home";
+    renderRoute();
+    updateStreak();
+
+  } catch (err) {
+    // In case of any unexpected runtime error, reveal the app to avoid the blank screen
+    console.error('Uncaught initialization error:', err);
+    const appRootFail = document.getElementById("app-root");
+    if (appRootFail) { appRootFail.classList.add('visible'); appRootFail.setAttribute('aria-hidden','false'); }
+    const splashFail = document.getElementById("splash-screen");
+    if (splashFail && splashFail.parentNode) {
+      try { splashFail.parentNode.removeChild(splashFail); } catch(e){ /* ignore */ }
+    }
   }
-
-  // Helper: set rotation (JS relies on CSS transition)
-  function setNeedleRotation(angle){
-    if (!needleGroup) return;
-    needleGroup.style.transform = `rotate(${angle}deg)`;
-  }
-
-  // Helper: run brief spin animation class and resolve when finished
-  function runNeedleSpin(){
-    return new Promise((resolve) => {
-      if (!needleGroup) return resolve();
-      needleGroup.classList.add('needle-spin');
-      setTimeout(() => {
-        needleGroup.classList.remove('needle-spin');
-        setNeedleRotation(0);
-        resolve();
-      }, 560);
-    });
-  }
-
-  // pointer heuristics for wedge tapping (avoid accidental activations)
-  if (compass) {
-    let pointerState = null;
-    compass.addEventListener("pointerdown", (e) => {
-      if (e.isPrimary === false) return;
-      const path = findPathElement(e.target);
-      if (path) pointerState = { id: e.pointerId, x: e.clientX, y: e.clientY, t: Date.now(), target: path };
-    }, {passive:true});
-    compass.addEventListener("pointermove", (e) => {
-      if (!pointerState || pointerState.id !== e.pointerId) return;
-      const dx = e.clientX - pointerState.x, dy = e.clientY - pointerState.y;
-      if (dx*dx + dy*dy > 28*28) pointerState = null;
-    }, {passive:true});
-    compass.addEventListener("pointerup", (e) => { pointerState = null; }, {passive:true});
-    compass.addEventListener("pointercancel", () => pointerState = null);
-  }
-
-  // ensure path elements are keyboard focusable
-  document.querySelectorAll("#compass path[data-mode]").forEach(p => p.setAttribute("tabindex","0"));
-
-  window.addEventListener("hashchange", renderRoute);
-  if (!location.hash) location.hash = "#home";
-  renderRoute();
-  updateStreak();
 });
 
-/* remaining app functions unchanged (activities, history donut, completeActivity, confetti, etc.)
-   For brevity they are included below intact. */
+/* The rest of the app (activities, render functions, completeActivity, history donut, confetti, etc.)
+   is unchanged from previous v27 implementation. Keep those functions here unchanged. */
 
 const activities = {
   growing: [
@@ -226,7 +264,6 @@ function renderRoute(){
     renderHome();
   }
 
-  // always start at top
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
@@ -304,7 +341,6 @@ function completeActivity(mode, activity, noteId, rowId){
     runConfettiBurst();
   }
 
-  // animate a visible needle spin and a bloom on the currently selected wedge for delight
   const activeWedge = document.querySelector(`#compass path[data-mode="${normalizedMode}"]`);
   if (activeWedge) {
     activeWedge.classList.add('bloom-strong');
@@ -382,7 +418,6 @@ function renderHistory(){
   if (!c) return;
   const history = JSON.parse(localStorage.getItem("resetHistory") || "[]");
 
-  // compute counts per mode (include quick-win)
   const counts = { 'growing':0, 'grounded':0, 'drifting':0, 'surviving':0, 'quick-win':0 };
   history.forEach(h => {
     const key = (h.mode||'').toLowerCase();
