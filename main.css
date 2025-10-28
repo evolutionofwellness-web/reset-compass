@@ -18,7 +18,7 @@ body{
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
 }
 
-/* No splash overlay used — appRoot visible immediately */
+/* App root visible */
 .app-root{opacity:1;transform:none;}
 
 /* Hero */
@@ -53,9 +53,8 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 /* Labels */
 .compass-label{font-size:20px;font-weight:900;fill:#fff;stroke:rgba(2,20,14,0.85);stroke-width:3;paint-order:stroke fill;text-anchor:middle;dominant-baseline:middle;pointer-events:none;text-shadow:0 8px 20px rgba(0,0,0,0.36)}
 
-/* Needle group: non-interactive so it does not block clicks; slight transparency applied */
+/* Needle group: non-interactive; slight transparency */
 #needle-group{transform-origin:100px 100px;transition:transform 300ms cubic-bezier(.2,.9,.2,1);will-change:transform;pointer-events:none;opacity:0.96}
-#compass-rose, #compass-gloss, #compass-tail{transition:opacity 240ms ease}
 
 /* Idle animation */
 @keyframes needleIdle{0%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}100%{transform:rotate(-1.6deg)}}
