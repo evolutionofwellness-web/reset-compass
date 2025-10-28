@@ -4,20 +4,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-
-  <link rel="stylesheet" href="main.css?v=101" />
+  <link rel="stylesheet" href="main.css?v=102" />
 </head>
 <body>
-  <!-- Full-screen splash overlay -->
+  <!-- Full-screen splash overlay (uses your splash-icon.png) -->
   <div id="splash-screen" aria-hidden="true">
     <img id="splash-icon" src="splash-icon.png" alt="Reset Compass" width="160" height="160">
   </div>
 
-  <!-- Application root -->
+  <!-- APP ROOT (revealed after splash) -->
   <div id="app-root" class="app-root" aria-hidden="true">
+    <!-- HERO -->
     <header class="hero" id="hero">
       <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="56" height="56">
-      <div class="hero-text">
+      <div class="hero-text" aria-hidden="false">
         <h1 class="hero-title">The Reset Compass</h1>
         <p class="hero-sub">A small reset, every day.</p>
       </div>
@@ -33,9 +33,7 @@
     </nav>
 
     <main class="page" id="page">
-      <div id="streak" class="streak" aria-live="polite">
-        <span id="streak-emoji" aria-hidden="true">🔥</span> Streak: <span id="streak-count">0</span> days
-      </div>
+      <div id="streak" class="streak" aria-live="polite"><span id="streak-emoji" aria-hidden="true">🔥</span> Streak: <span id="streak-count">0</span> days</div>
 
       <section id="how-to" class="card" aria-labelledby="howto-heading">
         <h2 id="howto-heading">How to Use This App</h2>
@@ -88,10 +86,11 @@
           <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
           <g id="needle-group" class="idle" style="transform-origin:100px 100px;">
-            <rect id="compass-needle" x="99" y="60" width="2" height="36" rx="1" ry="1" fill="#063827"></rect>
+            <rect id="compass-needle" x="99" y="60" width="2" height="36" rx="1" ry="1" fill="#063827" />
             <circle id="compass-pivot" cx="100" cy="100" r="4" fill="#063827" />
           </g>
 
+          <!-- Note: compass-label styling updated in main.css (bigger, heavier stroke & shadow) -->
           <text x="100" y="36" class="compass-label in-wedge">Growing</text>
           <text x="156" y="100" class="compass-label in-wedge">Grounded</text>
           <text x="100" y="164" class="compass-label in-wedge">Drifting</text>
@@ -111,6 +110,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js?v=101"></script>
+  <script src="app.js?v=102"></script>
 </body>
 </html>
