@@ -5,18 +5,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
 
-  <!-- Link to main stylesheet (version query helps cache-bust when you update) -->
-  <link rel="stylesheet" href="main.css?v=100" />
+  <link rel="stylesheet" href="main.css?v=101" />
 </head>
 <body>
-  <!-- Full-screen splash overlay (uses splash-icon.png). App will always reveal after fallback. -->
+  <!-- Full-screen splash overlay -->
   <div id="splash-screen" aria-hidden="true">
     <img id="splash-icon" src="splash-icon.png" alt="Reset Compass" width="160" height="160">
   </div>
 
-  <!-- Application root: shown after splash finishes/fallback -->
+  <!-- Application root -->
   <div id="app-root" class="app-root" aria-hidden="true">
-    <!-- HERO -->
     <header class="hero" id="hero">
       <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="56" height="56">
       <div class="hero-text">
@@ -25,7 +23,6 @@
       </div>
     </header>
 
-    <!-- Navigation -->
     <nav class="site-nav" role="navigation" aria-label="Main navigation">
       <ul class="nav-links" role="menubar">
         <li role="none"><a role="menuitem" href="#home" data-hash="#home">Home</a></li>
@@ -35,22 +32,16 @@
       </ul>
     </nav>
 
-    <!-- Main page container -->
     <main class="page" id="page">
-
-      <!-- Streak -->
       <div id="streak" class="streak" aria-live="polite">
-        <span id="streak-emoji" aria-hidden="true">🔥</span>
-        Streak: <span id="streak-count">0</span> days
+        <span id="streak-emoji" aria-hidden="true">🔥</span> Streak: <span id="streak-count">0</span> days
       </div>
 
-      <!-- How-to / intro card (visible on home) -->
       <section id="how-to" class="card" aria-labelledby="howto-heading">
         <h2 id="howto-heading">How to Use This App</h2>
         <p>Select a mode from the compass or the buttons below. Complete an activity. Log it. Build your streak.</p>
       </section>
 
-      <!-- Compass -->
       <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
         <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0">
           <title id="compassTitle">Mode compass — choose a mode</title>
@@ -74,7 +65,6 @@
             </linearGradient>
           </defs>
 
-          <!-- ring wedges (outer radius ~94, inner cutout) -->
           <g transform="rotate(-45 100 100)">
             <path class="wedge" d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z"
                   fill="url(#growingGrad)" fill-opacity="0.96"
@@ -94,13 +84,9 @@
                   data-mode="surviving" data-angle="225" tabindex="0"/>
           </g>
 
-          <!-- inner hole to make the compass feel like a compass (donut) -->
           <circle cx="100" cy="100" r="44" fill="var(--muted-bg)" stroke="rgba(0,0,0,0.02)"/>
-
-          <!-- outer ring -->
           <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-          <!-- pivot dot and thin needle -->
           <g id="needle-group" class="idle" style="transform-origin:100px 100px;">
             <rect id="compass-needle" x="99" y="60" width="2" height="36" rx="1" ry="1" fill="#063827"></rect>
             <circle id="compass-pivot" cx="100" cy="100" r="4" fill="#063827" />
@@ -113,7 +99,6 @@
         </svg>
       </section>
 
-      <!-- Mode buttons -->
       <section id="mode-buttons" class="buttons" aria-hidden="false">
         <button class="mode-button growing" data-mode="growing">Growing: Push yourself to new heights</button>
         <button class="mode-button grounded" data-mode="grounded">Grounded: Stay centered and productive</button>
@@ -121,15 +106,11 @@
         <button class="mode-button surviving" data-mode="surviving">Surviving: Just get through the day</button>
       </section>
 
-      <!-- Main content area (pages rendered here) -->
       <div id="content" class="content-area" aria-live="polite"></div>
     </main>
   </div>
 
-  <!-- Chart.js for donut chart -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Main app script -->
-  <script src="app.js?v=100"></script>
+  <script src="app.js?v=101"></script>
 </body>
 </html>
