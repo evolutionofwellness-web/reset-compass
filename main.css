@@ -18,13 +18,8 @@ body{
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
 }
 
-/* Splash overlay + app crossfade */
-#splash-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--brand-green);z-index:99999;transition:opacity 520ms var(--animation-ease)}
-#splash-screen.hidden{opacity:0;pointer-events:none}
-#splash-icon{width:160px;height:160px;transform-origin:center;animation:splashZoom 1400ms cubic-bezier(.18,.9,.32,1) both}
-@keyframes splashZoom{0%{transform:scale(1) rotate(0)}65%{transform:scale(3.2) rotate(130deg)}100%{transform:scale(4.2) rotate(260deg)}}
-.app-root{opacity:0;transform:translateY(6px);transition:opacity 520ms var(--animation-ease),transform 520ms var(--animation-ease)}
-.app-root.visible{opacity:1;transform:none}
+/* No splash overlay used — appRoot visible immediately */
+.app-root{opacity:1;transform:none;}
 
 /* Hero */
 .hero{display:flex;align-items:center;gap:12px;max-width:820px;margin:12px auto 6px;padding:8px 16px}
@@ -58,9 +53,9 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 /* Labels */
 .compass-label{font-size:20px;font-weight:900;fill:#fff;stroke:rgba(2,20,14,0.85);stroke-width:3;paint-order:stroke fill;text-anchor:middle;dominant-baseline:middle;pointer-events:none;text-shadow:0 8px 20px rgba(0,0,0,0.36)}
 
-/* Needle group: non-interactive (so it cannot block clicks) */
-/* Visual adjustments: subtle opacity + inner gloss already supplied via SVG defs */
+/* Needle group: non-interactive so it does not block clicks; slight transparency applied */
 #needle-group{transform-origin:100px 100px;transition:transform 300ms cubic-bezier(.2,.9,.2,1);will-change:transform;pointer-events:none;opacity:0.96}
+#compass-rose, #compass-gloss, #compass-tail{transition:opacity 240ms ease}
 
 /* Idle animation */
 @keyframes needleIdle{0%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}100%{transform:rotate(-1.6deg)}}
@@ -87,6 +82,5 @@ svg{width:320px;height:320px;max-width:92vw;display:block}
 
 @media (max-width:420px){
   .compass-label{font-size:16px;stroke-width:2.2}
-  #splash-icon{width:132px;height:132px}
   .mode-page{padding:20px}
 }
