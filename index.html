@@ -4,12 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=107" />
+  <link rel="stylesheet" href="main.css?v=108" />
 </head>
 <body>
-  <!-- Splash intentionally removed for now (no animation / no overlay) -->
+  <!-- Splash intentionally removed for now to avoid blocking UI -->
 
-  <!-- App root: visible immediately (no splash to block interaction) -->
+  <!-- App root: visible immediately -->
   <div id="app-root" class="app-root visible" aria-hidden="false">
     <header class="hero" id="hero">
       <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="56" height="56">
@@ -89,7 +89,7 @@
           <circle cx="100" cy="100" r="44" fill="var(--muted-bg)" stroke="rgba(0,0,0,0.02)"/>
           <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-          <!-- stylized arrow: diamond + gloss + subtle transparency -->
+          <!-- diamond/rose arrow (visual only) -->
           <g id="needle-group" class="idle" style="transform-origin:100px 100px; pointer-events: none;">
             <polygon id="compass-rose" points="100,58 116,100 100,142 84,100"
                      fill="rgba(6,56,39,0.92)" fill-opacity="0.92" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
@@ -117,9 +117,6 @@
     </main>
   </div>
 
-  <!-- Chart.js for History donut (kept) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <script src="app.js?v=107"></script>
+  <script src="app.js?v=108"></script>
 </body>
 </html>
