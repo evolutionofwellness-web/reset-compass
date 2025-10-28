@@ -4,17 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css?v=103" />
+  <link rel="stylesheet" href="main.css?v=104" />
 </head>
 <body>
-  <!-- Full-screen splash overlay (visible on load, removed once app reveals) -->
+  <!-- Full-screen splash overlay (uses your splash-icon.png) -->
   <div id="splash-screen" aria-hidden="true">
     <img id="splash-icon" src="splash-icon.png" alt="Reset Compass" width="160" height="160">
   </div>
 
-  <!-- App root (hidden until splash finishes) -->
+  <!-- App root (revealed after splash) -->
   <div id="app-root" class="app-root" aria-hidden="true">
-    <!-- HERO -->
     <header class="hero" id="hero">
       <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="56" height="56">
       <div class="hero-text">
@@ -33,10 +32,9 @@
     </nav>
 
     <main class="page" id="page">
-      <!-- prominent streak -->
       <div id="streak" class="streak" aria-live="polite">
         <span id="streak-emoji" aria-hidden="true">🔥</span>
-        <span id="streak-text">Streak: </span><span id="streak-count">0</span><span> days</span>
+        <span id="streak-text">Streak:</span> <span id="streak-count">0</span> days
       </div>
 
       <section id="how-to" class="card" aria-labelledby="howto-heading">
@@ -47,7 +45,6 @@
       <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
         <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0">
           <title id="compassTitle">Mode compass — choose a mode</title>
-
           <defs>
             <linearGradient id="growingGrad" x1="0" x2="1">
               <stop offset="0" stop-color="#2FA0FF"/>
@@ -89,12 +86,13 @@
           <circle cx="100" cy="100" r="44" fill="var(--muted-bg)" stroke="rgba(0,0,0,0.02)"/>
           <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="4"/>
 
-          <!-- realistic compass arrow: arrowhead + tail grouped so rotation looks natural -->
+          <!-- updated arrow: diamond-shaped head like the splash icon, grouped so rotation is natural -->
           <g id="needle-group" class="idle" style="transform-origin:100px 100px;">
-            <!-- arrowhead (pointing up at 0deg) -->
-            <polygon id="compass-arrow-head" points="100,56 110,100 100,96 90,100" fill="#063827"></polygon>
-            <!-- tail (secondary) -->
-            <rect id="compass-arrow-tail" x="98.5" y="96" width="3" height="30" rx="1.5" fill="#063827"></rect>
+            <!-- diamond / compass head similar to the splash icon -->
+            <polygon id="compass-rose" points="100,62 108,92 100,92 92,92" fill="#063827"></polygon>
+            <!-- decorative main triangle (we'll use a symmetric arrow that looks like the icon) -->
+            <polygon id="compass-arrow" points="100,60 110,100 100,95 90,100" fill="#063827"></polygon>
+            <!-- center pivot -->
             <circle id="compass-pivot" cx="100" cy="100" r="4" fill="#063827" />
           </g>
 
@@ -117,6 +115,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js?v=103"></script>
+  <script src="app.js?v=104"></script>
 </body>
 </html>
