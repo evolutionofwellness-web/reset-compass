@@ -4,6 +4,19 @@
                simple scroll-driven needle rotation, and the same renderers for views and activities.
    - Paste/replace this file as app.js and hard-refresh (Cmd/Ctrl+Shift+R) or open a Private tab to test.
 */
+// Add near top of app.js (before any code that calls $$)
+(function(){
+  if (typeof window.$$ !== 'function') {
+    window.$$ = function(selector, root) {
+      root = root || document;
+      try {
+        return Array.prototype.slice.call(root.querySelectorAll(selector));
+      } catch (e) {
+        return [];
+      }
+    };
+  }
+})();
 
 (function () {
   'use strict';
