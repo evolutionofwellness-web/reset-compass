@@ -4,14 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-
-  <!-- Styles (bump the query when you update) -->
-  <link rel="stylesheet" href="main.css?v=1" />
+  <link rel="stylesheet" href="main.css" />
 </head>
 <body>
-  <!-- App root (no splash overlay — immediate interactivity) -->
   <div id="app-root" class="app-root visible" aria-hidden="false">
-    <!-- Header / Hero -->
     <header class="hero" id="hero">
       <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="56" height="56">
       <div class="hero-text">
@@ -20,7 +16,6 @@
       </div>
     </header>
 
-    <!-- Top Nav -->
     <nav class="site-nav" role="navigation" aria-label="Main navigation">
       <ul class="nav-links" role="menubar">
         <li role="none"><a role="menuitem" href="#home" data-hash="#home">Home</a></li>
@@ -30,39 +25,44 @@
       </ul>
     </nav>
 
-    <!-- Page -->
     <main class="page" id="page">
-      <!-- Streak -->
       <div id="streak" class="streak" aria-live="polite">
         <span id="streak-emoji" aria-hidden="true">🔥</span>
         <span id="streak-text">Streak:</span> <span id="streak-count">0</span> days
       </div>
 
-      <!-- Intro card -->
       <section id="how-to" class="card" aria-labelledby="howto-heading">
         <h2 id="howto-heading">How to Use This App</h2>
         <p>Select a mode from the compass or the buttons below. Complete an activity. Log it. Build your streak.</p>
       </section>
 
-      <!-- Compass -->
       <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
         <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0">
           <title id="compassTitle">Mode compass — choose a mode</title>
-
           <defs>
-            <linearGradient id="growingGrad" x1="0" x2="1"><stop offset="0" stop-color="#2FA0FF"/><stop offset="1" stop-color="#007BFF"/></linearGradient>
-            <linearGradient id="groundedGrad" x1="0" x2="1"><stop offset="0" stop-color="#3CA56A"/><stop offset="1" stop-color="#246B45"/></linearGradient>
-            <linearGradient id="driftingGrad" x1="0" x2="1"><stop offset="0" stop-color="#E6C450"/><stop offset="1" stop-color="#DAA520"/></linearGradient>
-            <linearGradient id="survivingGrad" x1="0" x2="1"><stop offset="0" stop-color="#E78B88"/><stop offset="1" stop-color="#D9534F"/></linearGradient>
+            <linearGradient id="growingGrad" x1="0" x2="1">
+              <stop offset="0" stop-color="#2FA0FF"/>
+              <stop offset="1" stop-color="#007BFF"/>
+            </linearGradient>
+            <linearGradient id="groundedGrad" x1="0" x2="1">
+              <stop offset="0" stop-color="#3CA56A"/>
+              <stop offset="1" stop-color="#246B45"/>
+            </linearGradient>
+            <linearGradient id="driftingGrad" x1="0" x2="1">
+              <stop offset="0" stop-color="#E6C450"/>
+              <stop offset="1" stop-color="#DAA520"/>
+            </linearGradient>
+            <linearGradient id="survivingGrad" x1="0" x2="1">
+              <stop offset="0" stop-color="#E78B88"/>
+              <stop offset="1" stop-color="#D9534F"/>
+            </linearGradient>
 
-            <!-- glossy overlay for arrow -->
             <linearGradient id="arrowGloss" x1="0" x2="0" y1="0" y2="1">
               <stop offset="0" stop-color="rgba(255,255,255,0.14)"/>
               <stop offset="1" stop-color="rgba(255,255,255,0.02)"/>
             </linearGradient>
           </defs>
 
-          <!-- wedges (donut) -->
           <g transform="rotate(-45 100 100)">
             <path class="wedge" d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z"
                   fill="url(#growingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="growing" data-angle="-45" tabindex="0"/>
@@ -74,17 +74,14 @@
                   fill="url(#survivingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="surviving" data-angle="225" tabindex="0"/>
           </g>
 
-          <!-- inner hole + compass rose (diamond arrow) -->
           <circle cx="100" cy="100" r="44" fill="var(--muted-bg)" stroke="rgba(0,0,0,0.02)"/>
           <g id="needle-group" class="idle" style="transform-origin:100px 100px; pointer-events: none;">
-            <polygon id="compass-rose" points="100,58 116,100 100,142 84,100"
-                     fill="rgba(6,56,39,0.92)" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+            <polygon id="compass-rose" points="100,58 116,100 100,142 84,100" fill="rgba(6,56,39,0.92)" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
             <polygon id="compass-gloss" points="100,66 112,100 100,134 88,100" fill="url(#arrowGloss)" opacity="0.72"/>
             <circle id="compass-pivot" cx="100" cy="100" r="6" fill="rgba(6,56,39,0.95)"/>
-            <rect id="compass-tail" x="98.5" y="104" width="3" height="26" rx="1.5" fill="rgba(6,56,39,0.88)" />
+            <rect id="compass-tail" x="98.5" y="104" width="3" height="26" rx="1.5" fill="rgba(6,56,39,0.88)"/>
           </g>
 
-          <!-- wedge labels -->
           <text x="100" y="36" class="compass-label in-wedge">Growing</text>
           <text x="156" y="100" class="compass-label in-wedge">Grounded</text>
           <text x="100" y="164" class="compass-label in-wedge">Drifting</text>
@@ -92,7 +89,6 @@
         </svg>
       </section>
 
-      <!-- Mode Buttons -->
       <section id="mode-buttons" class="buttons">
         <button type="button" class="mode-button growing" data-mode="growing">Growing: Push yourself to new heights</button>
         <button type="button" class="mode-button grounded" data-mode="grounded">Grounded: Stay centered and productive</button>
@@ -100,15 +96,11 @@
         <button type="button" class="mode-button surviving" data-mode="surviving">Surviving: Just get through the day</button>
       </section>
 
-      <!-- Content area (rendered views load here) -->
       <div id="content" class="content-area" aria-live="polite"></div>
     </main>
   </div>
 
-  <!-- Chart.js (history donut) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Main app script -->
-  <script src="app.js?v=1"></script>
+  <script src="app.js"></script>
 </body>
 </html>
