@@ -52,7 +52,7 @@ svg{width:360px;height:360px;max-width:92vw;display:block}
 /* Wedge labels */
 .compass-label{font-size:20px;font-weight:900;fill:#fff;stroke:rgba(0,0,0,0.45);stroke-width:2;paint-order:stroke fill;text-anchor:middle;dominant-baseline:middle;text-shadow:0 6px 18px rgba(0,0,0,0.28);pointer-events:none}
 
-/* Needle group (visual only) */
+/* Needle group */
 #needle-group{transform-origin:100px 100px;transition:transform 320ms cubic-bezier(.2,.9,.2,1);will-change:transform;pointer-events:none;opacity:0.96}
 @keyframes needleIdle{0%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}100%{transform:rotate(-1.6deg)}}
 #needle-group.idle{animation:needleIdle 8s ease-in-out infinite}
@@ -67,13 +67,12 @@ svg{width:360px;height:360px;max-width:92vw;display:block}
 .mode-button.drifting{background:linear-gradient(180deg,#f0c95f,#d6a520);color:#2e2a1e}
 .mode-button.surviving{background:linear-gradient(180deg,#f08f91,#d9534f)}
 
-/* Content area & mode pages */
+/* Content & mode pages */
 .content-area{margin-top:6px;padding-bottom:48px}
 .mode-page{background:linear-gradient(180deg,#ffffff,#fbfffb);border-radius:18px;padding:26px;border:1px solid rgba(0,0,0,0.04);box-shadow:0 26px 60px rgba(6,20,12,0.08);margin:14px 0 60px;max-width:760px;margin-left:auto;margin-right:auto}
 .activity-row{display:block;margin:14px 0;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(11,61,46,0.02), rgba(255,255,255,0));border-left:6px solid rgba(11,61,46,0.02);transition:transform .12s var(--animation-ease),box-shadow .12s var(--animation-ease)}
 .activity-row:hover{transform:translateY(-4px);box-shadow:0 18px 38px rgba(6,20,12,0.08);border-left-color:var(--brand-green)}
 
-/* Utilities */
 .return-button{display:inline-block;margin-top:18px;padding:14px 20px;background:var(--brand-green);color:white;border-radius:14px;border:none;font-weight:900;cursor:pointer}
 
 @media (max-width:420px){
