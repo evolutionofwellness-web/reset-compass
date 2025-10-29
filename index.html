@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
-  <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="main.css?v=115" />
 </head>
 <body>
   <div id="app-root" class="app-root visible" aria-hidden="false">
@@ -39,6 +39,7 @@
       <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
         <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0">
           <title id="compassTitle">Mode compass — choose a mode</title>
+
           <defs>
             <linearGradient id="growingGrad" x1="0" x2="1">
               <stop offset="0" stop-color="#2FA0FF"/>
@@ -76,10 +77,11 @@
 
           <circle cx="100" cy="100" r="44" fill="var(--muted-bg)" stroke="rgba(0,0,0,0.02)"/>
           <g id="needle-group" class="idle" style="transform-origin:100px 100px; pointer-events: none;">
-            <polygon id="compass-rose" points="100,58 116,100 100,142 84,100" fill="rgba(6,56,39,0.92)" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+            <polygon id="compass-rose" points="100,58 116,100 100,142 84,100"
+                     fill="rgba(6,56,39,0.92)" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
             <polygon id="compass-gloss" points="100,66 112,100 100,134 88,100" fill="url(#arrowGloss)" opacity="0.72"/>
             <circle id="compass-pivot" cx="100" cy="100" r="6" fill="rgba(6,56,39,0.95)"/>
-            <rect id="compass-tail" x="98.5" y="104" width="3" height="26" rx="1.5" fill="rgba(6,56,39,0.88)"/>
+            <rect id="compass-tail" x="98.5" y="104" width="3" height="26" rx="1.5" fill="rgba(6,56,39,0.88)" />
           </g>
 
           <text x="100" y="36" class="compass-label in-wedge">Growing</text>
@@ -101,6 +103,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=115"></script>
 </body>
 </html>
