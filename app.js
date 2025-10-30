@@ -1,12 +1,19 @@
-/* app.js v124 — stronger per-mode page visuals (decorative header + accents)
+/* app.js v128 — guided session modal (feature-flagged, no animations)
    - ES5-friendly
    - Sets .app-root.theme-<mode> and renders mode pages with a header block so the theme is obvious
    - Keeps defensive event delegation and mode-specific confetti palettes
-   - Removes debug click-trace UI (temporary)
+   - Adds guided session modal with timer, localStorage persistence, no Element.animate
 */
 
 (function () {
   'use strict';
+
+  /* APP_VERSION */
+  window.APP_VERSION = 'v128';
+
+  /* Feature flags */
+  window.__features = window.__features || {};
+  window.__features.sessions = true;
 
   /* Helpers */
   function $(sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } }
@@ -98,12 +105,302 @@
         container.appendChild(dot);
         (function (dot) {
           var angle = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 120, dx = Math.cos(angle) * dist, dy = Math.sin(angle) * dist;
-          try { dot.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(0.9)', opacity: 0.9 }], { duration: 700 + Math.random() * 300 }); } catch (e) {}
+          try { dot.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(0.9)'; dot.style.opacity = '0.9'; } catch (e) {}
         })(dot);
       }
       setTimeout(function () { try { container.remove(); } catch (e) {} }, 1400);
     } catch (e) { console.warn('confetti error', e); }
   }
+
+  /* Session management (v128) */
+  var sessionState = {
+    active: false,
+    mode: '',
+    totalSeconds: 0,
+    remainingSeconds: 0,
+    intervalId: null
+  };
+
+  var modeTimerDefaults = {
+    growing: 25 * 60,    // 25 minutes
+    grounded: 15 * 60,   // 15 minutes
+    drifting: 5 * 60,    // 5 minutes
+    surviving: 3 * 60,   // 3 minutes
+    quick: 1 * 60        // 1 minute
+  };
+
+  var modeSessionSteps = {
+    growing: ['Set a clear goal for this session', 'Break it into smaller steps', 'Work on the first step', 'Review progress at end'],
+    grounded: ['Identify the task to complete', 'Clear distractions', 'Work steadily', 'Check off when done'],
+    drifting: ['Take a few deep breaths', 'Do a gentle activity (walk, journal)', 'Notice how you feel', 'Return refreshed'],
+    surviving: ['Choose one simple action', 'Do it without pressure', 'Rest if needed', 'Celebrate completion'],
+    quick: ['Pick a quick action', 'Do it now', 'Done!']
+  };
+
+  function formatTime(seconds) {
+    var mins = Math.floor(seconds / 60);
+    var secs = seconds % 60;
+    return (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
+
+  function saveSessionState() {
+    try {
+      var data = {
+        mode: sessionState.mode,
+        remainingSeconds: sessionState.remainingSeconds,
+        totalSeconds: sessionState.totalSeconds
+      };
+      localStorage.setItem('sessionState', JSON.stringify(data));
+    } catch (e) { console.warn('saveSessionState error', e); }
+  }
+
+  function loadSessionState() {
+    try {
+      var data = JSON.parse(localStorage.getItem('sessionState') || '{}');
+      if (data.mode && data.remainingSeconds > 0) {
+        sessionState.mode = data.mode;
+        sessionState.remainingSeconds = data.remainingSeconds;
+        sessionState.totalSeconds = data.totalSeconds || data.remainingSeconds;
+        return true;
+      }
+    } catch (e) { console.warn('loadSessionState error', e); }
+    return false;
+  }
+
+  function clearSessionState() {
+    try {
+      localStorage.removeItem('sessionState');
+      sessionState.active = false;
+      sessionState.mode = '';
+      sessionState.totalSeconds = 0;
+      sessionState.remainingSeconds = 0;
+      if (sessionState.intervalId) {
+        clearInterval(sessionState.intervalId);
+        sessionState.intervalId = null;
+      }
+    } catch (e) { console.warn('clearSessionState error', e); }
+  }
+
+  function updateTimerDisplay() {
+    var display = id('session-timer-display');
+    if (display) {
+      display.textContent = formatTime(sessionState.remainingSeconds);
+    }
+  }
+
+  function startTimer(seconds, onDone) {
+    stopTimer();
+    sessionState.remainingSeconds = seconds;
+    sessionState.totalSeconds = seconds;
+    sessionState.active = true;
+    updateTimerDisplay();
+    saveSessionState();
+
+    sessionState.intervalId = setInterval(function () {
+      sessionState.remainingSeconds--;
+      updateTimerDisplay();
+      saveSessionState();
+
+      if (sessionState.remainingSeconds <= 0) {
+        stopTimer();
+        if (typeof onDone === 'function') {
+          try { onDone(); } catch (e) { console.warn('onDone error', e); }
+        }
+      }
+    }, 1000);
+
+    // Update UI buttons
+    var btnStart = id('session-btn-start');
+    var btnStop = id('session-btn-stop');
+    var btnComplete = id('session-btn-complete');
+    if (btnStart) btnStart.style.display = 'none';
+    if (btnStop) btnStop.style.display = '';
+    if (btnComplete) btnComplete.style.display = '';
+  }
+
+  function stopTimer() {
+    if (sessionState.intervalId) {
+      clearInterval(sessionState.intervalId);
+      sessionState.intervalId = null;
+    }
+    sessionState.active = false;
+    saveSessionState();
+
+    // Update UI buttons
+    var btnStart = id('session-btn-start');
+    var btnStop = id('session-btn-stop');
+    var btnComplete = id('session-btn-complete');
+    if (btnStart) btnStart.style.display = '';
+    if (btnStop) btnStop.style.display = 'none';
+    if (btnComplete) btnComplete.style.display = 'none';
+  }
+
+  function openSession(mode) {
+    if (!window.__features || !window.__features.sessions) return;
+    
+    try {
+      sessionState.mode = mode || window.__currentMode || 'quick';
+      
+      // Check if there's a saved session for this mode
+      var hasSaved = loadSessionState();
+      if (!hasSaved || sessionState.mode !== mode) {
+        sessionState.mode = mode;
+        sessionState.remainingSeconds = modeTimerDefaults[mode] || 300;
+        sessionState.totalSeconds = sessionState.remainingSeconds;
+      }
+
+      // Show modal
+      var modal = id('session-modal');
+      if (modal) modal.style.display = 'block';
+
+      // Set modal title
+      var title = id('session-modal-title');
+      if (title) {
+        var modeTitle = (modeInfo[mode] || {}).title || mode;
+        title.textContent = 'Guided Session: ' + modeTitle;
+      }
+
+      // Populate checklist
+      var checklistContainer = id('session-checklist-items');
+      if (checklistContainer) {
+        var steps = modeSessionSteps[mode] || ['Complete your activity'];
+        var html = '';
+        for (var i = 0; i < steps.length; i++) {
+          html += '<li>' + escapeHtml(steps[i]) + '</li>';
+        }
+        checklistContainer.innerHTML = html;
+      }
+
+      // Update timer display
+      updateTimerDisplay();
+
+      // Reset button states
+      var btnStart = id('session-btn-start');
+      var btnStop = id('session-btn-stop');
+      var btnComplete = id('session-btn-complete');
+      if (sessionState.active && sessionState.intervalId) {
+        if (btnStart) btnStart.style.display = 'none';
+        if (btnStop) btnStop.style.display = '';
+        if (btnComplete) btnComplete.style.display = '';
+      } else {
+        if (btnStart) btnStart.style.display = '';
+        if (btnStop) btnStop.style.display = 'none';
+        if (btnComplete) btnComplete.style.display = 'none';
+      }
+
+    } catch (e) { console.error('openSession error', e); }
+  }
+
+  function closeSession() {
+    try {
+      stopTimer();
+      var modal = id('session-modal');
+      if (modal) modal.style.display = 'none';
+    } catch (e) { console.warn('closeSession error', e); }
+  }
+
+  function completeSession() {
+    try {
+      var mode = sessionState.mode || window.__currentMode || 'quick';
+      
+      // Add history entry
+      var date = new Date().toLocaleDateString();
+      var entry = { date: date, mode: mode, activity: 'Guided session complete', note: '' };
+      var hist = JSON.parse(localStorage.getItem('resetHistory') || '[]');
+      hist.unshift(entry);
+      localStorage.setItem('resetHistory', JSON.stringify(hist));
+
+      // Update streak
+      var lastLogged = localStorage.getItem('lastLogged');
+      var today = new Date().toLocaleDateString();
+      if (lastLogged !== today) {
+        var streak = parseInt(localStorage.getItem('streak') || '0', 10) || 0;
+        streak += 1;
+        localStorage.setItem('streak', String(streak));
+        localStorage.setItem('lastLogged', today);
+        updateStreak();
+      }
+
+      // Clear session state
+      clearSessionState();
+
+      // Run confetti (no Element.animate)
+      try { runConfetti(mode); } catch (e) {}
+
+      // Close modal
+      closeSession();
+
+      // Navigate to history
+      setTimeout(function () { navigateHash('#history'); }, 700);
+
+    } catch (e) { console.error('completeSession error', e); }
+  }
+
+  function createSessionBindings() {
+    try {
+      // Close button
+      var closeBtn = document.querySelector('.session-modal-close');
+      if (closeBtn && !closeBtn.__sessionBound) {
+        closeBtn.addEventListener('click', function () { closeSession(); });
+        closeBtn.__sessionBound = true;
+      }
+
+      // Overlay click to close
+      var overlay = document.querySelector('.session-modal-overlay');
+      if (overlay && !overlay.__sessionBound) {
+        overlay.addEventListener('click', function () { closeSession(); });
+        overlay.__sessionBound = true;
+      }
+
+      // Start button
+      var btnStart = id('session-btn-start');
+      if (btnStart && !btnStart.__sessionBound) {
+        btnStart.addEventListener('click', function () {
+          startTimer(sessionState.remainingSeconds, function () {
+            // Timer complete
+            var btnComplete = id('session-btn-complete');
+            if (btnComplete) {
+              btnComplete.textContent = 'Session Complete!';
+              btnComplete.style.background = '#2e8b57';
+            }
+          });
+        });
+        btnStart.__sessionBound = true;
+      }
+
+      // Stop button
+      var btnStop = id('session-btn-stop');
+      if (btnStop && !btnStop.__sessionBound) {
+        btnStop.addEventListener('click', function () { stopTimer(); });
+        btnStop.__sessionBound = true;
+      }
+
+      // Complete button
+      var btnComplete = id('session-btn-complete');
+      if (btnComplete && !btnComplete.__sessionBound) {
+        btnComplete.addEventListener('click', function () { completeSession(); });
+        btnComplete.__sessionBound = true;
+      }
+
+      // Escape key to close
+      if (!document.__sessionEscBound) {
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' || e.keyCode === 27) {
+            var modal = id('session-modal');
+            if (modal && modal.style.display !== 'none') {
+              closeSession();
+            }
+          }
+        });
+        document.__sessionEscBound = true;
+      }
+    } catch (e) { console.warn('createSessionBindings error', e); }
+  }
+
+  window.openSession = openSession;
+  window.closeSession = closeSession;
+  window.startTimer = startTimer;
+  window.stopTimer = stopTimer;
 
   /* completeActivity (exposed) */
   window.completeActivity = function (mode, activity, noteId, rowId) {
@@ -159,6 +456,11 @@
     if (info.desc) html += '<div class="mode-sub">' + escapeHtml(info.desc) + '</div>';
     html += '</div></div>';
     if (info.tip) html += '<div class="mode-tip">Tip: ' + escapeHtml(info.tip) + '</div>';
+
+    // Add Start Session button if feature enabled
+    if (window.__features && window.__features.sessions) {
+      html += '<button class="start-session-btn" onclick="openSession(\'' + mode + '\')">Start Guided Session</button>';
+    }
 
     for (var i = 0; i < activities[mode].length; i++) {
       var act = activities[mode][i];
@@ -328,10 +630,11 @@
       bindUI();
       attachCompassDelegation();
       setupNeedleSpin();
+      createSessionBindings();
       if (!location.hash) location.hash = '#home';
       renderRoute();
       updateStreak();
-      console.info('[app v124] initialized (stronger mode themes)');
+      console.info('[app v128] initialized (guided session modal)');
     } catch (err) {
       console.error('init failed', err);
       try { window.__lastAppError = { msg: err.message || String(err), stack: err.stack || null, time: new Date().toISOString() }; } catch (e) {}
