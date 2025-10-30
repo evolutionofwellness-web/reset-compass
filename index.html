@@ -5,15 +5,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
 
-  <!-- Explicit favicon to avoid 404 from browser probing /favicon.ico -->
+  <!-- Explicit favicon so browsers don't probe /favicon.ico -->
   <link rel="icon" href="splash-icon.png" type="image/png">
 
-  <link rel="stylesheet" href="main.css?v=115" />
+  <!-- Main stylesheet (no animations) -->
+  <link rel="stylesheet" href="main.css?v=118" />
 </head>
 <body>
-  <div id="app-root" class="app-root visible" aria-hidden="false">
+  <div id="app-root" class="app-root" aria-hidden="false">
     <header class="hero" id="hero">
-      <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="56" height="56">
+      <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="64" height="64">
       <div class="hero-text">
         <h1 class="hero-title">The Reset Compass</h1>
         <p class="hero-sub">A small reset, every day.</p>
@@ -41,19 +42,46 @@
       </section>
 
       <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
-        <!-- SVG as before -->
-        <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0">
+        <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0" preserveAspectRatio="xMidYMid meet">
           <title id="compassTitle">Mode compass — choose a mode</title>
-          <!-- defs & wedges omitted for brevity here (keep your existing SVG content) -->
-          <!-- Make sure your SVG markup matches what you had previously -->
+
+          <defs>
+            <linearGradient id="growingGrad" x1="0" x2="1"><stop offset="0" stop-color="#2FA0FF"/><stop offset="1" stop-color="#007BFF"/></linearGradient>
+            <linearGradient id="groundedGrad" x1="0" x2="1"><stop offset="0" stop-color="#3CA56A"/><stop offset="1" stop-color="#246B45"/></linearGradient>
+            <linearGradient id="driftingGrad" x1="0" x2="1"><stop offset="0" stop-color="#E6C450"/><stop offset="1" stop-color="#DAA520"/></linearGradient>
+            <linearGradient id="survivingGrad" x1="0" x2="1"><stop offset="0" stop-color="#E78B88"/><stop offset="1" stop-color="#D9534F"/></linearGradient>
+          </defs>
+
+          <g transform="rotate(-45 100 100)">
+            <path class="wedge" d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z"
+                  fill="url(#growingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="growing" data-angle="-45" tabindex="0"/>
+            <path class="wedge" d="M100,100 L194,100 A94,94 0 0,1 100,194 L100,128 A28,28 0 0,0 128,100 Z"
+                  fill="url(#groundedGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="grounded" data-angle="45" tabindex="0"/>
+            <path class="wedge" d="M100,100 L100,194 A94,94 0 0,1 6,100 L72,100 A28,28 0 0,0 100,128 Z"
+                  fill="url(#driftingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="drifting" data-angle="135" tabindex="0"/>
+            <path class="wedge" d="M100,100 L6,100 A94,94 0 0,1 100,6 L100,72 A28,28 0 0,0 72,100 Z"
+                  fill="url(#survivingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="surviving" data-angle="225" tabindex="0"/>
+          </g>
+
+          <circle cx="100" cy="100" r="44" fill="#F7FBF8" stroke="rgba(0,0,0,0.02)"/>
+          <g id="needle-group" style="transform-origin:100px 100px;">
+            <polygon id="compass-rose" points="100,58 116,100 100,142 84,100" fill="rgba(6,56,39,0.92)" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+            <circle id="compass-pivot" cx="100" cy="100" r="6" fill="rgba(6,56,39,0.95)"/>
+            <rect id="compass-tail" x="98.5" y="104" width="3" height="26" rx="1.5" fill="rgba(6,56,39,0.88)" />
+          </g>
+
+          <text x="100" y="36" class="compass-label in-wedge">Growing</text>
+          <text x="156" y="100" class="compass-label in-wedge">Grounded</text>
+          <text x="100" y="164" class="compass-label in-wedge">Drifting</text>
+          <text x="44" y="100" class="compass-label in-wedge">Surviving</text>
         </svg>
       </section>
 
       <section id="mode-buttons" class="buttons">
-        <button type="button" class="mode-button growing" data-mode="growing">Growing: Push yourself to new heights</button>
-        <button type="button" class="mode-button grounded" data-mode="grounded">Grounded: Stay centered and productive</button>
-        <button type="button" class="mode-button drifting" data-mode="drifting">Drifting: Gently regain focus and energy</button>
-        <button type="button" class="mode-button surviving" data-mode="surviving">Surviving: Just get through the day</button>
+        <button type="button" class="mode-button growing" data-mode="growing">Growing</button>
+        <button type="button" class="mode-button grounded" data-mode="grounded">Grounded</button>
+        <button type="button" class="mode-button drifting" data-mode="drifting">Drifting</button>
+        <button type="button" class="mode-button surviving" data-mode="surviving">Surviving</button>
       </section>
 
       <div id="content" class="content-area" aria-live="polite"></div>
@@ -61,6 +89,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js?v=116"></script>
+  <script src="app.js?v=118"></script>
 </body>
 </html>
