@@ -208,3 +208,55 @@
   });
 
 })();
+
+/* DEBUG HELPER (temporary) — shows on-page status so we can confirm the running version and bindings */
+window.APP_VERSION = window.APP_VERSION || 'v122-debug';
+
+function updateDebugBanner() {
+  try {
+    var el = document.getElementById('debug-banner');
+    if (!el) return;
+    var renderRouteExists = typeof window.renderRoute === 'function';
+    var rebindExists = typeof window.__rebindUI === 'function';
+    var lastErr = window.__lastAppError ? (window.__lastAppError.msg || JSON.stringify(window.__lastAppError)) : 'none';
+    var navCount = (document.querySelectorAll && document.querySelectorAll('.nav-links a[data-hash]') ? document.querySelectorAll('.nav-links a[data-hash]').length : 0);
+    var btnCount = (document.querySelectorAll && document.querySelectorAll('button[data-mode]') ? document.querySelectorAll('button[data-mode]').length : 0);
+    var compassPresent = !!document.getElementById('compass');
+    var needlePresent = !!document.getElementById('needle-group');
+    var hash = location.hash || '(none)';
+    var text = [
+      'app.js: ' + (window.APP_VERSION || '(unknown)'),
+      'hash: ' + hash,
+      'renderRoute: ' + renderRouteExists,
+      '__rebindUI: ' + rebindExists,
+      'nav links: ' + navCount,
+      'mode buttons: ' + btnCount,
+      'compass: ' + compassPresent,
+      'needle: ' + needlePresent,
+      'lastError: ' + (lastErr || 'none')
+    ].join('\n');
+    el.style.display = 'block';
+    el.textContent = text;
+  } catch (e) {
+    // fail silently
+  }
+}
+
+// call from a few places to keep the banner current
+try { updateDebugBanner(); } catch(e){}
+
+var __orig_renderRoute = window.renderRoute;
+if (typeof __orig_renderRoute === 'function') {
+  window.renderRoute = function () {
+    try { __orig_renderRoute(); } catch(e) {}
+    try { updateDebugBanner(); } catch(e) {}
+  };
+}
+
+// ensure banner updated after DOMContentLoaded init too
+document.addEventListener('DOMContentLoaded', function () {
+  try { updateDebugBanner(); } catch (e) {}
+});
+
+// expose a small safe refresh function the page (no console required) — you can tap this link in the UI if you add one later
+window.__refreshDebug = function () { try { updateDebugBanner(); } catch(e){} };
