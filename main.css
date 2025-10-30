@@ -1,103 +1,64 @@
 :root{
   --bg: #F7FBF8;
   --brand-green: #0B3D2E;
-  --muted-bg: #F7FBF8;
   --card-bg: #ffffff;
   --accent: #007BFF;
-  --text-strong: #0B3D2E;
-  --soft-shadow: 0 12px 36px rgba(6,20,12,0.06);
-  --radius: 14px;
-  --ease: cubic-bezier(.2,.9,.2,1);
+  --muted-text: #5b6b60;
+  --radius: 12px;
+  --shadow: 0 8px 22px rgba(6,20,12,0.06);
 }
 
 /* Reset */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
-  margin:0;padding:0;background:var(--bg);color:var(--text-strong);
+  margin:0;padding:0;background:var(--bg);color:var(--brand-green);
   font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-  transition:background-color 420ms var(--ease), color 420ms var(--ease);
 }
 
-/* Theme variables (overridden when entering a mode) */
-.app-root { --theme-bg: var(--bg); --theme-accent: var(--accent); --theme-highlight: rgba(0,0,0,0.04); }
-
-/* Per-mode theme classes on body/app-root */
-.app-root.theme-growing { --theme-bg: linear-gradient(180deg,#E9F6FF,#F7FBFF); --theme-accent:#007BFF; --theme-accent-strong:#0056d6; }
-.app-root.theme-grounded { --theme-bg: linear-gradient(180deg,#F0FFF4,#F7FBF8); --theme-accent:#2e8b57; --theme-accent-strong:#196035; }
-.app-root.theme-drifting { --theme-bg: linear-gradient(180deg,#FFF9F0,#FFFBF6); --theme-accent:#d6a520; --theme-accent-strong:#b98512; }
-.app-root.theme-surviving { --theme-bg: linear-gradient(180deg,#FFF6F6,#FFFBFB); --theme-accent:#d9534f; --theme-accent-strong:#b22f2a; }
-
-.app-root { background: var(--theme-bg); }
-
-/* Hero */
-.hero{display:flex;align-items:center;gap:12px;max-width:960px;margin:18px auto;padding:10px 18px;transition:transform 420ms var(--ease)}
-.hero-icon{width:64px;height:64px;border-radius:12px;object-fit:contain;box-shadow:0 10px 30px rgba(6,20,12,0.06)}
-.hero-title{margin:0;font-size:1.25rem;font-weight:900;color:var(--brand-green)}
-.hero-sub{margin:2px 0 0;color:rgba(11,61,46,0.7)}
+/* App root & layout */
+.app-root{min-height:100vh}
+.hero{display:flex;align-items:center;gap:12px;max-width:980px;margin:18px auto;padding:8px 18px}
+.hero-icon{width:64px;height:64px;border-radius:10px;object-fit:contain}
+.hero-title{margin:0;font-size:1.25rem;font-weight:800}
+.hero-sub{margin:2px 0 0;color:var(--muted-text);font-weight:500}
 
 /* Nav */
-.site-nav{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:10px 14px;background:linear-gradient(180deg,var(--brand-green),#083126);color:#fff;box-shadow:0 10px 30px rgba(2,10,8,0.12)}
-.nav-links{display:flex;gap:28px;list-style:none;margin:0;padding:0}
-.nav-links a{color:#fff;text-decoration:none;font-weight:900;font-size:1.02rem;padding:8px 12px;border-radius:8px;transition:background 240ms var(--ease)}
-.nav-links a:hover{background:rgba(255,255,255,0.06)}
+.site-nav{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:10px;background:var(--brand-green);color:#fff}
+.nav-links{display:flex;gap:24px;list-style:none;margin:0;padding:0}
+.nav-links a{color:#fff;text-decoration:none;font-weight:800;padding:6px 10px;border-radius:8px}
 
 /* Streak */
-.streak{max-width:960px;margin:10px auto;padding:8px 18px;font-weight:800;color:var(--brand-green);font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.streak{max-width:980px;margin:10px auto;padding:8px 18px;font-weight:800;color:var(--brand-green);display:flex;align-items:center;gap:8px}
 
 /* Page */
-.page{max-width:960px;margin:6px auto;padding:0 16px 160px}
-.card{background:var(--card-bg);border-radius:var(--radius);padding:20px;border:1px solid rgba(11,61,46,0.04);box-shadow:var(--soft-shadow);margin-bottom:18px}
+.page{max-width:980px;margin:6px auto;padding:0 16px 120px}
+.card{background:var(--card-bg);border-radius:var(--radius);padding:18px;border:1px solid rgba(11,61,46,0.04);box-shadow:var(--shadow);margin-bottom:18px}
 
-/* Compass container */
-.compass-wrap{display:flex;justify-content:center;margin:10px 0 22px;position:relative;transition:transform 420ms var(--ease)}
-.compass-wrap::before{content:'';position:absolute;left:50%;top:0;transform:translateX(-50%) translateY(-6%);width:86%;height:86%;max-width:520px;max-height:520px;background:radial-gradient(ellipse at center, rgba(11,61,46,0.06) 0%, rgba(11,61,46,0.02) 35%, transparent 60%);border-radius:50%;pointer-events:none;z-index:-1}
+/* Compass */
+.compass-wrap{display:flex;justify-content:center;margin:8px 0 18px;position:relative}
 svg{width:360px;height:360px;max-width:92vw;display:block}
+.wedge{cursor:pointer;pointer-events:auto;transform-origin:100px 100px}
+.compass-label{font-size:20px;font-weight:900;fill:#fff;stroke:rgba(0,0,0,0.45);stroke-width:2;text-anchor:middle;dominant-baseline:middle}
 
-/* Wedges */
-.wedge{cursor:pointer;transition:transform 220ms var(--ease),filter 220ms var(--ease),stroke-opacity 120ms linear;transform-origin:100px 100px;stroke-opacity:1;pointer-events:auto}
-.wedge:hover,.wedge.bloom{transform:scale(1.035) translateZ(0);filter:drop-shadow(0 28px 50px rgba(0,0,0,0.14));stroke-opacity:0}
-.wedge.bloom-strong{transform:scale(1.08);filter:drop-shadow(0 40px 80px rgba(0,0,0,0.18));stroke-opacity:0;z-index:5}
-
-/* Labels */
-.compass-label{font-size:20px;font-weight:900;fill:#fff;stroke:rgba(0,0,0,0.45);stroke-width:2;paint-order:stroke fill;text-anchor:middle;dominant-baseline:middle;text-shadow:0 8px 22px rgba(0,0,0,0.32);pointer-events:none}
-
-/* Needle group */
-#needle-group{transform-origin:100px 100px;transition:transform 320ms cubic-bezier(.2,.9,.2,1);will-change:transform;pointer-events:none;opacity:0.98}
-@keyframes needleIdle{0%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}100%{transform:rotate(-1.6deg)}}
-#needle-group.idle{animation:needleIdle 8s ease-in-out infinite}
-.needle-spin{animation:needleSpin 520ms cubic-bezier(.22,.9,.3,1) forwards}
-@keyframes needleSpin{0%{transform:rotate(-24deg) scale(1)}50%{transform:rotate(24deg) scale(1.02)}100%{transform:rotate(0deg) scale(1)}}
-
-/* Mode enter animation (subtle) */
-.app-root.mode-enter { overflow: hidden; }
-.mode-flash {
-  position: absolute; inset: 0; pointer-events:none;
-  background: linear-gradient(120deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-  animation: modeFlash 760ms ease-out both;
-}
-@keyframes modeFlash { from { opacity:1; transform:scale(1.02); } 20% { opacity:0.7 } to { opacity:0; transform:scale(1); } }
+/* Needle */
+#needle-group{transform-origin:100px 100px;will-change:transform;}
 
 /* Buttons */
-.buttons{margin:6px 0 22px;display:flex;flex-direction:column;gap:14px;align-items:center}
-.mode-button{width:94%;max-width:720px;padding:16px 18px;border-radius:14px;border:none;color:white;font-weight:900;box-shadow:0 18px 48px rgba(6,20,12,0.08);text-align:center;font-size:1.02rem;transition:transform 220ms var(--ease),box-shadow 220ms var(--ease)}
-.mode-button:active{transform:translateY(2px)}
+.buttons{margin:6px 0 22px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.mode-button{width:92%;max-width:720px;padding:14px;border-radius:10px;border:none;color:white;font-weight:900}
 .mode-button.growing{background:linear-gradient(180deg,#2fa0ff,#007BFF)}
 .mode-button.grounded{background:linear-gradient(180deg,#48b174,#2e8b57)}
 .mode-button.drifting{background:linear-gradient(180deg,#f0c95f,#d6a520);color:#2e2a1e}
 .mode-button.surviving{background:linear-gradient(180deg,#f08f91,#d9534f)}
 
-/* Content / mode pages */
+/* Content */
 .content-area{margin-top:6px;padding-bottom:48px}
-.mode-page{background:linear-gradient(180deg,#ffffff,#fbfffb);border-radius:18px;padding:26px;border:1px solid rgba(0,0,0,0.04);box-shadow:0 26px 60px rgba(6,20,12,0.08);margin:14px 0 60px;max-width:760px;margin-left:auto;margin-right:auto}
-.activity-row{display:block;margin:14px 0;padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(11,61,46,0.02), rgba(255,255,255,0));border-left:6px solid rgba(11,61,46,0.02);transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
-.activity-row:hover{transform:translateY(-6px);box-shadow:0 22px 46px rgba(6,20,12,0.08);border-left-color:var(--brand-green)}
-.return-button{display:inline-block;margin-top:18px;padding:14px 20px;background:var(--brand-green);color:white;border-radius:14px;border:none;font-weight:900;cursor:pointer}
+.mode-page{background:linear-gradient(180deg,#ffffff,#fbfffb);border-radius:14px;padding:20px;border:1px solid rgba(0,0,0,0.04);box-shadow:var(--shadow);margin:14px 0 40px;max-width:760px;margin-left:auto;margin-right:auto}
+.activity-row{display:block;margin:10px 0;padding:14px;border-radius:10px;background:#fff;border-left:6px solid rgba(11,61,46,0.02)}
+.activity-label{font-weight:700;margin-top:6px}
 
-/* Small responsive adjustments */
-@media (max-width:420px){
-  svg{width:300px;height:300px}
-  .compass-label{font-size:16px;stroke-width:2}
-  .mode-button{font-size:0.95rem;padding:14px}
-}
+/* Utilities */
+.return-button{display:inline-block;margin-top:14px;padding:12px 18px;background:var(--brand-green);color:white;border-radius:12px;border:none;font-weight:800;cursor:pointer}
+@media (max-width:420px){ svg{width:300px;height:300px} .compass-label{font-size:16px} .mode-button{font-size:0.95rem;padding:12px} }
