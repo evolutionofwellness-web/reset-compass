@@ -1,14 +1,14 @@
-/* app.js v123 — robust early-capture delegation + clickable SVG labels
-   - Adds an early capturing click handler that intercepts nav, mode buttons, SVG wedges and SVG text labels
-   - Falls back to setting location.hash + renderRoute if navigation helpers are not present yet
-   - Shows a temporary small click trace UI so you can verify taps without the Console
-   - This file replaces prior versions — overwrite app.js with this content and hard-refresh
+/* app.js v124 — stronger per-mode page visuals (decorative header + accents)
+   - ES5-friendly
+   - Sets .app-root.theme-<mode> and renders mode pages with a header block so the theme is obvious
+   - Keeps defensive event delegation and mode-specific confetti palettes
+   - Removes debug click-trace UI (temporary)
 */
 
 (function () {
   'use strict';
 
-  /* Lightweight helpers */
+  /* Helpers */
   function $(sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } }
   if (typeof window.$$ !== 'function') {
     window.$$ = function (sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } };
@@ -24,7 +24,7 @@
     return false;
   };
 
-  /* Current-mode + confetti palettes */
+  /* Current mode & confetti palettes */
   window.__currentMode = '';
   var confettiColors = {
     growing: ['#79C7FF','#2FA0FF','#007BFF','#1B6EDC'],
@@ -34,19 +34,41 @@
     quick: ['#E7E0FF','#C1B3FF','#6f42c1','#4b2a8a']
   };
 
-  /* setTheme exposed (used elsewhere) */
   function setTheme(mode) {
     try {
-      var root = id('app-root');
-      if (!root) return;
-      root.classList.remove('theme-growing', 'theme-grounded', 'theme-drifting', 'theme-surviving', 'theme-quick');
+      var root = id('app-root'); if (!root) return;
+      root.classList.remove('theme-growing','theme-grounded','theme-drifting','theme-surviving','theme-quick');
       if (mode) root.classList.add('theme-' + mode);
       window.__currentMode = mode || '';
-    } catch (e) {}
+    } catch (e) { console.warn('setTheme failed', e); }
   }
   window.setTheme = setTheme;
 
-  /* Ensure content element exists */
+  /* Mode header icons (emoji) */
+  var modeIcons = {
+    growing: '🌱',
+    grounded: '🌿',
+    drifting: '🌤️',
+    surviving: '🛟',
+    'quick': '⚡'
+  };
+
+  /* Mode metadata & activities */
+  var modeInfo = {
+    growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Pick one focused, slightly-challenging task you can make progress on in 15–30 minutes.' },
+    grounded: { title: 'Grounded', desc: 'Stay centered and productive — structure your next steps and clear small hurdles.', tip: 'Break a larger task into 2–3 small wins and complete the first one now.' },
+    drifting: { title: 'Drifting', desc: 'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.', tip: 'Try a 7–10 minute walk or a 5-minute journaling exercise to refocus.' },
+    surviving: { title: 'Surviving', desc: 'Just get through the day — prioritize essentials and basic self-care to stay afloat.', tip: 'Pick one low-effort, high-impact action (water, breathe, rest) and pause for 3–5 minutes.' }
+  };
+
+  var activities = {
+    growing: [{ label: 'Write a goal', icon: '🎯' }, { label: 'Tackle a challenge', icon: '⚒️' }, { label: 'Start a new project', icon: '🚀' }],
+    grounded: [{ label: 'Declutter a space', icon: '🧹' }, { label: 'Complete a task', icon: '✅' }, { label: 'Plan your day', icon: '🗓️' }],
+    drifting: [{ label: 'Go for a walk', icon: '🚶' }, { label: 'Journal your thoughts', icon: '✍️' }, { label: 'Listen to calming music', icon: '🎧' }],
+    surviving: [{ label: 'Drink water', icon: '💧' }, { label: 'Breathe deeply', icon: '🌬️' }, { label: 'Rest for 5 minutes', icon: '😴' }]
+  };
+
+  /* Ensure content area */
   function ensureContentElement() {
     var c = id('content');
     if (c) return c;
@@ -59,27 +81,7 @@
     return c;
   }
 
-  /* Click trace UI (temporary) */
-  function createClickTrace() {
-    if (id('click-trace')) return;
-    var t = document.createElement('div');
-    t.id = 'click-trace';
-    t.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(t);
-  }
-  function showClickTrace(text) {
-    try {
-      var t = id('click-trace');
-      if (!t) return;
-      t.textContent = text;
-      t.style.display = 'block';
-      // hide after 1.5s
-      clearTimeout(t._hideTimer);
-      t._hideTimer = setTimeout(function () { try { t.style.display = 'none'; } catch (e) {} }, 1500);
-    } catch (e) {}
-  }
-
-  /* Confetti (mode-specific) */
+  /* Confetti */
   function runConfetti(mode) {
     try {
       mode = mode || window.__currentMode || 'quick';
@@ -102,7 +104,6 @@
       setTimeout(function () { try { container.remove(); } catch (e) {} }, 1400);
     } catch (e) { console.warn('confetti error', e); }
   }
-  window.runConfetti = runConfetti;
 
   /* completeActivity (exposed) */
   window.completeActivity = function (mode, activity, noteId, rowId) {
@@ -131,10 +132,9 @@
     } catch (e) { console.error('completeActivity error', e); window.__lastAppError = { msg: e.message || String(e), stack: e.stack || null, time: new Date().toISOString() }; }
   };
 
-  /* updateStreak */
   function updateStreak() { var el = id('streak-count'); if (el) el.textContent = localStorage.getItem('streak') || '0'; }
 
-  /* Navigation helpers (exposed) */
+  /* Navigation helpers */
   window.navigateHash = function (hash) {
     try { location.hash = hash; } catch (e) { console.warn(e); }
     try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
@@ -144,47 +144,42 @@
     try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
   };
 
-  /* Renderers (kept minimal) */
-  var modeInfo = {
-    growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Pick one focused, slightly-challenging task you can make progress on in 15–30 minutes.' },
-    grounded: { title: 'Grounded', desc: 'Stay centered and productive — structure your next steps and clear small hurdles.', tip: 'Break a larger task into 2–3 small wins and complete the first one now.' },
-    drifting: { title: 'Drifting', desc: 'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.', tip: 'Try a 7–10 minute walk or a 5-minute journaling exercise to refocus.' },
-    surviving: { title: 'Surviving', desc: 'Just get through the day — prioritize essentials and basic self-care to stay afloat.', tip: 'Pick one low-effort, high-impact action (water, breathe, rest) and pause for 3–5 minutes.' }
-  };
+  /* Renderers that include a decorative header block */
+  function renderHome() { var c = ensureContentElement(); c.innerHTML = ''; setTheme(''); }
 
-  var activities = {
-    growing: [{ label: 'Write a goal', icon: '🎯' }, { label: 'Tackle a challenge', icon: '⚒️' }, { label: 'Start a new project', icon: '🚀' }],
-    grounded: [{ label: 'Declutter a space', icon: '🧹' }, { label: 'Complete a task', icon: '✅' }, { label: 'Plan your day', icon: '🗓️' }],
-    drifting: [{ label: 'Go for a walk', icon: '🚶' }, { label: 'Journal your thoughts', icon: '✍️' }, { label: 'Listen to calming music', icon: '🎧' }],
-    surviving: [{ label: 'Drink water', icon: '💧' }, { label: 'Breathe deeply', icon: '🌬️' }, { label: 'Rest for 5 minutes', icon: '😴' }]
-  };
-
-  function ensureContent() { return ensureContentElement(); }
-
-  function renderHome() { var c = ensureContent(); c.innerHTML = ''; setTheme(''); }
   function renderModePage(mode) {
-    var c = ensureContent(); setTheme(mode);
+    var c = ensureContentElement(); setTheme(mode);
     var info = modeInfo[mode] || { title: mode, desc: '', tip: '' };
     if (!activities[mode]) { c.innerHTML = '<p>Unknown mode</p>'; return; }
-    var html = '<div class="mode-page" role="region" aria-labelledby="mode-title">';
-    html += '<h2 id="mode-title">' + escapeHtml(info.title) + '</h2>';
-    if (info.desc) html += '<div class="mode-desc">' + escapeHtml(info.desc) + '</div>';
+
+    var icon = escapeHtml(modeIcons[mode] || '•');
+    var html = '<div class="mode-page mode-' + escapeHtml(mode) + '" role="region" aria-labelledby="mode-title">';
+    html += '<div class="mode-header"><div class="mode-icon" aria-hidden="true">' + icon + '</div>';
+    html += '<div><h2 class="mode-title" id="mode-title">' + escapeHtml(info.title) + '</h2>';
+    if (info.desc) html += '<div class="mode-sub">' + escapeHtml(info.desc) + '</div>';
+    html += '</div></div>';
     if (info.tip) html += '<div class="mode-tip">Tip: ' + escapeHtml(info.tip) + '</div>';
+
     for (var i = 0; i < activities[mode].length; i++) {
-      var a = activities[mode][i];
+      var act = activities[mode][i];
       html += '<div class="activity-row" id="row-' + mode + '-' + i + '">';
-      html += '<div class="activity-main"><span class="activity-icon" aria-hidden="true">' + escapeHtml(a.icon) + '</span><div class="activity-label">' + escapeHtml(a.label) + '</div></div>';
+      html += '<div class="activity-main"><span class="activity-icon" aria-hidden="true">' + escapeHtml(act.icon) + '</span><div class="activity-label">' + escapeHtml(act.label) + '</div></div>';
       html += '<textarea id="note-' + mode + '-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="activity-controls"><button class="btn-complete" onclick="completeActivity(\'' + mode + '\',\'' + escapeJs(a.label) + '\',\'note-' + mode + '-' + i + '\',\'row-' + mode + '-' + i + '\')">Complete</button></div>';
+      html += '<div class="activity-controls"><button class="btn-complete" onclick="completeActivity(\'' + mode + '\',\'' + escapeJs(act.label) + '\',\'note-' + mode + '-' + i + '\',\'row-' + mode + '-' + i + '\')">Complete</button></div>';
       html += '</div>';
     }
-    html += '<button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
+
+    html += '<button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button>';
+    html += '</div>';
     c.innerHTML = html;
   }
+
   function renderQuickWins() {
-    var c = ensureContent();
+    var c = ensureContentElement(); setTheme('quick');
     var quick = [{ label: 'Drink water', icon: '💧' }, { label: 'Stand up and stretch', icon: '🧘' }, { label: 'Take 3 deep breaths', icon: '🌬️' }];
-    var html = '<div class="mode-page"><h2>Quick Wins</h2><div class="quick-list">';
+    var html = '<div class="mode-page mode-quick"><div class="mode-header"><div class="mode-icon" aria-hidden="true">' + escapeHtml(modeIcons['quick']) + '</div>';
+    html += '<div><h2 class="mode-title">Quick Wins</h2><div class="mode-sub">Small, fast actions to refresh your energy</div></div></div><div class="mode-tip">Quick actions to reset in 1–5 minutes</div>';
+    html += '<div class="quick-list">';
     for (var i = 0; i < quick.length; i++) {
       html += '<div class="quick-card" id="qw-' + i + '">';
       html += '<div class="icon">' + escapeHtml(quick[i].icon) + '</div>';
@@ -195,14 +190,17 @@
     html += '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
     c.innerHTML = html;
   }
+
   function renderHistory() {
-    var c = ensureContent();
+    var c = ensureContentElement(); setTheme('');
     var history = JSON.parse(localStorage.getItem('resetHistory') || '[]');
     var listHtml = '';
     if (history.length === 0) listHtml = '<p>No history yet.</p>'; else for (var i = 0; i < history.length; i++) listHtml += '<p><strong>' + escapeHtml(history[i].date) + ':</strong> ' + escapeHtml((history[i].mode || '').charAt(0).toUpperCase() + (history[i].mode || '').slice(1)) + ' — ' + escapeHtml(history[i].activity) + (history[i].note ? ' • <em>' + escapeHtml(history[i].note) + '</em>' : '') + '</p>';
     c.innerHTML = '<div class="mode-page"><h2>History</h2><div>' + listHtml + '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
+    // Chart code left unchanged (if Chart is present elsewhere)
   }
-  function renderAbout() { var c = ensureContent(); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>'; }
+
+  function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>'; }
 
   /* renderRoute */
   function renderRoute() {
@@ -223,11 +221,9 @@
   }
   window.renderRoute = renderRoute;
 
-  /* Defensive early delegated click handler (capture phase) */
+  /* Defensive early delegation (capture) to ensure taps are handled reliably */
   (function attachEarlyDelegate() {
     try {
-      createClickTrace();
-
       function safeNavigateHash(h) {
         try {
           if (typeof window.navigateHash === 'function') { window.navigateHash(h); return; }
@@ -246,51 +242,23 @@
       document.addEventListener('click', function (ev) {
         try {
           var tgt = ev.target;
-
-          // nav link
           var a = tgt && tgt.closest ? tgt.closest('.nav-links a[data-hash]') : null;
-          if (a) {
-            try { ev.preventDefault && ev.preventDefault(); } catch (e) {}
-            var hh = a.getAttribute('data-hash') || a.getAttribute('href') || '#home';
-            showClickTrace('nav → ' + hh);
-            safeNavigateHash(hh);
-            return;
-          }
+          if (a) { try { ev.preventDefault && ev.preventDefault(); } catch (e) {} var hh = a.getAttribute('data-hash') || a.getAttribute('href') || '#home'; safeNavigateHash(hh); return; }
 
-          // mode button
           var b = tgt && tgt.closest ? tgt.closest('button[data-mode]') : null;
-          if (b) {
-            try { ev.preventDefault && ev.preventDefault(); } catch (e) {}
-            var mm = b.getAttribute('data-mode');
-            showClickTrace('button → ' + mm);
-            try { setTheme(mm); } catch (e) {}
-            safeNavigateMode(mm);
-            return;
-          }
+          if (b) { try { ev.preventDefault && ev.preventDefault(); } catch (e) {} var mm = b.getAttribute('data-mode'); try { setTheme(mm); } catch (e) {} safeNavigateMode(mm); return; }
 
-          // SVG: path or text with data-mode
           var svgNode = tgt && tgt.closest ? tgt.closest('[data-mode]') : null;
           if (svgNode) {
             var md = svgNode.getAttribute && svgNode.getAttribute('data-mode');
-            if (md) {
-              try { ev.preventDefault && ev.preventDefault(); } catch (e) {}
-              showClickTrace('wedge → ' + md);
-              try { setTheme(md); } catch (e) {}
-              safeNavigateMode(md);
-              return;
-            }
+            if (md) { try { ev.preventDefault && ev.preventDefault(); } catch (e) {} try { setTheme(md); } catch (e) {} safeNavigateMode(md); return; }
           }
-
-        } catch (err) {
-          console.warn('early-delegate error', err);
-        }
-      }, true); // capture: true so we catch taps early
-    } catch (e) {
-      console.warn('attachEarlyDelegate failed', e);
-    }
+        } catch (err) {}
+      }, true);
+    } catch (e) {}
   })();
 
-  /* UI binding helpers (run at DOMContentLoaded) */
+  /* bindUI + compass delegation + needle spin */
   function bindUI() {
     try {
       var navs = $$('.nav-links a[data-hash]');
@@ -315,9 +283,7 @@
   }
 
   function attachCompassDelegation() {
-    var comp = id('compass');
-    if (!comp) return;
-    if (comp.__delegated) return;
+    var comp = id('compass'); if (!comp) return; if (comp.__delegated) return;
     comp.addEventListener('click', function (ev) {
       try {
         var tgt = ev.target;
@@ -352,23 +318,20 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  window.__rebindUI = function () {
-    try { bindUI(); attachCompassDelegation(); setupNeedleSpin(); console.info('rebindUI done'); } catch (e) { console.warn('rebindUI failed', e); }
-  };
+  window.__rebindUI = function () { try { bindUI(); attachCompassDelegation(); setupNeedleSpin(); console.info('rebindUI done'); } catch (e) { console.warn('rebindUI failed', e); } };
 
   /* Init */
   document.addEventListener('DOMContentLoaded', function () {
     try {
       var root = id('app-root'); if (root) { root.classList.add('visible'); root.setAttribute('aria-hidden', 'false'); }
-      ensureContent();
+      ensureContentElement();
       bindUI();
       attachCompassDelegation();
       setupNeedleSpin();
-      createClickTrace();
       if (!location.hash) location.hash = '#home';
-      try { renderRoute(); } catch (e) {}
+      renderRoute();
       updateStreak();
-      console.info('[app v123] initialized (early delegation + click trace)');
+      console.info('[app v124] initialized (stronger mode themes)');
     } catch (err) {
       console.error('init failed', err);
       try { window.__lastAppError = { msg: err.message || String(err), stack: err.stack || null, time: new Date().toISOString() }; } catch (e) {}
