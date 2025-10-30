@@ -1,8 +1,7 @@
-/* app.js v124 — stronger per-mode page visuals (decorative header + accents)
-   - ES5-friendly
-   - Sets .app-root.theme-<mode> and renders mode pages with a header block so the theme is obvious
-   - Keeps defensive event delegation and mode-specific confetti palettes
-   - Removes debug click-trace UI (temporary)
+/* app.js v125 — guided mode sessions and clearer page instructions
+   - Adds a small accessible session modal with per-mode guided steps and timers
+   - Keeps defensive delegation and existing routing
+   - Mode-specific session content and simple countdown timer included
 */
 
 (function () {
@@ -24,7 +23,7 @@
     return false;
   };
 
-  /* Current mode & confetti palettes */
+  /* State & confetti palettes (unchanged) */
   window.__currentMode = '';
   var confettiColors = {
     growing: ['#79C7FF','#2FA0FF','#007BFF','#1B6EDC'],
@@ -44,21 +43,13 @@
   }
   window.setTheme = setTheme;
 
-  /* Mode header icons (emoji) */
-  var modeIcons = {
-    growing: '🌱',
-    grounded: '🌿',
-    drifting: '🌤️',
-    surviving: '🛟',
-    'quick': '⚡'
-  };
-
-  /* Mode metadata & activities */
+  /* Mode icons and meta */
+  var modeIcons = { growing: '🌱', grounded: '🌿', drifting: '🌤️', surviving: '🛟', quick: '⚡' };
   var modeInfo = {
-    growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Pick one focused, slightly-challenging task you can make progress on in 15–30 minutes.' },
-    grounded: { title: 'Grounded', desc: 'Stay centered and productive — structure your next steps and clear small hurdles.', tip: 'Break a larger task into 2–3 small wins and complete the first one now.' },
-    drifting: { title: 'Drifting', desc: 'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.', tip: 'Try a 7–10 minute walk or a 5-minute journaling exercise to refocus.' },
-    surviving: { title: 'Surviving', desc: 'Just get through the day — prioritize essentials and basic self-care to stay afloat.', tip: 'Pick one low-effort, high-impact action (water, breathe, rest) and pause for 3–5 minutes.' }
+    growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Try a focused 25-minute work session (Pomodoro).' },
+    grounded: { title: 'Grounded', desc: 'Stay centered and productive — structure your next steps and clear small hurdles.', tip: 'Break a larger task into 2–3 small wins and do the first now.' },
+    drifting: { title: 'Drifting', desc: 'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.', tip: 'Try a 7–10 minute walk or a 5-minute breathing reset.' },
+    surviving: { title: 'Surviving', desc: 'Just get through the day — prioritize essentials and basic self-care to stay afloat.', tip: 'Take a 3–5 minute breathing break (box or 4-4-4) and hydrate.' }
   };
 
   var activities = {
@@ -68,7 +59,7 @@
     surviving: [{ label: 'Drink water', icon: '💧' }, { label: 'Breathe deeply', icon: '🌬️' }, { label: 'Rest for 5 minutes', icon: '😴' }]
   };
 
-  /* Ensure content area */
+  /* Content container */
   function ensureContentElement() {
     var c = id('content');
     if (c) return c;
@@ -105,7 +96,7 @@
     } catch (e) { console.warn('confetti error', e); }
   }
 
-  /* completeActivity (exposed) */
+  /* completeActivity: unchanged except confetti uses __currentMode */
   window.completeActivity = function (mode, activity, noteId, rowId) {
     try {
       var row = id(rowId);
@@ -132,6 +123,7 @@
     } catch (e) { console.error('completeActivity error', e); window.__lastAppError = { msg: e.message || String(e), stack: e.stack || null, time: new Date().toISOString() }; }
   };
 
+  /* updateStreak */
   function updateStreak() { var el = id('streak-count'); if (el) el.textContent = localStorage.getItem('streak') || '0'; }
 
   /* Navigation helpers */
@@ -144,7 +136,7 @@
     try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
   };
 
-  /* Renderers that include a decorative header block */
+  /* Renderers (mode pages now include a Start session CTA) */
   function renderHome() { var c = ensureContentElement(); c.innerHTML = ''; setTheme(''); }
 
   function renderModePage(mode) {
@@ -160,18 +152,37 @@
     html += '</div></div>';
     if (info.tip) html += '<div class="mode-tip">Tip: ' + escapeHtml(info.tip) + '</div>';
 
+    // Start session CTA (experiential)
+    html += '<div class="session-cta"><button class="btn-primary" data-start-session data-mode="' + escapeHtml(mode) + '">Start session</button>';
+    html += '<button class="btn-secondary" onclick="navigateHash(\\'#home\\')">Return</button></div>';
+
+    // Activities (unchanged layout)
     for (var i = 0; i < activities[mode].length; i++) {
       var act = activities[mode][i];
       html += '<div class="activity-row" id="row-' + mode + '-' + i + '">';
       html += '<div class="activity-main"><span class="activity-icon" aria-hidden="true">' + escapeHtml(act.icon) + '</span><div class="activity-label">' + escapeHtml(act.label) + '</div></div>';
       html += '<textarea id="note-' + mode + '-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="activity-controls"><button class="btn-complete" onclick="completeActivity(\'' + mode + '\',\'' + escapeJs(act.label) + '\',\'note-' + mode + '-' + i + '\',\'row-' + mode + '-' + i + '\')">Complete</button></div>';
+      html += '<div class="activity-controls"><button class="btn-complete" onclick="completeActivity(\\'' + mode + '\\',\\'' + escapeJs(act.label) + '\\',\\'note-' + mode + '-' + i + '\\',\\'row-' + mode + '-' + i + '\\')">Complete</button></div>';
       html += '</div>';
     }
 
-    html += '<button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button>';
+    html += '<button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button>';
     html += '</div>';
     c.innerHTML = html;
+
+    // attach Start session handlers for the buttons just rendered
+    var starts = c.querySelectorAll('[data-start-session]');
+    for (var j = 0; j < starts.length; j++) {
+      (function (btn) {
+        if (!btn.__bound) {
+          btn.addEventListener('click', function (e) {
+            var md = btn.getAttribute('data-mode') || mode;
+            openSession(md);
+          });
+          btn.__bound = true;
+        }
+      })(starts[j]);
+    }
   }
 
   function renderQuickWins() {
@@ -185,9 +196,9 @@
       html += '<div class="icon">' + escapeHtml(quick[i].icon) + '</div>';
       html += '<div class="content"><div class="label">' + escapeHtml(quick[i].label) + '</div>';
       html += '<textarea id="qw-note-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="controls" style="margin-top:8px"><button class="btn-complete" onclick="completeActivity(\'quick-win\',\'' + escapeJs(quick[i].label) + '\',\'qw-note-' + i + '\',\'row-quick-' + i + '\')">Complete</button></div></div></div>';
+      html += '<div class="controls" style="margin-top:8px"><button class="btn-complete" onclick="completeActivity(\\'quick-win\\',\\'' + escapeJs(quick[i].label) + '\\',\\'qw-note-' + i + '\\',\\'row-quick-' + i + '\\')">Complete</button></div></div></div>';
     }
-    html += '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
+    html += '</div><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>';
     c.innerHTML = html;
   }
 
@@ -196,11 +207,10 @@
     var history = JSON.parse(localStorage.getItem('resetHistory') || '[]');
     var listHtml = '';
     if (history.length === 0) listHtml = '<p>No history yet.</p>'; else for (var i = 0; i < history.length; i++) listHtml += '<p><strong>' + escapeHtml(history[i].date) + ':</strong> ' + escapeHtml((history[i].mode || '').charAt(0).toUpperCase() + (history[i].mode || '').slice(1)) + ' — ' + escapeHtml(history[i].activity) + (history[i].note ? ' • <em>' + escapeHtml(history[i].note) + '</em>' : '') + '</p>';
-    c.innerHTML = '<div class="mode-page"><h2>History</h2><div>' + listHtml + '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
-    // Chart code left unchanged (if Chart is present elsewhere)
+    c.innerHTML = '<div class="mode-page"><h2>History</h2><div>' + listHtml + '</div><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>';
   }
 
-  function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>'; }
+  function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>'; }
 
   /* renderRoute */
   function renderRoute() {
@@ -221,7 +231,142 @@
   }
   window.renderRoute = renderRoute;
 
-  /* Defensive early delegation (capture) to ensure taps are handled reliably */
+  /* Session modal logic */
+  var session = { timerId: null, remaining: 0, running: false };
+
+  function openSession(mode) {
+    try {
+      var modal = id('session-modal'), body = id('session-body'), title = id('session-title');
+      if (!modal || !body || !title) return;
+      title.textContent = (modeInfo[mode] && modeInfo[mode].title ? modeInfo[mode].title : mode) + ' — Guided session';
+      body.innerHTML = buildSessionBody(mode);
+      modal.hidden = false;
+      modal.querySelector('.modal-panel').focus && modal.querySelector('.modal-panel').setAttribute('tabindex', '-1');
+      createSessionBindings(mode);
+    } catch (e) { console.warn('openSession failed', e); }
+  }
+
+  function closeSession() {
+    try {
+      var modal = id('session-modal');
+      if (!modal) return;
+      modal.hidden = true;
+      stopTimer();
+    } catch (e) {}
+  }
+
+  function buildSessionBody(mode) {
+    // returns HTML for the session modal based on mode
+    var html = '';
+    if (mode === 'growing') {
+      html += '<p class="helper">A focused session helps you make meaningful progress. Recommended: 25 minutes focus + 5 minute break.</p>';
+      html += '<div class="helper">When ready, press Start. The timer will run and you’ll get a short celebration on completion.</div>';
+      html += '<div class="timer" aria-hidden="false"><div class="timer-display" id="session-timer">25:00</div><div class="helper">Pomodoro — 25 min</div></div>';
+    } else if (mode === 'grounded') {
+      html += '<p class="helper">Pick one task from the checklist below. Each item is a small, finishable win.</p>';
+      html += '<div class="step-list"><div class="step-item"><input type="checkbox" id="step-0"><label for="step-0">Declutter a focused space (5–15 min)</label></div>';
+      html += '<div class="step-item"><input type="checkbox" id="step-1"><label for="step-1">Complete one small task (10–20 min)</label></div>';
+      html += '<div class="step-item"><input type="checkbox" id="step-2"><label for="step-2">Plan your next 3 actions</label></div></div>';
+      html += '<div class="helper">Use Start to begin a 15-minute focused window or just mark items as you finish them.</div>';
+      html += '<div class="timer" aria-hidden="false"><div class="timer-display" id="session-timer">15:00</div><div class="helper">Recommended: 15 min</div></div>';
+    } else if (mode === 'drifting') {
+      html += '<p class="helper">A gentle reset — try a 5–10 minute movement or breathing exercise.</p>';
+      html += '<div class="helper">Option A: 7–10 minute walk. Option B: 5 minutes mindful breathing (4-4-4).</div>';
+      html += '<div class="timer" aria-hidden="false"><div class="timer-display" id="session-timer">05:00</div><div class="helper">Quick reset — 5 min</div></div>';
+    } else if (mode === 'surviving') {
+      html += '<p class="helper">Focus on essentials and self-care. This short routine should help you feel a little steadier.</p>';
+      html += '<ol class="helper"><li>Water: drink a glass</li><li>Breathing: 4-4-4 for 3–5 minutes</li><li>Rest briefly or sit quietly</li></ol>';
+      html += '<div class="timer" aria-hidden="false"><div class="timer-display" id="session-timer">03:00</div><div class="helper">Breathing — 3 min</div></div>';
+    } else { // quick
+      html += '<p class="helper">Quick wins — pick one and do it now.</p>';
+      html += '<div class="helper">Examples: Drink water, Stand and stretch, Breathe deeply for 1 minute.</div>';
+      html += '<div class="timer" aria-hidden="false"><div class="timer-display" id="session-timer">01:00</div><div class="helper">Quick — 1 min</div></div>';
+    }
+    return html;
+  }
+
+  function createSessionBindings(mode) {
+    try {
+      var modal = id('session-modal');
+      if (!modal) return;
+      var start = id('session-start'), cancel = id('session-cancel'), closeBtn = id('session-close');
+      start && start.removeEventListener('click', modal._startFn);
+      cancel && cancel.removeEventListener('click', modal._cancelFn);
+      closeBtn && closeBtn.removeEventListener('click', modal._closeFn);
+
+      modal._startFn = function () { startTimerForMode(mode); };
+      modal._cancelFn = function () { closeSession(); };
+      modal._closeFn = function () { closeSession(); };
+
+      start && start.addEventListener('click', modal._startFn);
+      cancel && cancel.addEventListener('click', modal._cancelFn);
+      closeBtn && closeBtn.addEventListener('click', modal._closeFn);
+
+      // key handling for escape
+      modal._keyHandler = function (e) { if (e.key === 'Escape') closeSession(); };
+      document.removeEventListener('keydown', modal._keyHandler);
+      document.addEventListener('keydown', modal._keyHandler);
+
+    } catch (e) { console.warn('createSessionBindings', e); }
+  }
+
+  function startTimerForMode(mode) {
+    try {
+      var display = id('session-timer');
+      if (!display) return;
+      var seconds = 60;
+      if (mode === 'growing') seconds = 25 * 60;
+      else if (mode === 'grounded') seconds = 15 * 60;
+      else if (mode === 'drifting') seconds = 5 * 60;
+      else if (mode === 'surviving') seconds = 3 * 60;
+      else seconds = 60;
+
+      startTimer(seconds, function onDone() {
+        // completion behavior
+        runConfetti(mode);
+        // auto-record a tiny 'Session complete' history item (optional)
+        try {
+          var date = new Date().toLocaleDateString();
+          var entry = { date: date, mode: mode, activity: 'Guided session complete', note: '' };
+          var hist = JSON.parse(localStorage.getItem('resetHistory') || '[]');
+          hist.unshift(entry);
+          localStorage.setItem('resetHistory', JSON.stringify(hist));
+          updateStreak();
+        } catch (e) {}
+        // close modal after a short pause
+        setTimeout(closeSession, 550);
+      });
+    } catch (e) { console.warn('startTimerForMode', e); }
+  }
+
+  function startTimer(totalSeconds, onDone) {
+    stopTimer();
+    session.remaining = Math.max(0, totalSeconds || 60);
+    session.running = true;
+    var display = id('session-timer');
+    if (display) display.textContent = formatTime(session.remaining);
+    session.timerId = setInterval(function () {
+      session.remaining -= 1;
+      if (display) display.textContent = formatTime(session.remaining);
+      if (session.remaining <= 0) {
+        stopTimer();
+        session.running = false;
+        if (typeof onDone === 'function') onDone();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (session.timerId) { clearInterval(session.timerId); session.timerId = null; session.running = false; }
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec || 0));
+    var m = Math.floor(sec / 60), s = sec % 60;
+    return (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+  }
+
+  /* Defensive early delegation (capture) so taps work reliably */
   (function attachEarlyDelegate() {
     try {
       function safeNavigateHash(h) {
@@ -258,7 +403,7 @@
     } catch (e) {}
   })();
 
-  /* bindUI + compass delegation + needle spin */
+  /* UI binding helpers + compass delegation + needle spin */
   function bindUI() {
     try {
       var navs = $$('.nav-links a[data-hash]');
@@ -287,9 +432,9 @@
     comp.addEventListener('click', function (ev) {
       try {
         var tgt = ev.target;
-        var path = (tgt && tgt.closest) ? tgt.closest('[data-mode]') : null;
-        if (!path) return;
-        var mode = path.getAttribute('data-mode');
+        var node = (tgt && tgt.closest) ? tgt.closest('[data-mode]') : null;
+        if (!node) return;
+        var mode = node.getAttribute('data-mode');
         setTheme(mode);
         renderModePage(mode);
         navigateMode(mode);
@@ -328,10 +473,17 @@
       bindUI();
       attachCompassDelegation();
       setupNeedleSpin();
+      // session modal controls
+      var modal = id('session-modal'), closeBtn = id('session-close'), cancel = id('session-cancel');
+      if (modal) {
+        modal.addEventListener('click', function (e) { if (e.target === modal) closeSession(); });
+        closeBtn && closeBtn.addEventListener('click', closeSession);
+        cancel && cancel.addEventListener('click', closeSession);
+      }
       if (!location.hash) location.hash = '#home';
       renderRoute();
       updateStreak();
-      console.info('[app v124] initialized (stronger mode themes)');
+      console.info('[app v125] initialized (guided sessions)');
     } catch (err) {
       console.error('init failed', err);
       try { window.__lastAppError = { msg: err.message || String(err), stack: err.stack || null, time: new Date().toISOString() }; } catch (e) {}
