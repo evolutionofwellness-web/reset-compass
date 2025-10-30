@@ -8,8 +8,7 @@
   <!-- Explicit favicon so browsers don't probe /favicon.ico -->
   <link rel="icon" href="splash-icon.png" type="image/png">
 
-  <!-- Main stylesheet (no animations) -->
-  <link rel="stylesheet" href="main.css?v=118" />
+  <link rel="stylesheet" href="main.css?v=119" />
 </head>
 <body>
   <div id="app-root" class="app-root" aria-hidden="false">
@@ -78,10 +77,21 @@
       </section>
 
       <section id="mode-buttons" class="buttons">
-        <button type="button" class="mode-button growing" data-mode="growing">Growing</button>
-        <button type="button" class="mode-button grounded" data-mode="grounded">Grounded</button>
-        <button type="button" class="mode-button drifting" data-mode="drifting">Drifting</button>
-        <button type="button" class="mode-button surviving" data-mode="surviving">Surviving</button>
+        <button type="button" class="mode-button growing" data-mode="growing" data-desc="Push yourself to new heights">
+          <div class="btn-content"><div class="btn-title">Growing</div><div class="btn-desc">Push yourself to new heights</div></div>
+        </button>
+
+        <button type="button" class="mode-button grounded" data-mode="grounded" data-desc="Stay centered and productive">
+          <div class="btn-content"><div class="btn-title">Grounded</div><div class="btn-desc">Stay centered and productive</div></div>
+        </button>
+
+        <button type="button" class="mode-button drifting" data-mode="drifting" data-desc="Gently regain focus and energy">
+          <div class="btn-content"><div class="btn-title">Drifting</div><div class="btn-desc">Gently regain focus and energy</div></div>
+        </button>
+
+        <button type="button" class="mode-button surviving" data-mode="surviving" data-desc="Just get through the day">
+          <div class="btn-content"><div class="btn-title">Surviving</div><div class="btn-desc">Just get through the day</div></div>
+        </button>
       </section>
 
       <div id="content" class="content-area" aria-live="polite"></div>
@@ -89,6 +99,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js?v=118"></script>
+  <script src="app.js?v=119"></script>
 </body>
 </html>
