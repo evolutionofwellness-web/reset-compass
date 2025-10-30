@@ -1,17 +1,16 @@
-/* app.js v118 — simplified, ES5-compatible, NO ANIMATIONS
-   - Minimal, defensive helpers ($ and $$)
-   - Delegated wedge click handling
-   - Nav + button binding
-   - Renderers for Home / Mode / Quick / History / About
-   - Needle rotation on scroll (transform only), no CSS animations
+/* app.js v119 — updated to show mode descriptions + improved Quick Wins layout
+   - ES5-friendly
+   - modeInfo map provides short descriptions and tips
+   - renderModePage now shows description + tip box
+   - Quick wins render as compact cards with clear labels
+   - No animations; defensive bindings retained
 */
 
 (function () {
   'use strict';
 
-  /* Helpers (ES5-friendly) */
+  /* Helpers */
   function $(sel, root) { root = root || document; return Array.prototype.slice.call(root.querySelectorAll(sel)); }
-  // $$ alias for older code / safety
   if (typeof window.$$ !== 'function') {
     window.$$ = function (sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } };
   }
@@ -19,12 +18,9 @@
   function escapeHtml(s) { s = String(s || ''); return s.replace(/[&<>"']/g, function (ch) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]); }); }
   function escapeJs(s) { s = String(s || ''); return s.replace(/'/g, "\\'").replace(/"/g, '\\"'); }
 
-  /* Error capture for debugging */
+  /* Error capture */
   window.__lastAppError = null;
-  window.onerror = function (msg, url, line, col, err) {
-    try { window.__lastAppError = { msg: msg, url: url, line: line, col: col, err: err && (err.stack || err.message) || null, time: new Date().toISOString() }; } catch (e) {}
-    return false;
-  };
+  window.onerror = function (msg, url, line, col, err) { try { window.__lastAppError = { msg: msg, url: url, line: line, col: col, err: err && (err.stack || err.message) || null, time: new Date().toISOString() }; } catch (e) {} return false; };
 
   /* Ensure content exists */
   function ensureContentElement() {
@@ -39,27 +35,31 @@
     return c;
   }
 
-  /* Simple theming: toggles a class, no animations */
-  function setTheme(mode) {
-    try {
-      var root = id('app-root');
-      if (!root) return;
-      root.classList.remove('theme-growing', 'theme-grounded', 'theme-drifting', 'theme-surviving');
-      if (mode) root.classList.add('theme-' + mode);
-    } catch (e) {}
-  }
-
-  /* Navigation helpers (exposed) */
-  window.navigateHash = function (hash) {
-    try { location.hash = hash; } catch (e) { console.warn(e); }
-    try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
+  /* Simple mode metadata */
+  var modeInfo = {
+    growing: {
+      title: 'Growing',
+      desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.',
+      tip: 'Choose one focused, slightly-challenging task you can make progress on in 15–30 minutes.'
+    },
+    grounded: {
+      title: 'Grounded',
+      desc: 'Stay centered and productive — structure your next steps and clear small hurdles.',
+      tip: 'Break a larger task into 2–3 small wins and complete the first one now.'
+    },
+    drifting: {
+      title: 'Drifting',
+      desc: 'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.',
+      tip: 'Try a 7–10 minute walk or a 5-minute journaling exercise to refocus.'
+    },
+    surviving: {
+      title: 'Surviving',
+      desc: 'Just get through the day — prioritize essentials and basic self-care to stay afloat.',
+      tip: 'Pick one low-effort, high-impact action (water, breathe, rest) and pause for 3–5 minutes.'
+    }
   };
-  window.navigateMode = function (mode) {
-    try { location.hash = '#mode/' + mode; } catch (e) { console.warn(e); }
-    try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
-  };
 
-  /* Activities data */
+  /* Activities dataset */
   var activities = {
     growing: [{ label: 'Write a goal', icon: '🎯' }, { label: 'Tackle a challenge', icon: '⚒️' }, { label: 'Start a new project', icon: '🚀' }],
     grounded: [{ label: 'Declutter a space', icon: '🧹' }, { label: 'Complete a task', icon: '✅' }, { label: 'Plan your day', icon: '🗓️' }],
@@ -67,7 +67,11 @@
     surviving: [{ label: 'Drink water', icon: '💧' }, { label: 'Breathe deeply', icon: '🌬️' }, { label: 'Rest for 5 minutes', icon: '😴' }]
   };
 
-  /* Renderers */
+  /* Navigation helpers */
+  window.navigateHash = function (hash) { try { location.hash = hash; } catch (e) { console.warn(e); } try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {} };
+  window.navigateMode = function (mode) { try { location.hash = '#mode/' + mode; } catch (e) { console.warn(e); } try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {} };
+
+  /* Renders */
   function renderRoute() {
     try {
       var h = location.hash || '#home';
@@ -86,33 +90,50 @@
   }
   window.renderRoute = renderRoute;
 
-  function renderHome() { var c = ensureContentElement(); c.innerHTML = ''; setTheme(''); }
+  function renderHome() {
+    var c = ensureContentElement();
+    c.innerHTML = '';
+    setTheme('');
+  }
+
   function renderModePage(mode) {
-    var c = ensureContentElement(); setTheme(mode);
+    var c = ensureContentElement();
+    setTheme(mode);
+    var info = modeInfo[mode] || { title: mode, desc: '', tip: '' };
     if (!activities[mode]) { c.innerHTML = '<p>Unknown mode</p>'; return; }
-    var html = '<div class="mode-page" role="region" aria-labelledby="mode-title"><h2 id="mode-title">' + (mode.charAt(0).toUpperCase() + mode.slice(1)) + '</h2>';
+
+    var html = '<div class="mode-page" role="region" aria-labelledby="mode-title">';
+    html += '<h2 id="mode-title">' + escapeHtml(info.title) + '</h2>';
+    if (info.desc) html += '<div class="mode-desc">' + escapeHtml(info.desc) + '</div>';
+    if (info.tip) html += '<div class="mode-tip">Tip: ' + escapeHtml(info.tip) + '</div>';
+
+    // activity list
     for (var i = 0; i < activities[mode].length; i++) {
-      var a = activities[mode][i];
+      var act = activities[mode][i];
       html += '<div class="activity-row" id="row-' + mode + '-' + i + '">';
-      html += '<div class="activity-main"><span class="activity-icon" aria-hidden="true">' + escapeHtml(a.icon) + '</span><div class="activity-label">' + escapeHtml(a.label) + '</div></div>';
+      html += '<div class="activity-main"><span class="activity-icon" aria-hidden="true">' + escapeHtml(act.icon) + '</span><div class="activity-label">' + escapeHtml(act.label) + '</div></div>';
       html += '<textarea id="note-' + mode + '-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="activity-controls"><button class="btn btn-complete" onclick="completeActivity(\'' + mode + '\',\'' + escapeJs(a.label) + '\',\'note-' + mode + '-' + i + '\',\'row-' + mode + '-' + i + '\')">Complete</button></div>';
+      html += '<div class="activity-controls"><button class="btn btn-complete" onclick="completeActivity(\'' + mode + '\',\'' + escapeJs(act.label) + '\',\'note-' + mode + '-' + i + '\',\'row-' + mode + '-' + i + '\')">Complete</button></div>';
       html += '</div>';
     }
-    html += '<button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
+
+    html += '<button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button>';
+    html += '</div>';
     c.innerHTML = html;
   }
 
   function renderQuickWins() {
     var c = ensureContentElement();
     var quick = [{ label: 'Drink water', icon: '💧' }, { label: 'Stand up and stretch', icon: '🧘' }, { label: 'Take 3 deep breaths', icon: '🌬️' }];
-    var html = '<div class="mode-page"><h2>Quick Wins</h2>';
+    var html = '<div class="mode-page"><h2>Quick Wins</h2><div class="quick-list">';
     for (var i = 0; i < quick.length; i++) {
-      html += '<div class="activity-row" id="row-quick-' + i + '"><div class="activity-main"><span class="activity-icon">' + escapeHtml(quick[i].icon) + '</span><div class="activity-label">' + escapeHtml(quick[i].label) + '</div></div>';
-      html += '<textarea id="qw-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="activity-controls"><button class="btn btn-complete" onclick="completeActivity(\'quick-win\',\'' + escapeJs(quick[i].label) + '\',\'qw-' + i + '\',\'row-quick-' + i + '\')">Complete</button></div></div>';
+      html += '<div class="quick-card" id="qw-' + i + '">';
+      html += '<div class="icon">' + escapeHtml(quick[i].icon) + '</div>';
+      html += '<div class="content"><div class="label">' + escapeHtml(quick[i].label) + '</div>';
+      html += '<div class="controls"><textarea id="qw-note-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
+      html += '<div style="margin-top:8px"><button class="btn btn-complete" onclick="completeActivity(\'quick-win\',\'' + escapeJs(quick[i].label) + '\',\'qw-note-' + i + '\',\'row-quick-' + i + '\')">Complete</button></div></div></div></div>';
     }
-    html += '<button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
+    html += '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
     c.innerHTML = html;
   }
 
@@ -211,7 +232,7 @@
       for (var b = 0; b < btns.length; b++) {
         (function (el) {
           if (!el.__bound) {
-            el.addEventListener('click', function (ev) { try { ev && ev.preventDefault && ev.preventDefault(); } catch (ee) {} var m = el.getAttribute('data-mode'); setTheme(m); navigateMode(m); });
+            el.addEventListener('click', function (ev) { try { ev && ev.preventDefault && ev.preventDefault(); } catch (ee) {} var m = el.getAttribute('data-mode'); setTheme(m); renderModePage(m); navigateMode(m); });
             el.__bound = true;
           }
         })(btns[b]);
@@ -219,7 +240,7 @@
     } catch (e) { console.warn('bindUI error', e); }
   }
 
-  /* Needle rotation: keep transform only, no idle animation */
+  /* Needle transform on scroll */
   function setupNeedleSpin() {
     var ng = id('needle-group');
     if (!ng) return;
@@ -246,7 +267,6 @@
       var root = id('app-root'); if (root) { root.classList.add('visible'); root.setAttribute('aria-hidden', 'false'); }
       ensureContentElement();
 
-      // Delegated wedge handling
       var comp = id('compass');
       if (comp && !comp.__delegated) {
         comp.addEventListener('click', function (ev) {
@@ -256,6 +276,7 @@
             if (!path) return;
             var mode = path.getAttribute('data-mode');
             setTheme(mode);
+            renderModePage(mode);
             navigateMode(mode);
           } catch (e) { console.warn('compass click', e); }
         });
@@ -268,7 +289,7 @@
       if (!location.hash) location.hash = '#home';
       try { renderRoute(); } catch (e) {}
       updateStreak();
-      console.info('[app v118] initialized (no animations)');
+      console.info('[app v119] initialized (mode descriptions + quick wins)');
     } catch (err) {
       console.error('init failed', err);
       try { window.__lastAppError = { msg: err.message || String(err), stack: err.stack || null, time: new Date().toISOString() }; } catch (e) {}
