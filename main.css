@@ -20,46 +20,76 @@ body{
 /* Theme backgrounds applied on .app-root to allow per-mode theming */
 .app-root { background: var(--bg); transition: background .18s linear; }
 
-/* Per-mode theme variables & subtle patterns */
-/* Growing: cool blue gradient + soft diagonal stripe overlay */
-.app-root.theme-growing {
-  background: linear-gradient(180deg,#E9F6FF,#F7FBFF);
-  --mode-accent: #007BFF; --mode-bg: #E9F6FF; --mode-text: #043b66;
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0)), repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 6px, transparent 6px 12px);
-  background-blend-mode: overlay, normal;
+/* Per-mode theme variables & stronger page-level visuals */
+/* Growing: bold blue band + diagonal stripes */
+.app-root.theme-growing { --mode-accent: #007BFF; --mode-text: #043b66; }
+.app-root.theme-growing .mode-page {
+  background: linear-gradient(180deg,#F8FBFF,#FFFFFF);
+  border-color: rgba(0,123,255,0.10);
+  box-shadow: 0 10px 30px rgba(6,20,40,0.04);
 }
+.app-root.theme-growing .mode-page::before {
+  content: ""; display:block; height:8px; border-top-left-radius:14px; border-top-right-radius:14px;
+  background: linear-gradient(90deg,#2FA0FF,#007BFF);
+  margin:-20px -20px 14px; /* extend past edges */
+  box-shadow: 0 6px 16px rgba(2,56,120,0.06);
+  opacity:0.95;
+}
+.app-root.theme-growing .mode-page .mode-icon { background: linear-gradient(180deg,#2FA0FF,#007BFF); color:#fff; }
 
-/* Grounded: soft green with linen texture via radial dots */
-.app-root.theme-grounded {
-  background: linear-gradient(180deg,#F0FFF4,#F7FBF8);
-  --mode-accent: #2e8b57; --mode-bg: #F0FFF4; --mode-text: #0b3d2e;
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0)), radial-gradient(circle at 10% 10%, rgba(46,139,87,0.02) 0, rgba(46,139,87,0.02) 1px, transparent 1px);
-  background-size: auto, 14px 14px;
+/* Grounded: soft green + linen dots */
+.app-root.theme-grounded { --mode-accent: #2e8b57; --mode-text: #0b3d2e; }
+.app-root.theme-grounded .mode-page {
+  background: linear-gradient(180deg,#FBFFFB,#FFFFFF);
+  border-color: rgba(46,139,87,0.08);
+  box-shadow: 0 10px 28px rgba(6,20,20,0.03);
 }
+.app-root.theme-grounded .mode-page::before {
+  content: ""; display:block; height:8px; border-top-left-radius:14px; border-top-right-radius:14px;
+  background: linear-gradient(90deg,#79D18E,#2e8b57);
+  margin:-20px -20px 14px;
+  opacity:0.98;
+}
+.app-root.theme-grounded .mode-page { background-image: radial-gradient(circle at 10% 10%, rgba(46,139,87,0.02) 0, rgba(46,139,87,0.02) 1px, transparent 1px); background-size: auto, 14px 14px; }
+.app-root.theme-grounded .mode-page .mode-icon { background: linear-gradient(180deg,#79D18E,#2e8b57); color:#fff; }
 
-/* Drifting: warm gold + subtle paper grain */
-.app-root.theme-drifting {
-  background: linear-gradient(180deg,#FFF9F0,#FFFBF6);
-  --mode-accent: #d6a520; --mode-bg: #FFF9F0; --mode-text: #5b3f12;
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0)), radial-gradient(circle at 50% 50%, rgba(0,0,0,0.02) 0, rgba(0,0,0,0.02) 0.8px, transparent 1px);
-  background-size: auto, 10px 10px;
+/* Drifting: warm gold + paper grain */
+.app-root.theme-drifting { --mode-accent: #d6a520; --mode-text: #5b3f12; }
+.app-root.theme-drifting .mode-page {
+  background: linear-gradient(180deg,#FFFBF5,#FFFFFF);
+  border-color: rgba(214,165,32,0.08);
+  box-shadow: 0 10px 28px rgba(80,50,10,0.03);
 }
+.app-root.theme-drifting .mode-page::before {
+  content: ""; display:block; height:8px; border-top-left-radius:14px; border-top-right-radius:14px;
+  background: linear-gradient(90deg,#FFD166,#D6A520);
+  margin:-20px -20px 14px;
+  opacity:0.96;
+}
+.app-root.theme-drifting .mode-page { background-image: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.015) 0, rgba(0,0,0,0.015) 0.8px, transparent 1px); background-size: auto, 10px 10px; }
+.app-root.theme-drifting .mode-page .mode-icon { background: linear-gradient(180deg,#FFD166,#D6A520); color:#382B10; }
 
-/* Surviving: soft warm red with faint crosshatch */
-.app-root.theme-surviving {
-  background: linear-gradient(180deg,#FFF6F6,#FFFBFB);
-  --mode-accent: #d9534f; --mode-bg: #FFF6F6; --mode-text: #6a2422;
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0)), repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 8px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 8px);
-  background-blend-mode: overlay, overlay, overlay;
+/* Surviving: soft warm red + crosshatch */
+.app-root.theme-surviving { --mode-accent: #d9534f; --mode-text: #6a2422; }
+.app-root.theme-surviving .mode-page {
+  background: linear-gradient(180deg,#FFF6F6,#FFFFFF);
+  border-color: rgba(217,83,79,0.08);
+  box-shadow: 0 10px 28px rgba(120,40,40,0.03);
 }
+.app-root.theme-surviving .mode-page::before {
+  content: ""; display:block; height:8px; border-top-left-radius:14px; border-top-right-radius:14px;
+  background: linear-gradient(90deg,#F08F91,#D9534F);
+  margin:-20px -20px 14px;
+  opacity:0.96;
+}
+.app-root.theme-surviving .mode-page { background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0 1px, transparent 1px 8px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.01) 0 1px, transparent 1px 8px); background-blend-mode: overlay; }
+.app-root.theme-surviving .mode-page .mode-icon { background: linear-gradient(180deg,#F08F91,#D9534F); color:#fff; }
 
-/* Quick wins theme: light blue wash */
-.app-root.theme-quick {
-  background: linear-gradient(180deg,#f3f7ff,#fdfefe);
-  --mode-accent: #6f42c1; --mode-bg:#f3f7ff; --mode-text:#253858;
-  background-image: radial-gradient(circle at 80% 20%, rgba(111,66,193,0.02) 0, rgba(111,66,193,0.02) 1px, transparent 2px);
-  background-size: auto, 14px 14px;
-}
+/* Quick theme */
+.app-root.theme-quick { --mode-accent: #6f42c1; --mode-text: #253858; }
+.app-root.theme-quick .mode-page { background: linear-gradient(180deg,#F6F7FF,#FFFFFF); border-color: rgba(111,66,193,0.06); box-shadow: 0 10px 28px rgba(60,50,90,0.03); }
+.app-root.theme-quick .mode-page::before { content: ""; display:block; height:8px; border-top-left-radius:14px; border-top-right-radius:14px; background: linear-gradient(90deg,#C1B3FF,#6f42c1); margin:-20px -20px 14px; opacity:0.95; }
+.app-root.theme-quick .mode-page .mode-icon { background: linear-gradient(180deg,#C1B3FF,#6f42c1); color:#fff; }
 
 /* App root & layout */
 .app-root{min-height:100vh}
@@ -80,6 +110,16 @@ body{
 /* Page */
 .page{max-width:980px;margin:6px auto;padding:0 16px 120px}
 .card{background:var(--card-bg);border-radius:var(--radius);padding:18px;border:1px solid rgba(11,61,46,0.04);box-shadow:var(--shadow);margin-bottom:18px}
+
+/* Mode page header */
+.mode-page { position:relative; overflow:visible; }
+.mode-header { display:flex; align-items:center; gap:14px; margin-bottom:12px; padding-top:6px; }
+.mode-icon {
+  width:56px; height:56px; border-radius:14px; flex:0 0 56px; display:flex; align-items:center; justify-content:center;
+  font-size:26px; font-weight:800; box-shadow: 0 6px 18px rgba(6,20,12,0.06);
+}
+.mode-title { margin:0; font-size:1.6rem; font-weight:900; color:var(--mode-text, var(--brand-green)); }
+.mode-sub { margin-top:6px; color:var(--muted-text); font-weight:600; }
 
 /* Compass */
 .compass-wrap{display:flex;justify-content:center;margin:8px 0 18px;position:relative}
@@ -125,36 +165,14 @@ svg{width:360px;height:360px;max-width:92vw;display:block}
 .btn-complete{background:var(--brand-green);color:#fff;border:none;padding:10px 12px;border-radius:10px;font-weight:800;cursor:pointer}
 .return-button{display:inline-block;margin-top:14px;padding:12px 18px;background:var(--brand-green);color:white;border-radius:12px;border:none;font-weight:800;cursor:pointer}
 
-/* Mode-specific accents for mode pages */
-.app-root.theme-growing .mode-page { border-color: rgba(0,123,255,0.08); }
+/* Mode-specific accents for mode pages (fallbacks kept) */
 .app-root.theme-growing .mode-page h2 { color: #004a90; }
-.app-root.theme-grounded .mode-page { border-color: rgba(46,139,87,0.06); }
 .app-root.theme-grounded .mode-page h2 { color: #145a2f; }
-.app-root.theme-drifting .mode-page { border-color: rgba(214,165,32,0.06); }
 .app-root.theme-drifting .mode-page h2 { color: #7a5d1a; }
-.app-root.theme-surviving .mode-page { border-color: rgba(217,83,79,0.06); }
 .app-root.theme-surviving .mode-page h2 { color: #7a2320; }
-.app-root.theme-quick .mode-page { border-color: rgba(111,66,193,0.06); }
 .app-root.theme-quick .mode-page h2 { color: #3b2a6e; }
 
-/* Small visual click trace (temporary) */
-#click-trace {
-  position: fixed;
-  left: 12px;
-  bottom: 12px;
-  background: rgba(0,0,0,0.7);
-  color: #fff;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  z-index: 200000;
-  display: none;
-  max-width: 260px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
+/* Utilities */
 .small-muted{color:var(--muted-text);font-size:0.9rem;margin-top:6px}
 
 @media (max-width:420px){
@@ -163,4 +181,6 @@ svg{width:360px;height:360px;max-width:92vw;display:block}
   .mode-button{font-size:0.95rem;padding:10px}
   .nav-links a{font-size:0.9rem;padding:6px 6px}
   .hero-title{font-size:1.1rem}
+  .mode-title{font-size:1.3rem}
+  .mode-icon{width:48px;height:48px;border-radius:12px;font-size:20px}
 }
