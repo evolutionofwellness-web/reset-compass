@@ -1,7 +1,8 @@
-/* app.js v126 — animations removed for stability
-   - Replaces Element.animate usage with non-animated fallbacks for confetti
-   - Keeps defensive delegation and routing
-   - No animation or CSS transitions relied upon
+/* app.js v124 — stronger per-mode page visuals (decorative header + accents)
+   - ES5-friendly
+   - Sets .app-root.theme-<mode> and renders mode pages with a header block so the theme is obvious
+   - Keeps defensive event delegation and mode-specific confetti palettes
+   - Removes debug click-trace UI (temporary)
 */
 
 (function () {
@@ -16,21 +17,21 @@
   function escapeHtml(s) { s = String(s || ''); return s.replace(/[&<>"']/g, function (ch) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]); }); }
   function escapeJs(s) { s = String(s || ''); return s.replace(/'/g, "\\'").replace(/"/g, '\\"'); }
 
-  /* Last error capture */
+  /* Error capture */
   window.__lastAppError = null;
   window.onerror = function (msg, url, line, col, err) {
     try { window.__lastAppError = { msg: msg, url: url, line: line, col: col, err: err && (err.stack || err.message) || null, time: new Date().toISOString() }; } catch (e) {}
     return false;
   };
 
-  /* Current mode + confetti colors */
+  /* Current mode & confetti palettes */
   window.__currentMode = '';
   var confettiColors = {
     growing: ['#79C7FF','#2FA0FF','#007BFF','#1B6EDC'],
     grounded: ['#B7E7C7','#7FD1A1','#2e8b57','#196035'],
     drifting: ['#FFE9A8','#FFD166','#D6A520','#B78F18'],
     surviving: ['#FFD3D6','#F08F91','#D9534F','#B73534'],
-    'quick': ['#E7E0FF','#C1B3FF','#6f42c1','#4b2a8a']
+    quick: ['#E7E0FF','#C1B3FF','#6f42c1','#4b2a8a']
   };
 
   function setTheme(mode) {
@@ -41,8 +42,33 @@
       window.__currentMode = mode || '';
     } catch (e) { console.warn('setTheme failed', e); }
   }
+  window.setTheme = setTheme;
 
-  /* Minimal ensureContent */
+  /* Mode header icons (emoji) */
+  var modeIcons = {
+    growing: '🌱',
+    grounded: '🌿',
+    drifting: '🌤️',
+    surviving: '🛟',
+    'quick': '⚡'
+  };
+
+  /* Mode metadata & activities */
+  var modeInfo = {
+    growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Pick one focused, slightly-challenging task you can make progress on in 15–30 minutes.' },
+    grounded: { title: 'Grounded', desc: 'Stay centered and productive — structure your next steps and clear small hurdles.', tip: 'Break a larger task into 2–3 small wins and complete the first one now.' },
+    drifting: { title: 'Drifting', desc: 'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.', tip: 'Try a 7–10 minute walk or a 5-minute journaling exercise to refocus.' },
+    surviving: { title: 'Surviving', desc: 'Just get through the day — prioritize essentials and basic self-care to stay afloat.', tip: 'Pick one low-effort, high-impact action (water, breathe, rest) and pause for 3–5 minutes.' }
+  };
+
+  var activities = {
+    growing: [{ label: 'Write a goal', icon: '🎯' }, { label: 'Tackle a challenge', icon: '⚒️' }, { label: 'Start a new project', icon: '🚀' }],
+    grounded: [{ label: 'Declutter a space', icon: '🧹' }, { label: 'Complete a task', icon: '✅' }, { label: 'Plan your day', icon: '🗓️' }],
+    drifting: [{ label: 'Go for a walk', icon: '🚶' }, { label: 'Journal your thoughts', icon: '✍️' }, { label: 'Listen to calming music', icon: '🎧' }],
+    surviving: [{ label: 'Drink water', icon: '💧' }, { label: 'Breathe deeply', icon: '🌬️' }, { label: 'Rest for 5 minutes', icon: '😴' }]
+  };
+
+  /* Ensure content area */
   function ensureContentElement() {
     var c = id('content');
     if (c) return c;
@@ -55,49 +81,31 @@
     return c;
   }
 
-  /* Confetti fallback: place dots instantly without animation, then remove */
+  /* Confetti */
   function runConfetti(mode) {
     try {
       mode = mode || window.__currentMode || 'quick';
       var colors = confettiColors[mode] || confettiColors['quick'];
       var n = 10, container = document.createElement('div');
-      container.style.position = 'fixed';
-      container.style.left = '50%';
-      container.style.top = '32%';
-      container.style.pointerEvents = 'none';
-      container.style.zIndex = 99999;
-      container.style.transform = 'translateX(-50%)';
+      container.style.position = 'fixed'; container.style.left = '50%'; container.style.top = '32%';
+      container.style.pointerEvents = 'none'; container.style.zIndex = 99999; container.style.transform = 'translateX(-50%)';
       document.body.appendChild(container);
-
       for (var i = 0; i < n; i++) {
-        var dot = document.createElement('div');
-        var size = (6 + Math.round(Math.random() * 8)) + 'px';
-        dot.style.width = size;
-        dot.style.height = size;
-        dot.style.borderRadius = '50%';
+        var dot = document.createElement('div'), size = (6 + Math.round(Math.random() * 8)) + 'px';
+        dot.style.width = size; dot.style.height = size; dot.style.borderRadius = '50%';
         dot.style.background = colors[i % colors.length];
-        dot.style.position = 'absolute';
-        dot.style.left = '0';
-        dot.style.top = '0';
-        dot.style.opacity = '0.95';
-        // compute a final offset and apply immediately (no animation)
-        var angle = Math.random() * Math.PI * 2;
-        var dist = 40 + Math.random() * 80; // spread
-        var dx = Math.round(Math.cos(angle) * dist);
-        var dy = Math.round(Math.sin(angle) * dist);
-        dot.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(0.95)';
+        dot.style.position = 'absolute'; dot.style.left = '0'; dot.style.top = '0'; dot.style.opacity = '0.95';
         container.appendChild(dot);
+        (function (dot) {
+          var angle = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 120, dx = Math.cos(angle) * dist, dy = Math.sin(angle) * dist;
+          try { dot.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(0.9)', opacity: 0.9 }], { duration: 700 + Math.random() * 300 }); } catch (e) {}
+        })(dot);
       }
-
-      // remove after a short delay
-      setTimeout(function () {
-        try { container.remove(); } catch (e) {}
-      }, 900);
+      setTimeout(function () { try { container.remove(); } catch (e) {} }, 1400);
     } catch (e) { console.warn('confetti error', e); }
   }
-  window.runConfetti = runConfetti;
 
-  /* completeActivity */
+  /* completeActivity (exposed) */
   window.completeActivity = function (mode, activity, noteId, rowId) {
     try {
       var row = id(rowId);
@@ -136,29 +144,14 @@
     try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
   };
 
-  /* Renderers are left unchanged from v125/v124 versions (mode pages, quick, history, about) */
-  var modeIcons = { growing: '🌱', grounded: '🌿', drifting: '🌤️', surviving: '🛟', quick: '⚡' };
-  var modeInfo = {
-    growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Try a focused 25-minute work session (Pomodoro).' },
-    grounded: { title: 'Grounded', desc: 'Stay centered and productive — structure your next steps and clear small hurdles.', tip: 'Break a larger task into 2–3 small wins and do the first now.' },
-    drifting: { title: 'Drifting', desc: 'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.', tip: 'Try a 7–10 minute walk or a 5-minute breathing reset.' },
-    surviving: { title: 'Surviving', desc: 'Just get through the day — prioritize essentials and basic self-care to stay afloat.', tip: 'Take a 3–5 minute breathing break (box or 4-4-4) and hydrate.' }
-  };
-  var activities = {
-    growing: [{ label: 'Write a goal', icon: '🎯' }, { label: 'Tackle a challenge', icon: '⚒️' }, { label: 'Start a new project', icon: '🚀' }],
-    grounded: [{ label: 'Declutter a space', icon: '🧹' }, { label: 'Complete a task', icon: '✅' }, { label: 'Plan your day', icon: '🗓️' }],
-    drifting: [{ label: 'Go for a walk', icon: '🚶' }, { label: 'Journal your thoughts', icon: '✍️' }, { label: 'Listen to calming music', icon: '🎧' }],
-    surviving: [{ label: 'Drink water', icon: '💧' }, { label: 'Breathe deeply', icon: '🌬️' }, { label: 'Rest for 5 minutes', icon: '😴' }]
-  };
-
-  function ensureContent() { return ensureContentElement(); }
-
-  function renderHome() { var c = ensureContent(); c.innerHTML = ''; setTheme(''); }
+  /* Renderers that include a decorative header block */
+  function renderHome() { var c = ensureContentElement(); c.innerHTML = ''; setTheme(''); }
 
   function renderModePage(mode) {
-    var c = ensureContent();
+    var c = ensureContentElement(); setTheme(mode);
     var info = modeInfo[mode] || { title: mode, desc: '', tip: '' };
     if (!activities[mode]) { c.innerHTML = '<p>Unknown mode</p>'; return; }
+
     var icon = escapeHtml(modeIcons[mode] || '•');
     var html = '<div class="mode-page mode-' + escapeHtml(mode) + '" role="region" aria-labelledby="mode-title">';
     html += '<div class="mode-header"><div class="mode-icon" aria-hidden="true">' + icon + '</div>';
@@ -166,38 +159,23 @@
     if (info.desc) html += '<div class="mode-sub">' + escapeHtml(info.desc) + '</div>';
     html += '</div></div>';
     if (info.tip) html += '<div class="mode-tip">Tip: ' + escapeHtml(info.tip) + '</div>';
-    html += '<div class="session-cta"><button class="btn-primary" data-start-session data-mode="' + escapeHtml(mode) + '">Start session</button>';
-    html += '<button class="btn-secondary" onclick="navigateHash(\\'#home\\')">Return</button></div>';
+
     for (var i = 0; i < activities[mode].length; i++) {
       var act = activities[mode][i];
       html += '<div class="activity-row" id="row-' + mode + '-' + i + '">';
       html += '<div class="activity-main"><span class="activity-icon" aria-hidden="true">' + escapeHtml(act.icon) + '</span><div class="activity-label">' + escapeHtml(act.label) + '</div></div>';
       html += '<textarea id="note-' + mode + '-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="activity-controls"><button class="btn-complete" onclick="completeActivity(\\'' + mode + '\\',\\'' + escapeJs(act.label) + '\\',\\'note-' + mode + '-' + i + '\\',\\'row-' + mode + '-' + i + '\\')">Complete</button></div>';
+      html += '<div class="activity-controls"><button class="btn-complete" onclick="completeActivity(\'' + mode + '\',\'' + escapeJs(act.label) + '\',\'note-' + mode + '-' + i + '\',\'row-' + mode + '-' + i + '\')">Complete</button></div>';
       html += '</div>';
     }
-    html += '<button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button>';
+
+    html += '<button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button>';
     html += '</div>';
     c.innerHTML = html;
-
-    // bind Start session buttons
-    var starts = c.querySelectorAll('[data-start-session]');
-    for (var j = 0; j < starts.length; j++) {
-      (function (btn) {
-        if (!btn.__bound) {
-          btn.addEventListener('click', function () {
-            var md = btn.getAttribute('data-mode') || mode;
-            // reuse existing session modal logic if present (v125)
-            if (typeof openSession === 'function') openSession(md);
-          });
-          btn.__bound = true;
-        }
-      })(starts[j]);
-    }
   }
 
   function renderQuickWins() {
-    var c = ensureContent(); setTheme('quick');
+    var c = ensureContentElement(); setTheme('quick');
     var quick = [{ label: 'Drink water', icon: '💧' }, { label: 'Stand up and stretch', icon: '🧘' }, { label: 'Take 3 deep breaths', icon: '🌬️' }];
     var html = '<div class="mode-page mode-quick"><div class="mode-header"><div class="mode-icon" aria-hidden="true">' + escapeHtml(modeIcons['quick']) + '</div>';
     html += '<div><h2 class="mode-title">Quick Wins</h2><div class="mode-sub">Small, fast actions to refresh your energy</div></div></div><div class="mode-tip">Quick actions to reset in 1–5 minutes</div>';
@@ -207,21 +185,22 @@
       html += '<div class="icon">' + escapeHtml(quick[i].icon) + '</div>';
       html += '<div class="content"><div class="label">' + escapeHtml(quick[i].label) + '</div>';
       html += '<textarea id="qw-note-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="controls" style="margin-top:8px"><button class="btn-complete" onclick="completeActivity(\\'quick-win\\',\\'' + escapeJs(quick[i].label) + '\\',\\'qw-note-' + i + '\\',\\'row-quick-' + i + '\\')">Complete</button></div></div></div>';
+      html += '<div class="controls" style="margin-top:8px"><button class="btn-complete" onclick="completeActivity(\'quick-win\',\'' + escapeJs(quick[i].label) + '\',\'qw-note-' + i + '\',\'row-quick-' + i + '\')">Complete</button></div></div></div>';
     }
-    html += '</div><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>';
+    html += '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
     c.innerHTML = html;
   }
 
   function renderHistory() {
-    var c = ensureContent(); setTheme('');
+    var c = ensureContentElement(); setTheme('');
     var history = JSON.parse(localStorage.getItem('resetHistory') || '[]');
     var listHtml = '';
     if (history.length === 0) listHtml = '<p>No history yet.</p>'; else for (var i = 0; i < history.length; i++) listHtml += '<p><strong>' + escapeHtml(history[i].date) + ':</strong> ' + escapeHtml((history[i].mode || '').charAt(0).toUpperCase() + (history[i].mode || '').slice(1)) + ' — ' + escapeHtml(history[i].activity) + (history[i].note ? ' • <em>' + escapeHtml(history[i].note) + '</em>' : '') + '</p>';
-    c.innerHTML = '<div class="mode-page"><h2>History</h2><div>' + listHtml + '</div><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>';
+    c.innerHTML = '<div class="mode-page"><h2>History</h2><div>' + listHtml + '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
+    // Chart code left unchanged (if Chart is present elsewhere)
   }
 
-  function renderAbout() { var c = ensureContent(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>'; }
+  function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>'; }
 
   /* renderRoute */
   function renderRoute() {
@@ -242,7 +221,7 @@
   }
   window.renderRoute = renderRoute;
 
-  /* Defensive early delegation (capture) */
+  /* Defensive early delegation (capture) to ensure taps are handled reliably */
   (function attachEarlyDelegate() {
     try {
       function safeNavigateHash(h) {
@@ -279,7 +258,7 @@
     } catch (e) {}
   })();
 
-  /* bindUI + compass delegation + needle spin (kept) */
+  /* bindUI + compass delegation + needle spin */
   function bindUI() {
     try {
       var navs = $$('.nav-links a[data-hash]');
@@ -308,9 +287,9 @@
     comp.addEventListener('click', function (ev) {
       try {
         var tgt = ev.target;
-        var node = (tgt && tgt.closest) ? tgt.closest('[data-mode]') : null;
-        if (!node) return;
-        var mode = node.getAttribute('data-mode');
+        var path = (tgt && tgt.closest) ? tgt.closest('[data-mode]') : null;
+        if (!path) return;
+        var mode = path.getAttribute('data-mode');
         setTheme(mode);
         renderModePage(mode);
         navigateMode(mode);
@@ -352,11 +331,11 @@
       if (!location.hash) location.hash = '#home';
       renderRoute();
       updateStreak();
-      console.info('[app v126] initialized (animations disabled)');
+      console.info('[app v124] initialized (stronger mode themes)');
     } catch (err) {
       console.error('init failed', err);
       try { window.__lastAppError = { msg: err.message || String(err), stack: err.stack || null, time: new Date().toISOString() }; } catch (e) {}
-      var rt = id('app-root') || document.body; if (rt) { rt.classList.add('visible'); rt.setAttribute('aria-hidden','false'); }
+      var rt = id('app-root') || document.body; if (rt) { rt.classList.add('visible'); rt.setAttribute('aria-hidden', 'false'); }
     }
   });
 
