@@ -1,10 +1,9 @@
-/* app.js v120 — reliable bindings, readable wedge text, improved Quick Wins styling
+/* app.js v121 — per-mode themes + quick-win theme, tightened nav spacing
    - ES5-friendly
    - Robust $$ helper
-   - Delegated wedge clicks + defensive binding
-   - Mode metadata (descriptions & tips)
-   - Quick Wins card layout and clear Complete button
-   - Exposes window.__rebindUI() to rebind handlers from console if needed
+   - setTheme(mode) toggles .app-root.theme-<mode>
+   - renderRoute sets theme: mode pages -> theme-<mode>, quick wins -> theme-quick, home -> no theme
+   - small change: buttons render call renderModePage() then navigateMode() (keeps UI immediate & URL in sync)
 */
 
 (function () {
@@ -19,14 +18,14 @@
   function escapeHtml(s) { s = String(s || ''); return s.replace(/[&<>"']/g, function (ch) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]); }); }
   function escapeJs(s) { s = String(s || ''); return s.replace(/'/g, "\\'").replace(/"/g, '\\"'); }
 
-  /* Capture last error */
+  /* Last error */
   window.__lastAppError = null;
   window.onerror = function (msg, url, line, col, err) {
     try { window.__lastAppError = { msg: msg, url: url, line: line, col: col, err: err && (err.stack || err.message) || null, time: new Date().toISOString() }; } catch (e) {}
     return false;
   };
 
-  /* Mode info */
+  /* Mode metadata */
   var modeInfo = {
     growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Pick one focused, slightly-challenging task you can make progress on in 15–30 minutes.' },
     grounded: { title: 'Grounded', desc: 'Stay centered and productive — structure your next steps and clear small hurdles.', tip: 'Break a larger task into 2–3 small wins and complete the first one now.' },
@@ -42,31 +41,15 @@
     surviving: [{ label: 'Drink water', icon: '💧' }, { label: 'Breathe deeply', icon: '🌬️' }, { label: 'Rest for 5 minutes', icon: '😴' }]
   };
 
-  /* Exposed navigation helpers */
-  window.navigateHash = function (hash) { try { location.hash = hash; } catch (e) { console.warn(e); } try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {} };
-  window.navigateMode = function (mode) { try { location.hash = '#mode/' + mode; } catch (e) { console.warn(e); } try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {} };
-
-  /* Ensure #content */
-  function ensureContentElement() {
-    var c = id('content');
-    if (c) return c;
-    var page = id('page') || document.querySelector('.page') || document.body;
-    c = document.createElement('div');
-    c.id = 'content';
-    c.className = 'content-area';
-    c.setAttribute('aria-live', 'polite');
-    page.appendChild(c);
-    return c;
-  }
-
-  /* Theme setter (no animations) */
+  /* Theme applicator */
   function setTheme(mode) {
     try {
       var root = id('app-root');
       if (!root) return;
-      root.classList.remove('theme-growing', 'theme-grounded', 'theme-drifting', 'theme-surviving');
+      // remove all known theme classes
+      root.classList.remove('theme-growing', 'theme-grounded', 'theme-drifting', 'theme-surviving', 'theme-quick');
       if (mode) root.classList.add('theme-' + mode);
-    } catch (e) {}
+    } catch (e) { console.warn('setTheme failed', e); }
   }
 
   /* Renderers */
@@ -78,11 +61,23 @@
       if (compassContainer) compassContainer.style.display = isFull ? 'none' : '';
       if (modeButtons) modeButtons.style.display = isFull ? 'none' : '';
       if (howTo) howTo.style.display = isFull ? 'none' : '';
-      if (h.indexOf('#mode/') === 0) renderModePage(h.split('/')[1]);
-      else if (h === '#quick') renderQuickWins();
-      else if (h === '#history') renderHistory();
-      else if (h === '#about') renderAbout();
-      else renderHome();
+      if (h.indexOf('#mode/') === 0) {
+        var m = h.split('/')[1];
+        setTheme(m);
+        renderModePage(m);
+      } else if (h === '#quick') {
+        setTheme('quick');
+        renderQuickWins();
+      } else if (h === '#history') {
+        setTheme('');
+        renderHistory();
+      } else if (h === '#about') {
+        setTheme('');
+        renderAbout();
+      } else {
+        setTheme('');
+        renderHome();
+      }
       try { window.scrollTo(0, 0); } catch (e) {}
     } catch (e) { console.error('renderRoute failed', e); window.__lastAppError = { msg: e.message || String(e), stack: e.stack || null, time: new Date().toISOString() }; }
   }
@@ -91,12 +86,10 @@
   function renderHome() {
     var c = ensureContentElement();
     c.innerHTML = '';
-    setTheme('');
   }
 
   function renderModePage(mode) {
     var c = ensureContentElement();
-    setTheme(mode);
     var info = modeInfo[mode] || { title: mode, desc: '', tip: '' };
     if (!activities[mode]) { c.innerHTML = '<p>Unknown mode</p>'; return; }
 
@@ -105,7 +98,6 @@
     if (info.desc) html += '<div class="mode-desc">' + escapeHtml(info.desc) + '</div>';
     if (info.tip) html += '<div class="mode-tip">Tip: ' + escapeHtml(info.tip) + '</div>';
 
-    // activities
     for (var i = 0; i < activities[mode].length; i++) {
       var act = activities[mode][i];
       html += '<div class="activity-row" id="row-' + mode + '-' + i + '">';
@@ -123,7 +115,7 @@
   function renderQuickWins() {
     var c = ensureContentElement();
     var quick = [{ label: 'Drink water', icon: '💧' }, { label: 'Stand up and stretch', icon: '🧘' }, { label: 'Take 3 deep breaths', icon: '🌬️' }];
-    var html = '<div class="mode-page"><h2>Quick Wins</h2><div class="quick-list">';
+    var html = '<div class="mode-page quick-mode"><h2>Quick Wins</h2><div class="quick-list">';
     for (var i = 0; i < quick.length; i++) {
       html += '<div class="quick-card" id="qw-' + i + '">';
       html += '<div class="icon">' + escapeHtml(quick[i].icon) + '</div>';
@@ -184,7 +176,6 @@
         localStorage.setItem('lastLogged', today);
         updateStreak();
       }
-      // small confetti that doesn't rely on CSS animations
       try { runConfetti(); } catch (e) {}
       setTimeout(function () { navigateHash('#history'); }, 700);
     } catch (e) { console.error('completeActivity error', e); window.__lastAppError = { msg: e.message || String(e), stack: e.stack || null, time: new Date().toISOString() }; }
@@ -237,7 +228,7 @@
     } catch (e) { console.warn('bindUI error', e); }
   }
 
-  /* Delegated wedge click */
+  /* Compass delegation */
   function attachCompassDelegation() {
     var comp = id('compass');
     if (!comp) return;
@@ -277,10 +268,21 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  /* Expose rebind helper for debugging */
-  window.__rebindUI = function () {
-    try { bindUI(); attachCompassDelegation(); setupNeedleSpin(); console.info('rebindUI: done'); } catch (e) { console.warn('rebindUI failed', e); }
-  };
+  /* Ensure #content exists */
+  function ensureContentElement() {
+    var c = id('content');
+    if (c) return c;
+    var page = id('page') || document.querySelector('.page') || document.body;
+    c = document.createElement('div');
+    c.id = 'content';
+    c.className = 'content-area';
+    c.setAttribute('aria-live', 'polite');
+    page.appendChild(c);
+    return c;
+  }
+
+  /* Expose rebind for debug */
+  window.__rebindUI = function () { try { bindUI(); attachCompassDelegation(); setupNeedleSpin(); console.info('rebindUI done'); } catch (e) { console.warn('rebindUI failed', e); } };
 
   /* Init */
   document.addEventListener('DOMContentLoaded', function () {
@@ -293,7 +295,7 @@
       if (!location.hash) location.hash = '#home';
       renderRoute();
       updateStreak();
-      console.info('[app v120] initialized');
+      console.info('[app v121] initialized (themes + tightened nav)');
     } catch (err) {
       console.error('init failed', err);
       try { window.__lastAppError = { msg: err.message || String(err), stack: err.stack || null, time: new Date().toISOString() }; } catch (e) {}
