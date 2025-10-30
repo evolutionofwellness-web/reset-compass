@@ -8,8 +8,8 @@
   <!-- Explicit favicon -->
   <link rel="icon" href="splash-icon.png" type="image/png">
 
-  <!-- Styles (v123: stronger delegation + clickable SVG labels) -->
-  <link rel="stylesheet" href="main.css?v=123" />
+  <!-- Styles (v124: stronger per-mode page themes) -->
+  <link rel="stylesheet" href="main.css?v=124" />
 </head>
 <body>
   <div id="app-root" class="app-root" aria-hidden="false">
@@ -75,8 +75,7 @@
             <rect id="compass-tail" x="98.5" y="104" width="3" height="26" rx="1.5" fill="rgba(6,56,39,0.88)" />
           </g>
 
-          <!-- improved readable labels: stroke + paint-order + filter
-               and IMPORTANT: include data-mode on the text so clicks on labels work too -->
+          <!-- readable labels with data-mode so label taps work -->
           <text data-mode="growing" x="100" y="36" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Growing</text>
           <text data-mode="grounded" x="156" y="100" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Grounded</text>
           <text data-mode="drifting" x="100" y="164" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Drifting</text>
@@ -107,6 +106,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js?v=123"></script>
+  <script src="app.js?v=124"></script>
 </body>
 </html>
