@@ -3,6 +3,7 @@
    - window.__features.sessions controls guided sessions (true = enabled)
    - Session logic is isolated and uses localStorage for persistence
    - Non-animated confetti used for completion
+   - Defensive: no syntax errors, no inline onclick strings; elements bound after render
 */
 
 (function () {
@@ -13,22 +14,18 @@
   // Default: enable sessions on this branch. Set false to disable immediately:
   window.__features.sessions = (typeof window.__features.sessions === 'boolean') ? window.__features.sessions : true;
 
-  /* Helpers (kept small and defensive) */
-  function $(sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } }
-  if (typeof window.$$ !== 'function') {
-    window.$$ = function (sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } };
-  }
+  /* Small helpers */
   function id(name) { return document.getElementById(name); }
+  function $$(sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } }
   function escapeHtml(s) { s = String(s || ''); return s.replace(/[&<>"']/g, function (ch) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]); }); }
 
-  /* Error capture */
   window.__lastAppError = null;
   window.onerror = function (msg, url, line, col, err) {
     try { window.__lastAppError = { msg: msg, url: url, line: line, col: col, err: err && (err.stack || err.message) || null, time: new Date().toISOString() }; } catch (e) {}
     return false;
   };
 
-  /* Current mode + palettes */
+  /* theme + data */
   window.__currentMode = '';
   var confettiColors = {
     growing: ['#79C7FF','#2FA0FF','#007BFF'],
@@ -48,7 +45,6 @@
   }
   window.setTheme = setTheme;
 
-  /* Mode data */
   var modeIcons = { growing: '🌱', grounded: '🌿', drifting: '🌤️', surviving: '🛟', quick: '⚡' };
   var modeInfo = {
     growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Try a focused 25-minute work session (Pomodoro).' },
@@ -63,7 +59,6 @@
     surviving: [{ label: 'Drink water', icon: '💧' }, { label: 'Breathe deeply', icon: '🌬️' }, { label: 'Rest for 5 minutes', icon: '😴' }]
   };
 
-  /* Ensure content container */
   function ensureContentElement() {
     var c = id('content');
     if (c) return c;
@@ -76,7 +71,7 @@
     return c;
   }
 
-  /* Non-animated confetti (safe) */
+  /* confetti */
   function runConfetti(mode) {
     try {
       mode = mode || window.__currentMode || 'quick';
@@ -89,7 +84,6 @@
       container.style.zIndex = 99999;
       container.style.transform = 'translateX(-50%)';
       document.body.appendChild(container);
-
       for (var i = 0; i < n; i++) {
         var dot = document.createElement('div');
         var size = (6 + Math.round(Math.random() * 8)) + 'px';
@@ -100,12 +94,11 @@
         dot.style.margin = (Math.random() * 12) + 'px';
         container.appendChild(dot);
       }
-
       setTimeout(function () { try { container.remove(); } catch (e) {} }, 900);
     } catch (e) { console.warn('confetti error', e); }
   }
 
-  /* completeActivity (unchanged behavior) */
+  /* activity completion behaviour (no change) */
   window.completeActivity = function (mode, activity, noteId, rowId) {
     try {
       var row = id(rowId);
@@ -134,7 +127,7 @@
 
   function updateStreak() { var el = id('streak-count'); if (el) el.textContent = localStorage.getItem('streak') || '0'; }
 
-  /* Navigation helpers */
+  /* navigation helpers */
   window.navigateHash = function (hash) {
     try { location.hash = hash; } catch (e) { console.warn(e); }
     try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
@@ -144,7 +137,7 @@
     try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
   };
 
-  /* Renderers (mode pages include Start session CTA when sessions enabled) */
+  /* renderers */
   function renderHome() { var c = ensureContentElement(); c.innerHTML = ''; setTheme(''); }
 
   function renderModePage(mode) {
@@ -153,38 +146,40 @@
     if (!activities[mode]) { c.innerHTML = '<p>Unknown mode</p>'; return; }
 
     var icon = escapeHtml(modeIcons[mode] || '•');
-    var html = '<div class="mode-page mode-' + escapeHtml(mode) + '" role="region" aria-labelledby="mode-title">';
+    var html = '';
+    html += '<div class="mode-page mode-' + escapeHtml(mode) + '" role="region" aria-labelledby="mode-title">';
     html += '<div class="mode-header"><div class="mode-icon" aria-hidden="true">' + icon + '</div>';
     html += '<div><h2 class="mode-title" id="mode-title">' + escapeHtml(info.title) + '</h2>';
     if (info.desc) html += '<div class="mode-desc">' + escapeHtml(info.desc) + '</div>';
     html += '</div></div>';
     if (info.tip) html += '<div class="mode-tip">Tip: ' + escapeHtml(info.tip) + '</div>';
 
-    // Start session CTA (if enabled)
     if (window.__features && window.__features.sessions) {
       html += '<div class="session-cta" style="margin:12px 0;"><button class="btn-primary" data-start-session data-mode="' + escapeHtml(mode) + '">Start session</button></div>';
     }
 
-    // Activities
+    // Activities: use data attributes and attach handlers after inserting HTML
     for (var i = 0; i < activities[mode].length; i++) {
       var act = activities[mode][i];
-      html += '<div class="activity-row" id="row-' + mode + '-' + i + '">';
+      var noteId = 'note-' + mode + '-' + i;
+      var rowId = 'row-' + mode + '-' + i;
+      html += '<div class="activity-row" id="' + rowId + '">';
       html += '<div class="activity-main"><span class="activity-icon" aria-hidden="true">' + escapeHtml(act.icon) + '</span><div class="activity-label">' + escapeHtml(act.label) + '</div></div>';
-      html += '<textarea id="note-' + mode + '-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="activity-controls"><button class="btn-complete" onclick="completeActivity(\\'' + mode + '\\',\\'' + escapeHtml(act.label) + '\\',\\'note-' + mode + '-' + i + '\\',\\'row-' + mode + '-' + i + '\\')">Complete</button></div>';
+      html += '<textarea id="' + noteId + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
+      html += '<div class="activity-controls"><button class="btn-complete" data-mode="' + escapeHtml(mode) + '" data-activity="' + escapeHtml(act.label) + '" data-note="' + noteId + '" data-row="' + rowId + '">Complete</button></div>';
       html += '</div>';
     }
 
-    html += '<button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button>';
+    html += '<button class="return-button" data-hash="#home">Return to the Compass</button>';
     html += '</div>';
     c.innerHTML = html;
 
-    // attach Start session handlers for the buttons just rendered
+    // attach start session handlers
     var starts = c.querySelectorAll('[data-start-session]');
     for (var j = 0; j < starts.length; j++) {
       (function (btn) {
         if (!btn.__bound) {
-          btn.addEventListener('click', function (e) {
+          btn.addEventListener('click', function () {
             var md = btn.getAttribute('data-mode') || mode;
             try { window.openSession && window.openSession(md); } catch (e) {}
           });
@@ -192,28 +187,49 @@
         }
       })(starts[j]);
     }
+
+    // attach complete handlers
+    var completes = c.querySelectorAll('.btn-complete');
+    for (var k = 0; k < completes.length; k++) {
+      (function (b) {
+        if (!b.__bound) {
+          b.addEventListener('click', function (ev) {
+            try {
+              var m = b.getAttribute('data-mode');
+              var a = b.getAttribute('data-activity');
+              var noteId = b.getAttribute('data-note');
+              var rowId = b.getAttribute('data-row');
+              window.completeActivity && window.completeActivity(m, a, noteId, rowId);
+            } catch (e) {}
+          });
+          b.__bound = true;
+        }
+      })(completes[k]);
+    }
   }
 
   function renderQuickWins() {
     var c = ensureContentElement(); setTheme('quick');
     var quick = [{ label: 'Drink water', icon: '💧' }, { label: 'Stand up and stretch', icon: '🧘' }, { label: 'Take 3 deep breaths', icon: '🌬️' }];
-    var html = '<div class="mode-page mode-quick"><div class="mode-header"><div class="mode-icon" aria-hidden="true">' + escapeHtml(modeIcons['quick']) + '</div>';
+    var html = '';
+    html += '<div class="mode-page mode-quick"><div class="mode-header"><div class="mode-icon" aria-hidden="true">' + escapeHtml(modeIcons['quick']) + '</div>';
     html += '<div><h2 class="mode-title">Quick Wins</h2><div class="mode-desc">Small, fast actions to refresh your energy</div></div></div><div class="mode-tip">Quick actions to reset in 1–5 minutes</div>';
 
-    // Start session CTA for quick wins (if enabled)
     if (window.__features && window.__features.sessions) {
       html += '<div class="session-cta" style="margin:12px 0;"><button class="btn-primary" data-start-session data-mode="quick">Start session</button></div>';
     }
 
     html += '<div class="quick-list">';
     for (var i = 0; i < quick.length; i++) {
+      var noteId = 'qw-note-' + i;
+      var rowId = 'row-quick-' + i;
       html += '<div class="quick-card" id="qw-' + i + '">';
       html += '<div class="icon">' + escapeHtml(quick[i].icon) + '</div>';
       html += '<div class="content"><div class="label">' + escapeHtml(quick[i].label) + '</div>';
-      html += '<textarea id="qw-note-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="controls" style="margin-top:8px"><button class="btn-complete" onclick="completeActivity(\\'quick-win\\',\\'' + escapeHtml(quick[i].label) + '\\',\\'qw-note-' + i + '\\',\\'row-quick-' + i + '\\')">Complete</button></div></div></div>';
+      html += '<textarea id="' + noteId + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
+      html += '<div class="controls" style="margin-top:8px"><button class="btn-complete" data-mode="quick" data-activity="' + escapeHtml(quick[i].label) + '" data-note="' + noteId + '" data-row="' + rowId + '">Complete</button></div></div></div>';
     }
-    html += '</div><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>';
+    html += '</div><button class="return-button" data-hash="#home">Return to the Compass</button></div>';
     c.innerHTML = html;
 
     var starts = c.querySelectorAll('[data-start-session]');
@@ -225,6 +241,24 @@
         }
       })(starts[j]);
     }
+
+    var completes = c.querySelectorAll('.btn-complete');
+    for (var k = 0; k < completes.length; k++) {
+      (function (b) {
+        if (!b.__bound) {
+          b.addEventListener('click', function () {
+            try {
+              var m = b.getAttribute('data-mode');
+              var a = b.getAttribute('data-activity');
+              var noteId = b.getAttribute('data-note');
+              var rowId = b.getAttribute('data-row');
+              window.completeActivity && window.completeActivity(m, a, noteId, rowId);
+            } catch (e) {}
+          });
+          b.__bound = true;
+        }
+      })(completes[k]);
+    }
   }
 
   function renderHistory() {
@@ -232,12 +266,12 @@
     var history = JSON.parse(localStorage.getItem('resetHistory') || '[]');
     var listHtml = '';
     if (history.length === 0) listHtml = '<p>No history yet.</p>'; else for (var i = 0; i < history.length; i++) listHtml += '<p><strong>' + escapeHtml(history[i].date) + ':</strong> ' + escapeHtml((history[i].mode || '').charAt(0).toUpperCase() + (history[i].mode || '').slice(1)) + ' — ' + escapeHtml(history[i].activity) + (history[i].note ? ' • <em>' + escapeHtml(history[i].note) + '</em>' : '') + '</p>';
-    c.innerHTML = '<div class="mode-page"><h2>History</h2><div>' + listHtml + '</div><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>';
+    c.innerHTML = '<div class="mode-page"><h2>History</h2><div>' + listHtml + '</div><button class="return-button" data-hash="#home">Return to the Compass</button></div>';
   }
 
-  function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>'; }
+  function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" data-hash="#home">Return to the Compass</button></div>'; }
 
-  /* renderRoute */  
+  /* route rendering */
   function renderRoute() {
     try {
       var h = location.hash || '#home';
@@ -256,7 +290,7 @@
   }
   window.renderRoute = renderRoute;
 
-  /* Session implementation (feature-flagged) */
+  /* sessions (feature-flagged) */
   var sessionDefaults = {
     growing: 25 * 60,
     grounded: 15 * 60,
@@ -444,48 +478,38 @@
 
       // clicking backdrop closes
       modal.addEventListener('click', function (e) { if (e.target === modal) closeSession(); });
+
+      // also attach row-tap delegation for checklist (defensive)
+      if (!modal.__checklistDelegate) {
+        modal.__checklistDelegate = function (e) {
+          try {
+            var tgt = e.target;
+            var row = tgt && tgt.closest ? tgt.closest('.step-item') : null;
+            if (!row) return;
+            var cb = row.querySelector('input[type="checkbox"]');
+            if (!cb) return;
+            if (e.target === cb) return;
+            e.preventDefault && e.preventDefault();
+            cb.checked = !cb.checked;
+            // persist
+            try {
+              var modeTitle = id('session-title');
+              var modeName = modeTitle ? (modeTitle.textContent || '').split('—')[0].trim().toLowerCase() : 'session';
+              var list = Array.prototype.slice.call(modal.querySelectorAll('.step-item input[type="checkbox"]')).map(function(chk){ return chk.checked; });
+              localStorage.setItem('session.checklist.' + modeName, JSON.stringify(list));
+            } catch (err) {}
+          } catch (err) {}
+        };
+        modal.addEventListener('click', modal.__checklistDelegate, true);
+      }
     } catch (e) { console.warn('createSessionBindings', e); }
   }
 
-  // Expose minimal API
+  // expose
   window.openSession = openSession;
   window.closeSession = closeSession;
 
-  // Ensure session CTAs are attached after route renders (non-invasive)
-  var _origRenderRoute = window.renderRoute;
-  if (typeof _origRenderRoute === 'function') {
-    window.renderRoute = function () {
-      try { _origRenderRoute(); } catch (e) {}
-      try {
-        var h = location.hash || '#home';
-        if (h.indexOf('#mode/') === 0) {
-          var mode = h.split('/')[1];
-          // append CTA if sessions enabled (renderModePage will also add in many cases)
-          var content = id('content'); if (content) {
-            var mp = content.querySelector('.mode-page');
-            if (mp && !mp.querySelector('[data-start-session]') && window.__features.sessions) {
-              var wrapper = document.createElement('div'); wrapper.style.margin = '12px 0';
-              var btn = document.createElement('button'); btn.className = 'btn-primary'; btn.setAttribute('data-start-session', 'true'); btn.setAttribute('data-mode', mode); btn.textContent = 'Start session';
-              wrapper.appendChild(btn); mp.insertBefore(wrapper, mp.firstChild ? mp.firstChild.nextSibling : null);
-              btn.addEventListener('click', function () { openSession(mode); });
-            }
-          }
-        } else if (h === '#quick') {
-          var content = id('content'); if (content) {
-            var mp = content.querySelector('.mode-page');
-            if (mp && !mp.querySelector('[data-start-session]') && window.__features.sessions) {
-              var wrapper = document.createElement('div'); wrapper.style.margin = '12px 0';
-              var btn = document.createElement('button'); btn.className = 'btn-primary'; btn.setAttribute('data-start-session', 'true'); btn.setAttribute('data-mode', 'quick'); btn.textContent = 'Start session';
-              wrapper.appendChild(btn); mp.insertBefore(wrapper, mp.firstChild ? mp.firstChild.nextSibling : null);
-              btn.addEventListener('click', function () { openSession('quick'); });
-            }
-          }
-        }
-      } catch (e) { console.warn('renderRoute wrapper', e); }
-    };
-  }
-
-  /* Defensive early delegation */
+  /* attach UI delegations early */
   (function attachEarlyDelegate() {
     try {
       function safeNavigateHash(h) {
@@ -517,12 +541,17 @@
             var md = svgNode.getAttribute && svgNode.getAttribute('data-mode');
             if (md) { try { ev.preventDefault && ev.preventDefault(); } catch (e) {} try { setTheme(md); } catch (e) {} safeNavigateMode(md); return; }
           }
+
+          // return-button handler
+          var ret = tgt && tgt.closest ? tgt.closest('.return-button') : null;
+          if (ret) { try { ev.preventDefault && ev.preventDefault(); } catch (e) {} var hh = ret.getAttribute('data-hash') || '#home'; safeNavigateHash(hh); return; }
+
         } catch (err) {}
       }, true);
     } catch (e) {}
   })();
 
-  /* UI bindings */
+  /* UI bindings (for static elements) */
   function bindUI() {
     try {
       var navs = $$('.nav-links a[data-hash]');
@@ -534,6 +563,7 @@
           }
         })(navs[n]);
       }
+      // static mode buttons (on home)
       var btns = $$('button[data-mode]');
       for (var b = 0; b < btns.length; b++) {
         (function (el) {
@@ -583,35 +613,6 @@
   }
 
   window.__rebindUI = function () { try { bindUI(); attachCompassDelegation(); setupNeedleSpin(); console.info('rebindUI done'); } catch (e) { console.warn('rebindUI failed', e); } };
-
-  /* Modal checklist tap helper (defensive) */
-  (function () {
-    function modalChecklistDelegate(e) {
-      try {
-        var modal = document.getElementById('session-modal');
-        if (!modal || modal.hidden) return;
-        var tgt = e.target;
-        // find nearest .step-item
-        var row = tgt && tgt.closest ? tgt.closest('.step-item') : null;
-        if (!row) return;
-        // if the click was on the checkbox itself, let native behavior happen
-        var cb = row.querySelector('input[type="checkbox"]');
-        if (!cb) return;
-        if (e.target === cb) return;
-        // otherwise toggle checkbox
-        e.preventDefault && e.preventDefault();
-        cb.checked = !cb.checked;
-        // persist per-session checklist to localStorage (keyed by mode)
-        try {
-          var modeTitle = document.getElementById('session-title');
-          var mode = modeTitle ? (modeTitle.textContent || '').split('—')[0].trim().toLowerCase() : 'session';
-          var list = Array.prototype.slice.call(modal.querySelectorAll('.step-item input[type="checkbox"]')).map(function(chk){ return chk.checked; });
-          localStorage.setItem('session.checklist.' + mode, JSON.stringify(list));
-        } catch (err) {}
-      } catch (err) { /* swallow */ }
-    }
-    document.addEventListener('click', modalChecklistDelegate, true);
-  })();
 
   /* Init */
   document.addEventListener('DOMContentLoaded', function () {
