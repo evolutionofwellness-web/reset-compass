@@ -1,109 +1,645 @@
-:root{
-  --bg: #F7FBF8;
-  --brand-green: #0B3D2E;
-  --card-bg: #ffffff;
-  --accent: #007BFF;
-  --muted-text: #5b6b60;
-  --radius: 12px;
-  --shadow: 0 8px 22px rgba(6,20,12,0.06);
-  --modal-bg: rgba(8,10,12,0.6);
-}
+/* app.js v128 — guided session modal (feature-flagged, no animations)
+   - ES5-friendly
+   - Sets .app-root.theme-<mode> and renders mode pages with a header block so the theme is obvious
+   - Keeps defensive event delegation and mode-specific confetti palettes
+   - Adds guided session modal with timer, localStorage persistence, no Element.animate
+*/
 
-/* SECURITY: disable all CSS animations and transitions for stability */
-*,
-*::before,
-*::after { animation: none !important; transition: none !important; }
+(function () {
+  'use strict';
 
-/* Reset */
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;padding:0;background:var(--bg);color:var(--brand-green);
-  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-}
+  /* APP_VERSION */
+  window.APP_VERSION = 'v128';
 
-/* App root & layout */
-.app-root{min-height:100vh}
+  /* Feature flags */
+  window.__features = window.__features || {};
+  window.__features.sessions = true;
 
-/* Mode page header refinements (v128) */
-.mode-page { position:relative; overflow:visible; }
-.mode-page::before {
-  content: ""; display:block; height:10px; border-top-left-radius:14px; border-top-right-radius:14px;
-  margin:-20px -20px 14px; opacity:0.98;
-}
-.mode-header { display:flex; align-items:center; gap:14px; margin-bottom:12px; padding-top:6px; }
-.mode-icon {
-  width:64px; height:64px; border-radius:14px; flex:0 0 64px; display:flex; align-items:center; justify-content:center;
-  font-size:28px; font-weight:900; box-shadow: 0 6px 18px rgba(6,20,12,0.06);
-}
+  /* Helpers */
+  function $(sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } }
+  if (typeof window.$$ !== 'function') {
+    window.$$ = function (sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } };
+  }
+  function id(name) { return document.getElementById(name); }
+  function escapeHtml(s) { s = String(s || ''); return s.replace(/[&<>"']/g, function (ch) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]); }); }
+  function escapeJs(s) { s = String(s || ''); return s.replace(/'/g, "\\'").replace(/"/g, '\\"'); }
 
-/* stronger title & tip contrast */
-.mode-title { margin:0; font-size:1.6rem; font-weight:900; color:var(--mode-text, var(--brand-green)); }
-.mode-tip { background:rgba(11,61,46,0.04); padding:12px; border-radius:12px; margin:12px 0; color:var(--muted-text); font-weight:700; }
+  /* Error capture */
+  window.__lastAppError = null;
+  window.onerror = function (msg, url, line, col, err) {
+    try { window.__lastAppError = { msg: msg, url: url, line: line, col: col, err: err && (err.stack || err.message) || null, time: new Date().toISOString() }; } catch (e) {}
+    return false;
+  };
 
-/* Mode theme accents (v128) */
-.app-root.theme-growing .mode-page::before { background: linear-gradient(90deg,#2FA0FF,#007BFF); box-shadow: 0 6px 16px rgba(2,56,120,0.04); }
-.app-root.theme-growing .mode-page .mode-icon { background: linear-gradient(180deg,#2FA0FF,#007BFF); color:#fff; }
+  /* Current mode & confetti palettes */
+  window.__currentMode = '';
+  var confettiColors = {
+    growing: ['#79C7FF','#2FA0FF','#007BFF','#1B6EDC'],
+    grounded: ['#B7E7C7','#7FD1A1','#2e8b57','#196035'],
+    drifting: ['#FFE9A8','#FFD166','#D6A520','#B78F18'],
+    surviving: ['#FFD3D6','#F08F91','#D9534F','#B73534'],
+    quick: ['#E7E0FF','#C1B3FF','#6f42c1','#4b2a8a']
+  };
 
-.app-root.theme-grounded .mode-page::before { background: linear-gradient(90deg,#79D18E,#2e8b57); }
-.app-root.theme-grounded .mode-page .mode-icon { background: linear-gradient(180deg,#79D18E,#2e8b57); color:#fff; }
+  function setTheme(mode) {
+    try {
+      var root = id('app-root'); if (!root) return;
+      root.classList.remove('theme-growing','theme-grounded','theme-drifting','theme-surviving','theme-quick');
+      if (mode) root.classList.add('theme-' + mode);
+      window.__currentMode = mode || '';
+    } catch (e) { console.warn('setTheme failed', e); }
+  }
+  window.setTheme = setTheme;
 
-.app-root.theme-drifting .mode-page::before { background: linear-gradient(90deg,#FFD166,#D6A520); }
-.app-root.theme-drifting .mode-page .mode-icon { background: linear-gradient(180deg,#FFD166,#D6A520); color:#382B10; }
+  /* Mode header icons (emoji) */
+  var modeIcons = {
+    growing: '🌱',
+    grounded: '🌿',
+    drifting: '🌤️',
+    surviving: '🛟',
+    'quick': '⚡'
+  };
 
-.app-root.theme-surviving .mode-page::before { background: linear-gradient(90deg,#F08F91,#D9534F); }
-.app-root.theme-surviving .mode-page .mode-icon { background: linear-gradient(180deg,#F08F91,#D9534F); color:#fff; }
+  /* Mode metadata & activities */
+  var modeInfo = {
+    growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Pick one focused, slightly-challenging task you can make progress on in 15–30 minutes.' },
+    grounded: { title: 'Grounded', desc: 'Stay centered and productive — structure your next steps and clear small hurdles.', tip: 'Break a larger task into 2–3 small wins and complete the first one now.' },
+    drifting: { title: 'Drifting', desc: 'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.', tip: 'Try a 7–10 minute walk or a 5-minute journaling exercise to refocus.' },
+    surviving: { title: 'Surviving', desc: 'Just get through the day — prioritize essentials and basic self-care to stay afloat.', tip: 'Pick one low-effort, high-impact action (water, breathe, rest) and pause for 3–5 minutes.' }
+  };
 
-.app-root.theme-quick .mode-page::before { background: linear-gradient(90deg,#C1B3FF,#6f42c1); }
-.app-root.theme-quick .mode-page .mode-icon { background: linear-gradient(180deg,#C1B3FF,#6f42c1); color:#fff; }
+  var activities = {
+    growing: [{ label: 'Write a goal', icon: '🎯' }, { label: 'Tackle a challenge', icon: '⚒️' }, { label: 'Start a new project', icon: '🚀' }],
+    grounded: [{ label: 'Declutter a space', icon: '🧹' }, { label: 'Complete a task', icon: '✅' }, { label: 'Plan your day', icon: '🗓️' }],
+    drifting: [{ label: 'Go for a walk', icon: '🚶' }, { label: 'Journal your thoughts', icon: '✍️' }, { label: 'Listen to calming music', icon: '🎧' }],
+    surviving: [{ label: 'Drink water', icon: '💧' }, { label: 'Breathe deeply', icon: '🌬️' }, { label: 'Rest for 5 minutes', icon: '😴' }]
+  };
 
-/* Core layout & components */
-.hero{display:flex;align-items:center;gap:12px;max-width:980px;margin:18px auto;padding:8px 18px}
-.hero-icon{width:64px;height:64px;border-radius:10px;object-fit:contain}
-.hero-title{margin:0;font-size:1.25rem;font-weight:800}
-.hero-sub{margin:2px 0 0;color:var(--muted-text);font-weight:500}
-.site-nav{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:8px 6px;background:var(--brand-green);color:#fff}
-.nav-links{display:flex;gap:16px;list-style:none;margin:0;padding:0;flex-wrap:nowrap;overflow-x:auto}
-.nav-links a{color:#fff;text-decoration:none;font-weight:800;padding:6px 8px;border-radius:6px;font-size:0.95rem;white-space:nowrap}
-.page{max-width:980px;margin:6px auto;padding:0 16px 120px}
-.card{background:var(--card-bg);border-radius:var(--radius);padding:18px;border:1px solid rgba(11,61,46,0.04);box-shadow:var(--shadow);margin-bottom:18px}
-.compass-wrap{display:flex;justify-content:center;margin:8px 0 18px;position:relative}
-svg{width:360px;height:360px;max-width:92vw;display:block}
-.wedge{cursor:pointer;pointer-events:auto;transform-origin:100px 100px}
-.compass-label{font-size:20px;font-weight:900;fill:#fff;text-anchor:middle;dominant-baseline:middle;pointer-events:none}
-.buttons{margin:6px 0 22px;display:flex;flex-direction:column;gap:12px;align-items:center}
-.mode-button{width:92%;max-width:720px;padding:10px 12px;border-radius:10px;border:none;color:white;font-weight:900;text-align:left;display:flex;align-items:center;cursor:pointer}
-.mode-button .btn-content{display:flex;flex-direction:column;align-items:flex-start}
-.mode-button .btn-title{font-size:1.02rem;line-height:1}
-.mode-button .btn-desc{font-size:0.86rem;color:rgba(255,255,255,0.96);font-weight:600;margin-top:6px;opacity:0.95}
-.mode-button.growing{background:linear-gradient(180deg,#2fa0ff,#007BFF)}
-.mode-button.grounded{background:linear-gradient(180deg,#48b174,#2e8b57)}
-.mode-button.drifting{background:linear-gradient(180deg,#f0c95f,#d6a520);color:#2e2a1e}
-.mode-button.surviving{background:linear-gradient(180deg,#f08f91,#d9534f)}
-.content-area{margin-top:6px;padding-bottom:48px}
-.mode-page{background:var(--card-bg);border-radius:14px;padding:20px;border:1px solid rgba(0,0,0,0.04);box-shadow:var(--shadow);margin:14px 0 40px;max-width:760px;margin-left:auto;margin-right:auto}
-.mode-page h2{margin:0 0 8px 0;font-size:1.5rem;color:var(--brand-green)}
-.mode-desc{color:var(--muted-text);margin-bottom:12px;font-weight:600}
-.mode-tip{background:rgba(11,61,46,0.03);padding:10px;border-radius:10px;margin-bottom:14px;color:var(--muted-text);font-weight:600;border-left:4px solid rgba(11,61,46,0.08)}
-.quick-list{display:block}
-.quick-card{background:#fff;border-radius:12px;padding:14px;margin:12px 0;border:1px solid rgba(0,0,0,0.04);display:flex;align-items:flex-start;gap:12px}
-.activity-row{display:block;margin:10px 0;padding:14px;border-radius:10px;background:#fff;border-left:6px solid rgba(11,61,46,0.02)}
-.activity-label{font-weight:700;margin-top:6px}
-.btn-complete{background:var(--brand-green);color:#fff;border:none;padding:10px 12px;border-radius:10px;font-weight:800;cursor:pointer}
-.return-button{display:inline-block;margin-top:14px;padding:12px 18px;background:var(--brand-green);color:white;border-radius:12px;border:none;font-weight:800;cursor:pointer}
+  /* Ensure content area */
+  function ensureContentElement() {
+    var c = id('content');
+    if (c) return c;
+    var page = id('page') || document.querySelector('.page') || document.body;
+    c = document.createElement('div');
+    c.id = 'content';
+    c.className = 'content-area';
+    c.setAttribute('aria-live', 'polite');
+    page.appendChild(c);
+    return c;
+  }
 
-/* Modal & session helpers (already defined above) */
-.modal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:var(--modal-bg); z-index:140000; }
-.modal[hidden]{ display:none; }
-.modal-panel { width:92%; max-width:720px; background:#fff; border-radius:14px; box-shadow:0 18px 46px rgba(2,6,10,0.36); padding:16px; outline:none; }
-.modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-.modal-body { max-height:56vh; overflow:auto; padding:6px 4px; }
-.modal-controls { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
-.timer { display:flex; gap:12px; align-items:center; margin-top:10px; }
-.timer-display { font-size:1.6rem; font-weight:900; color:var(--brand-green); background:rgba(0,0,0,0.03); padding:8px 12px; border-radius:10px; min-width:88px; text-align:center; }
-.step-list { margin-top:10px; display:flex; flex-direction:column; gap:10px; }
-.step-item { background:#fff; padding:12px; border-radius:10px; border:1px solid rgba(0,0,0,0.04); display:flex; gap:12px; align-items:flex-start; }
-.helper{font-size:0.95rem;color:var(--muted-text);margin-top:8px}
+  /* Confetti */
+  function runConfetti(mode) {
+    try {
+      mode = mode || window.__currentMode || 'quick';
+      var colors = confettiColors[mode] || confettiColors['quick'];
+      var n = 10, container = document.createElement('div');
+      container.style.position = 'fixed'; container.style.left = '50%'; container.style.top = '32%';
+      container.style.pointerEvents = 'none'; container.style.zIndex = 99999; container.style.transform = 'translateX(-50%)';
+      document.body.appendChild(container);
+      for (var i = 0; i < n; i++) {
+        var dot = document.createElement('div'), size = (6 + Math.round(Math.random() * 8)) + 'px';
+        dot.style.width = size; dot.style.height = size; dot.style.borderRadius = '50%';
+        dot.style.background = colors[i % colors.length];
+        dot.style.position = 'absolute'; dot.style.left = '0'; dot.style.top = '0'; dot.style.opacity = '0.95';
+        container.appendChild(dot);
+        (function (dot) {
+          var angle = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 120, dx = Math.cos(angle) * dist, dy = Math.sin(angle) * dist;
+          try { dot.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(0.9)'; dot.style.opacity = '0.9'; } catch (e) {}
+        })(dot);
+      }
+      setTimeout(function () { try { container.remove(); } catch (e) {} }, 1400);
+    } catch (e) { console.warn('confetti error', e); }
+  }
 
-@media (max-width:420px){ svg{width:300px;height:300px} .compass-label{font-size:16px} .mode-button{font-size:0.95rem;padding:10px} .nav-links a{font-size:0.9rem;padding:6px 6px} .hero-title{font-size:1.1rem} .mode-title{font-size:1.3rem} .mode-icon{width:48px;height:48px;border-radius:12px;font-size:20px} }
+  /* Session management (v128) */
+  var sessionState = {
+    active: false,
+    mode: '',
+    totalSeconds: 0,
+    remainingSeconds: 0,
+    intervalId: null
+  };
+
+  var modeTimerDefaults = {
+    growing: 25 * 60,    // 25 minutes
+    grounded: 15 * 60,   // 15 minutes
+    drifting: 5 * 60,    // 5 minutes
+    surviving: 3 * 60,   // 3 minutes
+    quick: 1 * 60        // 1 minute
+  };
+
+  var modeSessionSteps = {
+    growing: ['Set a clear goal for this session', 'Break it into smaller steps', 'Work on the first step', 'Review progress at end'],
+    grounded: ['Identify the task to complete', 'Clear distractions', 'Work steadily', 'Check off when done'],
+    drifting: ['Take a few deep breaths', 'Do a gentle activity (walk, journal)', 'Notice how you feel', 'Return refreshed'],
+    surviving: ['Choose one simple action', 'Do it without pressure', 'Rest if needed', 'Celebrate completion'],
+    quick: ['Pick a quick action', 'Do it now', 'Done!']
+  };
+
+  function formatTime(seconds) {
+    var mins = Math.floor(seconds / 60);
+    var secs = seconds % 60;
+    return (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
+
+  function saveSessionState() {
+    try {
+      var data = {
+        mode: sessionState.mode,
+        remainingSeconds: sessionState.remainingSeconds,
+        totalSeconds: sessionState.totalSeconds
+      };
+      localStorage.setItem('sessionState', JSON.stringify(data));
+    } catch (e) { console.warn('saveSessionState error', e); }
+  }
+
+  function loadSessionState() {
+    try {
+      var data = JSON.parse(localStorage.getItem('sessionState') || '{}');
+      if (data.mode && data.remainingSeconds > 0) {
+        sessionState.mode = data.mode;
+        sessionState.remainingSeconds = data.remainingSeconds;
+        sessionState.totalSeconds = data.totalSeconds || data.remainingSeconds;
+        return true;
+      }
+    } catch (e) { console.warn('loadSessionState error', e); }
+    return false;
+  }
+
+  function clearSessionState() {
+    try {
+      localStorage.removeItem('sessionState');
+      sessionState.active = false;
+      sessionState.mode = '';
+      sessionState.totalSeconds = 0;
+      sessionState.remainingSeconds = 0;
+      if (sessionState.intervalId) {
+        clearInterval(sessionState.intervalId);
+        sessionState.intervalId = null;
+      }
+    } catch (e) { console.warn('clearSessionState error', e); }
+  }
+
+  function updateTimerDisplay() {
+    var display = id('session-timer-display');
+    if (display) {
+      display.textContent = formatTime(sessionState.remainingSeconds);
+    }
+  }
+
+  function startTimer(seconds, onDone) {
+    stopTimer();
+    sessionState.remainingSeconds = seconds;
+    sessionState.totalSeconds = seconds;
+    sessionState.active = true;
+    updateTimerDisplay();
+    saveSessionState();
+
+    sessionState.intervalId = setInterval(function () {
+      sessionState.remainingSeconds--;
+      updateTimerDisplay();
+      saveSessionState();
+
+      if (sessionState.remainingSeconds <= 0) {
+        stopTimer();
+        if (typeof onDone === 'function') {
+          try { onDone(); } catch (e) { console.warn('onDone error', e); }
+        }
+      }
+    }, 1000);
+
+    // Update UI buttons
+    var btnStart = id('session-btn-start');
+    var btnStop = id('session-btn-stop');
+    var btnComplete = id('session-btn-complete');
+    if (btnStart) btnStart.style.display = 'none';
+    if (btnStop) btnStop.style.display = '';
+    if (btnComplete) btnComplete.style.display = '';
+  }
+
+  function stopTimer() {
+    if (sessionState.intervalId) {
+      clearInterval(sessionState.intervalId);
+      sessionState.intervalId = null;
+    }
+    sessionState.active = false;
+    saveSessionState();
+
+    // Update UI buttons
+    var btnStart = id('session-btn-start');
+    var btnStop = id('session-btn-stop');
+    var btnComplete = id('session-btn-complete');
+    if (btnStart) btnStart.style.display = '';
+    if (btnStop) btnStop.style.display = 'none';
+    if (btnComplete) btnComplete.style.display = 'none';
+  }
+
+  function openSession(mode) {
+    if (!window.__features || !window.__features.sessions) return;
+    
+    try {
+      sessionState.mode = mode || window.__currentMode || 'quick';
+      
+      // Check if there's a saved session for this mode
+      var hasSaved = loadSessionState();
+      if (!hasSaved || sessionState.mode !== mode) {
+        sessionState.mode = mode;
+        sessionState.remainingSeconds = modeTimerDefaults[mode] || 300;
+        sessionState.totalSeconds = sessionState.remainingSeconds;
+      }
+
+      // Show modal
+      var modal = id('session-modal');
+      if (modal) modal.style.display = 'block';
+
+      // Set modal title
+      var title = id('session-modal-title');
+      if (title) {
+        var modeTitle = (modeInfo[mode] || {}).title || mode;
+        title.textContent = 'Guided Session: ' + modeTitle;
+      }
+
+      // Populate checklist
+      var checklistContainer = id('session-checklist-items');
+      if (checklistContainer) {
+        var steps = modeSessionSteps[mode] || ['Complete your activity'];
+        var html = '';
+        for (var i = 0; i < steps.length; i++) {
+          html += '<li>' + escapeHtml(steps[i]) + '</li>';
+        }
+        checklistContainer.innerHTML = html;
+      }
+
+      // Update timer display
+      updateTimerDisplay();
+
+      // Reset button states
+      var btnStart = id('session-btn-start');
+      var btnStop = id('session-btn-stop');
+      var btnComplete = id('session-btn-complete');
+      if (sessionState.active && sessionState.intervalId) {
+        if (btnStart) btnStart.style.display = 'none';
+        if (btnStop) btnStop.style.display = '';
+        if (btnComplete) btnComplete.style.display = '';
+      } else {
+        if (btnStart) btnStart.style.display = '';
+        if (btnStop) btnStop.style.display = 'none';
+        if (btnComplete) btnComplete.style.display = 'none';
+      }
+
+    } catch (e) { console.error('openSession error', e); }
+  }
+
+  function closeSession() {
+    try {
+      stopTimer();
+      var modal = id('session-modal');
+      if (modal) modal.style.display = 'none';
+    } catch (e) { console.warn('closeSession error', e); }
+  }
+
+  function completeSession() {
+    try {
+      var mode = sessionState.mode || window.__currentMode || 'quick';
+      
+      // Add history entry
+      var date = new Date().toLocaleDateString();
+      var entry = { date: date, mode: mode, activity: 'Guided session complete', note: '' };
+      var hist = JSON.parse(localStorage.getItem('resetHistory') || '[]');
+      hist.unshift(entry);
+      localStorage.setItem('resetHistory', JSON.stringify(hist));
+
+      // Update streak
+      var lastLogged = localStorage.getItem('lastLogged');
+      var today = new Date().toLocaleDateString();
+      if (lastLogged !== today) {
+        var streak = parseInt(localStorage.getItem('streak') || '0', 10) || 0;
+        streak += 1;
+        localStorage.setItem('streak', String(streak));
+        localStorage.setItem('lastLogged', today);
+        updateStreak();
+      }
+
+      // Clear session state
+      clearSessionState();
+
+      // Run confetti (no Element.animate)
+      try { runConfetti(mode); } catch (e) {}
+
+      // Close modal
+      closeSession();
+
+      // Navigate to history
+      setTimeout(function () { navigateHash('#history'); }, 700);
+
+    } catch (e) { console.error('completeSession error', e); }
+  }
+
+  function createSessionBindings() {
+    try {
+      // Close button
+      var closeBtn = document.querySelector('.session-modal-close');
+      if (closeBtn && !closeBtn.__sessionBound) {
+        closeBtn.addEventListener('click', function () { closeSession(); });
+        closeBtn.__sessionBound = true;
+      }
+
+      // Overlay click to close
+      var overlay = document.querySelector('.session-modal-overlay');
+      if (overlay && !overlay.__sessionBound) {
+        overlay.addEventListener('click', function () { closeSession(); });
+        overlay.__sessionBound = true;
+      }
+
+      // Start button
+      var btnStart = id('session-btn-start');
+      if (btnStart && !btnStart.__sessionBound) {
+        btnStart.addEventListener('click', function () {
+          startTimer(sessionState.remainingSeconds, function () {
+            // Timer complete
+            var btnComplete = id('session-btn-complete');
+            if (btnComplete) {
+              btnComplete.textContent = 'Session Complete!';
+              btnComplete.style.background = '#2e8b57';
+            }
+          });
+        });
+        btnStart.__sessionBound = true;
+      }
+
+      // Stop button
+      var btnStop = id('session-btn-stop');
+      if (btnStop && !btnStop.__sessionBound) {
+        btnStop.addEventListener('click', function () { stopTimer(); });
+        btnStop.__sessionBound = true;
+      }
+
+      // Complete button
+      var btnComplete = id('session-btn-complete');
+      if (btnComplete && !btnComplete.__sessionBound) {
+        btnComplete.addEventListener('click', function () { completeSession(); });
+        btnComplete.__sessionBound = true;
+      }
+
+      // Escape key to close
+      if (!document.__sessionEscBound) {
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' || e.keyCode === 27) {
+            var modal = id('session-modal');
+            if (modal && modal.style.display !== 'none') {
+              closeSession();
+            }
+          }
+        });
+        document.__sessionEscBound = true;
+      }
+    } catch (e) { console.warn('createSessionBindings error', e); }
+  }
+
+  window.openSession = openSession;
+  window.closeSession = closeSession;
+  window.startTimer = startTimer;
+  window.stopTimer = stopTimer;
+
+  /* completeActivity (exposed) */
+  window.completeActivity = function (mode, activity, noteId, rowId) {
+    try {
+      var row = id(rowId);
+      if (row) { try { row.classList.add('activity-complete-pop'); } catch (e) {} }
+      var noteElem = document.getElementById(noteId);
+      var note = noteElem ? noteElem.value : '';
+      var date = new Date().toLocaleDateString();
+      var normalized = (mode === 'quick' || mode === 'quick-win') ? 'quick-win' : mode;
+      var entry = { date: date, mode: normalized, activity: activity, note: note };
+      var hist = JSON.parse(localStorage.getItem('resetHistory') || '[]');
+      hist.unshift(entry);
+      localStorage.setItem('resetHistory', JSON.stringify(hist));
+      var lastLogged = localStorage.getItem('lastLogged');
+      var today = new Date().toLocaleDateString();
+      if (lastLogged !== today) {
+        var streak = parseInt(localStorage.getItem('streak') || '0', 10) || 0;
+        streak += 1;
+        localStorage.setItem('streak', String(streak));
+        localStorage.setItem('lastLogged', today);
+        updateStreak();
+      }
+      try { runConfetti(window.__currentMode || normalized); } catch (e) {}
+      setTimeout(function () { navigateHash('#history'); }, 700);
+    } catch (e) { console.error('completeActivity error', e); window.__lastAppError = { msg: e.message || String(e), stack: e.stack || null, time: new Date().toISOString() }; }
+  };
+
+  function updateStreak() { var el = id('streak-count'); if (el) el.textContent = localStorage.getItem('streak') || '0'; }
+
+  /* Navigation helpers */
+  window.navigateHash = function (hash) {
+    try { location.hash = hash; } catch (e) { console.warn(e); }
+    try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
+  };
+  window.navigateMode = function (mode) {
+    try { location.hash = '#mode/' + mode; } catch (e) { console.warn(e); }
+    try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
+  };
+
+  /* Renderers that include a decorative header block */
+  function renderHome() { var c = ensureContentElement(); c.innerHTML = ''; setTheme(''); }
+
+  function renderModePage(mode) {
+    var c = ensureContentElement(); setTheme(mode);
+    var info = modeInfo[mode] || { title: mode, desc: '', tip: '' };
+    if (!activities[mode]) { c.innerHTML = '<p>Unknown mode</p>'; return; }
+
+    var icon = escapeHtml(modeIcons[mode] || '•');
+    var html = '<div class="mode-page mode-' + escapeHtml(mode) + '" role="region" aria-labelledby="mode-title">';
+    html += '<div class="mode-header"><div class="mode-icon" aria-hidden="true">' + icon + '</div>';
+    html += '<div><h2 class="mode-title" id="mode-title">' + escapeHtml(info.title) + '</h2>';
+    if (info.desc) html += '<div class="mode-sub">' + escapeHtml(info.desc) + '</div>';
+    html += '</div></div>';
+    if (info.tip) html += '<div class="mode-tip">Tip: ' + escapeHtml(info.tip) + '</div>';
+
+    // Add Start Session button if feature enabled
+    if (window.__features && window.__features.sessions) {
+      html += '<button class="start-session-btn" onclick="openSession(\'' + mode + '\')">Start Guided Session</button>';
+    }
+
+    for (var i = 0; i < activities[mode].length; i++) {
+      var act = activities[mode][i];
+      html += '<div class="activity-row" id="row-' + mode + '-' + i + '">';
+      html += '<div class="activity-main"><span class="activity-icon" aria-hidden="true">' + escapeHtml(act.icon) + '</span><div class="activity-label">' + escapeHtml(act.label) + '</div></div>';
+      html += '<textarea id="note-' + mode + '-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
+      html += '<div class="activity-controls"><button class="btn-complete" onclick="completeActivity(\'' + mode + '\',\'' + escapeJs(act.label) + '\',\'note-' + mode + '-' + i + '\',\'row-' + mode + '-' + i + '\')">Complete</button></div>';
+      html += '</div>';
+    }
+
+    html += '<button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button>';
+    html += '</div>';
+    c.innerHTML = html;
+  }
+
+  function renderQuickWins() {
+    var c = ensureContentElement(); setTheme('quick');
+    var quick = [{ label: 'Drink water', icon: '💧' }, { label: 'Stand up and stretch', icon: '🧘' }, { label: 'Take 3 deep breaths', icon: '🌬️' }];
+    var html = '<div class="mode-page mode-quick"><div class="mode-header"><div class="mode-icon" aria-hidden="true">' + escapeHtml(modeIcons['quick']) + '</div>';
+    html += '<div><h2 class="mode-title">Quick Wins</h2><div class="mode-sub">Small, fast actions to refresh your energy</div></div></div><div class="mode-tip">Quick actions to reset in 1–5 minutes</div>';
+    html += '<div class="quick-list">';
+    for (var i = 0; i < quick.length; i++) {
+      html += '<div class="quick-card" id="qw-' + i + '">';
+      html += '<div class="icon">' + escapeHtml(quick[i].icon) + '</div>';
+      html += '<div class="content"><div class="label">' + escapeHtml(quick[i].label) + '</div>';
+      html += '<textarea id="qw-note-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
+      html += '<div class="controls" style="margin-top:8px"><button class="btn-complete" onclick="completeActivity(\'quick-win\',\'' + escapeJs(quick[i].label) + '\',\'qw-note-' + i + '\',\'row-quick-' + i + '\')">Complete</button></div></div></div>';
+    }
+    html += '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
+    c.innerHTML = html;
+  }
+
+  function renderHistory() {
+    var c = ensureContentElement(); setTheme('');
+    var history = JSON.parse(localStorage.getItem('resetHistory') || '[]');
+    var listHtml = '';
+    if (history.length === 0) listHtml = '<p>No history yet.</p>'; else for (var i = 0; i < history.length; i++) listHtml += '<p><strong>' + escapeHtml(history[i].date) + ':</strong> ' + escapeHtml((history[i].mode || '').charAt(0).toUpperCase() + (history[i].mode || '').slice(1)) + ' — ' + escapeHtml(history[i].activity) + (history[i].note ? ' • <em>' + escapeHtml(history[i].note) + '</em>' : '') + '</p>';
+    c.innerHTML = '<div class="mode-page"><h2>History</h2><div>' + listHtml + '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
+    // Chart code left unchanged (if Chart is present elsewhere)
+  }
+
+  function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>'; }
+
+  /* renderRoute */
+  function renderRoute() {
+    try {
+      var h = location.hash || '#home';
+      var isFull = h !== '#home';
+      var compassContainer = id('compass-container'), modeButtons = id('mode-buttons'), howTo = id('how-to');
+      if (compassContainer) compassContainer.style.display = isFull ? 'none' : '';
+      if (modeButtons) modeButtons.style.display = isFull ? 'none' : '';
+      if (howTo) howTo.style.display = isFull ? 'none' : '';
+      if (h.indexOf('#mode/') === 0) { var m = h.split('/')[1]; setTheme(m); renderModePage(m); }
+      else if (h === '#quick') { setTheme('quick'); renderQuickWins(); }
+      else if (h === '#history') { setTheme(''); renderHistory(); }
+      else if (h === '#about') { setTheme(''); renderAbout(); }
+      else { setTheme(''); renderHome(); }
+      try { window.scrollTo(0, 0); } catch (e) {}
+    } catch (e) { console.error('renderRoute failed', e); window.__lastAppError = { msg: e.message || String(e), stack: e.stack || null, time: new Date().toISOString() }; }
+  }
+  window.renderRoute = renderRoute;
+
+  /* Defensive early delegation (capture) to ensure taps are handled reliably */
+  (function attachEarlyDelegate() {
+    try {
+      function safeNavigateHash(h) {
+        try {
+          if (typeof window.navigateHash === 'function') { window.navigateHash(h); return; }
+          location.hash = h;
+          if (typeof window.renderRoute === 'function') window.renderRoute();
+        } catch (e) {}
+      }
+      function safeNavigateMode(m) {
+        try {
+          if (typeof window.navigateMode === 'function') { window.navigateMode(m); return; }
+          location.hash = '#mode/' + m;
+          if (typeof window.renderRoute === 'function') window.renderRoute();
+        } catch (e) {}
+      }
+
+      document.addEventListener('click', function (ev) {
+        try {
+          var tgt = ev.target;
+          var a = tgt && tgt.closest ? tgt.closest('.nav-links a[data-hash]') : null;
+          if (a) { try { ev.preventDefault && ev.preventDefault(); } catch (e) {} var hh = a.getAttribute('data-hash') || a.getAttribute('href') || '#home'; safeNavigateHash(hh); return; }
+
+          var b = tgt && tgt.closest ? tgt.closest('button[data-mode]') : null;
+          if (b) { try { ev.preventDefault && ev.preventDefault(); } catch (e) {} var mm = b.getAttribute('data-mode'); try { setTheme(mm); } catch (e) {} safeNavigateMode(mm); return; }
+
+          var svgNode = tgt && tgt.closest ? tgt.closest('[data-mode]') : null;
+          if (svgNode) {
+            var md = svgNode.getAttribute && svgNode.getAttribute('data-mode');
+            if (md) { try { ev.preventDefault && ev.preventDefault(); } catch (e) {} try { setTheme(md); } catch (e) {} safeNavigateMode(md); return; }
+          }
+        } catch (err) {}
+      }, true);
+    } catch (e) {}
+  })();
+
+  /* bindUI + compass delegation + needle spin */
+  function bindUI() {
+    try {
+      var navs = $$('.nav-links a[data-hash]');
+      for (var n = 0; n < navs.length; n++) {
+        (function (a) {
+          if (!a.__bound) {
+            a.addEventListener('click', function (e) { try { e && e.preventDefault && e.preventDefault(); } catch (ee) {} var h = a.getAttribute('data-hash') || a.getAttribute('href'); navigateHash(h); });
+            a.__bound = true;
+          }
+        })(navs[n]);
+      }
+      var btns = $$('button[data-mode]');
+      for (var b = 0; b < btns.length; b++) {
+        (function (el) {
+          if (!el.__bound) {
+            el.addEventListener('click', function (ev) { try { ev && ev.preventDefault && ev.preventDefault(); } catch (ee) {} var m = el.getAttribute('data-mode'); setTheme(m); renderModePage(m); navigateMode(m); });
+            el.__bound = true;
+          }
+        })(btns[b]);
+      }
+    } catch (e) { console.warn('bindUI error', e); }
+  }
+
+  function attachCompassDelegation() {
+    var comp = id('compass'); if (!comp) return; if (comp.__delegated) return;
+    comp.addEventListener('click', function (ev) {
+      try {
+        var tgt = ev.target;
+        var path = (tgt && tgt.closest) ? tgt.closest('[data-mode]') : null;
+        if (!path) return;
+        var mode = path.getAttribute('data-mode');
+        setTheme(mode);
+        renderModePage(mode);
+        navigateMode(mode);
+      } catch (e) { console.warn('compass click', e); }
+    });
+    comp.__delegated = true;
+  }
+
+  function setupNeedleSpin() {
+    var ng = id('needle-group');
+    if (!ng) return;
+    var ANG = 720, lastY = 0, queued = false;
+    function onScroll() {
+      lastY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+      if (!queued) {
+        queued = true;
+        window.requestAnimationFrame(function () {
+          queued = false;
+          var doc = document.documentElement;
+          var max = Math.max(1, doc.scrollHeight - window.innerHeight);
+          var r = Math.max(0, Math.min(1, lastY / max));
+          try { ng.style.transform = 'rotate(' + (r * ANG) + 'deg)'; } catch (e) {}
+        });
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  window.__rebindUI = function () { try { bindUI(); attachCompassDelegation(); setupNeedleSpin(); console.info('rebindUI done'); } catch (e) { console.warn('rebindUI failed', e); } };
+
+  /* Init */
+  document.addEventListener('DOMContentLoaded', function () {
+    try {
+      var root = id('app-root'); if (root) { root.classList.add('visible'); root.setAttribute('aria-hidden', 'false'); }
+      ensureContentElement();
+      bindUI();
+      attachCompassDelegation();
+      setupNeedleSpin();
+      createSessionBindings();
+      if (!location.hash) location.hash = '#home';
+      renderRoute();
+      updateStreak();
+      console.info('[app v128] initialized (guided session modal)');
+    } catch (err) {
+      console.error('init failed', err);
+      try { window.__lastAppError = { msg: err.message || String(err), stack: err.stack || null, time: new Date().toISOString() }; } catch (e) {}
+      var rt = id('app-root') || document.body; if (rt) { rt.classList.add('visible'); rt.setAttribute('aria-hidden', 'false'); }
+    }
+  });
+
+})();
