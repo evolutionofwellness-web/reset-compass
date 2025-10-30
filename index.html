@@ -3,62 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>The Reset Compass — stable fallback</title>
+  <title>The Reset Compass</title>
 
-  <style>
-    /* Stable minimal CSS — no animations/transitions */
-    :root{
-      --bg:#F7FBF8;--brand-green:#0B3D2E;--card-bg:#fff;--muted-text:#5b6b60;--radius:12px;--shadow:0 8px 22px rgba(6,20,12,0.06);
-      --mode-accent:#007BFF;--mode-text:#043b66;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;padding:0;background:var(--bg);color:var(--brand-green);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-    a{color:inherit;text-decoration:none}
-    /* header */
-    .hero{display:flex;align-items:center;gap:12px;max-width:980px;margin:18px auto;padding:8px 18px}
-    .hero-icon{width:64px;height:64px;border-radius:10px;background:var(--brand-green);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
-    .hero-title{margin:0;font-size:1.25rem;font-weight:800}
-    .hero-sub{margin:2px 0 0;color:var(--muted-text);font-weight:500}
-    /* nav */
-    .site-nav{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:8px 6px;background:var(--brand-green);color:#fff}
-    .nav-links{display:flex;gap:16px;list-style:none;margin:0;padding:0;flex-wrap:nowrap;overflow:auto}
-    .nav-links a{color:#fff;padding:8px 10px;border-radius:6px;font-weight:800;white-space:nowrap}
-    /* page */
-    .page{max-width:980px;margin:6px auto;padding:0 16px 120px}
-    .streak{max-width:980px;margin:10px auto;padding:8px 18px;font-weight:800;color:var(--brand-green);display:flex;align-items:center;gap:8px}
-    .card{background:var(--card-bg);border-radius:var(--radius);padding:18px;border:1px solid rgba(11,61,46,0.04);box-shadow:var(--shadow);margin-bottom:18px}
-    /* compass */
-    .compass-wrap{display:flex;justify-content:center;margin:8px 0 18px}
-    svg{width:360px;height:360px;max-width:92vw;display:block}
-    .compass-label{font-size:20px;font-weight:900;pointer-events:none;fill:#fff}
-    /* buttons */
-    .buttons{margin:6px 0 22px;display:flex;flex-direction:column;gap:12px;align-items:center}
-    .mode-button{width:92%;max-width:720px;padding:10px 12px;border-radius:10px;border:none;color:white;font-weight:900;text-align:left;display:flex;align-items:center;cursor:pointer}
-    .mode-button.growing{background:linear-gradient(180deg,#2fa0ff,#007BFF)}
-    .mode-button.grounded{background:linear-gradient(180deg,#48b174,#2e8b57)}
-    .mode-button.drifting{background:linear-gradient(180deg,#f0c95f,#d6a520);color:#2e2a1e}
-    .mode-button.surviving{background:linear-gradient(180deg,#f08f91,#d9534f)}
-    /* content area */
-    .content-area{margin-top:6px;padding-bottom:48px}
-    .mode-page{background:var(--card-bg);border-radius:14px;padding:20px;border:1px solid rgba(0,0,0,0.04);box-shadow:var(--shadow);margin:14px 0 40px;max-width:760px;margin-left:auto;margin-right:auto}
-    .mode-header{display:flex;gap:12px;align-items:center}
-    .mode-icon{width:56px;height:56px;border-radius:12px;background:var(--mode-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
-    .mode-title{margin:0;font-size:1.4rem;font-weight:900}
-    .mode-sub{margin-top:6px;color:var(--muted-text);font-weight:600}
-    .mode-tip{background:rgba(11,61,46,0.03);padding:10px;border-radius:10px;margin:12px 0;color:var(--muted-text);font-weight:600;border-left:4px solid rgba(11,61,46,0.06)}
-    .activity-row{display:block;margin:10px 0;padding:14px;border-radius:10px;background:#fff;border-left:6px solid rgba(11,61,46,0.02)}
-    .activity-label{font-weight:700;margin-top:6px}
-    .activity-note{width:100%;min-height:44px;margin-top:8px;padding:8px;border-radius:6px;border:1px solid rgba(0,0,0,0.12)}
-    .btn-complete{background:var(--brand-green);color:#fff;border:none;padding:10px 12px;border-radius:10px;font-weight:800;cursor:pointer}
-    /* simple responsive */
-    @media (max-width:420px){ svg{width:300px;height:300px} .mode-title{font-size:1.2rem} .mode-icon{width:48px;height:48px} }
-  </style>
+  <!-- Explicit favicon -->
+  <link rel="icon" href="splash-icon.png" type="image/png">
+
+  <!-- Styles (v124: stronger per-mode page themes) -->
+  <link rel="stylesheet" href="main.css?v=124" />
 </head>
 <body>
   <div id="app-root" class="app-root" aria-hidden="false">
     <header class="hero" id="hero">
-      <div class="hero-icon">🧭</div>
+      <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="64" height="64">
       <div class="hero-text">
         <h1 class="hero-title">The Reset Compass</h1>
         <p class="hero-sub">A small reset, every day.</p>
@@ -67,15 +23,18 @@
 
     <nav class="site-nav" role="navigation" aria-label="Main navigation">
       <ul class="nav-links" role="menubar">
-        <li><a href="#home" data-hash="#home">Home</a></li>
-        <li><a href="#quick" data-hash="#quick">Quick Wins</a></li>
-        <li><a href="#history" data-hash="#history">History</a></li>
-        <li><a href="#about" data-hash="#about">About</a></li>
+        <li role="none"><a role="menuitem" href="#home" data-hash="#home">Home</a></li>
+        <li role="none"><a role="menuitem" href="#quick" data-hash="#quick">Quick Wins</a></li>
+        <li role="none"><a role="menuitem" href="#history" data-hash="#history">History</a></li>
+        <li role="none"><a role="menuitem" href="#about" data-hash="#about">About</a></li>
       </ul>
     </nav>
 
     <main class="page" id="page">
-      <div id="streak" class="streak" aria-live="polite">🔥 Streak: <span id="streak-count">0</span> days</div>
+      <div id="streak" class="streak" aria-live="polite">
+        <span id="streak-emoji" aria-hidden="true">🔥</span>
+        <span id="streak-text">Streak:</span> <span id="streak-count">0</span> days
+      </div>
 
       <section id="how-to" class="card" aria-labelledby="howto-heading">
         <h2 id="howto-heading">How to Use This App</h2>
@@ -83,202 +42,70 @@
       </section>
 
       <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
-        <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" preserveAspectRatio="xMidYMid meet">
+        <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0" preserveAspectRatio="xMidYMid meet">
           <title id="compassTitle">Mode compass — choose a mode</title>
+
           <defs>
             <linearGradient id="growingGrad" x1="0" x2="1"><stop offset="0" stop-color="#2FA0FF"/><stop offset="1" stop-color="#007BFF"/></linearGradient>
             <linearGradient id="groundedGrad" x1="0" x2="1"><stop offset="0" stop-color="#3CA56A"/><stop offset="1" stop-color="#246B45"/></linearGradient>
             <linearGradient id="driftingGrad" x1="0" x2="1"><stop offset="0" stop-color="#E6C450"/><stop offset="1" stop-color="#DAA520"/></linearGradient>
             <linearGradient id="survivingGrad" x1="0" x2="1"><stop offset="0" stop-color="#E78B88"/><stop offset="1" stop-color="#D9534F"/></linearGradient>
+
+            <!-- subtle drop-shadow filter for SVG text -->
+            <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+            </filter>
           </defs>
 
           <g transform="rotate(-45 100 100)">
-            <path class="wedge" d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z" fill="url(#growingGrad)" data-mode="growing"/>
-            <path class="wedge" d="M100,100 L194,100 A94,94 0 0,1 100,194 L100,128 A28,28 0 0,0 128,100 Z" fill="url(#groundedGrad)" data-mode="grounded"/>
-            <path class="wedge" d="M100,100 L100,194 A94,94 0 0,1 6,100 L72,100 A28,28 0 0,0 100,128 Z" fill="url(#driftingGrad)" data-mode="drifting"/>
-            <path class="wedge" d="M100,100 L6,100 A94,94 0 0,1 100,6 L100,72 A28,28 0 0,0 72,100 Z" fill="url(#survivingGrad)" data-mode="surviving"/>
+            <path class="wedge" d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z"
+                  fill="url(#growingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="growing" data-angle="-45" tabindex="0"/>
+            <path class="wedge" d="M100,100 L194,100 A94,94 0 0,1 100,194 L100,128 A28,28 0 0,0 128,100 Z"
+                  fill="url(#groundedGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="grounded" data-angle="45" tabindex="0"/>
+            <path class="wedge" d="M100,100 L100,194 A94,94 0 0,1 6,100 L72,100 A28,28 0 0,0 100,128 Z"
+                  fill="url(#driftingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="drifting" data-angle="135" tabindex="0"/>
+            <path class="wedge" d="M100,100 L6,100 A94,94 0 0,1 100,6 L100,72 A28,28 0 0,0 72,100 Z"
+                  fill="url(#survivingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="surviving" data-angle="225" tabindex="0"/>
           </g>
 
           <circle cx="100" cy="100" r="44" fill="#F7FBF8" stroke="rgba(0,0,0,0.02)"/>
           <g id="needle-group" style="transform-origin:100px 100px;">
-            <polygon points="100,58 116,100 100,142 84,100" fill="rgba(6,56,39,0.92)"/>
-            <circle cx="100" cy="100" r="6" fill="rgba(6,56,39,0.95)"/>
+            <polygon id="compass-rose" points="100,58 116,100 100,142 84,100" fill="rgba(6,56,39,0.92)" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+            <circle id="compass-pivot" cx="100" cy="100" r="6" fill="rgba(6,56,39,0.95)"/>
+            <rect id="compass-tail" x="98.5" y="104" width="3" height="26" rx="1.5" fill="rgba(6,56,39,0.88)" />
           </g>
 
-          <text x="100" y="36" class="compass-label" data-mode="growing" style="text-anchor:middle">Growing</text>
-          <text x="156" y="100" class="compass-label" data-mode="grounded" style="text-anchor:middle">Grounded</text>
-          <text x="100" y="164" class="compass-label" data-mode="drifting" style="text-anchor:middle">Drifting</text>
-          <text x="44" y="100" class="compass-label" data-mode="surviving" style="text-anchor:middle">Surviving</text>
+          <!-- readable labels with data-mode so label taps work -->
+          <text data-mode="growing" x="100" y="36" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Growing</text>
+          <text data-mode="grounded" x="156" y="100" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Grounded</text>
+          <text data-mode="drifting" x="100" y="164" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Drifting</text>
+          <text data-mode="surviving" x="44" y="100" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Surviving</text>
         </svg>
       </section>
 
       <section id="mode-buttons" class="buttons">
-        <button type="button" class="mode-button growing" data-mode="growing"><div class="btn-content"><div class="btn-title">Growing</div><div class="btn-desc">Push yourself to new heights</div></div></button>
-        <button type="button" class="mode-button grounded" data-mode="grounded"><div class="btn-content"><div class="btn-title">Grounded</div><div class="btn-desc">Stay centered and productive</div></div></button>
-        <button type="button" class="mode-button drifting" data-mode="drifting"><div class="btn-content"><div class="btn-title">Drifting</div><div class="btn-desc">Gently regain focus and energy</div></div></button>
-        <button type="button" class="mode-button surviving" data-mode="surviving"><div class="btn-content"><div class="btn-title">Surviving</div><div class="btn-desc">Just get through the day</div></div></button>
+        <button type="button" class="mode-button growing" data-mode="growing" data-desc="Push yourself to new heights">
+          <div class="btn-content"><div class="btn-title">Growing</div><div class="btn-desc">Push yourself to new heights</div></div>
+        </button>
+
+        <button type="button" class="mode-button grounded" data-mode="grounded" data-desc="Stay centered and productive">
+          <div class="btn-content"><div class="btn-title">Grounded</div><div class="btn-desc">Stay centered and productive</div></div>
+        </button>
+
+        <button type="button" class="mode-button drifting" data-mode="drifting" data-desc="Gently regain focus and energy">
+          <div class="btn-content"><div class="btn-title">Drifting</div><div class="btn-desc">Gently regain focus and energy</div></div>
+        </button>
+
+        <button type="button" class="mode-button surviving" data-mode="surviving" data-desc="Just get through the day">
+          <div class="btn-content"><div class="btn-title">Surviving</div><div class="btn-desc">Just get through the day</div></div>
+        </button>
       </section>
 
       <div id="content" class="content-area" aria-live="polite"></div>
     </main>
   </div>
 
-  <script>
-    // Stable JS inline — defensive delegation, no animations, non-animated confetti
-    (function(){
-      'use strict';
-      // helpers
-      function id(n){return document.getElementById(n)}
-      function $$(sel, root){ root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch(e) { return []; } }
-      function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])}) }
-      window.__lastAppError = null;
-      window.onerror = function(msg,url,line,col,err){ try{ window.__lastAppError = {msg:msg,url:url,line:line,col:col,err:err && (err.stack||err.message)||null,time:new Date().toISOString()}}catch(e){}; return false; };
-
-      // data
-      var modeInfo = {
-        growing:{title:'Growing',desc:'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.',tip:'Pick one 15–30 minute focused task.'},
-        grounded:{title:'Grounded',desc:'Stay centered and productive — structure your next steps and clear small hurdles.',tip:'Break a task into 2–3 small wins.'},
-        drifting:{title:'Drifting',desc:'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.',tip:'Try a 5–10 minute walk or breathing.'},
-        surviving:{title:'Surviving',desc:'Just get through the day — prioritize essentials and basic self-care to stay afloat.',tip:'Pick one low-effort, high-impact action (water, breathe).'}
-      };
-      var activities = {
-        growing:[{label:'Write a goal',icon:'🎯'},{label:'Tackle a challenge',icon:'⚒️'},{label:'Start a new project',icon:'🚀'}],
-        grounded:[{label:'Declutter a space',icon:'🧹'},{label:'Complete a task',icon:'✅'},{label:'Plan your day',icon:'🗓️'}],
-        drifting:[{label:'Go for a walk',icon:'🚶'},{label:'Journal your thoughts',icon:'✍️'},{label:'Listen to calming music',icon:'🎧'}],
-        surviving:[{label:'Drink water',icon:'💧'},{label:'Breathe deeply',icon:'🌬️'},{label:'Rest for 5 minutes',icon:'😴'}]
-      };
-
-      // confetti non-animated
-      var confettiColors = { growing:['#79C7FF','#2FA0FF','#007BFF'], grounded:['#B7E7C7','#7FD1A1','#2e8b57'], drifting:['#FFE9A8','#FFD166','#D6A520'], surviving:['#FFD3D6','#F08F91','#D9534F'], 'quick':['#E7E0FF','#C1B3FF','#6f42c1'] };
-      window.runConfetti = function(mode){
-        try{
-          mode = mode || 'quick';
-          var colors = confettiColors[mode] || confettiColors['quick'];
-          var n=10, container = document.createElement('div');
-          container.style.position='fixed';container.style.left='50%';container.style.top='32%';container.style.pointerEvents='none'; container.style.zIndex=99999; container.style.transform='translateX(-50%)';
-          document.body.appendChild(container);
-          for(var i=0;i<n;i++){ var dot=document.createElement('div'); var size=(6+Math.round(Math.random()*8))+'px'; dot.style.width=size; dot.style.height=size; dot.style.borderRadius='50%'; dot.style.background=colors[i%colors.length]; dot.style.margin=(Math.random()*10)+'px'; container.appendChild(dot); }
-          setTimeout(function(){ try{ container.remove(); }catch(e){} },900);
-        }catch(e){console.warn('confetti',e)}
-      };
-
-      // routing / rendering
-      window.navigateHash = function(h){ try{ location.hash = h }catch(e){}; try{ renderRoute() }catch(e){} };
-      window.navigateMode = function(m){ try{ location.hash = '#mode/'+m }catch(e){}; try{ renderRoute() }catch(e){} };
-
-      function ensureContent(){ var c = id('content'); if(c) return c; var page = id('page') || document.body; c = document.createElement('div'); c.id='content'; c.className='content-area'; page.appendChild(c); return c; }
-
-      function renderHome(){ var c=ensureContent(); c.innerHTML=''; setTheme(''); }
-
-      function setTheme(mode){ try{ var root = id('app-root'); if(!root) return; root.classList.remove('theme-growing','theme-grounded','theme-drifting','theme-surviving','theme-quick'); if(mode) root.classList.add('theme-'+mode); window.__currentMode = mode||'' }catch(e){} }
-
-      function renderModePage(mode){
-        var c=ensureContent(); setTheme(mode);
-        var info = modeInfo[mode] || {title:mode,desc:'',tip:''};
-        var html = '<div class="mode-page"><div class="mode-header"><div class="mode-icon">'+(mode==='growing'?'🌱':mode==='grounded'?'🌿':mode==='drifting'?'🌤️':'🛟')+'</div>';
-        html += '<div><h2 class="mode-title">'+escapeHtml(info.title)+'</h2>';
-        if(info.desc) html += '<div class="mode-sub">'+escapeHtml(info.desc)+'</div>';
-        html += '</div></div>';
-        if(info.tip) html += '<div class="mode-tip">Tip: '+escapeHtml(info.tip)+'</div>';
-        html += '<div style="margin:12px 0"><button class="btn-complete" onclick="runConfetti(\\''+mode+'\\')">Celebrate</button></div>';
-        for(var i=0;i<activities[mode].length;i++){
-          var a=activities[mode][i];
-          html += '<div class="activity-row" id="row-'+mode+'-'+i+'"><div class="activity-main"><span class="activity-icon">'+escapeHtml(a.icon)+'</span><div class="activity-label">'+escapeHtml(a.label)+'</div></div>';
-          html += '<textarea id="note-'+mode+'-'+i+'" class="activity-note" placeholder="Notes (optional)"></textarea>';
-          html += '<div style="margin-top:8px"><button class="btn-complete" onclick="completeActivity(\\''+mode+'\\',\\''+escapeHtml(a.label)+'\\',\\'note-'+mode+'-'+i+'\\',\\'row-'+mode+'-'+i+'\\')">Complete</button></div></div>';
-        }
-        html += '<div style="margin-top:14px"><button onclick="navigateHash(\\'#home\\')">Return to Compass</button></div>';
-        html += '</div>';
-        c.innerHTML = html;
-      }
-
-      function renderQuickWins(){
-        var c=ensureContent(); setTheme('quick');
-        var quick=[{label:'Drink water',icon:'💧'},{label:'Stand and stretch',icon:'🧘'},{label:'Take 3 deep breaths',icon:'🌬️'}];
-        var html = '<div class="mode-page"><h2>Quick Wins</h2><div class="quick-list">';
-        for(var i=0;i<quick.length;i++){ html += '<div class="quick-card"><div class="icon">'+escapeHtml(quick[i].icon)+'</div><div class="label">'+escapeHtml(quick[i].label)+'</div><div style="margin-top:8px"><button class="btn-complete" onclick="completeActivity(\\'quick-win\\',\\''+escapeHtml(quick[i].label)+'\\',\\'qw-note-'+i+'\\',\\'row-quick-'+i+'\\')">Complete</button></div></div>'; }
-        html += '</div><div style="margin-top:12px"><button onclick="navigateHash(\\'#home\\')">Return to Compass</button></div></div>';
-        c.innerHTML = html;
-      }
-
-      function renderHistory(){
-        var c=ensureContent(); setTheme('');
-        var history = JSON.parse(localStorage.getItem('resetHistory')||'[]');
-        var html = '<div class="mode-page"><h2>History</h2>';
-        if(history.length===0) html += '<p>No history yet.</p>'; else { for(var i=0;i<history.length;i++){ html += '<p><strong>'+escapeHtml(history[i].date)+'</strong>: '+escapeHtml(history[i].mode)+' — '+escapeHtml(history[i].activity)+'</p>'; } }
-        html += '<div style="margin-top:12px"><button onclick="navigateHash(\\'#home\\')">Return</button></div></div>';
-        c.innerHTML = html;
-      }
-
-      function renderAbout(){ var c=ensureContent(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state.</p><div style="margin-top:12px"><button onclick="navigateHash(\\'#home\\')">Return</button></div></div>'; }
-
-      window.completeActivity = function(mode, activity, noteId, rowId){
-        try {
-          var note = document.getElementById(noteId) ? document.getElementById(noteId).value : '';
-          var date = new Date().toLocaleDateString();
-          var normalized = (mode==='quick' || mode==='quick-win') ? 'quick-win' : mode;
-          var entry = {date:date, mode:normalized, activity:activity, note:note};
-          var hist = JSON.parse(localStorage.getItem('resetHistory')||'[]'); hist.unshift(entry); localStorage.setItem('resetHistory', JSON.stringify(hist));
-          var last = localStorage.getItem('lastLogged'); var today = new Date().toLocaleDateString();
-          if(last !== today){ var streak = parseInt(localStorage.getItem('streak')||'0',10)||0; streak += 1; localStorage.setItem('streak', String(streak)); localStorage.setItem('lastLogged', today); updateStreak(); }
-          runConfetti(window.__currentMode || normalized);
-          setTimeout(function(){ navigateHash('#history'); }, 600);
-        } catch(e){ console.error(e) }
-      };
-
-      function updateStreak(){ var el = document.getElementById('streak-count'); if(el) el.textContent = localStorage.getItem('streak') || '0'; }
-
-      function renderRoute(){
-        var h = location.hash || '#home';
-        var comp = document.getElementById('compass-container'), btns = document.getElementById('mode-buttons'), how = document.getElementById('how-to');
-        var isFull = h !== '#home';
-        if(comp) comp.style.display = isFull ? 'none' : '';
-        if(btns) btns.style.display = isFull ? 'none' : '';
-        if(how) how.style.display = isFull ? 'none' : '';
-        if(h.indexOf('#mode/')===0){ var m = h.split('/')[1]; renderModePage(m); }
-        else if(h === '#quick'){ renderQuickWins(); }
-        else if(h === '#history'){ renderHistory(); }
-        else if(h === '#about'){ renderAbout(); }
-        else { renderHome(); }
-        try{ window.scrollTo(0,0); }catch(e){}
-      }
-      window.renderRoute = renderRoute;
-
-      /* Defensive early capture delegation */
-      (function(){
-        document.addEventListener('click', function(ev){
-          try{
-            var tgt = ev.target;
-            var a = tgt && tgt.closest ? tgt.closest('.nav-links a[data-hash]') : null;
-            if(a){ ev.preventDefault && ev.preventDefault(); var hh = a.getAttribute('data-hash') || a.getAttribute('href') || '#home'; navigateHash(hh); return; }
-            var b = tgt && tgt.closest ? tgt.closest('button[data-mode]') : null;
-            if(b){ ev.preventDefault && ev.preventDefault(); var mm = b.getAttribute('data-mode'); setTheme(mm); navigateMode(mm); return; }
-            var svgNode = tgt && tgt.closest ? tgt.closest('[data-mode]') : null;
-            if(svgNode){ var md = svgNode.getAttribute && svgNode.getAttribute('data-mode'); if(md){ ev.preventDefault && ev.preventDefault(); setTheme(md); navigateMode(md); return; } }
-          }catch(e){}
-        }, true);
-      })();
-
-      // attach compass delegation (clicking <text> data-mode or wedges)
-      function attachCompass(){
-        var comp = document.getElementById('compass');
-        if(!comp) return;
-        if(comp.__delegated) return;
-        comp.addEventListener('click', function(ev){
-          var tgt = ev.target; var node = tgt && tgt.closest ? tgt.closest('[data-mode]') : null;
-          if(!node) return; var mode = node.getAttribute('data-mode'); setTheme(mode); renderModePage(mode); navigateMode(mode);
-        });
-        comp.__delegated = true;
-      }
-
-      document.addEventListener('DOMContentLoaded', function(){
-        attachCompass();
-        updateStreak();
-        if(!location.hash) location.hash = '#home';
-        renderRoute();
-        console.info('stable inline app initialized');
-      });
-    })();
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="app.js?v=124"></script>
 </body>
 </html>
