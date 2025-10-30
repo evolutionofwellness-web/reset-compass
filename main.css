@@ -20,12 +20,46 @@ body{
 /* Theme backgrounds applied on .app-root to allow per-mode theming */
 .app-root { background: var(--bg); transition: background .18s linear; }
 
-/* Per-mode theme variables */
-.app-root.theme-growing { background: linear-gradient(180deg,#E9F6FF,#F7FBFF); --mode-accent: #007BFF; --mode-bg: #E9F6FF; --mode-text: #043b66; }
-.app-root.theme-grounded { background: linear-gradient(180deg,#F0FFF4,#F7FBF8); --mode-accent: #2e8b57; --mode-bg: #F0FFF4; --mode-text: #0b3d2e; }
-.app-root.theme-drifting { background: linear-gradient(180deg,#FFF9F0,#FFFBF6); --mode-accent: #d6a520; --mode-bg: #FFF9F0; --mode-text: #5b3f12; }
-.app-root.theme-surviving { background: linear-gradient(180deg,#FFF6F6,#FFFBFB); --mode-accent: #d9534f; --mode-bg: #FFF6F6; --mode-text: #6a2422; }
-.app-root.theme-quick { background: linear-gradient(180deg,#f3f7ff,#fdfefe); --mode-accent: #6f42c1; --mode-bg:#f3f7ff; --mode-text:#253858; }
+/* Per-mode theme variables & subtle patterns */
+/* Growing: cool blue gradient + soft diagonal stripe overlay */
+.app-root.theme-growing {
+  background: linear-gradient(180deg,#E9F6FF,#F7FBFF);
+  --mode-accent: #007BFF; --mode-bg: #E9F6FF; --mode-text: #043b66;
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0)), repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 6px, transparent 6px 12px);
+  background-blend-mode: overlay, normal;
+}
+
+/* Grounded: soft green with linen texture via radial dots */
+.app-root.theme-grounded {
+  background: linear-gradient(180deg,#F0FFF4,#F7FBF8);
+  --mode-accent: #2e8b57; --mode-bg: #F0FFF4; --mode-text: #0b3d2e;
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0)), radial-gradient(circle at 10% 10%, rgba(46,139,87,0.02) 0, rgba(46,139,87,0.02) 1px, transparent 1px);
+  background-size: auto, 14px 14px;
+}
+
+/* Drifting: warm gold + subtle paper grain */
+.app-root.theme-drifting {
+  background: linear-gradient(180deg,#FFF9F0,#FFFBF6);
+  --mode-accent: #d6a520; --mode-bg: #FFF9F0; --mode-text: #5b3f12;
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0)), radial-gradient(circle at 50% 50%, rgba(0,0,0,0.02) 0, rgba(0,0,0,0.02) 0.8px, transparent 1px);
+  background-size: auto, 10px 10px;
+}
+
+/* Surviving: soft warm red with faint crosshatch */
+.app-root.theme-surviving {
+  background: linear-gradient(180deg,#FFF6F6,#FFFBFB);
+  --mode-accent: #d9534f; --mode-bg: #FFF6F6; --mode-text: #6a2422;
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0)), repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 8px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 8px);
+  background-blend-mode: overlay, overlay, overlay;
+}
+
+/* Quick wins theme: light blue wash */
+.app-root.theme-quick {
+  background: linear-gradient(180deg,#f3f7ff,#fdfefe);
+  --mode-accent: #6f42c1; --mode-bg:#f3f7ff; --mode-text:#253858;
+  background-image: radial-gradient(circle at 80% 20%, rgba(111,66,193,0.02) 0, rgba(111,66,193,0.02) 1px, transparent 2px);
+  background-size: auto, 14px 14px;
+}
 
 /* App root & layout */
 .app-root{min-height:100vh}
@@ -51,7 +85,7 @@ body{
 .compass-wrap{display:flex;justify-content:center;margin:8px 0 18px;position:relative}
 svg{width:360px;height:360px;max-width:92vw;display:block}
 .wedge{cursor:pointer;pointer-events:auto;transform-origin:100px 100px}
-.compass-label{font-size:20px;font-weight:900;fill:#fff;text-anchor:middle;dominant-baseline:middle;pointer-events:none}
+.compass-label{font-size:20px;font-weight:900;fill:#fff;text-anchor:middle;dominant-baseline:middle;pointer-events:none;}
 
 /* Needle */
 #needle-group{transform-origin:100px 100px;will-change:transform;}
