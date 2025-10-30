@@ -1,28 +1,25 @@
-/* app.js v128 — guided session modal (feature-flagged, no animations)
-   - ES5-friendly
-   - Sets .app-root.theme-<mode> and renders mode pages with a header block so the theme is obvious
-   - Keeps defensive event delegation and mode-specific confetti palettes
-   - Adds guided session modal with timer, localStorage persistence, no Element.animate
+/* app.js (v128) — stable app + feature-flagged guided sessions (no animations)
+   - APP_VERSION = 'v128'
+   - window.__features.sessions controls guided sessions (true = enabled)
+   - Session logic is isolated and uses localStorage for persistence
+   - Non-animated confetti used for completion
 */
 
 (function () {
   'use strict';
 
-  /* APP_VERSION */
-  window.APP_VERSION = 'v128';
-
-  /* Feature flags */
+  window.APP_VERSION = window.APP_VERSION || 'v128';
   window.__features = window.__features || {};
-  window.__features.sessions = true;
+  // Default: enable sessions on this branch. Set false to disable immediately:
+  window.__features.sessions = (typeof window.__features.sessions === 'boolean') ? window.__features.sessions : true;
 
-  /* Helpers */
+  /* Helpers (kept small and defensive) */
   function $(sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } }
   if (typeof window.$$ !== 'function') {
     window.$$ = function (sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } };
   }
   function id(name) { return document.getElementById(name); }
   function escapeHtml(s) { s = String(s || ''); return s.replace(/[&<>"']/g, function (ch) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]); }); }
-  function escapeJs(s) { s = String(s || ''); return s.replace(/'/g, "\\'").replace(/"/g, '\\"'); }
 
   /* Error capture */
   window.__lastAppError = null;
@@ -31,14 +28,14 @@
     return false;
   };
 
-  /* Current mode & confetti palettes */
+  /* Current mode + palettes */
   window.__currentMode = '';
   var confettiColors = {
-    growing: ['#79C7FF','#2FA0FF','#007BFF','#1B6EDC'],
-    grounded: ['#B7E7C7','#7FD1A1','#2e8b57','#196035'],
-    drifting: ['#FFE9A8','#FFD166','#D6A520','#B78F18'],
-    surviving: ['#FFD3D6','#F08F91','#D9534F','#B73534'],
-    quick: ['#E7E0FF','#C1B3FF','#6f42c1','#4b2a8a']
+    growing: ['#79C7FF','#2FA0FF','#007BFF'],
+    grounded: ['#B7E7C7','#7FD1A1','#2e8b57'],
+    drifting: ['#FFE9A8','#FFD166','#D6A520'],
+    surviving: ['#FFD3D6','#F08F91','#D9534F'],
+    quick: ['#E7E0FF','#C1B3FF','#6f42c1']
   };
 
   function setTheme(mode) {
@@ -51,23 +48,14 @@
   }
   window.setTheme = setTheme;
 
-  /* Mode header icons (emoji) */
-  var modeIcons = {
-    growing: '🌱',
-    grounded: '🌿',
-    drifting: '🌤️',
-    surviving: '🛟',
-    'quick': '⚡'
-  };
-
-  /* Mode metadata & activities */
+  /* Mode data */
+  var modeIcons = { growing: '🌱', grounded: '🌿', drifting: '🌤️', surviving: '🛟', quick: '⚡' };
   var modeInfo = {
-    growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Pick one focused, slightly-challenging task you can make progress on in 15–30 minutes.' },
-    grounded: { title: 'Grounded', desc: 'Stay centered and productive — structure your next steps and clear small hurdles.', tip: 'Break a larger task into 2–3 small wins and complete the first one now.' },
-    drifting: { title: 'Drifting', desc: 'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.', tip: 'Try a 7–10 minute walk or a 5-minute journaling exercise to refocus.' },
-    surviving: { title: 'Surviving', desc: 'Just get through the day — prioritize essentials and basic self-care to stay afloat.', tip: 'Pick one low-effort, high-impact action (water, breathe, rest) and pause for 3–5 minutes.' }
+    growing: { title: 'Growing', desc: 'Push yourself to new heights — tackle meaningful tasks that expand capability and momentum.', tip: 'Try a focused 25-minute work session (Pomodoro).' },
+    grounded: { title: 'Grounded', desc: 'Stay centered and productive — structure your next steps and clear small hurdles.', tip: 'Break a larger task into 2–3 small wins and do the first now.' },
+    drifting: { title: 'Drifting', desc: 'Gently regain focus and energy — calming movement, brief reflection, or a reset can help.', tip: 'Try a 7–10 minute walk or a 5-minute breathing reset.' },
+    surviving: { title: 'Surviving', desc: 'Just get through the day — prioritize essentials and basic self-care to stay afloat.', tip: 'Take a 3–5 minute breathing break (box or 4-4-4) and hydrate.' }
   };
-
   var activities = {
     growing: [{ label: 'Write a goal', icon: '🎯' }, { label: 'Tackle a challenge', icon: '⚒️' }, { label: 'Start a new project', icon: '🚀' }],
     grounded: [{ label: 'Declutter a space', icon: '🧹' }, { label: 'Complete a task', icon: '✅' }, { label: 'Plan your day', icon: '🗓️' }],
@@ -75,7 +63,7 @@
     surviving: [{ label: 'Drink water', icon: '💧' }, { label: 'Breathe deeply', icon: '🌬️' }, { label: 'Rest for 5 minutes', icon: '😴' }]
   };
 
-  /* Ensure content area */
+  /* Ensure content container */
   function ensureContentElement() {
     var c = id('content');
     if (c) return c;
@@ -88,321 +76,36 @@
     return c;
   }
 
-  /* Confetti */
+  /* Non-animated confetti (safe) */
   function runConfetti(mode) {
     try {
       mode = mode || window.__currentMode || 'quick';
       var colors = confettiColors[mode] || confettiColors['quick'];
       var n = 10, container = document.createElement('div');
-      container.style.position = 'fixed'; container.style.left = '50%'; container.style.top = '32%';
-      container.style.pointerEvents = 'none'; container.style.zIndex = 99999; container.style.transform = 'translateX(-50%)';
+      container.style.position = 'fixed';
+      container.style.left = '50%';
+      container.style.top = '32%';
+      container.style.pointerEvents = 'none';
+      container.style.zIndex = 99999;
+      container.style.transform = 'translateX(-50%)';
       document.body.appendChild(container);
+
       for (var i = 0; i < n; i++) {
-        var dot = document.createElement('div'), size = (6 + Math.round(Math.random() * 8)) + 'px';
-        dot.style.width = size; dot.style.height = size; dot.style.borderRadius = '50%';
+        var dot = document.createElement('div');
+        var size = (6 + Math.round(Math.random() * 8)) + 'px';
+        dot.style.width = size;
+        dot.style.height = size;
+        dot.style.borderRadius = '50%';
         dot.style.background = colors[i % colors.length];
-        dot.style.position = 'absolute'; dot.style.left = '0'; dot.style.top = '0'; dot.style.opacity = '0.95';
+        dot.style.margin = (Math.random() * 12) + 'px';
         container.appendChild(dot);
-        (function (dot) {
-          var angle = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 120, dx = Math.cos(angle) * dist, dy = Math.sin(angle) * dist;
-          try { dot.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(0.9)'; dot.style.opacity = '0.9'; } catch (e) {}
-        })(dot);
       }
-      setTimeout(function () { try { container.remove(); } catch (e) {} }, 1400);
+
+      setTimeout(function () { try { container.remove(); } catch (e) {} }, 900);
     } catch (e) { console.warn('confetti error', e); }
   }
 
-  /* Session management (v128) */
-  var sessionState = {
-    active: false,
-    mode: '',
-    totalSeconds: 0,
-    remainingSeconds: 0,
-    intervalId: null
-  };
-
-  var modeTimerDefaults = {
-    growing: 25 * 60,    // 25 minutes
-    grounded: 15 * 60,   // 15 minutes
-    drifting: 5 * 60,    // 5 minutes
-    surviving: 3 * 60,   // 3 minutes
-    quick: 1 * 60        // 1 minute
-  };
-
-  var modeSessionSteps = {
-    growing: ['Set a clear goal for this session', 'Break it into smaller steps', 'Work on the first step', 'Review progress at end'],
-    grounded: ['Identify the task to complete', 'Clear distractions', 'Work steadily', 'Check off when done'],
-    drifting: ['Take a few deep breaths', 'Do a gentle activity (walk, journal)', 'Notice how you feel', 'Return refreshed'],
-    surviving: ['Choose one simple action', 'Do it without pressure', 'Rest if needed', 'Celebrate completion'],
-    quick: ['Pick a quick action', 'Do it now', 'Done!']
-  };
-
-  function formatTime(seconds) {
-    var mins = Math.floor(seconds / 60);
-    var secs = seconds % 60;
-    return (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
-  }
-
-  function saveSessionState() {
-    try {
-      var data = {
-        mode: sessionState.mode,
-        remainingSeconds: sessionState.remainingSeconds,
-        totalSeconds: sessionState.totalSeconds
-      };
-      localStorage.setItem('sessionState', JSON.stringify(data));
-    } catch (e) { console.warn('saveSessionState error', e); }
-  }
-
-  function loadSessionState() {
-    try {
-      var data = JSON.parse(localStorage.getItem('sessionState') || '{}');
-      if (data.mode && data.remainingSeconds > 0) {
-        sessionState.mode = data.mode;
-        sessionState.remainingSeconds = data.remainingSeconds;
-        sessionState.totalSeconds = data.totalSeconds || data.remainingSeconds;
-        return true;
-      }
-    } catch (e) { console.warn('loadSessionState error', e); }
-    return false;
-  }
-
-  function clearSessionState() {
-    try {
-      localStorage.removeItem('sessionState');
-      sessionState.active = false;
-      sessionState.mode = '';
-      sessionState.totalSeconds = 0;
-      sessionState.remainingSeconds = 0;
-      if (sessionState.intervalId) {
-        clearInterval(sessionState.intervalId);
-        sessionState.intervalId = null;
-      }
-    } catch (e) { console.warn('clearSessionState error', e); }
-  }
-
-  function updateTimerDisplay() {
-    var display = id('session-timer-display');
-    if (display) {
-      display.textContent = formatTime(sessionState.remainingSeconds);
-    }
-  }
-
-  function startTimer(seconds, onDone) {
-    stopTimer();
-    sessionState.remainingSeconds = seconds;
-    sessionState.totalSeconds = seconds;
-    sessionState.active = true;
-    updateTimerDisplay();
-    saveSessionState();
-
-    sessionState.intervalId = setInterval(function () {
-      sessionState.remainingSeconds--;
-      updateTimerDisplay();
-      saveSessionState();
-
-      if (sessionState.remainingSeconds <= 0) {
-        stopTimer();
-        if (typeof onDone === 'function') {
-          try { onDone(); } catch (e) { console.warn('onDone error', e); }
-        }
-      }
-    }, 1000);
-
-    // Update UI buttons
-    var btnStart = id('session-btn-start');
-    var btnStop = id('session-btn-stop');
-    var btnComplete = id('session-btn-complete');
-    if (btnStart) btnStart.style.display = 'none';
-    if (btnStop) btnStop.style.display = '';
-    if (btnComplete) btnComplete.style.display = '';
-  }
-
-  function stopTimer() {
-    if (sessionState.intervalId) {
-      clearInterval(sessionState.intervalId);
-      sessionState.intervalId = null;
-    }
-    sessionState.active = false;
-    saveSessionState();
-
-    // Update UI buttons
-    var btnStart = id('session-btn-start');
-    var btnStop = id('session-btn-stop');
-    var btnComplete = id('session-btn-complete');
-    if (btnStart) btnStart.style.display = '';
-    if (btnStop) btnStop.style.display = 'none';
-    if (btnComplete) btnComplete.style.display = 'none';
-  }
-
-  function openSession(mode) {
-    if (!window.__features || !window.__features.sessions) return;
-    
-    try {
-      sessionState.mode = mode || window.__currentMode || 'quick';
-      
-      // Check if there's a saved session for this mode
-      var hasSaved = loadSessionState();
-      if (!hasSaved || sessionState.mode !== mode) {
-        sessionState.mode = mode;
-        sessionState.remainingSeconds = modeTimerDefaults[mode] || 300;
-        sessionState.totalSeconds = sessionState.remainingSeconds;
-      }
-
-      // Show modal
-      var modal = id('session-modal');
-      if (modal) modal.style.display = 'block';
-
-      // Set modal title
-      var title = id('session-modal-title');
-      if (title) {
-        var modeTitle = (modeInfo[mode] || {}).title || mode;
-        title.textContent = 'Guided Session: ' + modeTitle;
-      }
-
-      // Populate checklist
-      var checklistContainer = id('session-checklist-items');
-      if (checklistContainer) {
-        var steps = modeSessionSteps[mode] || ['Complete your activity'];
-        var html = '';
-        for (var i = 0; i < steps.length; i++) {
-          html += '<li>' + escapeHtml(steps[i]) + '</li>';
-        }
-        checklistContainer.innerHTML = html;
-      }
-
-      // Update timer display
-      updateTimerDisplay();
-
-      // Reset button states
-      var btnStart = id('session-btn-start');
-      var btnStop = id('session-btn-stop');
-      var btnComplete = id('session-btn-complete');
-      if (sessionState.active && sessionState.intervalId) {
-        if (btnStart) btnStart.style.display = 'none';
-        if (btnStop) btnStop.style.display = '';
-        if (btnComplete) btnComplete.style.display = '';
-      } else {
-        if (btnStart) btnStart.style.display = '';
-        if (btnStop) btnStop.style.display = 'none';
-        if (btnComplete) btnComplete.style.display = 'none';
-      }
-
-    } catch (e) { console.error('openSession error', e); }
-  }
-
-  function closeSession() {
-    try {
-      stopTimer();
-      var modal = id('session-modal');
-      if (modal) modal.style.display = 'none';
-    } catch (e) { console.warn('closeSession error', e); }
-  }
-
-  function completeSession() {
-    try {
-      var mode = sessionState.mode || window.__currentMode || 'quick';
-      
-      // Add history entry
-      var date = new Date().toLocaleDateString();
-      var entry = { date: date, mode: mode, activity: 'Guided session complete', note: '' };
-      var hist = JSON.parse(localStorage.getItem('resetHistory') || '[]');
-      hist.unshift(entry);
-      localStorage.setItem('resetHistory', JSON.stringify(hist));
-
-      // Update streak
-      var lastLogged = localStorage.getItem('lastLogged');
-      var today = new Date().toLocaleDateString();
-      if (lastLogged !== today) {
-        var streak = parseInt(localStorage.getItem('streak') || '0', 10) || 0;
-        streak += 1;
-        localStorage.setItem('streak', String(streak));
-        localStorage.setItem('lastLogged', today);
-        updateStreak();
-      }
-
-      // Clear session state
-      clearSessionState();
-
-      // Run confetti (no Element.animate)
-      try { runConfetti(mode); } catch (e) {}
-
-      // Close modal
-      closeSession();
-
-      // Navigate to history
-      setTimeout(function () { navigateHash('#history'); }, 700);
-
-    } catch (e) { console.error('completeSession error', e); }
-  }
-
-  function createSessionBindings() {
-    try {
-      // Close button
-      var closeBtn = document.querySelector('.session-modal-close');
-      if (closeBtn && !closeBtn.__sessionBound) {
-        closeBtn.addEventListener('click', function () { closeSession(); });
-        closeBtn.__sessionBound = true;
-      }
-
-      // Overlay click to close
-      var overlay = document.querySelector('.session-modal-overlay');
-      if (overlay && !overlay.__sessionBound) {
-        overlay.addEventListener('click', function () { closeSession(); });
-        overlay.__sessionBound = true;
-      }
-
-      // Start button
-      var btnStart = id('session-btn-start');
-      if (btnStart && !btnStart.__sessionBound) {
-        btnStart.addEventListener('click', function () {
-          startTimer(sessionState.remainingSeconds, function () {
-            // Timer complete
-            var btnComplete = id('session-btn-complete');
-            if (btnComplete) {
-              btnComplete.textContent = 'Session Complete!';
-              btnComplete.style.background = '#2e8b57';
-            }
-          });
-        });
-        btnStart.__sessionBound = true;
-      }
-
-      // Stop button
-      var btnStop = id('session-btn-stop');
-      if (btnStop && !btnStop.__sessionBound) {
-        btnStop.addEventListener('click', function () { stopTimer(); });
-        btnStop.__sessionBound = true;
-      }
-
-      // Complete button
-      var btnComplete = id('session-btn-complete');
-      if (btnComplete && !btnComplete.__sessionBound) {
-        btnComplete.addEventListener('click', function () { completeSession(); });
-        btnComplete.__sessionBound = true;
-      }
-
-      // Escape key to close
-      if (!document.__sessionEscBound) {
-        document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape' || e.keyCode === 27) {
-            var modal = id('session-modal');
-            if (modal && modal.style.display !== 'none') {
-              closeSession();
-            }
-          }
-        });
-        document.__sessionEscBound = true;
-      }
-    } catch (e) { console.warn('createSessionBindings error', e); }
-  }
-
-  window.openSession = openSession;
-  window.closeSession = closeSession;
-  window.startTimer = startTimer;
-  window.stopTimer = stopTimer;
-
-  /* completeActivity (exposed) */
+  /* completeActivity (unchanged behavior) */
   window.completeActivity = function (mode, activity, noteId, rowId) {
     try {
       var row = id(rowId);
@@ -441,7 +144,7 @@
     try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
   };
 
-  /* Renderers that include a decorative header block */
+  /* Renderers (mode pages include Start session CTA when sessions enabled) */
   function renderHome() { var c = ensureContentElement(); c.innerHTML = ''; setTheme(''); }
 
   function renderModePage(mode) {
@@ -453,44 +156,75 @@
     var html = '<div class="mode-page mode-' + escapeHtml(mode) + '" role="region" aria-labelledby="mode-title">';
     html += '<div class="mode-header"><div class="mode-icon" aria-hidden="true">' + icon + '</div>';
     html += '<div><h2 class="mode-title" id="mode-title">' + escapeHtml(info.title) + '</h2>';
-    if (info.desc) html += '<div class="mode-sub">' + escapeHtml(info.desc) + '</div>';
+    if (info.desc) html += '<div class="mode-desc">' + escapeHtml(info.desc) + '</div>';
     html += '</div></div>';
     if (info.tip) html += '<div class="mode-tip">Tip: ' + escapeHtml(info.tip) + '</div>';
 
-    // Add Start Session button if feature enabled
+    // Start session CTA (if enabled)
     if (window.__features && window.__features.sessions) {
-      html += '<button class="start-session-btn" onclick="openSession(\'' + mode + '\')">Start Guided Session</button>';
+      html += '<div class="session-cta" style="margin:12px 0;"><button class="btn-primary" data-start-session data-mode="' + escapeHtml(mode) + '">Start session</button></div>';
     }
 
+    // Activities
     for (var i = 0; i < activities[mode].length; i++) {
       var act = activities[mode][i];
       html += '<div class="activity-row" id="row-' + mode + '-' + i + '">';
       html += '<div class="activity-main"><span class="activity-icon" aria-hidden="true">' + escapeHtml(act.icon) + '</span><div class="activity-label">' + escapeHtml(act.label) + '</div></div>';
       html += '<textarea id="note-' + mode + '-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="activity-controls"><button class="btn-complete" onclick="completeActivity(\'' + mode + '\',\'' + escapeJs(act.label) + '\',\'note-' + mode + '-' + i + '\',\'row-' + mode + '-' + i + '\')">Complete</button></div>';
+      html += '<div class="activity-controls"><button class="btn-complete" onclick="completeActivity(\\'' + mode + '\\',\\'' + escapeHtml(act.label) + '\\',\\'note-' + mode + '-' + i + '\\',\\'row-' + mode + '-' + i + '\\')">Complete</button></div>';
       html += '</div>';
     }
 
-    html += '<button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button>';
+    html += '<button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button>';
     html += '</div>';
     c.innerHTML = html;
+
+    // attach Start session handlers for the buttons just rendered
+    var starts = c.querySelectorAll('[data-start-session]');
+    for (var j = 0; j < starts.length; j++) {
+      (function (btn) {
+        if (!btn.__bound) {
+          btn.addEventListener('click', function (e) {
+            var md = btn.getAttribute('data-mode') || mode;
+            try { window.openSession && window.openSession(md); } catch (e) {}
+          });
+          btn.__bound = true;
+        }
+      })(starts[j]);
+    }
   }
 
   function renderQuickWins() {
     var c = ensureContentElement(); setTheme('quick');
     var quick = [{ label: 'Drink water', icon: '💧' }, { label: 'Stand up and stretch', icon: '🧘' }, { label: 'Take 3 deep breaths', icon: '🌬️' }];
     var html = '<div class="mode-page mode-quick"><div class="mode-header"><div class="mode-icon" aria-hidden="true">' + escapeHtml(modeIcons['quick']) + '</div>';
-    html += '<div><h2 class="mode-title">Quick Wins</h2><div class="mode-sub">Small, fast actions to refresh your energy</div></div></div><div class="mode-tip">Quick actions to reset in 1–5 minutes</div>';
+    html += '<div><h2 class="mode-title">Quick Wins</h2><div class="mode-desc">Small, fast actions to refresh your energy</div></div></div><div class="mode-tip">Quick actions to reset in 1–5 minutes</div>';
+
+    // Start session CTA for quick wins (if enabled)
+    if (window.__features && window.__features.sessions) {
+      html += '<div class="session-cta" style="margin:12px 0;"><button class="btn-primary" data-start-session data-mode="quick">Start session</button></div>';
+    }
+
     html += '<div class="quick-list">';
     for (var i = 0; i < quick.length; i++) {
       html += '<div class="quick-card" id="qw-' + i + '">';
       html += '<div class="icon">' + escapeHtml(quick[i].icon) + '</div>';
       html += '<div class="content"><div class="label">' + escapeHtml(quick[i].label) + '</div>';
       html += '<textarea id="qw-note-' + i + '" class="activity-note" placeholder="Notes (optional)"></textarea>';
-      html += '<div class="controls" style="margin-top:8px"><button class="btn-complete" onclick="completeActivity(\'quick-win\',\'' + escapeJs(quick[i].label) + '\',\'qw-note-' + i + '\',\'row-quick-' + i + '\')">Complete</button></div></div></div>';
+      html += '<div class="controls" style="margin-top:8px"><button class="btn-complete" onclick="completeActivity(\\'quick-win\\',\\'' + escapeHtml(quick[i].label) + '\\',\\'qw-note-' + i + '\\',\\'row-quick-' + i + '\\')">Complete</button></div></div></div>';
     }
-    html += '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
+    html += '</div><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>';
     c.innerHTML = html;
+
+    var starts = c.querySelectorAll('[data-start-session]');
+    for (var j = 0; j < starts.length; j++) {
+      (function (btn) {
+        if (!btn.__bound) {
+          btn.addEventListener('click', function () { try { window.openSession && window.openSession('quick'); } catch (e) {} });
+          btn.__bound = true;
+        }
+      })(starts[j]);
+    }
   }
 
   function renderHistory() {
@@ -498,11 +232,10 @@
     var history = JSON.parse(localStorage.getItem('resetHistory') || '[]');
     var listHtml = '';
     if (history.length === 0) listHtml = '<p>No history yet.</p>'; else for (var i = 0; i < history.length; i++) listHtml += '<p><strong>' + escapeHtml(history[i].date) + ':</strong> ' + escapeHtml((history[i].mode || '').charAt(0).toUpperCase() + (history[i].mode || '').slice(1)) + ' — ' + escapeHtml(history[i].activity) + (history[i].note ? ' • <em>' + escapeHtml(history[i].note) + '</em>' : '') + '</p>';
-    c.innerHTML = '<div class="mode-page"><h2>History</h2><div>' + listHtml + '</div><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>';
-    // Chart code left unchanged (if Chart is present elsewhere)
+    c.innerHTML = '<div class="mode-page"><h2>History</h2><div>' + listHtml + '</div><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>';
   }
 
-  function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\'#home\')">Return to the Compass</button></div>'; }
+  function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>'; }
 
   /* renderRoute */
   function renderRoute() {
@@ -523,7 +256,236 @@
   }
   window.renderRoute = renderRoute;
 
-  /* Defensive early delegation (capture) to ensure taps are handled reliably */
+  /* Session implementation (feature-flagged) */
+  var sessionDefaults = {
+    growing: 25 * 60,
+    grounded: 15 * 60,
+    drifting: 5 * 60,
+    surviving: 3 * 60,
+    quick: 1 * 60
+  };
+
+  var sessionState = { timerId: null, remaining: 0, mode: null, running: false };
+
+  function persistSession() {
+    try {
+      if (!sessionState.mode) return;
+      var key = 'session.' + sessionState.mode;
+      var obj = { remaining: sessionState.remaining, mode: sessionState.mode, running: sessionState.running, ts: Date.now() };
+      localStorage.setItem(key, JSON.stringify(obj));
+    } catch (e) {}
+  }
+
+  function restoreSessionForMode(mode) {
+    try {
+      var key = 'session.' + mode;
+      var raw = localStorage.getItem(key);
+      if (!raw) return false;
+      var obj = JSON.parse(raw);
+      if (!obj || obj.mode !== mode) return false;
+      sessionState.mode = mode;
+      sessionState.remaining = typeof obj.remaining === 'number' ? obj.remaining : sessionDefaults[mode] || 60;
+      sessionState.running = !!obj.running;
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function clearPersistedSession(mode) {
+    try { localStorage.removeItem('session.' + (mode || sessionState.mode || 'none')); } catch (e) {}
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec || 0));
+    var m = Math.floor(sec / 60), s = sec % 60;
+    return (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+  }
+
+  function startTimer(seconds, onDone) {
+    try {
+      stopTimer();
+      sessionState.remaining = seconds || 60;
+      sessionState.running = true;
+      persistSession();
+      var display = id('session-timer');
+      if (display) display.textContent = formatTime(sessionState.remaining);
+      sessionState.timerId = setInterval(function () {
+        sessionState.remaining -= 1;
+        if (display) display.textContent = formatTime(sessionState.remaining);
+        persistSession();
+        if (sessionState.remaining <= 0) {
+          stopTimer();
+          sessionState.running = false;
+          clearPersistedSession(sessionState.mode);
+          if (typeof onDone === 'function') onDone();
+        }
+      }, 1000);
+    } catch (e) { console.warn('startTimer failed', e); }
+  }
+
+  function stopTimer() {
+    if (sessionState.timerId) { clearInterval(sessionState.timerId); sessionState.timerId = null; sessionState.running = false; }
+    persistSession();
+  }
+
+  function pushGuidedSessionHistory(mode) {
+    try {
+      var date = new Date().toLocaleDateString();
+      var entry = { date: date, mode: mode, activity: 'Guided session complete', note: '' };
+      var hist = JSON.parse(localStorage.getItem('resetHistory') || '[]');
+      hist.unshift(entry);
+      localStorage.setItem('resetHistory', JSON.stringify(hist));
+      var lastLogged = localStorage.getItem('lastLogged');
+      var today = new Date().toLocaleDateString();
+      if (lastLogged !== today) {
+        var streak = parseInt(localStorage.getItem('streak') || '0', 10) || 0;
+        streak += 1;
+        localStorage.setItem('streak', String(streak));
+        localStorage.setItem('lastLogged', today);
+        updateStreak();
+      }
+    } catch (e) {}
+  }
+
+  function buildSessionBody(mode) {
+    var html = '';
+    html += '<p class="helper">Follow the short guided session below. You can start, pause, and resume. Progress persists if you close the modal.</p>';
+    html += '<div class="timer"><div class="timer-display" id="session-timer">' + formatTime(sessionDefaults[mode] || 60) + '</div><div class="helper">Recommended</div></div>';
+    html += '<div class="step-list">';
+    if (mode === 'growing') {
+      html += '<div class="step-item"><input type="checkbox" id="step-1"><label for="step-1">Set a clear goal (2 min)</label></div>';
+      html += '<div class="step-item"><input type="checkbox" id="step-2"><label for="step-2">Work focused (25 min)</label></div>';
+      html += '<div class="step-item"><input type="checkbox" id="step-3"><label for="step-3">Quick review (3 min)</label></div>';
+    } else if (mode === 'grounded') {
+      html += '<div class="step-item"><input type="checkbox" id="step-1"><label for="step-1">Pick one area to declutter (5–15 min)</label></div>';
+      html += '<div class="step-item"><input type="checkbox" id="step-2"><label for="step-2">Complete a small task (10–20 min)</label></div>';
+      html += '<div class="step-item"><input type="checkbox" id="step-3"><label for="step-3">Plan next 3 actions</label></div>';
+    } else if (mode === 'drifting') {
+      html += '<div class="step-item"><input type="checkbox" id="step-1"><label for="step-1">Step outside or move gently (7–10 min)</label></div>';
+      html += '<div class="step-item"><input type="checkbox" id="step-2"><label for="step-2">Breathe or journal (5 min)</label></div>';
+    } else if (mode === 'surviving') {
+      html += '<div class="step-item"><input type="checkbox" id="step-1"><label for="step-1">Drink a glass of water</label></div>';
+      html += '<div class="step-item"><input type="checkbox" id="step-2"><label for="step-2">Breathe for 3–5 minutes</label></div>';
+      html += '<div class="step-item'><input type="checkbox" id="step-3"><label for="step-3">Sit quietly for a minute</label></div>';
+    } else {
+      html += '<div class="step-item"><input type="checkbox" id="step-1"><label for="step-1">Drink water</label></div>';
+      html += '<div class="step-item"><input type="checkbox" id="step-2"><label for="step-2">Stretch</label></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function openSession(mode) {
+    try {
+      if (!window.__features.sessions) return;
+      var modal = id('session-modal'), body = id('session-body'), title = id('session-title');
+      if (!modal || !body || !title) return;
+      title.textContent = (mode.charAt(0).toUpperCase() + mode.slice(1)) + ' — Guided session';
+      body.innerHTML = buildSessionBody(mode);
+      modal.hidden = false;
+      // restore persisted session if present
+      if (restoreSessionForMode(mode)) {
+        var display = id('session-timer'); if (display) display.textContent = formatTime(sessionState.remaining);
+      } else {
+        sessionState.mode = mode;
+        sessionState.remaining = sessionDefaults[mode] || 60;
+        sessionState.running = false;
+        var display = id('session-timer'); if (display) display.textContent = formatTime(sessionState.remaining);
+      }
+      createSessionBindings(mode);
+      var panel = modal.querySelector('.modal-panel'); if (panel) panel.focus && panel.setAttribute('tabindex', '-1');
+
+      // restore checklist state if any (small delay to ensure DOM ready)
+      setTimeout(function () {
+        try {
+          var raw = localStorage.getItem('session.checklist.' + (mode || 'session'));
+          if (!raw) return;
+          var arr = JSON.parse(raw);
+          var checks = modal.querySelectorAll('.step-item input[type="checkbox"]');
+          for (var i = 0; i < checks.length && i < arr.length; i++) checks[i].checked = !!arr[i];
+        } catch (e) {}
+      }, 120);
+    } catch (e) { console.warn('openSession error', e); }
+  }
+
+  function closeSession() {
+    try {
+      var modal = id('session-modal'); if (!modal) return;
+      modal.hidden = true;
+      stopTimer();
+    } catch (e) {}
+  }
+
+  function createSessionBindings(mode) {
+    try {
+      var modal = id('session-modal');
+      if (!modal) return;
+      var start = id('session-start'), cancel = id('session-cancel'), closeBtn = id('session-close');
+      if (start && modal._startFn) start.removeEventListener('click', modal._startFn);
+      if (cancel && modal._cancelFn) cancel.removeEventListener('click', modal._cancelFn);
+      if (closeBtn && modal._closeFn) closeBtn.removeEventListener('click', modal._closeFn);
+      if (modal._keyHandler) document.removeEventListener('keydown', modal._keyHandler);
+
+      modal._startFn = function () {
+        sessionState.mode = mode;
+        startTimer(sessionDefaults[mode] || 60, function () {
+          pushGuidedSessionHistory(mode);
+          runConfetti(mode);
+          setTimeout(closeSession, 600);
+        });
+      };
+      modal._cancelFn = function () { closeSession(); };
+      modal._closeFn = function () { closeSession(); };
+      modal._keyHandler = function (e) { if (e.key === 'Escape') closeSession(); };
+
+      start && start.addEventListener('click', modal._startFn);
+      cancel && cancel.addEventListener('click', modal._cancelFn);
+      closeBtn && closeBtn.addEventListener('click', modal._closeFn);
+      document.addEventListener('keydown', modal._keyHandler);
+
+      // clicking backdrop closes
+      modal.addEventListener('click', function (e) { if (e.target === modal) closeSession(); });
+    } catch (e) { console.warn('createSessionBindings', e); }
+  }
+
+  // Expose minimal API
+  window.openSession = openSession;
+  window.closeSession = closeSession;
+
+  // Ensure session CTAs are attached after route renders (non-invasive)
+  var _origRenderRoute = window.renderRoute;
+  if (typeof _origRenderRoute === 'function') {
+    window.renderRoute = function () {
+      try { _origRenderRoute(); } catch (e) {}
+      try {
+        var h = location.hash || '#home';
+        if (h.indexOf('#mode/') === 0) {
+          var mode = h.split('/')[1];
+          // append CTA if sessions enabled (renderModePage will also add in many cases)
+          var content = id('content'); if (content) {
+            var mp = content.querySelector('.mode-page');
+            if (mp && !mp.querySelector('[data-start-session]') && window.__features.sessions) {
+              var wrapper = document.createElement('div'); wrapper.style.margin = '12px 0';
+              var btn = document.createElement('button'); btn.className = 'btn-primary'; btn.setAttribute('data-start-session', 'true'); btn.setAttribute('data-mode', mode); btn.textContent = 'Start session';
+              wrapper.appendChild(btn); mp.insertBefore(wrapper, mp.firstChild ? mp.firstChild.nextSibling : null);
+              btn.addEventListener('click', function () { openSession(mode); });
+            }
+          }
+        } else if (h === '#quick') {
+          var content = id('content'); if (content) {
+            var mp = content.querySelector('.mode-page');
+            if (mp && !mp.querySelector('[data-start-session]') && window.__features.sessions) {
+              var wrapper = document.createElement('div'); wrapper.style.margin = '12px 0';
+              var btn = document.createElement('button'); btn.className = 'btn-primary'; btn.setAttribute('data-start-session', 'true'); btn.setAttribute('data-mode', 'quick'); btn.textContent = 'Start session';
+              wrapper.appendChild(btn); mp.insertBefore(wrapper, mp.firstChild ? mp.firstChild.nextSibling : null);
+              btn.addEventListener('click', function () { openSession('quick'); });
+            }
+          }
+        }
+      } catch (e) { console.warn('renderRoute wrapper', e); }
+    };
+  }
+
+  /* Defensive early delegation */
   (function attachEarlyDelegate() {
     try {
       function safeNavigateHash(h) {
@@ -560,7 +522,7 @@
     } catch (e) {}
   })();
 
-  /* bindUI + compass delegation + needle spin */
+  /* UI bindings */
   function bindUI() {
     try {
       var navs = $$('.nav-links a[data-hash]');
@@ -589,9 +551,9 @@
     comp.addEventListener('click', function (ev) {
       try {
         var tgt = ev.target;
-        var path = (tgt && tgt.closest) ? tgt.closest('[data-mode]') : null;
-        if (!path) return;
-        var mode = path.getAttribute('data-mode');
+        var node = (tgt && tgt.closest) ? tgt.closest('[data-mode]') : null;
+        if (!node) return;
+        var mode = node.getAttribute('data-mode');
         setTheme(mode);
         renderModePage(mode);
         navigateMode(mode);
@@ -622,6 +584,35 @@
 
   window.__rebindUI = function () { try { bindUI(); attachCompassDelegation(); setupNeedleSpin(); console.info('rebindUI done'); } catch (e) { console.warn('rebindUI failed', e); } };
 
+  /* Modal checklist tap helper (defensive) */
+  (function () {
+    function modalChecklistDelegate(e) {
+      try {
+        var modal = document.getElementById('session-modal');
+        if (!modal || modal.hidden) return;
+        var tgt = e.target;
+        // find nearest .step-item
+        var row = tgt && tgt.closest ? tgt.closest('.step-item') : null;
+        if (!row) return;
+        // if the click was on the checkbox itself, let native behavior happen
+        var cb = row.querySelector('input[type="checkbox"]');
+        if (!cb) return;
+        if (e.target === cb) return;
+        // otherwise toggle checkbox
+        e.preventDefault && e.preventDefault();
+        cb.checked = !cb.checked;
+        // persist per-session checklist to localStorage (keyed by mode)
+        try {
+          var modeTitle = document.getElementById('session-title');
+          var mode = modeTitle ? (modeTitle.textContent || '').split('—')[0].trim().toLowerCase() : 'session';
+          var list = Array.prototype.slice.call(modal.querySelectorAll('.step-item input[type="checkbox"]')).map(function(chk){ return chk.checked; });
+          localStorage.setItem('session.checklist.' + mode, JSON.stringify(list));
+        } catch (err) {}
+      } catch (err) { /* swallow */ }
+    }
+    document.addEventListener('click', modalChecklistDelegate, true);
+  })();
+
   /* Init */
   document.addEventListener('DOMContentLoaded', function () {
     try {
@@ -630,11 +621,10 @@
       bindUI();
       attachCompassDelegation();
       setupNeedleSpin();
-      createSessionBindings();
       if (!location.hash) location.hash = '#home';
       renderRoute();
       updateStreak();
-      console.info('[app v128] initialized (guided session modal)');
+      console.info('[app v128] initialized (sessions feature: ' + (window.__features.sessions ? 'enabled' : 'disabled') + ')');
     } catch (err) {
       console.error('init failed', err);
       try { window.__lastAppError = { msg: err.message || String(err), stack: err.stack || null, time: new Date().toISOString() }; } catch (e) {}
