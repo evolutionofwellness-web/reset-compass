@@ -6,8 +6,6 @@
   <title>The Reset Compass</title>
 
   <link rel="icon" href="splash-icon.png" type="image/png">
-
-  <!-- Styles (v128: guided session modal) -->
   <link rel="stylesheet" href="main.css?v=128" />
 </head>
 <body>
@@ -97,28 +95,6 @@
     </main>
   </div>
 
-  <!-- Guided Session Modal (v128, hidden by default) -->
-  <div id="session-modal" class="session-modal" role="dialog" aria-modal="true" aria-labelledby="session-modal-title" style="display:none;">
-    <div class="session-modal-overlay"></div>
-    <div class="session-modal-content">
-      <div class="session-modal-header">
-        <h2 id="session-modal-title" class="session-modal-title">Guided Session</h2>
-        <button type="button" class="session-modal-close" aria-label="Close session modal">&times;</button>
-      </div>
-      <div class="session-modal-body">
-        <div class="session-timer" id="session-timer">
-          <div class="session-timer-display" id="session-timer-display">00:00</div>
-          <div class="session-timer-label">Time remaining</div>
-        </div>
-        <div class="session-checklist" id="session-checklist">
-          <h3 class="session-checklist-title">Session Steps</h3>
-          <ul class="session-checklist-items" id="session-checklist-items"></ul>
-        </div>
-        <div class="session-controls">
-          <button type="button" class="session-btn session-btn-start" id="session-btn-start">Start Timer</button>
-          <button type="button" class="session-btn session-btn-stop" id="session-btn-stop" style="display:none;">Stop Timer</button>
-          <button type="button" class="session-btn session-btn-complete" id="session-btn-complete" style="display:none;">Complete Session</button>
-        </div>
   <!-- Session modal (hidden until Start session) -->
   <div id="session-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="session-title" hidden>
     <div class="modal-panel" role="document" aria-describedby="session-body" tabindex="-1">
