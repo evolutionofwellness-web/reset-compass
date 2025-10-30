@@ -1,4 +1,4 @@
-/* app.js v124 — stronger per-mode page visuals (decorative header + accents)
+/* app.js v127 — CSS-only visual enhancements (no behavior changes)
    - ES5-friendly
    - Sets .app-root.theme-<mode> and renders mode pages with a header block so the theme is obvious
    - Keeps defensive event delegation and mode-specific confetti palettes
@@ -7,6 +7,9 @@
 
 (function () {
   'use strict';
+
+  /* Version marker */
+  window.APP_VERSION = 'v127';
 
   /* Helpers */
   function $(sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } }
@@ -331,7 +334,7 @@
       if (!location.hash) location.hash = '#home';
       renderRoute();
       updateStreak();
-      console.info('[app v124] initialized (stronger mode themes)');
+      console.info('[app v127] initialized (CSS-only visual enhancements)');
     } catch (err) {
       console.error('init failed', err);
       try { window.__lastAppError = { msg: err.message || String(err), stack: err.stack || null, time: new Date().toISOString() }; } catch (e) {}
