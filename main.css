@@ -17,8 +17,14 @@ body{
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
 }
 
+/* v127: Disable all animations globally for safety */
+*, *::before, *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
 /* Theme backgrounds applied on .app-root to allow per-mode theming */
-.app-root { background: var(--bg); transition: background .18s linear; }
+.app-root { background: var(--bg); }
 
 /* Per-mode theme variables & stronger page-level visuals */
 /* Growing: bold blue band + diagonal stripes */
@@ -29,7 +35,7 @@ body{
   box-shadow: 0 10px 30px rgba(6,20,40,0.04);
 }
 .app-root.theme-growing .mode-page::before {
-  content: ""; display:block; height:8px; border-top-left-radius:14px; border-top-right-radius:14px;
+  content: ""; display:block; height:14px; border-top-left-radius:14px; border-top-right-radius:14px;
   background: linear-gradient(90deg,#2FA0FF,#007BFF);
   margin:-20px -20px 14px; /* extend past edges */
   box-shadow: 0 6px 16px rgba(2,56,120,0.06);
@@ -45,7 +51,7 @@ body{
   box-shadow: 0 10px 28px rgba(6,20,20,0.03);
 }
 .app-root.theme-grounded .mode-page::before {
-  content: ""; display:block; height:8px; border-top-left-radius:14px; border-top-right-radius:14px;
+  content: ""; display:block; height:14px; border-top-left-radius:14px; border-top-right-radius:14px;
   background: linear-gradient(90deg,#79D18E,#2e8b57);
   margin:-20px -20px 14px;
   opacity:0.98;
@@ -61,7 +67,7 @@ body{
   box-shadow: 0 10px 28px rgba(80,50,10,0.03);
 }
 .app-root.theme-drifting .mode-page::before {
-  content: ""; display:block; height:8px; border-top-left-radius:14px; border-top-right-radius:14px;
+  content: ""; display:block; height:14px; border-top-left-radius:14px; border-top-right-radius:14px;
   background: linear-gradient(90deg,#FFD166,#D6A520);
   margin:-20px -20px 14px;
   opacity:0.96;
@@ -77,7 +83,7 @@ body{
   box-shadow: 0 10px 28px rgba(120,40,40,0.03);
 }
 .app-root.theme-surviving .mode-page::before {
-  content: ""; display:block; height:8px; border-top-left-radius:14px; border-top-right-radius:14px;
+  content: ""; display:block; height:14px; border-top-left-radius:14px; border-top-right-radius:14px;
   background: linear-gradient(90deg,#F08F91,#D9534F);
   margin:-20px -20px 14px;
   opacity:0.96;
@@ -88,7 +94,7 @@ body{
 /* Quick theme */
 .app-root.theme-quick { --mode-accent: #6f42c1; --mode-text: #253858; }
 .app-root.theme-quick .mode-page { background: linear-gradient(180deg,#F6F7FF,#FFFFFF); border-color: rgba(111,66,193,0.06); box-shadow: 0 10px 28px rgba(60,50,90,0.03); }
-.app-root.theme-quick .mode-page::before { content: ""; display:block; height:8px; border-top-left-radius:14px; border-top-right-radius:14px; background: linear-gradient(90deg,#C1B3FF,#6f42c1); margin:-20px -20px 14px; opacity:0.95; }
+.app-root.theme-quick .mode-page::before { content: ""; display:block; height:14px; border-top-left-radius:14px; border-top-right-radius:14px; background: linear-gradient(90deg,#C1B3FF,#6f42c1); margin:-20px -20px 14px; opacity:0.95; }
 .app-root.theme-quick .mode-page .mode-icon { background: linear-gradient(180deg,#C1B3FF,#6f42c1); color:#fff; }
 
 /* App root & layout */
@@ -115,10 +121,10 @@ body{
 .mode-page { position:relative; overflow:visible; }
 .mode-header { display:flex; align-items:center; gap:14px; margin-bottom:12px; padding-top:6px; }
 .mode-icon {
-  width:56px; height:56px; border-radius:14px; flex:0 0 56px; display:flex; align-items:center; justify-content:center;
-  font-size:26px; font-weight:800; box-shadow: 0 6px 18px rgba(6,20,12,0.06);
+  width:68px; height:68px; border-radius:14px; flex:0 0 68px; display:flex; align-items:center; justify-content:center;
+  font-size:32px; font-weight:800; box-shadow: 0 6px 18px rgba(6,20,12,0.06);
 }
-.mode-title { margin:0; font-size:1.6rem; font-weight:900; color:var(--mode-text, var(--brand-green)); }
+.mode-title { margin:0; font-size:1.6rem; font-weight:900; color:var(--mode-text, var(--brand-green)); text-shadow: 0 1px 2px rgba(0,0,0,0.08); }
 .mode-sub { margin-top:6px; color:var(--muted-text); font-weight:600; }
 
 /* Compass */
@@ -182,5 +188,5 @@ svg{width:360px;height:360px;max-width:92vw;display:block}
   .nav-links a{font-size:0.9rem;padding:6px 6px}
   .hero-title{font-size:1.1rem}
   .mode-title{font-size:1.3rem}
-  .mode-icon{width:48px;height:48px;border-radius:12px;font-size:20px}
+  .mode-icon{width:58px;height:58px;border-radius:12px;font-size:26px}
 }
