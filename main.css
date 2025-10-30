@@ -85,7 +85,7 @@ body{
 .compass-wrap{display:flex;justify-content:center;margin:8px 0 18px;position:relative}
 svg{width:360px;height:360px;max-width:92vw;display:block}
 .wedge{cursor:pointer;pointer-events:auto;transform-origin:100px 100px}
-.compass-label{font-size:20px;font-weight:900;fill:#fff;text-anchor:middle;dominant-baseline:middle;pointer-events:none;}
+.compass-label{font-size:20px;font-weight:900;fill:#fff;text-anchor:middle;dominant-baseline:middle;pointer-events:auto;cursor:pointer;}
 
 /* Needle */
 #needle-group{transform-origin:100px 100px;will-change:transform;}
@@ -137,7 +137,24 @@ svg{width:360px;height:360px;max-width:92vw;display:block}
 .app-root.theme-quick .mode-page { border-color: rgba(111,66,193,0.06); }
 .app-root.theme-quick .mode-page h2 { color: #3b2a6e; }
 
-/* Utilities */
+/* Small visual click trace (temporary) */
+#click-trace {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  z-index: 200000;
+  display: none;
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .small-muted{color:var(--muted-text);font-size:0.9rem;margin-top:6px}
 
 @media (max-width:420px){
@@ -146,22 +163,4 @@ svg{width:360px;height:360px;max-width:92vw;display:block}
   .mode-button{font-size:0.95rem;padding:10px}
   .nav-links a{font-size:0.9rem;padding:6px 6px}
   .hero-title{font-size:1.1rem}
-}
-
-/* DEBUG BANNER (temporary) */
-#debug-banner{
-  position:fixed;
-  bottom:12px;
-  right:12px;
-  background:rgba(0,0,0,0.78);
-  color:#fff;
-  padding:10px 12px;
-  border-radius:10px;
-  font-size:12px;
-  line-height:1.2;
-  z-index:120000;
-  max-width:320px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.28);
-  white-space:pre-wrap;
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
 }
