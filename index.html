@@ -8,8 +8,8 @@
   <!-- Explicit favicon -->
   <link rel="icon" href="splash-icon.png" type="image/png">
 
-  <!-- Styles (v124: stronger per-mode page themes) -->
-  <link rel="stylesheet" href="main.css?v=124" />
+  <!-- Styles (v127: visual tweaks only, no animations) -->
+  <link rel="stylesheet" href="main.css?v=127" />
 </head>
 <body>
   <div id="app-root" class="app-root" aria-hidden="false">
@@ -50,22 +50,17 @@
             <linearGradient id="groundedGrad" x1="0" x2="1"><stop offset="0" stop-color="#3CA56A"/><stop offset="1" stop-color="#246B45"/></linearGradient>
             <linearGradient id="driftingGrad" x1="0" x2="1"><stop offset="0" stop-color="#E6C450"/><stop offset="1" stop-color="#DAA520"/></linearGradient>
             <linearGradient id="survivingGrad" x1="0" x2="1"><stop offset="0" stop-color="#E78B88"/><stop offset="1" stop-color="#D9534F"/></linearGradient>
-
-            <!-- subtle drop-shadow filter for SVG text -->
-            <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
-            </filter>
           </defs>
 
           <g transform="rotate(-45 100 100)">
             <path class="wedge" d="M100,100 L100,6 A94,94 0 0,1 194,100 L128,100 A28,28 0 0,0 100,72 Z"
-                  fill="url(#growingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="growing" data-angle="-45" tabindex="0"/>
+                  fill="url(#growingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="growing" tabindex="0"/>
             <path class="wedge" d="M100,100 L194,100 A94,94 0 0,1 100,194 L100,128 A28,28 0 0,0 128,100 Z"
-                  fill="url(#groundedGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="grounded" data-angle="45" tabindex="0"/>
+                  fill="url(#groundedGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="grounded" tabindex="0"/>
             <path class="wedge" d="M100,100 L100,194 A94,94 0 0,1 6,100 L72,100 A28,28 0 0,0 100,128 Z"
-                  fill="url(#driftingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="drifting" data-angle="135" tabindex="0"/>
+                  fill="url(#driftingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="drifting" tabindex="0"/>
             <path class="wedge" d="M100,100 L6,100 A94,94 0 0,1 100,6 L100,72 A28,28 0 0,0 72,100 Z"
-                  fill="url(#survivingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="surviving" data-angle="225" tabindex="0"/>
+                  fill="url(#survivingGrad)" stroke="#F7FBF8" stroke-width="3" data-mode="surviving" tabindex="0"/>
           </g>
 
           <circle cx="100" cy="100" r="44" fill="#F7FBF8" stroke="rgba(0,0,0,0.02)"/>
@@ -75,11 +70,10 @@
             <rect id="compass-tail" x="98.5" y="104" width="3" height="26" rx="1.5" fill="rgba(6,56,39,0.88)" />
           </g>
 
-          <!-- readable labels with data-mode so label taps work -->
-          <text data-mode="growing" x="100" y="36" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Growing</text>
-          <text data-mode="grounded" x="156" y="100" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Grounded</text>
-          <text data-mode="drifting" x="100" y="164" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Drifting</text>
-          <text data-mode="surviving" x="44" y="100" class="compass-label in-wedge" filter="url(#textShadow)" style="paint-order:stroke fill; stroke:#000; stroke-width:3; fill:#fff;">Surviving</text>
+          <text data-mode="growing" x="100" y="36" class="compass-label in-wedge" style="text-anchor:middle;pointer-events:none;">Growing</text>
+          <text data-mode="grounded" x="156" y="100" class="compass-label in-wedge" style="text-anchor:middle;pointer-events:none;">Grounded</text>
+          <text data-mode="drifting" x="100" y="164" class="compass-label in-wedge" style="text-anchor:middle;pointer-events:none;">Drifting</text>
+          <text data-mode="surviving" x="44" y="100" class="compass-label in-wedge" style="text-anchor:middle;pointer-events:none;">Surviving</text>
         </svg>
       </section>
 
@@ -106,6 +100,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js?v=124"></script>
+  <script src="app.js?v=127"></script>
 </body>
 </html>
