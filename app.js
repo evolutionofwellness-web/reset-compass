@@ -1,4 +1,4 @@
-/* app.js v122 — per-mode themes + quick-win theme + mode-specific confetti colors
+/* app.js v122 — per-mode patterns + mode-specific confetti colors
    - ES5-friendly
    - setTheme(mode) toggles .app-root.theme-<mode> and stores window.__currentMode
    - runConfetti(mode) uses mode-specific palettes
