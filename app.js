@@ -237,7 +237,7 @@
 
   function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" onclick="navigateHash(\\'#home\\')">Return to the Compass</button></div>'; }
 
-  /* renderRoute */
+  /* renderRoute */  
   function renderRoute() {
     try {
       var h = location.hash || '#home';
@@ -365,7 +365,7 @@
     } else if (mode === 'surviving') {
       html += '<div class="step-item"><input type="checkbox" id="step-1"><label for="step-1">Drink a glass of water</label></div>';
       html += '<div class="step-item"><input type="checkbox" id="step-2"><label for="step-2">Breathe for 3–5 minutes</label></div>';
-      html += '<div class="step-item'><input type="checkbox" id="step-3"><label for="step-3">Sit quietly for a minute</label></div>';
+      html += '<div class="step-item"><input type="checkbox" id="step-3"><label for="step-3">Sit quietly for a minute</label></div>';
     } else {
       html += '<div class="step-item"><input type="checkbox" id="step-1"><label for="step-1">Drink water</label></div>';
       html += '<div class="step-item"><input type="checkbox" id="step-2"><label for="step-2">Stretch</label></div>';
