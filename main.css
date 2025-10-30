@@ -45,20 +45,43 @@ svg{width:360px;height:360px;max-width:92vw;display:block}
 /* Needle */
 #needle-group{transform-origin:100px 100px;will-change:transform;}
 
-/* Buttons */
+/* Buttons: two-line, readable */
 .buttons{margin:6px 0 22px;display:flex;flex-direction:column;gap:12px;align-items:center}
-.mode-button{width:92%;max-width:720px;padding:14px;border-radius:10px;border:none;color:white;font-weight:900}
+.mode-button{width:92%;max-width:720px;padding:12px;border-radius:10px;border:none;color:white;font-weight:900;text-align:left;display:flex;align-items:center}
+.mode-button .btn-content{display:flex;flex-direction:column;align-items:flex-start}
+.mode-button .btn-title{font-size:1.02rem;line-height:1}
+.mode-button .btn-desc{font-size:0.88rem;color:rgba(255,255,255,0.92);font-weight:600;margin-top:6px;opacity:0.95}
+
+/* Mode-specific accessible tints via classes on .app-root */
+.app-root.theme-growing .mode-button.growing{background:linear-gradient(180deg,#2fa0ff,#007BFF)}
+.app-root.theme-grounded .mode-button.grounded{background:linear-gradient(180deg,#48b174,#2e8b57)}
+.app-root.theme-drifting .mode-button.drifting{background:linear-gradient(180deg,#f0c95f,#d6a520);color:#2e2a1e}
+.app-root.theme-surviving .mode-button.surviving{background:linear-gradient(180deg,#f08f91,#d9534f)}
+
+/* Default button colors (when no theme class is set) */
 .mode-button.growing{background:linear-gradient(180deg,#2fa0ff,#007BFF)}
 .mode-button.grounded{background:linear-gradient(180deg,#48b174,#2e8b57)}
 .mode-button.drifting{background:linear-gradient(180deg,#f0c95f,#d6a520);color:#2e2a1e}
 .mode-button.surviving{background:linear-gradient(180deg,#f08f91,#d9534f)}
 
-/* Content */
+/* Content & mode pages */
 .content-area{margin-top:6px;padding-bottom:48px}
-.mode-page{background:linear-gradient(180deg,#ffffff,#fbfffb);border-radius:14px;padding:20px;border:1px solid rgba(0,0,0,0.04);box-shadow:var(--shadow);margin:14px 0 40px;max-width:760px;margin-left:auto;margin-right:auto}
+.mode-page{background:var(--card-bg);border-radius:14px;padding:20px;border:1px solid rgba(0,0,0,0.04);box-shadow:var(--shadow);margin:14px 0 40px;max-width:760px;margin-left:auto;margin-right:auto}
+.mode-page h2{margin:0 0 8px 0;font-size:1.5rem;color:var(--brand-green)}
+.mode-desc{color:var(--muted-text);margin-bottom:12px;font-weight:600}
+.mode-tip{background:rgba(11,61,46,0.03);padding:10px;border-radius:10px;margin-bottom:14px;color:var(--muted-text);font-weight:600;border-left:4px solid rgba(11,61,46,0.08)}
+
+/* Quick wins cards */
+.quick-card{background:#fff;border-radius:12px;padding:14px;margin:12px 0;border:1px solid rgba(0,0,0,0.04);display:flex;align-items:flex-start;gap:12px}
+.quick-card .icon{font-size:22px}
+.quick-card .label{font-weight:800;font-size:1.02rem}
+.quick-card .controls{margin-top:8px}
+
+/* Activity rows */
 .activity-row{display:block;margin:10px 0;padding:14px;border-radius:10px;background:#fff;border-left:6px solid rgba(11,61,46,0.02)}
 .activity-label{font-weight:700;margin-top:6px}
 
 /* Utilities */
 .return-button{display:inline-block;margin-top:14px;padding:12px 18px;background:var(--brand-green);color:white;border-radius:12px;border:none;font-weight:800;cursor:pointer}
+
 @media (max-width:420px){ svg{width:300px;height:300px} .compass-label{font-size:16px} .mode-button{font-size:0.95rem;padding:12px} }
