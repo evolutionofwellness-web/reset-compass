@@ -3,7 +3,7 @@
    - window.__features.sessions controls guided sessions (true = enabled)
    - Session logic is isolated and uses localStorage for persistence
    - Non-animated confetti used for completion
-   - Defensive: no syntax errors, no inline onclick strings; elements bound after render
+   - Defensive: no syntax errors; event handlers bound after render
 */
 
 (function () {
@@ -11,10 +11,8 @@
 
   window.APP_VERSION = window.APP_VERSION || 'v128';
   window.__features = window.__features || {};
-  // Default: enable sessions on this branch. Set false to disable immediately:
   window.__features.sessions = (typeof window.__features.sessions === 'boolean') ? window.__features.sessions : true;
 
-  /* Small helpers */
   function id(name) { return document.getElementById(name); }
   function $$(sel, root) { root = root || document; try { return Array.prototype.slice.call(root.querySelectorAll(sel)); } catch (e) { return []; } }
   function escapeHtml(s) { s = String(s || ''); return s.replace(/[&<>"']/g, function (ch) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]); }); }
@@ -25,7 +23,6 @@
     return false;
   };
 
-  /* theme + data */
   window.__currentMode = '';
   var confettiColors = {
     growing: ['#79C7FF','#2FA0FF','#007BFF'],
@@ -71,7 +68,6 @@
     return c;
   }
 
-  /* confetti */
   function runConfetti(mode) {
     try {
       mode = mode || window.__currentMode || 'quick';
@@ -98,7 +94,6 @@
     } catch (e) { console.warn('confetti error', e); }
   }
 
-  /* activity completion behaviour (no change) */
   window.completeActivity = function (mode, activity, noteId, rowId) {
     try {
       var row = id(rowId);
@@ -127,7 +122,6 @@
 
   function updateStreak() { var el = id('streak-count'); if (el) el.textContent = localStorage.getItem('streak') || '0'; }
 
-  /* navigation helpers */
   window.navigateHash = function (hash) {
     try { location.hash = hash; } catch (e) { console.warn(e); }
     try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
@@ -137,7 +131,6 @@
     try { if (typeof window.renderRoute === 'function') window.renderRoute(); } catch (e) {}
   };
 
-  /* renderers */
   function renderHome() { var c = ensureContentElement(); c.innerHTML = ''; setTheme(''); }
 
   function renderModePage(mode) {
@@ -158,7 +151,6 @@
       html += '<div class="session-cta" style="margin:12px 0;"><button class="btn-primary" data-start-session data-mode="' + escapeHtml(mode) + '">Start session</button></div>';
     }
 
-    // Activities: use data attributes and attach handlers after inserting HTML
     for (var i = 0; i < activities[mode].length; i++) {
       var act = activities[mode][i];
       var noteId = 'note-' + mode + '-' + i;
@@ -174,7 +166,6 @@
     html += '</div>';
     c.innerHTML = html;
 
-    // attach start session handlers
     var starts = c.querySelectorAll('[data-start-session]');
     for (var j = 0; j < starts.length; j++) {
       (function (btn) {
@@ -188,7 +179,6 @@
       })(starts[j]);
     }
 
-    // attach complete handlers
     var completes = c.querySelectorAll('.btn-complete');
     for (var k = 0; k < completes.length; k++) {
       (function (b) {
@@ -271,7 +261,6 @@
 
   function renderAbout() { var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><h2>About</h2><p>The Reset Compass helps align energy and action with your state. Questions? <a href="mailto:evolutionofwellness@gmail.com">Contact Support</a></p><button class="return-button" data-hash="#home">Return to the Compass</button></div>'; }
 
-  /* route rendering */
   function renderRoute() {
     try {
       var h = location.hash || '#home';
@@ -290,7 +279,6 @@
   }
   window.renderRoute = renderRoute;
 
-  /* sessions (feature-flagged) */
   var sessionDefaults = {
     growing: 25 * 60,
     grounded: 15 * 60,
@@ -416,7 +404,6 @@
       title.textContent = (mode.charAt(0).toUpperCase() + mode.slice(1)) + ' — Guided session';
       body.innerHTML = buildSessionBody(mode);
       modal.hidden = false;
-      // restore persisted session if present
       if (restoreSessionForMode(mode)) {
         var display = id('session-timer'); if (display) display.textContent = formatTime(sessionState.remaining);
       } else {
@@ -428,7 +415,6 @@
       createSessionBindings(mode);
       var panel = modal.querySelector('.modal-panel'); if (panel) panel.focus && panel.setAttribute('tabindex', '-1');
 
-      // restore checklist state if any (small delay to ensure DOM ready)
       setTimeout(function () {
         try {
           var raw = localStorage.getItem('session.checklist.' + (mode || 'session'));
@@ -476,10 +462,8 @@
       closeBtn && closeBtn.addEventListener('click', modal._closeFn);
       document.addEventListener('keydown', modal._keyHandler);
 
-      // clicking backdrop closes
       modal.addEventListener('click', function (e) { if (e.target === modal) closeSession(); });
 
-      // also attach row-tap delegation for checklist (defensive)
       if (!modal.__checklistDelegate) {
         modal.__checklistDelegate = function (e) {
           try {
@@ -491,7 +475,6 @@
             if (e.target === cb) return;
             e.preventDefault && e.preventDefault();
             cb.checked = !cb.checked;
-            // persist
             try {
               var modeTitle = id('session-title');
               var modeName = modeTitle ? (modeTitle.textContent || '').split('—')[0].trim().toLowerCase() : 'session';
@@ -505,11 +488,9 @@
     } catch (e) { console.warn('createSessionBindings', e); }
   }
 
-  // expose
   window.openSession = openSession;
   window.closeSession = closeSession;
 
-  /* attach UI delegations early */
   (function attachEarlyDelegate() {
     try {
       function safeNavigateHash(h) {
@@ -542,7 +523,6 @@
             if (md) { try { ev.preventDefault && ev.preventDefault(); } catch (e) {} try { setTheme(md); } catch (e) {} safeNavigateMode(md); return; }
           }
 
-          // return-button handler
           var ret = tgt && tgt.closest ? tgt.closest('.return-button') : null;
           if (ret) { try { ev.preventDefault && ev.preventDefault(); } catch (e) {} var hh = ret.getAttribute('data-hash') || '#home'; safeNavigateHash(hh); return; }
 
@@ -551,7 +531,6 @@
     } catch (e) {}
   })();
 
-  /* UI bindings (for static elements) */
   function bindUI() {
     try {
       var navs = $$('.nav-links a[data-hash]');
@@ -563,7 +542,6 @@
           }
         })(navs[n]);
       }
-      // static mode buttons (on home)
       var btns = $$('button[data-mode]');
       for (var b = 0; b < btns.length; b++) {
         (function (el) {
@@ -614,7 +592,6 @@
 
   window.__rebindUI = function () { try { bindUI(); attachCompassDelegation(); setupNeedleSpin(); console.info('rebindUI done'); } catch (e) { console.warn('rebindUI failed', e); } };
 
-  /* Init */
   document.addEventListener('DOMContentLoaded', function () {
     try {
       var root = id('app-root'); if (root) { root.classList.add('visible'); root.setAttribute('aria-hidden', 'false'); }
