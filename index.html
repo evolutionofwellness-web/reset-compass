@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
 
-  <!-- PWA / Homescreen -->
-  <link rel="manifest" href="/manifest.json">
+  <!-- PWA / Homescreen (using manifest.webmanifest) -->
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
   <meta name="theme-color" content="#0B3D2E">
@@ -15,7 +15,6 @@
   <meta name="apple-mobile-web-app-title" content="Reset Compass">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-  <!-- v128: guided sessions + UI fixes -->
   <link rel="stylesheet" href="main.css?v=128" />
 </head>
 <body>
@@ -49,7 +48,7 @@
       </section>
 
       <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
-        <!-- Updated SVG: includes translucent pill backgrounds behind labels for best contrast -->
+        <!-- Updated SVG with pill backdrops for clear labels -->
         <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0" preserveAspectRatio="xMidYMid meet">
           <title id="compassTitle">Mode compass — choose a mode</title>
           <defs>
@@ -77,30 +76,11 @@
             <rect id="compass-tail" x="98.5" y="104" width="3" height="26" rx="1.5" fill="rgba(6,56,39,0.88)" />
           </g>
 
-          <!-- Label pills (ensures readable contrast on all wedges) -->
-          <!-- Growing (top) -->
-          <g>
-            <rect x="48" y="14" width="104" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" />
-            <text data-mode="growing" x="100" y="36" class="compass-label" style="text-anchor:middle;pointer-events:none;">Growing</text>
-          </g>
-
-          <!-- Grounded (right) -->
-          <g>
-            <rect x="146" y="86" width="96" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" />
-            <text data-mode="grounded" x="194" y="106" class="compass-label" style="text-anchor:middle;pointer-events:none;">Grounded</text>
-          </g>
-
-          <!-- Drifting (bottom) -->
-          <g>
-            <rect x="48" y="150" width="104" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" />
-            <text data-mode="drifting" x="100" y="170" class="compass-label" style="text-anchor:middle;pointer-events:none;">Drifting</text>
-          </g>
-
-          <!-- Surviving (left) -->
-          <g>
-            <rect x="-44" y="86" width="96" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" />
-            <text data-mode="surviving" x="8" y="106" class="compass-label" style="text-anchor:middle;pointer-events:none;">Surviving</text>
-          </g>
+          <!-- label pills -->
+          <g> <rect x="48" y="14" width="104" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" /> <text data-mode="growing" x="100" y="36" class="compass-label" style="text-anchor:middle;pointer-events:none;">Growing</text> </g>
+          <g> <rect x="146" y="86" width="96" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" /> <text data-mode="grounded" x="194" y="106" class="compass-label" style="text-anchor:middle;pointer-events:none;">Grounded</text> </g>
+          <g> <rect x="48" y="150" width="104" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" /> <text data-mode="drifting" x="100" y="170" class="compass-label" style="text-anchor:middle;pointer-events:none;">Drifting</text> </g>
+          <g> <rect x="-44" y="86" width="96" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" /> <text data-mode="surviving" x="8" y="106" class="compass-label" style="text-anchor:middle;pointer-events:none;">Surviving</text> </g>
         </svg>
       </section>
 
