@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>The Reset Compass</title>
 
-  <link rel="icon" href="/icons/icon-192.png" type="image/png">
   <!-- PWA / Homescreen -->
   <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" href="/icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
   <meta name="theme-color" content="#0B3D2E">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,7 +21,7 @@
 <body>
   <div id="app-root" class="app-root" aria-hidden="false">
     <header class="hero" id="hero">
-      <img class="hero-icon" src="splash-icon.png" alt="Reset Compass logo" width="64" height="64">
+      <img class="hero-icon" src="/icons/apple-touch-icon.png" alt="Reset Compass logo" width="64" height="64">
       <div class="hero-text">
         <h1 class="hero-title">The Reset Compass</h1>
         <p class="hero-sub">A small reset, every day.</p>
@@ -49,6 +49,7 @@
       </section>
 
       <section id="compass-container" class="compass-wrap" aria-label="Mode compass">
+        <!-- Updated SVG: includes translucent pill backgrounds behind labels for best contrast -->
         <svg id="compass" viewBox="0 0 200 200" role="img" aria-labelledby="compassTitle" tabindex="0" preserveAspectRatio="xMidYMid meet">
           <title id="compassTitle">Mode compass — choose a mode</title>
           <defs>
@@ -76,10 +77,30 @@
             <rect id="compass-tail" x="98.5" y="104" width="3" height="26" rx="1.5" fill="rgba(6,56,39,0.88)" />
           </g>
 
-          <text data-mode="growing" x="100" y="36" class="compass-label in-wedge" style="text-anchor:middle;pointer-events:none;">Growing</text>
-          <text data-mode="grounded" x="156" y="100" class="compass-label in-wedge" style="text-anchor:middle;pointer-events:none;">Grounded</text>
-          <text data-mode="drifting" x="100" y="164" class="compass-label in-wedge" style="text-anchor:middle;pointer-events:none;">Drifting</text>
-          <text data-mode="surviving" x="44" y="100" class="compass-label in-wedge" style="text-anchor:middle;pointer-events:none;">Surviving</text>
+          <!-- Label pills (ensures readable contrast on all wedges) -->
+          <!-- Growing (top) -->
+          <g>
+            <rect x="48" y="14" width="104" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" />
+            <text data-mode="growing" x="100" y="36" class="compass-label" style="text-anchor:middle;pointer-events:none;">Growing</text>
+          </g>
+
+          <!-- Grounded (right) -->
+          <g>
+            <rect x="146" y="86" width="96" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" />
+            <text data-mode="grounded" x="194" y="106" class="compass-label" style="text-anchor:middle;pointer-events:none;">Grounded</text>
+          </g>
+
+          <!-- Drifting (bottom) -->
+          <g>
+            <rect x="48" y="150" width="104" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" />
+            <text data-mode="drifting" x="100" y="170" class="compass-label" style="text-anchor:middle;pointer-events:none;">Drifting</text>
+          </g>
+
+          <!-- Surviving (left) -->
+          <g>
+            <rect x="-44" y="86" width="96" height="32" rx="16" ry="16" fill="rgba(255,255,255,0.92)" />
+            <text data-mode="surviving" x="8" y="106" class="compass-label" style="text-anchor:middle;pointer-events:none;">Surviving</text>
+          </g>
         </svg>
       </section>
 
@@ -117,13 +138,12 @@
 
       <div class="modal-controls">
         <button id="session-start" class="btn-primary">Start</button>
-        <button id="session-complete" class="btn-primary" style="background:#2e8b57;margin-left:8px;">Complete Session</button>
-        <button id="session-cancel" class="btn-link">Cancel</button>
+        <button id="session-complete" class="btn-primary complete-cta" style="background:#2e8b57;margin-left:8px;">Complete Session</button>
+        <button id="session-cancel" class="btn-link" style="margin-left:8px;">Cancel</button>
       </div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="app.js?v=128"></script>
 </body>
 </html>
