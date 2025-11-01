@@ -3,7 +3,8 @@
    - window.__features.sessions controls guided sessions (true = enabled)
    - Session logic is isolated and uses localStorage for persistence
    - Non-animated confetti used for completion
-   - Adds modal "Complete Session" behavior and Cancel -> home navigation
+   - Cancel/close/backdrop keys now return to #home
+   - "Complete Session" button marks the mode complete and adds history/streak
 */
 
 (function () {
@@ -104,7 +105,6 @@
   function renderHome(){ var c = ensureContentElement(); c.innerHTML = ''; setTheme(''); }
 
   function renderModePage(mode){
-    // guard: if mode falsy or unknown, show informative message and avoid throwing
     if(!mode || typeof mode !== 'string' || !/^[a-z]/i.test(mode) || !activities[mode]){ var c = ensureContentElement(); setTheme(''); c.innerHTML = '<div class="mode-page"><p>Unknown mode</p><button class="return-button" data-hash="#home">Return to the Compass</button></div>'; return; }
 
     var c = ensureContentElement(); setTheme(mode);
@@ -135,7 +135,6 @@
     html += '</div>';
     c.innerHTML = html;
 
-    // attach handlers
     var starts = c.querySelectorAll('[data-start-session]');
     for(var j=0;j<starts.length;j++){ (function(btn){ if(!btn.__bound){ btn.addEventListener('click', function(){ var md = btn.getAttribute('data-mode') || mode; try{ window.openSession && window.openSession(md); }catch(e){} }); btn.__bound=true; } })(starts[j]); }
 
@@ -182,7 +181,6 @@
       if(h.indexOf('#mode/') === 0){
         var parts = h.split('/');
         var m = parts[1] || '';
-        // sanitize mode value
         m = String(m || '').replace(/[^a-zA-Z0-9_\-]/g,'').toLowerCase();
         setTheme(m);
         renderModePage(m);
@@ -199,16 +197,8 @@
   var sessionDefaults = { growing:25*60, grounded:15*60, drifting:5*60, surviving:3*60, quick:1*60 };
   var sessionState = { timerId:null, remaining:0, mode:null, running:false };
 
-  function persistSession(){
-    try{ if(!sessionState.mode) return; localStorage.setItem('session.'+sessionState.mode, JSON.stringify({ remaining: sessionState.remaining, mode: sessionState.mode, running: sessionState.running, ts: Date.now() })); }catch(e){}
-  }
-  function restoreSessionForMode(mode){
-    try{
-      var raw = localStorage.getItem('session.'+mode); if(!raw) return false;
-      var obj = JSON.parse(raw); if(!obj || obj.mode !== mode) return false;
-      sessionState.mode = mode; sessionState.remaining = typeof obj.remaining === 'number' ? obj.remaining : sessionDefaults[mode] || 60; sessionState.running = !!obj.running; return true;
-    }catch(e){ return false; }
-  }
+  function persistSession(){ try{ if(!sessionState.mode) return; localStorage.setItem('session.'+sessionState.mode, JSON.stringify({ remaining: sessionState.remaining, mode: sessionState.mode, running: sessionState.running, ts: Date.now() })); }catch(e){} }
+  function restoreSessionForMode(mode){ try{ var raw = localStorage.getItem('session.'+mode); if(!raw) return false; var obj = JSON.parse(raw); if(!obj || obj.mode !== mode) return false; sessionState.mode = mode; sessionState.remaining = typeof obj.remaining === 'number' ? obj.remaining : sessionDefaults[mode] || 60; sessionState.running = !!obj.running; return true; }catch(e){ return false; } }
   function clearPersistedSession(mode){ try{ localStorage.removeItem('session.' + (mode||sessionState.mode||'none')); }catch(e){} }
 
   function formatTime(sec){ sec = Math.max(0, Math.floor(sec||0)); var m = Math.floor(sec/60), s = sec%60; return (m<10 ? '0'+m : m) + ':' + (s<10 ? '0'+s : s); }
@@ -280,14 +270,12 @@
       body.innerHTML = buildSessionBody(mode);
       modal.hidden = false;
 
-      // restore persisted session if present
       if(restoreSessionForMode(mode)){ var display = id('session-timer'); if(display) display.textContent = formatTime(sessionState.remaining); }
       else{ sessionState.mode = mode; sessionState.remaining = sessionDefaults[mode] || 60; sessionState.running = false; var display = id('session-timer'); if(display) display.textContent = formatTime(sessionState.remaining); }
 
       createSessionBindings(mode);
       var panel = modal.querySelector('.modal-panel'); if(panel) panel.focus && panel.setAttribute('tabindex','-1');
 
-      // restore checklist state
       setTimeout(function(){ try{ var raw = localStorage.getItem('session.checklist.' + (mode || 'session')); if(!raw) return; var arr = JSON.parse(raw); var checks = modal.querySelectorAll('.step-item input[type="checkbox"]'); for(var i=0;i<checks.length && i<arr.length;i++) checks[i].checked = !!arr[i]; }catch(e){} }, 120);
     }catch(e){ console.warn('openSession error', e); }
   }
@@ -307,10 +295,7 @@
       modal._startFn = function(){ sessionState.mode = mode; startTimer(sessionDefaults[mode] || 60, function(){ pushGuidedSessionHistory(mode); runConfetti(mode); setTimeout(closeSession,600); }); };
       modal._cancelFn = function(){ closeSession(); navigateHash('#home'); };
       modal._closeFn = function(){ closeSession(); navigateHash('#home'); };
-      modal._completeFn = function(){
-        // mark complete instantly (without waiting for timer)
-        try{ pushGuidedSessionHistory(mode); runConfetti(mode); clearPersistedSession(mode); closeSession(); navigateHash('#history'); }catch(e){}
-      };
+      modal._completeFn = function(){ try{ pushGuidedSessionHistory(mode); runConfetti(mode); clearPersistedSession(mode); closeSession(); navigateHash('#history'); }catch(e){} };
       modal._keyHandler = function(e){ if(e.key === 'Escape') { closeSession(); navigateHash('#home'); } };
 
       start && start.addEventListener('click', modal._startFn);
@@ -319,10 +304,8 @@
       completeBtn && completeBtn.addEventListener('click', modal._completeFn);
       document.addEventListener('keydown', modal._keyHandler);
 
-      // backdrop click closes and returns home
       modal.addEventListener('click', function(e){ if(e.target === modal){ closeSession(); navigateHash('#home'); } });
 
-      // row tap checklist delegate (defensive)
       if(!modal.__checklistDelegate){
         modal.__checklistDelegate = function(e){
           try{
@@ -340,7 +323,7 @@
   window.openSession = openSession;
   window.closeSession = closeSession;
 
-  /* Delegations and UI */
+  /* Delegations & UI */
   (function attachEarlyDelegate(){
     try{
       function safeNavigateHash(h){ try{ if(typeof window.navigateHash === 'function'){ window.navigateHash(h); return; } location.hash = h; if(typeof window.renderRoute === 'function') window.renderRoute(); }catch(e){} }
@@ -369,9 +352,9 @@
   function bindUI(){
     try{
       var navs = $$('.nav-links a[data-hash]');
-      for(var n=0;n<navs.length;n++){ (function(a){ if(!a.__bound){ a.addEventListener('click', function(e){ try{ e && e.preventDefault && e.preventDefault(); }catch(ee){} var h = a.getAttribute('data-hash') || a.getAttribute('href'); navigateHash(h); }); a.__bound = true; } })(navs[n]); }
+      for(var n=0;n<navs.length;n++){ (function(a){ if(!a.__bound){ a.addEventListener('click', function(e){ try{ e && e.preventDefault && e.preventDefault(); }catch(ee){} var h = a.getAttribute('data-hash') || a.getAttribute('href'); navigateHash(h); }); a.__bound=true; } })(navs[n]); }
       var btns = $$('button[data-mode]');
-      for(var b=0;b<btns.length;b++){ (function(el){ if(!el.__bound){ el.addEventListener('click', function(ev){ try{ ev && ev.preventDefault && ev.preventDefault(); }catch(ee){} var m = el.getAttribute('data-mode'); setTheme(m); renderModePage(m); navigateMode(m); }); el.__bound = true; } })(btns[b]); }
+      for(var b=0;b<btns.length;b++){ (function(el){ if(!el.__bound){ el.addEventListener('click', function(ev){ try{ ev && ev.preventDefault && ev.preventDefault(); }catch(ee){} var m = el.getAttribute('data-mode'); setTheme(m); renderModePage(m); navigateMode(m); }); el.__bound=true; } })(btns[b]); }
     }catch(e){ console.warn('bindUI error', e); }
   }
 
