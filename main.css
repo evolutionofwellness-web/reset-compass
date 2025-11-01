@@ -26,19 +26,12 @@ body{
 /* App root & layout */
 .app-root{min-height:100vh}
 
-/* Mode page header refinements (v128) */
+/* Mode page header refinements */
 .mode-page { position:relative; overflow:visible; }
-.mode-page::before {
-  content: ""; display:block; height:10px; border-top-left-radius:14px; border-top-right-radius:14px;
-  margin:-20px -20px 14px; opacity:0.98;
-}
 .mode-header { display:flex; align-items:center; gap:14px; margin-bottom:12px; padding-top:6px; }
-.mode-icon {
-  width:64px; height:64px; border-radius:14px; flex:0 0 64px; display:flex; align-items:center; justify-content:center;
-  font-size:28px; font-weight:900; box-shadow: 0 6px 18px rgba(6,20,12,0.06);
-}
+.mode-icon { width:64px; height:64px; border-radius:14px; display:flex; align-items:center; justify-content:center; }
 
-/* stronger title & tip contrast */
+/* Mode title & tip */
 .mode-title { margin:0; font-size:1.6rem; font-weight:900; color:var(--mode-text, var(--brand-green)); }
 .mode-tip { background:rgba(11,61,46,0.04); padding:12px; border-radius:12px; margin:12px 0; color:var(--muted-text); font-weight:700; }
 
@@ -69,7 +62,6 @@ body{
   letter-spacing: 0.4px;
 }
 
-/* Slightly smaller on very small devices */
 @media (max-width:420px){
   .compass-label { font-size:13px; letter-spacing:0.2px; }
 }
