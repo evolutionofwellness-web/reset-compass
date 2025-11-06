@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Outer circle -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#00AFA0" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Inner circle -->
+  <circle cx="100" cy="100" r="80" fill="none" stroke="#00AFA0" stroke-width="1.5" opacity="0.5"/>
+  
+  <!-- Cardinal directions -->
+  <g fill="#00AFA0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">
+    <text x="100" y="20">N</text>
+    <text x="180" y="105">E</text>
+    <text x="100" y="190">S</text>
+    <text x="20" y="105">W</text>
+  </g>
+  
+  <!-- Tick marks -->
+  <g stroke="#00AFA0" stroke-width="2" opacity="0.4">
+    <!-- North -->
+    <line x1="100" y1="5" x2="100" y2="15"/>
+    <!-- Northeast -->
+    <line x1="156.066" y1="43.934" x2="151.421" y2="48.579"/>
+    <!-- East -->
+    <line x1="195" y1="100" x2="185" y2="100"/>
+    <!-- Southeast -->
+    <line x1="156.066" y1="156.066" x2="151.421" y2="151.421"/>
+    <!-- South -->
+    <line x1="100" y1="195" x2="100" y2="185"/>
+    <!-- Southwest -->
+    <line x1="43.934" y1="156.066" x2="48.579" y2="151.421"/>
+    <!-- West -->
+    <line x1="5" y1="100" x2="15" y2="100"/>
+    <!-- Northwest -->
+    <line x1="43.934" y1="43.934" x2="48.579" y2="48.579"/>
+  </g>
+  
+  <!-- Center dot -->
+  <circle cx="100" cy="100" r="8" fill="#00AFA0" opacity="0.8"/>
+  <circle cx="100" cy="100" r="5" fill="#ffffff"/>
+  
+  <!-- Decorative rings -->
+  <circle cx="100" cy="100" r="60" fill="none" stroke="#00AFA0" stroke-width="0.5" opacity="0.2"/>
+  <circle cx="100" cy="100" r="40" fill="none" stroke="#00AFA0" stroke-width="0.5" opacity="0.2"/>
+  <circle cx="100" cy="100" r="20" fill="none" stroke="#00AFA0" stroke-width="0.5" opacity="0.2"/>
+  
+  <!-- Glow effect -->
+  <defs>
+    <radialGradient id="compassGlow">
+      <stop offset="0%" stop-color="#00AFA0" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#00AFA0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="100" cy="100" r="95" fill="url(#compassGlow)"/>
+</svg>

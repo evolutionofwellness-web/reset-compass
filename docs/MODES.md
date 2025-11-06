@@ -4,6 +4,51 @@
 
 The Reset Compass app uses four wellness modes to help users understand their current state and choose appropriate reset activities. This document explains where to find the modes data and how to use it in your code.
 
+## TODOs for Marcus
+
+### Brand Color
+- **Current:** Placeholder brand color is `#00AFA0` (teal)
+- **Action needed:** Replace with official Evolution of Wellness brand hex color in:
+  - `style.css` (CSS variable `--brand-color`)
+  - `manifest.json` (`theme_color`)
+  - `index.html` (`<meta name="theme-color">`)
+
+### Compass Image
+- **Current:** Placeholder SVG compass at `assets/images/compass.svg`
+- **Action needed:** Replace with high-resolution PNG compass image (recommended: 512x512 or larger)
+- Update references in:
+  - `index.html` (hero section)
+  - `assets/images/compass.png` for PWA manifest icons
+
+### Google Integrations
+
+#### Google Ads
+- **Current:** Ad slot placeholder in footer with dashed border
+- **Action needed:** 
+  - Add Google AdSense script to `index.html` `<head>`
+  - Replace `.ad-slot` div content with actual ad unit code
+  - Configure responsive ad sizing in `style.css`
+
+#### Google Sheets Data Source
+- **Current:** Modes data loaded from local `/data/modes.json`
+- **Action needed:**
+  - Set up Google Sheets API or publish sheet as JSON
+  - Update `script.js` `loadModes()` function to fetch from Google Sheets endpoint
+  - Consider caching strategy for offline support
+
+### Quick Wins Content
+- **Current:** Placeholder quick wins hardcoded in `script.js` (`quickWinsMap`)
+- **Action needed:**
+  - Expand quick wins content with more varied, actionable suggestions
+  - Consider moving to Google Sheets or separate JSON file
+  - Add ability to select from multiple quick wins before starting reset
+
+### Analytics
+- **Action needed:**
+  - Add Google Analytics 4 tracking code to `index.html`
+  - Track events: mode selection, reset started, history viewed, app installed
+  - Add conversion tracking for reset completions
+
 ## The Four Modes
 
 1. **Surviving** (ID: 1) - 🩺

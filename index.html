@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The Reset Compass - Find your wellness mode and choose the right reset activity">
+  <meta name="theme-color" content="#00AFA0">
+  <title>The Reset Compass</title>
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/images/compass.svg">
+  
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1 class="app-title">The Reset Compass</h1>
+    <div class="header-actions">
+      <button id="historyBtn" class="header-btn" aria-label="View History">
+        <span aria-hidden="true">📊</span> History
+      </button>
+      <button id="installBtn" class="header-btn install-btn" aria-label="Install App" hidden>
+        <span aria-hidden="true">💾</span> Save App
+      </button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="hero" aria-label="Compass Hero">
+      <div class="compass-container">
+        <img 
+          src="assets/images/compass.svg" 
+          alt="Wellness Compass" 
+          class="compass-image"
+          id="compassImage"
+        >
+        <div class="compass-arrow" id="compassArrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="80" height="80">
+            <path d="M12 2 L16 12 L12 22 L8 12 Z" fill="currentColor" opacity="0.9"/>
+            <circle cx="12" cy="12" r="3" fill="white"/>
+          </svg>
+        </div>
+      </div>
+      <p class="hero-intro">Find your current wellness mode</p>
+      <button id="replayBtn" class="replay-btn" aria-label="Replay intro animation">
+        🔄 Replay
+      </button>
+    </section>
+
+    <section class="modes-section" aria-label="Wellness Modes">
+      <h2 class="section-title">Choose Your Mode</h2>
+      <div class="modes-grid" id="modesGrid" role="list">
+        <noscript>
+          <p class="no-js-message">Please enable JavaScript to view the wellness modes.</p>
+        </noscript>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <div class="ad-slot" aria-label="Advertisement">
+        <p class="ad-placeholder">Ad Placeholder</p>
+      </div>
+      <p class="footer-text">
+        <small>&copy; 2025 The Reset Compass. Find your wellness rhythm.</small>
+      </p>
+    </footer>
+  </main>
+
+  <!-- Mode Detail Dialog -->
+  <dialog id="modeDialog" class="mode-dialog" aria-labelledby="modeDialogTitle">
+    <div class="dialog-content">
+      <button class="dialog-close" aria-label="Close dialog">&times;</button>
+      <div class="mode-header">
+        <span class="mode-icon-large" id="dialogModeIcon" aria-hidden="true"></span>
+        <h2 id="modeDialogTitle" class="mode-title"></h2>
+      </div>
+      <p id="dialogModeDescription" class="mode-description"></p>
+      <blockquote id="dialogModeQuote" class="mode-quote"></blockquote>
+      
+      <div class="quick-wins-section">
+        <h3>Quick Wins</h3>
+        <ul id="dialogQuickWins" class="quick-wins-list"></ul>
+      </div>
+      
+      <div class="dialog-actions">
+        <button id="startResetBtn" class="btn-primary">Start Reset</button>
+        <button class="btn-secondary dialog-cancel">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- History Dialog -->
+  <dialog id="historyDialog" class="history-dialog" aria-labelledby="historyDialogTitle">
+    <div class="dialog-content">
+      <button class="dialog-close" aria-label="Close dialog">&times;</button>
+      <h2 id="historyDialogTitle">Your Reset History</h2>
+      
+      <div id="historyStats" class="history-stats"></div>
+      
+      <div id="historyTimeline" class="history-timeline"></div>
+      
+      <div class="dialog-actions">
+        <button id="exportHistoryBtn" class="btn-secondary">Export JSON</button>
+        <button id="clearHistoryBtn" class="btn-danger">Clear History</button>
+        <button class="btn-secondary dialog-cancel">Close</button>
+      </div>
+    </div>
+  </dialog>
+</body>
+</html>
