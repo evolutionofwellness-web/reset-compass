@@ -1,0 +1,12 @@
+{
+  "name": "reset-compass",
+  "version": "0.1.0",
+  "description": "A wellness app that helps users understand their current state through four wellness modes",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No tests specified yet\""
+  },
+  "keywords": ["wellness", "reset", "modes"],
+  "author": "",
+  "license": "ISC"
+}
