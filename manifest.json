@@ -1,0 +1,26 @@
+{
+  "name": "The Reset Compass",
+  "short_name": "Reset Compass",
+  "description": "Find your wellness mode and choose the right reset activity",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#00AFA0",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/images/compass.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/compass.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "lifestyle", "wellness"],
+  "screenshots": []
+}
