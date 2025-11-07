@@ -14,7 +14,7 @@
   <script src="script.js" defer></script>
 </head>
 <body class="page-compass">
-  <!-- Title row: The Reset Compass sits above the nav -->
+  <!-- Title row: The Reset Compass sits above the nav (consistent across pages) -->
   <header class="app-header" role="banner">
     <div class="app-header-top">
       <a class="home-link" id="homeBtn" href="./index.html" aria-label="Home — Reset Compass">
@@ -23,8 +23,6 @@
     </div>
 
     <nav class="app-nav" role="navigation" aria-label="Primary">
-      <div class="nav-left"></div>
-
       <div class="nav-center" id="navCenter">
         <button id="quickWinsBtn" class="nav-btn" aria-label="Quick Wins">Quick Wins</button>
         <button id="historyBtn" class="nav-btn" aria-label="View History">History</button>
@@ -57,6 +55,7 @@
           </svg>
         </div>
 
+        <!-- ring labels are inserted by JS and placed inside each wedge -->
         <div id="compassRing" class="compass-ring" aria-hidden="false"></div>
       </div>
 
