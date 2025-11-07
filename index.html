@@ -14,29 +14,33 @@
   <script src="script.js" defer></script>
 </head>
 <body class="page-compass">
+  <!-- Title row: The Reset Compass sits above the nav (not underlined) -->
   <header class="app-header" role="banner">
-    <div class="header-left">
+    <div class="app-header-top">
       <a class="home-link" id="homeBtn" href="./index.html" aria-label="Home — Reset Compass">
         <h1 class="app-title">The Reset Compass</h1>
       </a>
     </div>
 
-    <div class="header-center" role="navigation" aria-label="Primary">
-      <button id="quickWinsBtn" class="header-btn" aria-label="Quick Wins">Quick Wins</button>
-      <button id="historyBtn" class="header-btn" aria-label="View History">History</button>
-      <a class="header-btn" href="about.html" aria-label="About this app">About</a>
-    </div>
+    <nav class="app-nav" role="navigation" aria-label="Primary">
+      <div class="nav-left"></div>
 
-    <div class="header-right">
-      <button id="themeToggle" class="header-btn" aria-pressed="false" aria-label="Toggle theme">
-        <span id="themeIcon" aria-hidden="true">🌙</span>
-      </button>
-    </div>
+      <div class="nav-center" id="navCenter">
+        <button id="quickWinsBtn" class="nav-btn" aria-label="Quick Wins">Quick Wins</button>
+        <button id="historyBtn" class="nav-btn" aria-label="View History">History</button>
+        <a class="nav-btn" id="aboutBtn" href="about.html" aria-label="About">About</a>
+      </div>
+
+      <div class="nav-right">
+        <button id="themeToggle" class="nav-btn" aria-pressed="false" aria-label="Toggle theme">
+          <span id="themeIcon" aria-hidden="true">🌙</span>
+        </button>
+      </div>
+    </nav>
   </header>
 
   <main class="main-content">
     <section class="hero" aria-label="Compass Hero">
-      <!-- Daily streak moved above compass for prominence (no em dash usage) -->
       <div id="streakContainer" class="streak-container" aria-hidden="false">
         <div id="streakBadge" class="streak-badge" title="Daily streak: days in a row">Daily streak: 🔥 0</div>
       </div>
@@ -66,12 +70,14 @@
           <p class="no-js-message">Please enable JavaScript to view the wellness modes.</p>
         </noscript>
       </div>
-    </section>
 
-    <!-- Small explanatory note under header for Quick Wins (short, single button only on homepage) -->
-    <div class="quick-wins-note" aria-hidden="false" style="max-width:920px;margin:18px auto 0;text-align:center;color:var(--text-secondary)">
-      <p><strong>Quick Wins</strong> are accessible from the button in the header for fast, single-step actions and optional notes.</p>
-    </div>
+      <div class="quick-wins-under" style="text-align:center;margin-top:14px;">
+        <button id="quickWinsLink" class="nav-btn">Open Quick Wins</button>
+        <p class="quick-wins-note" style="margin-top:8px;color:var(--text-secondary);font-size:0.95rem;">
+          Quick Wins are quick, single-step actions available from the Quick Wins dialog.
+        </p>
+      </div>
+    </section>
 
     <footer class="app-footer">
       <div class="ad-slot" aria-label="Advertisement">
