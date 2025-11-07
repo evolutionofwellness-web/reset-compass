@@ -12,7 +12,6 @@
   <script src="script.js" defer></script>
 </head>
 <body class="page-about">
-  <!-- header stays identical to index for consistent navigation -->
   <header class="app-header" role="banner">
     <div class="app-header-top">
       <a class="home-link" id="returnCompassBtn" href="./index.html" aria-label="Return to Compass">
@@ -22,14 +21,14 @@
 
     <nav class="app-nav" role="navigation" aria-label="Primary">
       <div class="nav-center" id="navCenterAbout">
-        <button id="quickWinsBtn" class="nav-btn" aria-label="Quick Wins">Quick Wins</button>
-        <button id="historyBtn" class="nav-btn" aria-label="View History">History</button>
-        <a class="nav-btn" id="homeTextBtn" href="./index.html" aria-label="Home">Home</a>
+        <button id="quickWinsBtnAbout" class="nav-btn nav-sync" aria-label="Quick Wins">Quick Wins</button>
+        <button id="historyBtnAbout" class="nav-btn nav-sync" aria-label="View History">History</button>
+        <a class="nav-btn nav-sync" id="homeTextBtn" href="./index.html" aria-label="Home">Home</a>
       </div>
 
       <div class="nav-right">
-        <button id="themeToggle" class="nav-btn" aria-pressed="false" aria-label="Toggle theme">
-          <span id="themeIcon" aria-hidden="true">🌙</span>
+        <button id="themeToggleAbout" class="nav-btn theme-toggle nav-sync" aria-pressed="false" aria-label="Toggle theme">
+          <span id="themeIconAbout" aria-hidden="true">🌙</span>
         </button>
       </div>
     </nav>
@@ -50,15 +49,15 @@
       <section class="about-section" aria-labelledby="howTitle">
         <h3 id="howTitle">How to use</h3>
         <ol>
-          <li>From the compass: tap a wedge or pick a Mode Card below.</li>
+          <li>Tap a wedge inside the compass or pick a Mode Card below.</li>
           <li>In the Mode dialog, select one or more Activities (they highlight). Use the per-activity Notes inputs if you want.</li>
-          <li>Optionally add notes about each selected activity before you Complete them.</li>
-          <li>Tap "Complete Selected" to record the selected activities. That updates your daily streak when appropriate.</li>
-          <li>Quick Wins are available using the Quick Wins button in the header for quick, single-step actions with optional notes.</li>
+          <li>Add optional notes about each selected activity before you Complete them.</li>
+          <li>Tap "Complete Selected" to record the selected activities. That updates your daily streak.</li>
+          <li>Quick Wins are available using the Quick Wins button in the header for very fast, one-step resets.</li>
         </ol>
 
         <p class="about-note">
-          The current mode names used by this build are: Growing, Grounded, Drifting, Surviving. Your theme (light/dark), streak, and history are saved locally.
+          The mode names used by this build are: Growing, Grounded, Drifting, Surviving. Your theme (light/dark), streak, and history are saved locally.
         </p>
       </section>
     </article>
