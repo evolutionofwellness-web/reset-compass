@@ -671,3 +671,74 @@ button:focus { outline: 3px solid rgba(0,175,160,0.22); outline-offset: 2px; }
   .compass-image { max-height: 260px; width: auto; }
   .compass-container { margin-bottom: 6px; }
 }
+
+/* Additions/overrides for compass ring and readability */
+/* Paste this at the end of style.css so it overrides earlier rules */
+
+.compass-container { position: relative; display: flex; align-items: center; justify-content: center; max-width: 420px; margin: 0 auto; }
+
+.compass-ring { position: absolute; inset: 0; display: block; pointer-events: none; }
+
+/* ring button base */
+.ring-btn {
+  position: absolute;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.04);
+  min-width: 110px;
+  justify-content: center;
+  font-weight: 700;
+  transform-origin: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+
+/* positions */
+.ring-top { top: 6%; left: 50%; transform: translate(-50%, -0%); }
+.ring-right { top: 50%; right: 4%; transform: translate(0, -50%); }
+.ring-bottom { bottom: 6%; left: 50%; transform: translate(-50%, 0); }
+.ring-left { top: 50%; left: 4%; transform: translate(0, -50%); }
+
+/* color helper */
+.ring-btn .ring-icon { margin-right: 6px; }
+.ring-btn { border-color: color-mix(in srgb, var(--mode-color) 18%, transparent); }
+.ring-btn { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); }
+
+/* toast */
+.rc-toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  bottom: 18px;
+  background: rgba(10,10,10,0.86);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 220ms ease, transform 220ms ease;
+  z-index: 9999;
+}
+.rc-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Ensure modes grid is visible and readable */
+.modes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; padding: 12px; margin-top: 8px; }
+
+.mode-card { display:flex; gap:12px; align-items:center; padding:12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color: #fff; border: 1px solid rgba(255,255,255,0.04); }
+.mode-icon { font-size: 20px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:10px; background: rgba(255,255,255,0.06); }
+.mode-meta { display:flex; flex-direction:column; }
+.mode-name { font-weight:700; font-size:1.05rem; }
+.mode-desc { font-size:0.95rem; opacity:0.95; margin-top:4px; }
+
+/* Improve focus visibility */
+button:focus { outline: 3px solid rgba(0,175,160,0.22); outline-offset: 2px; }
+
+/* Make hero smaller on small screens so modes are visible without needing to scroll far */
+@media (max-height:640px) {
+  .compass-image { max-height: 260px; width: auto; }
+  .compass-container { margin-bottom: 6px; }
+}
