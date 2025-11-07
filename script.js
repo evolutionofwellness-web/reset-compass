@@ -1,4 +1,4 @@
-// The Reset Compass - Main Application Script
+// The Reset Compass - Main Application Script (updated: compass ring + manifest fix)
 (function() {
   'use strict';
 
@@ -9,32 +9,12 @@
   const HISTORY_KEY = 'resetCompassHistory';
   const INTRO_SEEN_KEY = 'resetCompassIntroSeen';
 
-  // Quick wins placeholder data per mode
+  // Quick wins placeholder data per mode (unchanged)
   const quickWinsMap = {
-    1: [ // Surviving
-      'Take 3 deep breaths',
-      'Drink a glass of water',
-      'Step outside for 2 minutes',
-      'Set one tiny goal for today'
-    ],
-    2: [ // Drifting
-      'Write down 3 things you\'re grateful for',
-      'Take a 10-minute walk',
-      'Call or text a friend',
-      'Tidy one small space'
-    ],
-    3: [ // Grounded
-      'Plan tomorrow evening',
-      'Do a 15-minute workout',
-      'Read for 20 minutes',
-      'Practice a new skill for 30 minutes'
-    ],
-    4: [ // Growing
-      'Set a challenging goal',
-      'Learn something new for 1 hour',
-      'Connect with a mentor',
-      'Celebrate a recent win'
-    ]
+    1: [ 'Take 3 deep breaths', 'Drink a glass of water', 'Step outside for 2 minutes', 'Set one tiny goal for today' ],
+    2: [ "Write down 3 things you're grateful for", 'Take a 10-minute walk', 'Call or text a friend', 'Tidy one small space' ],
+    3: [ 'Plan tomorrow evening', 'Do a 15-minute workout', 'Read for 20 minutes', 'Practice a new skill for 30 minutes' ],
+    4: [ 'Set a challenging goal', 'Learn something new for 1 hour', 'Connect with a mentor', 'Celebrate a recent win' ]
   };
 
   // Elements
@@ -46,6 +26,7 @@
   const replayBtn = document.getElementById('replayBtn');
   const historyBtn = document.getElementById('historyBtn');
   const installBtn = document.getElementById('installBtn');
+  const compassRing = document.getElementById('compassRing');
 
   // Detect motion preference
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -55,6 +36,7 @@
     try {
       await loadModes();
       renderModes();
+      renderCompassRing(); // new: show modes as directions on compass
       setupEventListeners();
       setupScrollAnimation();
       playIntroAnimation();
@@ -66,30 +48,35 @@
     }
   }
 
-  // Load modes from JSON
+  // Load modes from JSON (relative path to avoid host-root mismatch)
   async function loadModes() {
-    const response = await fetch('/data/modes.json');
+    const response = await fetch('data/modes.json');
     if (!response.ok) {
       throw new Error('Failed to load modes data');
     }
     modes = await response.json();
   }
 
-  // Render mode cards
+  // Render mode cards (list under the compass)
   function renderModes() {
+    if (!Array.isArray(modes) || modes.length === 0) {
+      modesGrid.innerHTML = '<p class="no-js-message">No modes available.</p>';
+      return;
+    }
+
     modesGrid.innerHTML = modes.map(mode => `
-      <button 
-        class="mode-card" 
+      <button
+        class="mode-card"
         data-mode-id="${mode.id}"
         role="listitem"
         aria-label="Select ${mode.name} mode"
-        style="border-color: ${mode.color}20"
+        style="border-color: ${mode.color}22"
       >
         <span class="mode-icon" aria-hidden="true">${mode.icon}</span>
-        <h3 class="mode-name">${mode.name}</h3>
-        <span class="mode-badge" style="background: ${mode.color}33; color: ${mode.color}">
-          ${mode.name}
-        </span>
+        <div class="mode-meta">
+          <h3 class="mode-name">${mode.name}</h3>
+          <div class="mode-desc">${mode.description}</div>
+        </div>
       </button>
     `).join('');
 
@@ -99,6 +86,35 @@
         const modeId = parseInt(card.dataset.modeId);
         openModeDialog(modeId);
       });
+    });
+  }
+
+  // Render compass ring (four buttons around the compass) so directions become modes
+  function renderCompassRing() {
+    if (!compassRing) return;
+    compassRing.innerHTML = '';
+
+    // Map modes to compass positions. If repo's modes are stable, map explicitly by id:
+    // top: id 4 (Growing), right: id 2 (Drifting), bottom: id 1 (Surviving), left: id 3 (Grounded)
+    const posMap = [
+      { pos: 'top', id: 4 },
+      { pos: 'right', id: 2 },
+      { pos: 'bottom', id: 1 },
+      { pos: 'left', id: 3 }
+    ];
+
+    posMap.forEach(({ pos, id }) => {
+      const mode = modes.find(m => m.id === id);
+      if (!mode) return;
+      const btn = document.createElement('button');
+      btn.className = `ring-btn ring-${pos}`;
+      btn.setAttribute('aria-label', `${mode.name} mode`);
+      btn.dataset.modeId = mode.id;
+      btn.innerHTML = `<span class="ring-icon" aria-hidden="true">${mode.icon}</span><span class="ring-label">${mode.name}</span>`;
+      // color accent
+      btn.style.setProperty('--mode-color', mode.color);
+      btn.addEventListener('click', () => openModeDialog(mode.id));
+      compassRing.appendChild(btn);
     });
   }
 
@@ -116,25 +132,33 @@
     // Populate quick wins
     const quickWins = quickWinsMap[currentMode.id] || [];
     document.getElementById('dialogQuickWins').innerHTML = quickWins
-      .map(win => `<li>${win}</li>`)
+      .map(win => `<li><button class="quick-win-btn" data-win="${escapeHtml(win)}">${escapeHtml(win)}</button></li>`)
       .join('');
 
+    // Attach click handlers to quick win buttons
+    document.querySelectorAll('.quick-win-btn').forEach(b => {
+      b.addEventListener('click', (e) => {
+        const winText = e.currentTarget.dataset.win;
+        startReset(winText);
+      });
+    });
+
     // Show dialog
-    modeDialog.showModal();
-    
-    // Focus management
-    const closeButton = modeDialog.querySelector('.dialog-close');
-    if (closeButton) {
-      closeButton.focus();
+    if (typeof modeDialog.showModal === 'function') {
+      modeDialog.showModal();
+      // Focus the close button for keyboard users
+      const closeButton = modeDialog.querySelector('.dialog-close');
+      if (closeButton) closeButton.focus();
+    } else {
+      alert(`${currentMode.name}\n\n${currentMode.description}`);
     }
   }
 
-  // Start reset and record to history
-  function startReset() {
+  // Start reset and record to history (selectedAction passed from quick-win button)
+  function startReset(selectedAction) {
     if (!currentMode) return;
 
-    const quickWins = quickWinsMap[currentMode.id] || [];
-    const selectedWin = quickWins[0] || 'No action selected';
+    const selectedWin = selectedAction || (quickWinsMap[currentMode.id] && quickWinsMap[currentMode.id][0]) || 'No action selected';
 
     const historyEntry = {
       timestamp: new Date().toISOString(),
@@ -148,13 +172,17 @@
     // Save to localStorage
     const history = getHistory();
     history.push(historyEntry);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } catch (e) {
+      console.warn('Could not save history', e);
+    }
 
     // Close dialog
-    modeDialog.close();
+    if (typeof modeDialog.close === 'function') modeDialog.close();
 
-    // Show confirmation (could be a toast notification)
-    alert(`Reset started! ${currentMode.icon} ${currentMode.name}\nAction: ${selectedWin}`);
+    // Friendly toast instead of blocking alert
+    showToast(`Saved: ${currentMode.name} — ${selectedWin}`);
   }
 
   // Get history from localStorage
@@ -175,18 +203,11 @@
     // Calculate stats
     const modeStats = {};
     modes.forEach(mode => {
-      modeStats[mode.id] = {
-        count: 0,
-        name: mode.name,
-        icon: mode.icon,
-        color: mode.color
-      };
+      modeStats[mode.id] = { count: 0, name: mode.name, icon: mode.icon, color: mode.color };
     });
 
     history.forEach(entry => {
-      if (modeStats[entry.modeId]) {
-        modeStats[entry.modeId].count++;
-      }
+      if (modeStats[entry.modeId]) modeStats[entry.modeId].count++;
     });
 
     const totalResets = history.length;
@@ -208,7 +229,6 @@
         `;
       }).join('')}
     `;
-
     document.getElementById('historyStats').innerHTML = statsHtml;
 
     // Render timeline
@@ -221,10 +241,10 @@
               <div class="history-entry-info">
                 <div class="history-entry-mode">
                   <span aria-hidden="true">${entry.modeIcon}</span>
-                  ${entry.modeName}
+                  ${escapeHtml(entry.modeName)}
                 </div>
                 <div class="history-entry-time">${timeStr}</div>
-                <div class="history-entry-action">${entry.action}</div>
+                <div class="history-entry-action">${escapeHtml(entry.action)}</div>
               </div>
             </div>
           `;
@@ -233,7 +253,7 @@
 
     document.getElementById('historyTimeline').innerHTML = timelineHtml;
 
-    historyDialog.showModal();
+    if (typeof historyDialog.showModal === 'function') historyDialog.showModal();
   }
 
   // Export history as JSON
@@ -245,26 +265,27 @@
     const link = document.createElement('a');
     link.href = url;
     link.download = `reset-compass-history-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
     link.click();
+    link.remove();
     URL.revokeObjectURL(url);
   }
 
   // Clear history
   function clearHistory() {
-    if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+    if (confirm('Are you sure you want to clear all history? This cannot be undone?')) {
       localStorage.removeItem(HISTORY_KEY);
-      historyDialog.close();
-      alert('History cleared successfully.');
+      try { historyDialog.close(); } catch (e) {}
+      showToast('History cleared');
     }
   }
 
   // Play intro animation
   function playIntroAnimation() {
     const hasSeenIntro = localStorage.getItem(INTRO_SEEN_KEY);
-    
+
     if (!hasSeenIntro && !prefersReducedMotion) {
-      // Animation already handled by CSS
-      // Mark as seen
+      // CSS-driven animation is enough; mark as seen
       localStorage.setItem(INTRO_SEEN_KEY, 'true');
     }
   }
@@ -272,32 +293,22 @@
   // Replay intro animation
   function replayIntro() {
     if (prefersReducedMotion) {
-      alert('Animation disabled due to motion preferences.');
+      showToast('Animations disabled (reduced motion).');
       return;
     }
 
-    // Reset animations
+    // Reset animations and replay
     compassImage.style.animation = 'none';
     const heroIntro = document.querySelector('.hero-intro');
-    if (heroIntro) {
-      heroIntro.style.animation = 'none';
-    }
-
-    // Trigger reflow
+    if (heroIntro) heroIntro.style.animation = 'none';
     void compassImage.offsetWidth;
-
-    // Restart animations
     compassImage.style.animation = 'fadeInScale 1s ease forwards';
-    if (heroIntro) {
-      heroIntro.style.animation = 'fadeInUp 1s 0.3s ease forwards';
-    }
+    if (heroIntro) heroIntro.style.animation = 'fadeInUp 1s 0.3s ease forwards';
   }
 
   // Setup scroll-linked arrow rotation
   function setupScrollAnimation() {
-    if (prefersReducedMotion) {
-      return;
-    }
+    if (prefersReducedMotion) return;
 
     let ticking = false;
 
@@ -306,7 +317,6 @@
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = maxScroll > 0 ? scrollY / maxScroll : 0;
       const rotation = scrollPercent * 360;
-
       compassArrow.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
       ticking = false;
     }
@@ -323,69 +333,35 @@
 
   // Setup event listeners
   function setupEventListeners() {
-    // Mode dialog
+    // Mode dialog actions
     const startResetBtn = document.getElementById('startResetBtn');
-    if (startResetBtn) {
-      startResetBtn.addEventListener('click', startReset);
-    }
+    if (startResetBtn) startResetBtn.addEventListener('click', () => startReset());
 
     // Dialog close buttons
     document.querySelectorAll('.dialog-close, .dialog-cancel').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const dialog = e.target.closest('dialog');
-        if (dialog) {
-          dialog.close();
-        }
+        if (dialog) dialog.close();
       });
     });
 
     // History
-    if (historyBtn) {
-      historyBtn.addEventListener('click', openHistoryDialog);
-    }
+    if (historyBtn) historyBtn.addEventListener('click', openHistoryDialog);
 
     const exportHistoryBtn = document.getElementById('exportHistoryBtn');
-    if (exportHistoryBtn) {
-      exportHistoryBtn.addEventListener('click', exportHistory);
-    }
+    if (exportHistoryBtn) exportHistoryBtn.addEventListener('click', exportHistory);
 
     const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-    if (clearHistoryBtn) {
-      clearHistoryBtn.addEventListener('click', clearHistory);
-    }
+    if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', clearHistory);
 
     // Replay button
-    if (replayBtn) {
-      replayBtn.addEventListener('click', replayIntro);
-    }
+    if (replayBtn) replayBtn.addEventListener('click', replayIntro);
 
     // Keyboard handlers
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        if (modeDialog.open) {
-          modeDialog.close();
-        }
-        if (historyDialog.open) {
-          historyDialog.close();
-        }
-      }
-    });
-
-    // Dialog backdrop click
-    [modeDialog, historyDialog].forEach(dialog => {
-      if (dialog) {
-        dialog.addEventListener('click', (e) => {
-          const rect = dialog.getBoundingClientRect();
-          const isInDialog = (
-            e.clientX >= rect.left &&
-            e.clientX <= rect.right &&
-            e.clientY >= rect.top &&
-            e.clientY <= rect.bottom
-          );
-          if (!isInDialog) {
-            dialog.close();
-          }
-        });
+        try { if (modeDialog.open) modeDialog.close(); } catch (e) {}
+        try { if (historyDialog.open) historyDialog.close(); } catch (e) {}
       }
     });
   }
@@ -394,7 +370,7 @@
   async function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register('/sw.js');
+        const registration = await navigator.serviceWorker.register('./sw.js');
         console.log('Service Worker registered:', registration);
       } catch (error) {
         console.error('Service Worker registration failed:', error);
@@ -404,24 +380,16 @@
 
   // Setup install prompt
   let deferredPrompt;
-
   function setupInstallPrompt() {
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      
-      // Show install button
-      if (installBtn) {
-        installBtn.hidden = false;
-      }
+      if (installBtn) installBtn.hidden = false;
     });
 
     if (installBtn) {
       installBtn.addEventListener('click', async () => {
-        if (!deferredPrompt) {
-          return;
-        }
-
+        if (!deferredPrompt) return;
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         console.log(`User response to install prompt: ${outcome}`);
@@ -433,11 +401,22 @@
     window.addEventListener('appinstalled', () => {
       console.log('PWA installed');
       deferredPrompt = null;
-      if (installBtn) {
-        installBtn.hidden = true;
-      }
+      if (installBtn) installBtn.hidden = true;
     });
   }
+
+  // Small toast helper
+  function showToast(text, ms = 1800) {
+    const el = document.createElement('div');
+    el.className = 'rc-toast';
+    el.textContent = text;
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add('visible'), 20);
+    setTimeout(() => { el.classList.remove('visible'); setTimeout(()=>el.remove(), 300); }, ms);
+  }
+
+  // escape helper for safety
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]); }); }
 
   // Start the app when DOM is ready
   if (document.readyState === 'loading') {
@@ -445,4 +424,5 @@
   } else {
     init();
   }
+
 })();
