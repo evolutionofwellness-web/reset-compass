@@ -8,7 +8,7 @@
   --bg-secondary: #0f1116;
   --bg-elevated: #15161b;
   --text-primary: #edf1f5;
-  --text-secondary: #cbd2db; /* increased contrast */
+  --text-secondary: #cbd2db;
   --text-muted: #9aa3b2;
   --border-color: rgba(255,255,255,0.06);
   --shadow-sm: 0 3px 10px rgba(0,0,0,0.4);
@@ -87,21 +87,25 @@ body{
   width:220px;
   height:220px;
   margin:0 auto 1.5rem;
+  border-radius:16px;
+  transition:transform 240ms var(--transition-normal), box-shadow 240ms var(--transition-normal);
 }
 @media(min-width:900px){
-  .compass-container{width:300px;height:300px}
+  .compass-container{width:320px;height:320px}
 }
+.compass-container:hover{transform:translateY(-4px);box-shadow:0 18px 50px rgba(0,0,0,0.45)}
 .compass-image{
   width:100%;height:100%;display:block;
   opacity:1;transform:scale(1);transition:transform 420ms var(--transition-normal);
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.45));
 }
 .compass-arrow{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);
-  color:var(--brand-color);filter:drop-shadow(0 6px 18px rgba(0,175,160,0.08));
-  transition:transform 300ms var(--transition-normal);pointer-events:none;
+  color:var(--brand-color);filter:drop-shadow(0 6px 18px rgba(0,175,160,0.1));
+  transition:transform 220ms var(--transition-normal);pointer-events:none;
 }
 .hero-intro{
-  margin-top:0.25rem;font-size:1.1rem;color:var(--text-secondary);
+  margin-top:0.25rem;font-size:1.05rem;color:var(--text-secondary);
 }
 .replay-btn{
   margin-top:0.65rem;background:transparent;border:1px solid var(--border-color);
@@ -122,6 +126,7 @@ body{
 .ring-bottom{bottom:6%;left:50%;transform:translate(-50%, 0)}
 .ring-left{top:50%;left:6%;transform:translate(0, -50%)}
 .ring-btn .ring-icon{font-size:1.15rem;margin-right:6px}
+.ring-btn .ring-label{font-size:0.92rem;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ring-btn:focus-visible{outline:3px solid rgba(0,175,160,0.18);outline-offset:3px}
 
 /* Modes grid / cards */
@@ -134,8 +139,13 @@ body{
 .mode-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md)}
 .mode-icon{font-size:22px;min-width:48px;min-height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(255,255,255,0.03)}
 .mode-meta{display:flex;flex-direction:column}
-.mode-name{font-weight:700;font-size:1.05rem}
+.mode-name{font-weight:700;font-size:1.05rem;color:var(--text-primary)}
 .mode-desc{font-size:0.98rem;color:var(--text-secondary);margin-top:4px;line-height:1.45}
+
+/* About section */
+.about-section{margin:2rem auto;padding:1.25rem;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));border:1px solid var(--border-color);max-width:920px;color:var(--text-secondary)}
+.about-section h2{color:var(--text-primary);margin-bottom:0.5rem}
+.about-note{font-size:0.95rem;margin-top:0.5rem;color:var(--text-muted)}
 
 /* Dialogs */
 dialog{border:none;border-radius:12px;padding:0;max-width:680px;width:calc(100% - 2rem);background:linear-gradient(180deg,var(--bg-elevated), rgba(255,255,255,0.01));color:var(--text-primary);box-shadow:var(--shadow-md)}
