@@ -1,10 +1,4 @@
-/* Updated layout:
- - Smooth compass arrow animation support
- - Quick wins moved under modes and rendered as cards (same visual as modes)
- - Daily streak moved above compass
- - Navigation responsive and always readable
- - Responsive compass sizing with clamped translate distance for ring labels
-*/
+/* Responsive compass sizing, ring label clamping, clear header rules, removed em dash characters */
 
 /* CSS Variables (dark defaults) */
 :root{
@@ -20,7 +14,7 @@
   --shadow-md: 0 12px 40px rgba(0,0,0,0.55);
   --mode-color: #00AFA0;
 
-  /* Responsive compass sizing */
+  /* Responsive compass sizing: min 220px, responsive by vmin, max 720px */
   --compass-size: clamp(220px, 40vmin, 720px);
 }
 
@@ -47,7 +41,7 @@ body{
   min-height:100vh;
 }
 
-/* Header — responsive and wraps on small screens, buttons scale */
+/* Header — responsive, wraps on small screens, buttons scale */
 .app-header{
   display:flex;
   align-items:center;
@@ -63,7 +57,7 @@ body{
 .header-center{display:flex;gap:0.5rem;align-items:center;justify-content:center;flex:1;min-width:160px;overflow-x:auto;padding-inline:6px}
 .header-right{display:flex;gap:0.5rem;align-items:center;justify-content:flex-end;flex:1;min-width:140px}
 .app-title{font-weight:800;font-size:1.05rem;background:linear-gradient(90deg,var(--brand-color),#00d4c4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.header-btn{background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);padding:0.45rem 0.8rem;border-radius:10px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;white-space:nowrap}
+.header-btn{background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);padding:0.45rem 0.8rem;border-radius:10px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;white-space:nowrap;font-size:clamp(0.85rem, 1.6vw, 0.98rem)}
 .header-btn:focus-visible{outline:3px solid rgba(0,175,160,0.12);outline-offset:2px}
 .home-link{display:inline-flex;align-items:center;text-decoration:none}
 .header-center::-webkit-scrollbar{height:6px}
@@ -122,7 +116,7 @@ body{
 }
 .ring-label{display:block;padding:0 6px;line-height:1}
 
-/* Modes grid and quick-win cards (same visual style) */
+/* Modes grid */
 .section-title{text-align:center;font-size:1.45rem;margin-bottom:1rem;color:var(--text-primary);font-weight:700}
 .modes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;padding:6px;margin-top:6px}
 .mode-card{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));border:1px solid var(--border);cursor:pointer;transition:transform 180ms ease,box-shadow 180ms ease;position:relative;overflow:hidden}
@@ -188,8 +182,6 @@ dialog::backdrop{background:rgba(0,0,0,0.6);backdrop-filter:blur(4px)}
   .ring-label{font-size:clamp(12px,3.4vw,14px)}
   .mode-name{font-size:1rem}
   .about-hero-grid{flex-direction:column;align-items:flex-start}
-  .top-quick-wins{flex-direction:column;align-items:stretch}
-  .top-quick-wins .quick-win-pill{min-width:unset;width:100%}
   .streak-badge{min-width:90px;padding:0.45rem 0.8rem;font-size:0.95rem}
   .header-center{justify-content:flex-start}
 }
