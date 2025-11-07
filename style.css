@@ -1,4 +1,4 @@
-/* Responsive compass sizing, ring label clamping, clear header rules, removed em dash characters */
+/* Updated: labels placed inside compass; stronger compass visibility; tightened clamping so labels won't fall off */
 
 /* CSS Variables (dark defaults) */
 :root{
@@ -14,8 +14,8 @@
   --shadow-md: 0 12px 40px rgba(0,0,0,0.55);
   --mode-color: #00AFA0;
 
-  /* Responsive compass sizing: min 220px, responsive by vmin, max 720px */
-  --compass-size: clamp(220px, 40vmin, 720px);
+  /* Responsive compass sizing: min 240px, responsive by vmin, max 760px */
+  --compass-size: clamp(240px, 44vmin, 760px);
 }
 
 /* Light theme overrides */
@@ -41,7 +41,7 @@ body{
   min-height:100vh;
 }
 
-/* Header — responsive, wraps on small screens, buttons scale */
+/* Header */
 .app-header{
   display:flex;
   align-items:center;
@@ -56,14 +56,11 @@ body{
 .header-left{flex:1;min-width:160px}
 .header-center{display:flex;gap:0.5rem;align-items:center;justify-content:center;flex:1;min-width:160px;overflow-x:auto;padding-inline:6px}
 .header-right{display:flex;gap:0.5rem;align-items:center;justify-content:flex-end;flex:1;min-width:140px}
-.app-title{font-weight:800;font-size:1.05rem;background:linear-gradient(90deg,var(--brand-color),#00d4c4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.header-btn{background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);padding:0.45rem 0.8rem;border-radius:10px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;white-space:nowrap;font-size:clamp(0.85rem, 1.6vw, 0.98rem)}
+.app-title{font-weight:900;font-size:1.35rem;letter-spacing:-0.5px;background:linear-gradient(90deg,var(--brand-color),#00d4c4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.header-btn{background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);padding:0.45rem 0.8rem;border-radius:10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;white-space:nowrap;font-size:clamp(0.85rem, 1.6vw, 1rem)}
 .header-btn:focus-visible{outline:3px solid rgba(0,175,160,0.12);outline-offset:2px}
-.home-link{display:inline-flex;align-items:center;text-decoration:none}
-.header-center::-webkit-scrollbar{height:6px}
-.header-center::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.04);border-radius:6px}
 
-/* Streak container above compass */
+/* Streak */
 .streak-container{display:flex;justify-content:center;margin-bottom:10px}
 .streak-badge{
   background:linear-gradient(180deg,#ffb874,#ff7a7a);
@@ -76,7 +73,7 @@ body{
   gap:0.6rem;
   box-shadow:0 12px 28px rgba(0,0,0,0.45);
   font-size:1.05rem;
-  min-width:120px;
+  min-width:140px;
   justify-content:center;
   text-align:center;
 }
@@ -93,47 +90,56 @@ body{
   margin:0 auto 1rem;
   border-radius:50%;
   transition:transform 220ms ease,box-shadow 220ms ease;
-  background: radial-gradient(1000px circle at 30% 20%, rgba(255,255,255,0.01), transparent 20%);
+  /* stronger internal contrast so wedges are visible behind labels */
+  background: radial-gradient(circle at 30% 20%, rgba(0,175,160,0.03), rgba(0,0,0,0.06));
   margin-top:6px;
+  box-shadow: inset 0 20px 60px rgba(0,0,0,0.45);
+  overflow:visible; /* allow labels inside ring without clipping */
 }
-.compass-image{width:100%;height:100%;display:block;opacity:0.04;filter:grayscale(60%) blur(0.2px);position:absolute;inset:0;border-radius:50%;z-index:0}
-.compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:0.95;z-index:0;transition:opacity 200ms ease}
+.compass-image{
+  width:100%;height:100%;display:block;
+  /* increase visibility so the compass base is clearer */
+  opacity:0.24;
+  filter:grayscale(12%) blur(0.2px);
+  position:absolute;inset:0;border-radius:50%;z-index:0;
+}
+.compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:0.98;z-index:0;transition:opacity 200ms ease}
 .compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);color:var(--brand-color);pointer-events:none;z-index:2}
 .hero-intro{margin-top:0.25rem;font-size:1.05rem;color:var(--text-secondary)}
 
-/* Compass ring: label spacing scaled with clamp so they stay on-screen */
+/* Compass ring: labels moved inside the compass */
+/* translateY uses a smaller multiplier so labels fall inside the ring,
+   with a tighter clamp to avoid off-screen placement */
 .compass-ring{position:absolute;inset:0;pointer-events:none;z-index:3}
 .ring-btn{
   --angle: 0deg;
-  position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:8px 10px;border-radius:999px;
-  min-width:96px;max-width:200px;font-weight:800;color:var(--text-primary);box-shadow:0 8px 30px rgba(0,0,0,0.45);border:none;
+  position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;
+  min-width:84px;max-width:160px;font-weight:800;color:var(--text-primary);box-shadow:0 8px 24px rgba(0,0,0,0.45);border:none;
   transform-origin:center;
-  transform: translate(-50%,-50%) rotate(var(--angle)) translateY(calc(-1 * clamp(90px, (var(--compass-size) * 0.46), 420px))) rotate(calc(-1 * var(--angle)));
+  /* moved label distance inward: uses 0.24 of compass size as preferred distance */
+  transform: translate(-50%,-50%) rotate(var(--angle)) translateY(calc(-1 * clamp(36px, (var(--compass-size) * 0.24), 220px))) rotate(calc(-1 * var(--angle)));
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
   z-index:4;
-  font-size:clamp(12px, 1.6vw, 16px);
-  padding-inline:12px;
+  font-size:clamp(12px, 1.6vw, 15px);
+  padding-inline:10px;
 }
 .ring-label{display:block;padding:0 6px;line-height:1}
 
 /* Modes grid */
-.section-title{text-align:center;font-size:1.45rem;margin-bottom:1rem;color:var(--text-primary);font-weight:700}
-.modes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;padding:6px;margin-top:6px}
-.mode-card{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));border:1px solid var(--border);cursor:pointer;transition:transform 180ms ease,box-shadow 180ms ease;position:relative;overflow:hidden}
+.section-title{text-align:center;font-size:1.55rem;margin-bottom:1rem;color:var(--text-primary);font-weight:800}
+.modes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;padding:6px;margin-top:6px}
+.mode-card{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.03));border:1px solid var(--border);cursor:pointer;transition:transform 160ms ease,box-shadow 160ms ease;position:relative;overflow:hidden;min-height:110px}
 .mode-card:before{
   content:"";
-  position:absolute;left:0;top:0;height:100%;width:10px;border-radius:6px 0 0 6px;
-  background: linear-gradient(180deg,var(--mode-color, rgba(0,175,160,0.3)), rgba(0,0,0,0));
-  opacity:0.95;
+  position:absolute;left:0;top:0;height:100%;width:12px;border-radius:8px 0 0 8px;
+  background: linear-gradient(180deg,var(--mode-color, rgba(0,175,160,0.35)), rgba(0,0,0,0));
+  opacity:0.98;
 }
-.mode-meta{display:flex;flex-direction:column}
-.mode-name{font-weight:900;font-size:1.05rem;color:var(--text-primary)}
-.mode-desc{font-size:0.95rem;color:var(--text-secondary);line-height:1.45}
-.mode-actions-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
-.card-begin{background:var(--brand-color);color:var(--text-primary);border:none;padding:0.38rem 0.65rem;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.95rem;min-width:76px}
+.mode-meta{display:flex;flex-direction:column;align-items:flex-start}
+.mode-name{font-weight:900;font-size:1.12rem;color:var(--text-primary);margin-bottom:6px}
+.mode-desc{font-size:0.98rem;color:var(--text-secondary);line-height:1.4}
+.mode-hint{font-size:0.95rem;color:var(--brand-color);margin-top:8px;font-weight:700}
 .mode-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md)}
-.mode-card .meta-top{display:flex;align-items:center;gap:12px}
-.mode-icon{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:800}
 
 /* Dialogs */
 dialog{border:none;border-radius:12px;padding:0;max-width:720px;width:calc(100% - 2rem);background:var(--bg-elevated);color:var(--text-primary);box-shadow:var(--shadow-md)}
@@ -177,12 +183,14 @@ dialog::backdrop{background:rgba(0,0,0,0.6);backdrop-filter:blur(4px)}
 /* Responsive tweaks */
 @media(max-width:640px){
   html{font-size:15.5px}
-  .compass-container{ --compass-size: clamp(200px, 56vmin, 460px) }
-  .ring-btn{min-width:86px;max-width:140px;padding:8px 10px}
-  .ring-label{font-size:clamp(12px,3.4vw,14px)}
-  .mode-name{font-size:1rem}
+  .compass-container{ --compass-size: clamp(200px, 56vmin, 520px) }
+  .ring-btn{min-width:80px;max-width:140px;padding:6px 8px}
+  .ring-label{font-size:clamp(11px,3.6vw,14px)}
+  .mode-name{font-size:1.05rem}
   .about-hero-grid{flex-direction:column;align-items:flex-start}
   .streak-badge{min-width:90px;padding:0.45rem 0.8rem;font-size:0.95rem}
   .header-center{justify-content:flex-start}
+  .modes-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .mode-desc{font-size:0.95rem}
 }
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
