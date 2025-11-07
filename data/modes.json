@@ -1,34 +1,30 @@
 [
   {
     "id": 1,
-    "name": "Surviving",
-    "description": "When you're running on empty. Use the simplest resets that bring you back to life.",
-    "color": "#A94747",
-    "icon": "🩺",
-    "defaultQuote": "Do the least that helps the most."
+    "name": "Grounding",
+    "description": "Reset and reconnect — slow the breath and root into the present.",
+    "color": "#3BC4A3",
+    "defaultQuote": "Breathe in ease, breathe out tension."
   },
   {
     "id": 2,
-    "name": "Drifting",
-    "description": "You're okay but unfocused. Gently reconnect with what matters.",
-    "color": "#E6B450",
-    "icon": "🧭",
-    "defaultQuote": "Small steps steer the ship."
+    "name": "Growing",
+    "description": "Small wins to move you forward and build momentum.",
+    "color": "#7BC96F",
+    "defaultQuote": "One small step is still progress."
   },
   {
     "id": 3,
-    "name": "Grounded",
-    "description": "You're stable and want steady progress without burnout.",
-    "color": "#3B755F",
-    "icon": "🌿",
-    "defaultQuote": "Consistency beats intensity."
+    "name": "Surviving",
+    "description": "Quick energy and focus resets when you need to steady the day.",
+    "color": "#F6C85F",
+    "defaultQuote": "You are doing enough for right now."
   },
   {
     "id": 4,
-    "name": "Growing",
-    "description": "You're ready to expand capacity intentionally and celebrate progress.",
-    "color": "#4C7EDC",
-    "icon": "🚀",
-    "defaultQuote": "Build from a full tank."
+    "name": "Exploring",
+    "description": "Playful prompts to try something new or expand your horizon.",
+    "color": "#8A7AF3",
+    "defaultQuote": "Curiosity unlocks new pathways."
   }
 ]
