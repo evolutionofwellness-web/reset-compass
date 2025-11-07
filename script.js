@@ -1,5 +1,5 @@
-// Robust updated script.js — guarded DOM access, unified theme toggle IDs, single beginActivity flow,
-// clear selection on close, dialog showModal fallback, global quick-wins, streak handling, debounced history writes.
+// Updated script.js for the user's requested modes (Surviving, Drifting, Grounded, Growing)
+// and to ensure Quick Wins are visible and usable from the header Quick Wins button.
 (function() {
   'use strict';
 
@@ -21,11 +21,12 @@
   let historyFlushTimer = null;
   const HISTORY_FLUSH_DELAY = 700;
 
+  // Quick wins mapping: keys correspond to mode ids below.
   const quickWinsMap = {
-    1: [ 'Take 3 deep breaths', 'Drink a glass of water', 'Step outside for 2 minutes', 'Set one tiny goal for today' ],
-    2: [ "Write down 3 things you're grateful for", 'Take a 10-minute walk', 'Call or text a friend', 'Tidy one small space' ],
-    3: [ 'Plan tomorrow evening', 'Do a 15-minute workout', 'Read for 20 minutes', 'Practice a new skill for 30 minutes' ],
-    4: [ 'Set a challenging goal', 'Learn something new for 1 hour', 'Connect with a mentor', 'Celebrate a recent win' ]
+    1: [ 'Take 3 deep breaths', 'Drink a glass of water', 'Step outside for 2 minutes', 'Set one tiny goal for today' ], // Surviving
+    2: [ 'Lie down and let your body relax for 2 minutes', 'Listen to a short calming track', 'Slow-release breathing for 1 minute', 'Name 3 things you notice around you' ], // Drifting
+    3: [ "Ground with deliberate breath: 4-4-4", 'Plant your feet and do a short stretch', 'Drink a glass of water', 'Put away one distracting item' ], // Grounded
+    4: [ "Try one small new challenge", 'Write a short reflection on progress', 'Do a 5-minute creative exercise', 'Send an encouraging message to someone' ] // Growing
   };
 
   // --- DOM refs (may be null on non-compass pages) ---
@@ -33,7 +34,6 @@
   const compassRing = document.getElementById('compassRing');
   const compassWedges = document.getElementById('compassWedges');
   const compassArrow = document.getElementById('compassArrow');
-  const compassImage = document.getElementById('compassImage');
 
   const modeDialog = document.getElementById('modeDialog');
   const quickWinsDialog = document.getElementById('quickWinsDialog');
@@ -66,18 +66,21 @@
     markIntroSeen();
   }
 
+  // If you have a data/modes.json, that will override the fallback.
   async function loadModes() {
     try {
       const res = await fetch('data/modes.json');
       if (!res.ok) throw new Error('Modes load failed');
       modes = await res.json();
+      // If loaded file doesn't use expected names, normalize below
+      if (!modes || !Array.isArray(modes) || modes.length === 0) throw new Error('No modes in file');
     } catch (e) {
-      console.warn('Failed loading data/modes.json — using fallback modes', e);
+      // fallback — use the explicit modes you requested
       modes = [
-        { id: 1, name: 'Grounding', description: 'Reset and reconnect', color:'#3BC4A3' },
-        { id: 2, name: 'Growing', description: 'Small wins to progress', color:'#7BC96F' },
-        { id: 3, name: 'Surviving', description: 'Energy & focus resets', color:'#F6C85F' },
-        { id: 4, name: 'Exploring', description: 'Try something new', color:'#8A7AF3' }
+        { id: 1, name: 'Surviving', description: 'Quick resets for focus and energy', color:'#F56C6C' },
+        { id: 2, name: 'Drifting',  description: 'Slow down and regain clarity', color:'#6C8CF5' },
+        { id: 3, name: 'Grounded',  description: 'Root into the present, reset and connect', color:'#3BC4A3' },
+        { id: 4, name: 'Growing',   description: 'Small wins to build forward momentum', color:'#7BC96F' }
       ];
     }
   }
@@ -157,22 +160,18 @@
     return luminance > 186 ? '#000' : '#fff';
   }
 
-  // show a dialog with a simple fallback if showModal isn't supported
   function safeShowDialog(d) {
     if (!d) return;
     if (typeof d.showModal === 'function') {
       try {
         d.showModal();
-        // focus first focusable element inside dialog
         const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
         if (f) f.focus();
       } catch (e) {
-        // fallback to alert if showModal throws
         d.style.display = 'none';
         alert(d.textContent || 'Dialog opened');
       }
     } else {
-      // very simple fallback: use alert with dialog heading + content
       const title = d.querySelector('h2') ? d.querySelector('h2').textContent : '';
       const txt = Array.from(d.querySelectorAll('p, li')).map(n => n.textContent.trim()).filter(Boolean).join('\n');
       alert((title ? title + '\n\n' : '') + txt);
@@ -188,7 +187,7 @@
     }
   }
 
-  // --- Render modes grid ---
+  // --- Render modes grid (explicit names & CTAs) ---
   function renderModes() {
     if (!modesGrid) return;
     if (!Array.isArray(modes) || modes.length === 0) {
@@ -200,38 +199,47 @@
       const safeName = escapeHtml(mode.name || 'Mode');
       const safeDesc = escapeHtml(mode.description || '');
       const color = mode.color || '#00AFA0';
+      const initials = safeName.split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
       return `
         <button class="mode-card" data-mode-id="${mode.id}" aria-label="Select ${safeName} mode" style="--mode-color:${color}">
-          <div class="mode-meta">
-            <div class="mode-name">${safeName}</div>
-            <div class="mode-desc">${safeDesc}</div>
+          <div class="meta-top">
+            <div class="mode-icon" aria-hidden="true" style="background: linear-gradient(180deg, ${color}33, transparent); color:${getContrastColor(color)}">${initials}</div>
+            <div class="mode-meta">
+              <div class="mode-name">${safeName}</div>
+              <div class="mode-desc">${safeDesc}</div>
+            </div>
+          </div>
+          <div class="mode-actions-row">
+            <div class="mode-hint">Tap to open activities</div>
+            <button class="card-begin" data-mode-id="${mode.id}" aria-label="Begin ${safeName}">Begin</button>
           </div>
         </button>
       `;
     }).join('');
   }
 
-  // --- Compass ring + wedges ---
+  // --- Compass ring + wedges (aligned) ---
   function renderCompassRing() {
     if (!compassRing) return;
     compassRing.innerHTML = '';
 
-    const preferOrder = [4,2,1,3];
-    const hasPrefer = preferOrder.every(id => modes.find(m => m.id === id));
-    const chosen = [];
-    if (hasPrefer) preferOrder.forEach(id => chosen.push(modes.find(m => m.id === id)));
-    else for (let i=0;i<Math.min(4,modes.length);i++) chosen.push(modes[i]);
-
+    const chosen = getPreferredRingModes();
     buildWedges(chosen);
 
-    const positions = ['top','right','bottom','left'];
+    const portion = 360 / (chosen.length || 4);
+
     chosen.forEach((mode, idx) => {
       if (!mode) return;
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `ring-btn ring-${positions[idx]}`;
+      btn.className = `ring-btn`;
       btn.dataset.modeId = mode.id;
       btn.setAttribute('aria-label', `${mode.name} mode`);
+
+      // center angle for segment when conic-gradient uses 'from -45deg' so centers map to cardinal directions
+      const centerAngle = Math.round(idx * portion);
+      btn.style.setProperty('--angle', `${centerAngle}deg`);
+
       btn.innerHTML = `<span class="ring-label">${escapeHtml(mode.name)}</span>`;
 
       const base = mode.color || '#00AFA0';
@@ -242,6 +250,24 @@
 
       compassRing.appendChild(btn);
     });
+  }
+
+  // Ensure the ring shows the four requested modes in the desired order:
+  // Surviving (1), Drifting (2), Grounded (3), Growing (4)
+  function getPreferredRingModes() {
+    const preferOrder = [1,2,3,4];
+    const chosen = [];
+    preferOrder.forEach(id => {
+      const m = modes.find(x => x.id === id);
+      if (m) chosen.push(m);
+    });
+    // fallback: if not all present, fill from available modes
+    if (chosen.length < 4) {
+      modes.forEach(m => {
+        if (!chosen.find(x => x.id === m.id)) chosen.push(m);
+      });
+    }
+    return chosen.slice(0,4);
   }
 
   function buildWedges(chosenModes) {
@@ -259,7 +285,8 @@
       const end = Math.round((i + 1) * portion);
       return `${stopColor} ${start}deg ${end}deg`;
     });
-    compassWedges.style.background = `conic-gradient(${entries.join(',')})`;
+    // Align wedges so their centers are at 0,90,180,270 when N === 4 by using 'from -45deg'
+    compassWedges.style.background = `conic-gradient(from -45deg, ${entries.join(',')})`;
   }
 
   // --- Mode dialog flow ---
@@ -316,7 +343,6 @@
     h.push(entry);
     bufferedSaveHistory(h);
 
-    // update streak (if not already recorded today)
     incrementStreakIfNeeded();
     updateStreakDisplay();
 
@@ -401,6 +427,13 @@
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
+      // card-begin CTA has priority
+      const cbtn = e.target.closest('.card-begin');
+      if (cbtn && cbtn.dataset && cbtn.dataset.modeId) {
+        openModeDialog(Number(cbtn.dataset.modeId));
+        return;
+      }
+
       // Mode card
       const card = e.target.closest('.mode-card');
       if (card && card.dataset && card.dataset.modeId) {
@@ -420,7 +453,6 @@
       if (selBtn && selBtn.dataset && selBtn.dataset.activity) {
         e.preventDefault();
         selectedActivity = selBtn.dataset.activity;
-        // visual highlight
         if (dialogQuickWins) {
           dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active'));
           selBtn.classList.add('active');
@@ -449,7 +481,6 @@
         const d = e.target.closest('dialog');
         if (d) {
           safeCloseDialog(d);
-          // clear selections when any dialog closes
           clearDialogSelections(d);
         }
       });
@@ -521,7 +552,7 @@
       }, { passive: true });
     }
 
-    // when any native dialog closes, clear selections (for browsers that support event)
+    // native dialog close event cleanup
     ['modeDialog','quickWinsDialog','historyDialog'].forEach(id => {
       const d = document.getElementById(id);
       if (d) {
@@ -540,29 +571,7 @@
       startQuickWinBtn.disabled = true;
       delete startQuickWinBtn.dataset.activity;
     }
-    // clear currentMode only if the closed dialog was the mode dialog
     if (d === modeDialog) currentMode = null;
-  }
-
-  // --- Start / shared beginActivity wrapper ---
-  function beginActivity(record) {
-    // record: { modeId?, modeName?, modeColor?, action }
-    const entry = {
-      timestamp: new Date().toISOString(),
-      modeId: record.modeId || null,
-      modeName: record.modeName || (record.modeId ? (modes.find(m=>m.id===record.modeId)||{}).name : 'Quick Win'),
-      modeColor: record.modeColor || (record.modeId ? (modes.find(m=>m.id===record.modeId)||{}).color : '#00AFA0'),
-      action: record.action || 'Activity'
-    };
-
-    const h = getHistory();
-    h.push(entry);
-    bufferedSaveHistory(h);
-
-    // streak update and toast
-    incrementStreakIfNeeded();
-    updateStreakDisplay();
-    showToast(`Activity started — ${entry.action}`);
   }
 
   function setupScrollAnimation() { /* handled in setupEventListeners */ }
