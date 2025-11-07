@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The Reset Compass - Find your wellness mode and choose the right reset activity">
-  <meta name="theme-color" content="#00AFA0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="The Reset Compass - Find your wellness mode and choose the right reset activity" />
+  <meta name="theme-color" content="#00AFA0" />
   <title>The Reset Compass</title>
 
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="assets/images/compass.svg">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="assets/images/compass.svg" />
 
   <script src="script.js" defer></script>
 </head>
@@ -17,10 +17,16 @@
   <header class="app-header">
     <h1 class="app-title">The Reset Compass</h1>
     <div class="header-actions">
-      <button id="aboutBtn" class="header-btn" aria-label="About this app">About</button>
+      <a class="header-btn" href="about.html" aria-label="About this app">About</a>
+
       <button id="historyBtn" class="header-btn" aria-label="View History">
         <span aria-hidden="true">📊</span> History
       </button>
+
+      <button id="themeToggle" class="header-btn" aria-pressed="false" aria-label="Toggle theme">
+        <span id="themeIcon" aria-hidden="true">🌙</span>
+      </button>
+
       <button id="installBtn" class="header-btn install-btn" aria-label="Install App" hidden>
         <span aria-hidden="true">💾</span> Save App
       </button>
@@ -29,30 +35,22 @@
 
   <main class="main-content">
     <section class="hero" aria-label="Compass Hero">
-      <div class="compass-container">
-        <img
-          src="assets/images/compass.svg"
-          alt="Wellness Compass"
-          class="compass-image"
-          id="compassImage"
-        >
+      <div class="compass-container" role="img" aria-label="Compass directions">
+        <!-- decorative graphic; intentionally de-emphasized so labels pop -->
+        <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" />
         <div class="compass-arrow" id="compassArrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="80" height="80" role="img" aria-hidden="true">
-            <path d="M12 2 L16 12 L12 22 L8 12 Z" fill="currentColor" opacity="0.95"/>
-            <circle cx="12" cy="12" r="3" fill="white"/>
+          <svg viewBox="0 0 24 24" width="88" height="88" role="img" aria-hidden="true">
+            <path d="M12 2 L16 12 L12 22 L8 12 Z" fill="currentColor" opacity="0.95" />
+            <circle cx="12" cy="12" r="3" fill="white" />
           </svg>
         </div>
 
         <!-- Compass ring (modes rendered here) -->
-        <div id="compassRing" class="compass-ring" aria-hidden="false">
-          <!-- Buttons are injected by script.js -->
-        </div>
+        <div id="compassRing" class="compass-ring" aria-hidden="false"></div>
       </div>
 
       <p class="hero-intro">Find your current wellness mode — choose a direction or pick a card below.</p>
-      <button id="replayBtn" class="replay-btn" aria-label="Replay intro animation">
-        🔄 Replay
-      </button>
+      <button id="replayBtn" class="replay-btn" aria-label="Replay intro animation">🔄 Replay</button>
     </section>
 
     <section class="modes-section" aria-label="Wellness Modes">
@@ -62,18 +60,6 @@
           <p class="no-js-message">Please enable JavaScript to view the wellness modes.</p>
         </noscript>
       </div>
-    </section>
-
-    <section id="about" class="about-section" aria-labelledby="aboutTitle">
-      <h2 id="aboutTitle">About The Reset Compass</h2>
-      <p>
-        The Reset Compass helps you quickly choose a short activity to reset your focus, energy, or mood.
-        Four directions represent different modes — select any direction around the compass or pick a card below.
-        Click a mode to see quick activities, then click "Begin Activity" to record it in your session history.
-      </p>
-      <p class="about-note">
-        Tip: If text looks large on your device, the compass ring labels will shrink to fit while keeping the icon visible.
-      </p>
     </section>
 
     <footer class="app-footer">
@@ -91,7 +77,6 @@
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
       <div class="mode-header">
-        <span class="mode-icon-large" id="dialogModeIcon" aria-hidden="true"></span>
         <h2 id="modeDialogTitle" class="mode-title"></h2>
       </div>
       <p id="dialogModeDescription" class="mode-description"></p>
@@ -116,7 +101,6 @@
       <h2 id="historyDialogTitle">Your Reset History</h2>
 
       <div id="historyStats" class="history-stats"></div>
-
       <div id="historyTimeline" class="history-timeline"></div>
 
       <div class="dialog-actions">
