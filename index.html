@@ -36,8 +36,12 @@
   <main class="main-content">
     <section class="hero" aria-label="Compass Hero">
       <div class="compass-container" role="img" aria-label="Compass directions">
-        <!-- decorative graphic; intentionally de-emphasized so labels pop -->
+        <!-- decorative graphic; intentionally de-emphasized so labels and wedges pop -->
         <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" />
+
+        <!-- Wedges (conic gradient set by JS to reflect per-mode colors) -->
+        <div id="compassWedges" class="compass-wedges" aria-hidden="true"></div>
+
         <div class="compass-arrow" id="compassArrow" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="88" height="88" role="img" aria-hidden="true">
             <path d="M12 2 L16 12 L12 22 L8 12 Z" fill="currentColor" opacity="0.95" />
