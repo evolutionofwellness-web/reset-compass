@@ -14,7 +14,7 @@
   <script src="script.js" defer></script>
 </head>
 <body class="page-compass">
-  <!-- Title row: The Reset Compass sits above the nav (not underlined) -->
+  <!-- Title row: The Reset Compass sits above the nav -->
   <header class="app-header" role="banner">
     <div class="app-header-top">
       <a class="home-link" id="homeBtn" href="./index.html" aria-label="Home — Reset Compass">
@@ -45,12 +45,12 @@
         <div id="streakBadge" class="streak-badge" title="Daily streak: days in a row">Daily streak: 🔥 0</div>
       </div>
 
-      <div class="compass-container" role="img" aria-label="Compass directions">
+      <div class="compass-container" role="img" aria-label="Compass shape with four wedges">
         <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" />
 
         <div id="compassWedges" class="compass-wedges" aria-hidden="true"></div>
 
-        <div class="compass-arrow" id="compassArrow" aria-hidden="true">
+        <div class="compass-arrow" id="compassArrow" aria-hidden="true" aria-label="Compass arrow">
           <svg viewBox="0 0 24 24" width="88" height="88" role="img" aria-hidden="true">
             <path d="M12 2 L16 12 L12 22 L8 12 Z" fill="currentColor" opacity="0.95" />
             <circle cx="12" cy="12" r="3" fill="white" />
@@ -60,7 +60,7 @@
         <div id="compassRing" class="compass-ring" aria-hidden="false"></div>
       </div>
 
-      <p class="hero-intro">Find your current wellness mode: pick a direction or choose a card below.</p>
+      <p class="hero-intro">Find your current wellness mode: pick a wedge inside the compass or choose a card below.</p>
     </section>
 
     <section class="modes-section" aria-label="Wellness Modes">
