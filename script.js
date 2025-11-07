@@ -1,9 +1,8 @@
-// Updates:
-// - Smooth arrow spin using lerp animation loop (requestAnimationFrame) for fluid rotation
-// - Quick Wins moved below modes and rendered as cards (same style as mode cards)
-// - Clicking a quick-win card opens the Quick Wins dialog with that activity preselected (notes + complete)
-// - Daily streak moved above compass; header simplified and responsive
-// - Ensures modes and quick-wins use the same preferred order and "Exploring" -> "Drifting" normalization
+// Script updates:
+// - Force canonical mode names by id so "Exploring" will be shown as "Drifting"
+// - Remove quick-wins listing on the homepage (Quick Wins are only accessible from header button)
+// - Replace em dash text with colon or plain punctuation
+// - Keep responsive ring labels and smoother arrow animation
 
 (function() {
   'use strict';
@@ -25,17 +24,17 @@
   let historyFlushTimer = null;
   const HISTORY_FLUSH_DELAY = 700;
 
-  // arrow animation state for smooth rotation
+  // arrow animation state
   let targetAngle = 0;
   let currentAngle = 0;
   let arrowAnimating = false;
 
-  // Quick wins mapping (keys are mode ids)
+  // Quick wins mapping (keys are mode ids) - unchanged
   const quickWinsMap = {
-    3: [ 'Plant your feet and do a short stretch', 'Ground with deliberate breath: 4-4-4', 'Put away one distracting item', 'Drink a glass of water' ], // Grounded
-    2: [ 'Take 3 deep breaths', 'Name 3 things you notice around you', 'Lie down and relax for 2 minutes', 'Slow-release breathing for 1 minute' ], // Drifting
-    4: [ 'Try one small new challenge', 'Write a short reflection on progress', 'Do a 5-minute creative exercise', 'Send an encouraging message to someone' ], // Growing
-    1: [ 'Take 3 quick breaths', 'Drink water', 'Set one tiny goal for the next hour', 'Stand up and move for 60 seconds' ] // Surviving
+    3: [ 'Plant your feet and do a short stretch', 'Ground with deliberate breath: 4 4 4', 'Put away one distracting item', 'Drink a glass of water' ],
+    2: [ 'Take 3 deep breaths', 'Name 3 things you notice around you', 'Lie down and relax for 2 minutes', 'Slow-release breathing for 1 minute' ],
+    4: [ 'Try one small new challenge', 'Write a short reflection on progress', 'Do a 5-minute creative exercise', 'Send an encouraging message to someone' ],
+    1: [ 'Take 3 quick breaths', 'Drink water', 'Set one tiny goal for the next hour', 'Stand up and move for 60 seconds' ]
   };
 
   // --- DOM refs ---
@@ -61,8 +60,13 @@
 
   const streakBadges = document.querySelectorAll('#streakBadge');
 
-  const topQuickWinsContainer = document.getElementById('topQuickWins');
-  const topCompleteSelectedBtn = document.getElementById('topCompleteSelectedBtn');
+  // canonical names keyed by id to guarantee visual consistency
+  const canonicalNames = {
+    4: 'Growing',
+    3: 'Grounded',
+    2: 'Drifting',
+    1: 'Surviving'
+  };
 
   // --- Initialization ---
   async function init() {
@@ -71,15 +75,14 @@
     initHistoryCache();
     updateStreakDisplay();
     renderModes();
-    renderTopQuickWins();  // now renders quick wins as cards
     renderCompassRing();
-    renderGlobalQuickWins();
+    renderGlobalQuickWins(); // quick wins dialog still available from header
     setupEventListeners();
     if (!prefersReducedMotion) startArrowAnimationLoop();
     markIntroSeen();
   }
 
-  // Load modes (data/modes.json overrides fallback)
+  // Load modes and force canonical names and canonical order
   async function loadModes() {
     try {
       const res = await fetch('data/modes.json');
@@ -92,45 +95,34 @@
       }
     } catch (e) {
       modes = [
-        { id: 4, name: 'Growing',   description: 'Small wins to build momentum', color:'#4DA6FF' },
-        { id: 3, name: 'Grounded',  description: 'Reset and connect — root into the present', color:'#2ECC71' },
-        { id: 2, name: 'Drifting',  description: 'Slow down and regain clarity', color:'#F7D154' },
+        { id: 4, name: 'Growing', description: 'Small wins to build momentum', color:'#4DA6FF' },
+        { id: 3, name: 'Grounded', description: 'Reset and connect - root into the present', color:'#2ECC71' },
+        { id: 2, name: 'Drifting', description: 'Slow down and regain clarity', color:'#F7D154' },
         { id: 1, name: 'Surviving', description: 'Quick resets for focus and energy', color:'#FF6B6B' }
       ];
     }
 
-    // Normalize names: map upstream "Exploring" to "Drifting" for id 2
+    // Force canonical name per id (overrides any upstream label like "Exploring")
     modes = modes.map(m => {
-      if (m.id === 2 && m.name && /explor/i.test(m.name)) {
-        return Object.assign({}, m, { name: 'Drifting' });
-      }
-      return m;
+      const id = Number(m.id);
+      const canonical = canonicalNames[id];
+      return Object.assign({}, m, { id, name: canonical || m.name });
     });
 
-    // Reorder to preferred visual order: Growing, Grounded, Drifting, Surviving
+    // Reorder to canonical visual order
     const preferOrder = [4,3,2,1];
     const ordered = [];
     preferOrder.forEach(id => {
       const found = modes.find(x => Number(x.id) === id);
       if (found) ordered.push(found);
     });
-    // append any remaining modes
     modes.forEach(m => { if (!ordered.find(o => o.id === m.id)) ordered.push(m); });
     modes = ordered;
   }
 
   // --- History / Streak management ---
-  function initHistoryCache() {
-    try { historyCache = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { historyCache = []; }
-  }
-  function bufferedSaveHistory(latest) {
-    historyCache = latest;
-    if (historyFlushTimer) clearTimeout(historyFlushTimer);
-    historyFlushTimer = setTimeout(() => {
-      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(historyCache || [])); } catch (e) { console.warn('Failed to save history', e); }
-      historyFlushTimer = null;
-    }, HISTORY_FLUSH_DELAY);
-  }
+  function initHistoryCache() { try { historyCache = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { historyCache = []; } }
+  function bufferedSaveHistory(latest) { historyCache = latest; if (historyFlushTimer) clearTimeout(historyFlushTimer); historyFlushTimer = setTimeout(() => { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(historyCache || [])); } catch (e) { console.warn('Failed to save history', e); } historyFlushTimer = null; }, HISTORY_FLUSH_DELAY); }
   function getHistory() { if (historyCache === null) initHistoryCache(); return historyCache || []; }
   function todayKey() { return new Date().toISOString().split('T')[0]; }
 
@@ -162,20 +154,13 @@
 
   function updateStreakDisplay() {
     const streak = Number(localStorage.getItem(STREAK_KEY) || 0);
-    streakBadges.forEach(b => { if (b) b.textContent = `Daily streak — 🔥 ${streak}`; });
+    streakBadges.forEach(b => { if (b) b.textContent = `Daily streak: 🔥 ${streak}`; });
   }
 
   // --- Helpers ---
   function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-  function getContrastColor(hex) {
-    if (!hex) return '#fff';
-    const h = hex.replace('#','').trim();
-    const r = parseInt(h.length===3? h[0]+h[0] : h.slice(0,2),16);
-    const g = parseInt(h.length===3? h[1]+h[1] : h.slice(h.length===3?1:2, h.length===3?2:4),16);
-    const b = parseInt(h.length===3? h[2]+h[2] : h.slice(h.length===3?2:4, h.length),16);
-    const luminance = (0.299*r + 0.587*g + 0.114*b);
-    return luminance > 186 ? '#000' : '#fff';
-  }
+  function getContrastColor(hex) { if (!hex) return '#fff'; const h = hex.replace('#','').trim(); const r = parseInt(h.length===3? h[0]+h[0] : h.slice(0,2),16); const g = parseInt(h.length===3? h[1]+h[1] : h.slice(h.length===3?1:2, h.length===3?2:4),16); const b = parseInt(h.length===3? h[2]+h[2] : h.slice(h.length===3?2:4, h.length),16); const luminance = (0.299*r + 0.587*g + 0.114*b); return luminance > 186 ? '#000' : '#fff'; }
+
   function safeShowDialog(d) {
     if (!d) return;
     if (typeof d.showModal === 'function') {
@@ -184,38 +169,33 @@
   }
   function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
-  // --- Rendering ---
+  // --- Render modes grid and ring ---
   function renderModes() {
     if (!modesGrid) return;
     if (!Array.isArray(modes) || modes.length === 0) { modesGrid.innerHTML = '<p class="no-js-message">No modes available.</p>'; return; }
-    modesGrid.innerHTML = modes.map(mode => makeModeCardHTML(mode)).join('');
-  }
-
-  // create card HTML used for both modes and quick-wins (re-used)
-  function makeModeCardHTML(item, opts = {}) {
-    const safeName = escapeHtml(item.name || item);
-    const safeDesc = escapeHtml(item.description || '');
-    const color = item.color || opts.color || '#00AFA0';
-    const initials = (item.name || (item + '')).split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
-    const dataAttr = opts.isQuickWin ? `data-activity="${escapeHtml(typeof item === 'string' ? item : item.name)}"` : `data-mode-id="${item.id}"`;
-    return `
-      <button class="mode-card ${opts.isQuickWin ? 'quick-win-card' : ''}" ${dataAttr} aria-label="${safeName}" style="--mode-color:${color}">
-        <div class="meta-top">
-          <div class="mode-icon" aria-hidden="true" style="background: linear-gradient(180deg, ${color}33, transparent); color:${getContrastColor(color)}">${initials}</div>
-          <div class="mode-meta">
-            <div class="mode-name">${safeName}</div>
-            <div class="mode-desc">${safeDesc || (opts.isQuickWin ? '' : '')}</div>
+    modesGrid.innerHTML = modes.map(mode => {
+      const safeName = escapeHtml(mode.name || 'Mode');
+      const safeDesc = escapeHtml(mode.description || '');
+      const color = mode.color || '#00AFA0';
+      const initials = safeName.split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
+      return `
+        <button class="mode-card" data-mode-id="${mode.id}" aria-label="Select ${safeName} mode" style="--mode-color:${color}">
+          <div class="meta-top">
+            <div class="mode-icon" aria-hidden="true" style="background: linear-gradient(180deg, ${color}33, transparent); color:${getContrastColor(color)}">${initials}</div>
+            <div class="mode-meta">
+              <div class="mode-name">${safeName}</div>
+              <div class="mode-desc">${safeDesc}</div>
+            </div>
           </div>
-        </div>
-        <div class="mode-actions-row">
-          <div class="mode-hint">${opts.isQuickWin ? 'Tap to open quick win' : 'Tap to open activities'}</div>
-          <button class="card-begin" ${opts.isQuickWin ? `data-activity="${escapeHtml(typeof item === 'string' ? item : item.name)}"` : `data-mode-id="${item.id}"`} aria-label="Open ${safeName}">Open</button>
-        </div>
-      </button>
-    `;
+          <div class="mode-actions-row">
+            <div class="mode-hint">Tap to open activities</div>
+            <button class="card-begin" data-mode-id="${mode.id}" aria-label="Open ${safeName}">Open</button>
+          </div>
+        </button>
+      `;
+    }).join('');
   }
 
-  // Compass ring + wedges
   function renderCompassRing() {
     if (!compassRing) return;
     compassRing.innerHTML = '';
@@ -270,17 +250,38 @@
     compassWedges.style.background = `conic-gradient(from -45deg, ${entries.join(',')})`;
   }
 
-  // Quick wins as cards below modes (uses mode-card style)
-  function renderTopQuickWins() {
-    if (!topQuickWinsContainer) return;
-    const items = [];
-    Object.values(quickWinsMap).forEach(arr => arr.forEach(i => { if (!items.includes(i)) items.push(i); }));
-    // show more cards but keep grid responsive
-    const top = items.slice(0, 12);
-    topQuickWinsContainer.innerHTML = top.map(w => makeModeCardHTML(w, { isQuickWin: true })).join('');
+  // --- Mode dialog ---
+  function openModeDialog(modeId) {
+    const m = modes.find(x => x.id === Number(modeId));
+    if (!m) return;
+    currentMode = m;
+    if (startResetBtn) startResetBtn.disabled = true;
+
+    const titleEl = document.getElementById('modeDialogTitle');
+    const descEl = document.getElementById('dialogModeDescription');
+
+    if (titleEl) titleEl.textContent = m.name;
+    if (descEl) descEl.textContent = (m.description || '').replace(/\u2014/g, ':');
+
+    if (dialogQuickWins) {
+      const quickWins = quickWinsMap[m.id] || [];
+      dialogQuickWins.innerHTML = quickWins.map(w => `
+        <li>
+          <div class="activity-row">
+            <span>${escapeHtml(w)}</span>
+            <div>
+              <button class="select-activity" data-activity="${escapeHtml(w)}">Select</button>
+            </div>
+          </div>
+          <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)"></textarea>
+        </li>
+      `).join('');
+    }
+
+    safeShowDialog(modeDialog);
   }
 
-  // Global quick wins dialog list (full list)
+  // --- Quick wins dialog rendering (header opens this only) ---
   function renderGlobalQuickWins() {
     if (!globalQuickWinsList) return;
     const items = new Set();
@@ -298,7 +299,7 @@
     `).join('');
   }
 
-  // --- Recording activities ---
+  // --- Record activities ---
   function recordActivities(entries) {
     if (!Array.isArray(entries) || entries.length === 0) return;
     const h = getHistory();
@@ -319,7 +320,7 @@
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
   }
 
-  // --- History UI ---
+  // --- History ---
   function openHistoryDialog() {
     if (!historyDialog) return;
     const history = getHistory();
@@ -359,59 +360,28 @@
   function showToast(text, ms = 1400) { const el = document.createElement('div'); el.className = 'rc-toast'; el.textContent = text; document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('visible')); setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 240); }, ms); }
 
   // --- Theme ---
-  function applySavedTheme() {
-    const saved = localStorage.getItem(THEME_KEY);
-    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    const theme = saved || (prefersLight ? 'light' : 'dark');
-    setTheme(theme);
-  }
-  function setTheme(name) {
-    if (name === 'light') document.documentElement.classList.add('light');
-    else document.documentElement.classList.remove('light');
-    try { localStorage.setItem(THEME_KEY, name); } catch (e) {}
-    if (themeToggle) themeToggle.setAttribute('aria-pressed', name === 'light');
-    if (themeIcon) themeIcon.textContent = name === 'light' ? '☀️' : '🌙';
-  }
+  function applySavedTheme() { const saved = localStorage.getItem(THEME_KEY); const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches; const theme = saved || (prefersLight ? 'light' : 'dark'); setTheme(theme); }
+  function setTheme(name) { if (name === 'light') document.documentElement.classList.add('light'); else document.documentElement.classList.remove('light'); try { localStorage.setItem(THEME_KEY, name); } catch (e) {} if (themeToggle) themeToggle.setAttribute('aria-pressed', name === 'light'); if (themeIcon) themeIcon.textContent = name === 'light' ? '☀️' : '🌙'; }
 
-  // --- Event listeners & interactions ---
+  // --- Event listeners ---
   function setupEventListeners() {
-    // Delegation for mode-cards, ring buttons, quick-win cards and activity selection
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
-      // Quick-win card container or Open button
-      const qCard = e.target.closest('.quick-win-card');
-      if (qCard && qCard.dataset && qCard.dataset.activity) {
-        const activity = qCard.dataset.activity;
-        openQuickWinsDialogWithActivities([activity]);
-        return;
-      }
-      const qOpen = e.target.closest('.card-begin[data-activity]');
-      if (qOpen && qOpen.dataset.activity) {
-        openQuickWinsDialogWithActivities([qOpen.dataset.activity]);
-        return;
-      }
-
       // Mode Open CTA or card
       const cbtn = e.target.closest('.card-begin[data-mode-id]');
-      if (cbtn && cbtn.dataset && cbtn.dataset.modeId) {
-        openModeDialog(Number(cbtn.dataset.modeId));
-        return;
-      }
+      if (cbtn && cbtn.dataset && cbtn.dataset.modeId) { openModeDialog(Number(cbtn.dataset.modeId)); return; }
       const card = e.target.closest('.mode-card[data-mode-id]');
-      if (card && card.dataset && card.dataset.modeId) {
-        openModeDialog(Number(card.dataset.modeId));
-        return;
-      }
+      if (card && card.dataset && card.dataset.modeId) { openModeDialog(Number(card.dataset.modeId)); return; }
 
       // Ring button
       const ringBtn = e.target.closest('.ring-btn');
-      if (ringBtn && ringBtn.dataset && ringBtn.dataset.modeId) {
-        openModeDialog(Number(ringBtn.dataset.modeId));
-        return;
-      }
+      if (ringBtn && ringBtn.dataset && ringBtn.dataset.modeId) { openModeDialog(Number(ringBtn.dataset.modeId)); return; }
 
-      // Select activity inside mode dialog (toggle)
+      // Header Quick Wins opens full dialog (Quick Wins are not listed on homepage)
+      if (e.target.id === 'quickWinsBtn' || e.target.closest('#quickWinsBtn')) { if (quickWinsDialog) safeShowDialog(quickWinsDialog); return; }
+
+      // Dialog activity selection
       const selBtn = e.target.closest('.select-activity');
       if (selBtn && selBtn.dataset && selBtn.dataset.activity) {
         e.preventDefault();
@@ -422,7 +392,6 @@
         return;
       }
 
-      // Select activity inside global quick wins (dialog)
       const gSel = e.target.closest('.select-global-activity');
       if (gSel && gSel.dataset && gSel.dataset.activity) {
         e.preventDefault();
@@ -433,22 +402,16 @@
         return;
       }
 
-      // header quick wins and history
-      if (e.target.id === 'quickWinsBtn' || e.target.closest('#quickWinsBtn')) { if (quickWinsDialog) safeShowDialog(quickWinsDialog); return; }
+      // Header history
       if (e.target.id === 'historyBtn' || e.target.closest('#historyBtn')) { openHistoryDialog(); return; }
 
-      // topCompleteSelectedBtn not present now (quick wins below)
     }, true);
 
     // Dialog close/cancel cleanup
     document.querySelectorAll('.dialog-close, .dialog-cancel').forEach(b => {
-      b.addEventListener('click', (e) => {
-        const d = e.target.closest('dialog');
-        if (d) { safeCloseDialog(d); clearDialogSelections(d); }
-      });
+      b.addEventListener('click', (e) => { const d = e.target.closest('dialog'); if (d) { safeCloseDialog(d); clearDialogSelections(d); } });
     });
 
-    // startResetBtn in mode dialog
     if (startResetBtn) {
       startResetBtn.addEventListener('click', function() {
         if (!dialogQuickWins) return;
@@ -471,7 +434,6 @@
       });
     }
 
-    // startQuickWinBtn in quick wins dialog
     if (startQuickWinBtn) {
       startQuickWinBtn.addEventListener('click', function() {
         if (!globalQuickWinsList) return;
@@ -492,60 +454,18 @@
       });
     }
 
-    // header theme toggle
     if (themeToggle) themeToggle.addEventListener('click', () => setTheme(document.documentElement.classList.contains('light') ? 'dark' : 'light'));
 
-    // export/clear
     const exportBtn = document.getElementById('exportHistoryBtn'); if (exportBtn) exportBtn.addEventListener('click', exportHistory);
     const clearBtn = document.getElementById('clearHistoryBtn'); if (clearBtn) clearBtn.addEventListener('click', clearHistory);
 
-    // keyboard
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') { safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections(); }
     });
 
-    // dialog close cleanup
-    ['modeDialog','quickWinsDialog','historyDialog'].forEach(id => {
-      const d = document.getElementById(id);
-      if (d) d.addEventListener('close', () => clearDialogSelections(d));
-    });
-
-    // on resize, ensure ring re-renders if needed
     window.addEventListener('resize', () => { renderCompassRing(); });
   }
 
-  // open mode dialog
-  function openModeDialog(modeId) {
-    const m = modes.find(x => x.id === Number(modeId));
-    if (!m) return;
-    currentMode = m;
-    if (startResetBtn) startResetBtn.disabled = true;
-
-    const titleEl = document.getElementById('modeDialogTitle');
-    const descEl = document.getElementById('dialogModeDescription');
-
-    if (titleEl) titleEl.textContent = m.name;
-    if (descEl) descEl.textContent = m.description || '';
-
-    if (dialogQuickWins) {
-      const quickWins = quickWinsMap[m.id] || [];
-      dialogQuickWins.innerHTML = quickWins.map(w => `
-        <li>
-          <div class="activity-row">
-            <span>${escapeHtml(w)}</span>
-            <div>
-              <button class="select-activity" data-activity="${escapeHtml(w)}">Select</button>
-            </div>
-          </div>
-          <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)"></textarea>
-        </li>
-      `).join('');
-    }
-
-    safeShowDialog(modeDialog);
-  }
-
-  // open quick wins dialog preselecting activities
   function openQuickWinsDialogWithActivities(activities) {
     if (!quickWinsDialog) return;
     safeShowDialog(quickWinsDialog);
@@ -563,10 +483,9 @@
         }
       });
       if (startQuickWinBtn) startQuickWinBtn.disabled = globalQuickWinsList.querySelectorAll('.select-global-activity.active').length === 0;
-    }, 50);
+    }, 60);
   }
 
-  // clear selections
   function clearDialogSelections(d) {
     if (dialogQuickWins) { dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t => t.classList.remove('visible')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t => t.value = ''); }
     if (globalQuickWinsList) { globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => b.classList.remove('active')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t => t.classList.remove('visible')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t => t.value = ''); }
@@ -577,38 +496,29 @@
 
   // --- Smooth arrow animation (lerp) ---
   function startArrowAnimationLoop() {
-    // compute targetAngle on scroll
-    let ticking = false;
     function onScroll() {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const pct = max > 0 ? (window.scrollY / max) : 0;
-      // multiplier gives many rotations over full scroll; reduce from previous to soften
-      targetAngle = pct * 360; // one full rotation over full page scroll for smoother result
+      // use one rotation over full scroll for smoothness
+      targetAngle = pct * 360;
       if (!arrowAnimating) { arrowAnimating = true; requestAnimationFrame(animateArrow); }
     }
 
-    window.addEventListener('scroll', () => { if (!ticking) { requestAnimationFrame(() => { onScroll(); ticking = false; }); ticking = true; } }, { passive: true });
+    window.addEventListener('scroll', () => { requestAnimationFrame(onScroll); }, { passive: true });
 
     function animateArrow() {
-      // lerp towards targetAngle for smoothness
-      currentAngle += (targetAngle - currentAngle) * 0.12; // smoothing factor
+      currentAngle += (targetAngle - currentAngle) * 0.12;
       if (compassArrow) compassArrow.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg)`;
-      // stop condition when close to target to avoid continuous CPU use
-      if (Math.abs(targetAngle - currentAngle) > 0.01) {
-        requestAnimationFrame(animateArrow);
-      } else {
-        arrowAnimating = false;
-      }
+      if (Math.abs(targetAngle - currentAngle) > 0.01) requestAnimationFrame(animateArrow);
+      else arrowAnimating = false;
     }
 
-    // initialize
     onScroll();
   }
 
-  // --- start/boot ---
   function markIntroSeen() { try { if (!localStorage.getItem(INTRO_SEEN_KEY)) localStorage.setItem(INTRO_SEEN_KEY, '1'); } catch (e) {} }
 
-  // Start app
+  // Start
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
