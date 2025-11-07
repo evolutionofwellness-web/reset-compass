@@ -1,14 +1,16 @@
 // script.js
-// - Force canonical names + canonical colors per mode id (prevents upstream "Exploring")
-// - Render wedge colors and place mode labels inside wedges (clickable)
-// - Ensure header/nav works identically on index and about pages
-// - Fix and wire theme toggle
-// - Add subtle dialog open animation and a completion animation that bumps the streak
+// Key fixes in this version:
+// - Force canonical names & colors so upstream can't override labels/colors
+// - Render wedge colors and place the clickable mode buttons in the center of each wedge
+// - Increase compass size and keep labels inside each wedge with a tighter clamp
+// - Ensure mode activities are selectable and enabling the Complete button
+// - Wire theme toggle across pages (multiple theme toggle controls supported)
+// - Improve Quick Wins wording (done in HTML) and style history dialog
+// - Add subtle animations: dialog open and streak bump/pulse when completing
 
 (function() {
   'use strict';
 
-  // Storage keys
   const HISTORY_KEY = 'resetCompassHistory';
   const THEME_KEY = 'resetCompassTheme';
   const STREAK_KEY = 'resetCompassStreak';
@@ -16,7 +18,7 @@
   const LONGEST_KEY = 'resetCompassLongest';
   const INTRO_SEEN_KEY = 'resetCompassIntroSeen';
 
-  // DOM refs
+  // DOM refs (may be absent on some pages)
   const modesGrid = document.getElementById('modesGrid');
   const compassRing = document.getElementById('compassRing');
   const compassWedges = document.getElementById('compassWedges');
@@ -28,14 +30,12 @@
   const globalQuickWinsList = document.getElementById('globalQuickWins');
   const startQuickWinBtn = document.getElementById('startQuickWinBtn');
   const historyDialog = document.getElementById('historyDialog');
-  const historyBtn = document.getElementById('historyBtn');
-  const quickWinsBtn = document.getElementById('quickWinsBtn');
-  const quickWinsLink = document.getElementById('quickWinsLink');
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIcon = document.getElementById('themeIcon');
+  const historyStats = document.getElementById('historyStats');
+  const historyTimeline = document.getElementById('historyTimeline');
+  const themeToggles = Array.from(document.querySelectorAll('#themeToggle, #themeToggleAbout, .theme-toggle'));
   const streakBadges = document.querySelectorAll('#streakBadge');
 
-  // Arrow multiplier: 2 rotations per full-page scroll
+  // Arrow rotation multiplier: 720 degrees = 2 rotations per full scroll
   const ARROW_MULTIPLIER = 720;
 
   // canonical modes (names + colors guaranteed)
@@ -55,6 +55,7 @@
   };
 
   let modes = [];
+  let currentMode = null;
 
   // --- Initialization ---
   async function init() {
@@ -70,14 +71,13 @@
     markIntroSeen();
   }
 
-  // Load modes.json if present but force canonical name+color for consistency
+  // Load modes.json but enforce canonical name+color (allow description override only)
   async function loadModes() {
     try {
       const res = await fetch('data/modes.json');
       if (res && res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length) {
-          // build by id but keep canonical name & color; allow description override only
           const byId = {};
           data.forEach(item => {
             const id = Number(item.id);
@@ -94,12 +94,12 @@
         }
       }
     } catch (e) {
-      console.warn('modes.json not loaded, using defaults', e);
+      console.warn('modes.json not loaded, falling back to canonical', e);
     }
     modes = [canonical[4], canonical[3], canonical[2], canonical[1]];
   }
 
-  // --- Render modes grid (below compass) ---
+  // --- Render modes grid (cards) ---
   function renderModes() {
     if (!modesGrid) return;
     modesGrid.innerHTML = modes.map(m => {
@@ -118,18 +118,20 @@
     }).join('');
   }
 
-  // --- Render compass wedges + labels inside each wedge ---
+  // --- Render compass wedges & clickable labels centered inside each wedge ---
   function renderCompassRing() {
     if (!compassRing) return;
     compassRing.innerHTML = '';
     buildWedges(modes);
 
+    // compute center positions and inject ring buttons centered inside each wedge
     const portion = 360 / (modes.length || 4);
     modes.forEach((mode, idx) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'ring-btn';
       btn.dataset.modeId = mode.id;
+      // angle places label in wedge center; CSS transform will rotate it back so text is horizontal
       const centerAngle = Math.round(((idx + 0.5) * portion) - 45);
       btn.style.setProperty('--angle', `${centerAngle}deg`);
       btn.innerHTML = `<span class="ring-label">${escapeHtml(mode.name)}</span>`;
@@ -142,7 +144,7 @@
     });
   }
 
-  // Build wedge conic-gradient using canonical colors
+  // build wedge conic-gradient using canonical colors
   function buildWedges(list) {
     if (!compassWedges) return;
     const N = (list && list.length) || 0;
@@ -171,12 +173,12 @@
             <button class="select-global-activity" data-activity="${escapeHtml(w)}">Select</button>
           </div>
         </div>
-        <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)"></textarea>
+        <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)" hidden></textarea>
       </li>
     `).join('');
   }
 
-  // --- History / streak helpers ---
+  // --- History & streak helpers ---
   function initHistory() { try { JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { localStorage.setItem(HISTORY_KEY, '[]'); } }
   function todayKey(){ return new Date().toISOString().split('T')[0]; }
   function incrementStreakIfNeeded() {
@@ -186,13 +188,13 @@
       let streak = Number(localStorage.getItem(STREAK_KEY) || 0);
       let longest = Number(localStorage.getItem(LONGEST_KEY) || 0);
       if (last === today) return false;
-      const y = new Date(); y.setDate(y.getDate() - 1); const yKey = y.toISOString().split('T')[0];
+      const y = new Date(); y.setDate(y.getDate() - 1);
+      const yKey = y.toISOString().split('T')[0];
       if (last === yKey) streak = streak + 1; else streak = 1;
       if (streak > longest) localStorage.setItem(LONGEST_KEY, String(streak));
       localStorage.setItem(STREAK_KEY, String(streak));
       localStorage.setItem(LAST_DAY_KEY, today);
       updateStreakDisplay();
-      // animate bump
       streakBadges.forEach(b => { b.classList.add('streak-bump'); setTimeout(()=>b.classList.remove('streak-bump'), 420); });
       return true;
     } catch (e) { console.warn(e); return false; }
@@ -202,7 +204,7 @@
     streakBadges.forEach(b => { if (b) b.textContent = `Daily streak: 🔥 ${s}`; });
   }
 
-  // --- UI helpers ---
+  // --- Utility helpers ---
   function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   function getContrastColor(hex){
     if(!hex) return '#fff';
@@ -214,7 +216,7 @@
     return lum > 186 ? '#000' : '#fff';
   }
 
-  // --- Record activities & animate completion ---
+  // --- Record activities, animate completion ---
   function recordActivities(entries) {
     if (!Array.isArray(entries) || entries.length === 0) return;
     let hist;
@@ -231,12 +233,10 @@
     });
     localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
 
-    // animate modal "closing" and streak bump if needed
-    const didBump = incrementStreakIfNeeded();
-    showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
-    // subtle pulse on mode card or ring label if present
-    if (didBump && currentMode) {
-      // pulse the ring label and card
+    const bumped = incrementStreakIfNeeded();
+
+    // subtle pulse on the card and ring label for completed mode
+    if (bumped && currentMode) {
       const ring = document.querySelector(`.ring-btn[data-mode-id="${currentMode.id}"]`);
       const card = document.querySelector(`.mode-card[data-mode-id="${currentMode.id}"]`);
       [ring, card].forEach(el => {
@@ -244,75 +244,63 @@
         el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }], { duration: 420, easing: 'cubic-bezier(.2,.9,.2,1)' });
       });
     }
+
+    showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
   }
 
-  // --- Dialog helpers with small open animation (class applied via CSS on dialog[open]) ---
+  // --- Dialog helpers ---
   function safeShowDialog(d) {
     if (!d) return;
     if (typeof d.showModal === 'function') {
-      try {
-        d.showModal();
-        // focus first actionable element
-        const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-        if (f) f.focus();
-      } catch (e) {
-        // fallback for older browsers
-        alert(d.querySelector('h2') ? d.querySelector('h2').textContent : '');
-      }
-    } else {
-      alert(d.querySelector('h2') ? d.querySelector('h2').textContent : '');
-    }
+      try { d.showModal(); const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); if (f) f.focus(); } catch (e) { console.warn(e); }
+    } else { alert(d.querySelector('h2') ? d.querySelector('h2').textContent : 'Dialog'); }
   }
   function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
-  // --- Event delegation and listeners ---
+  // --- Attach listeners and delegation ---
   function attachListeners() {
+    // theme toggles across pages
+    themeToggles.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const newTheme = document.documentElement.classList.contains('light') ? 'dark' : 'light';
+        setTheme(newTheme);
+      });
+    });
+
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
-      // mode card
+      // mode card opening
       const modeCard = e.target.closest('.mode-card[data-mode-id]');
-      if (modeCard && modeCard.dataset.modeId) {
-        openModeDialog(Number(modeCard.dataset.modeId));
-        return;
-      }
+      if (modeCard && modeCard.dataset.modeId) { openModeDialog(Number(modeCard.dataset.modeId)); return; }
 
-      // ring label click (inside wedges)
+      // ring label click (inside wedge)
       const ring = e.target.closest('.ring-btn');
-      if (ring && ring.dataset && ring.dataset.modeId) {
-        openModeDialog(Number(ring.dataset.modeId));
-        return;
-      }
+      if (ring && ring.dataset && ring.dataset.modeId) { openModeDialog(Number(ring.dataset.modeId)); return; }
 
-      // quick wins (header or under link)
-      if (e.target.id === 'quickWinsBtn' || e.target.closest('#quickWinsBtn') || e.target.id === 'quickWinsLink' || e.target.closest('#quickWinsLink')) {
-        safeShowDialog(quickWinsDialog);
-        return;
-      }
+      // quick wins open (header or under link)
+      if (e.target.id === 'quickWinsBtn' || e.target.closest('#quickWinsBtn') || e.target.id === 'quickWinsLink' || e.target.closest('#quickWinsLink')) { safeShowDialog(quickWinsDialog); return; }
 
       // history
-      if (e.target.id === 'historyBtn' || e.target.closest('#historyBtn')) {
-        openHistoryDialog();
-        return;
-      }
+      if (e.target.id === 'historyBtn' || e.target.closest('#historyBtn')) { openHistoryDialog(); return; }
 
-      // dialog select toggles (global quick wins)
+      // global quick wins select
       const gSel = e.target.closest('.select-global-activity');
       if (gSel && gSel.dataset && gSel.dataset.activity) {
         e.preventDefault();
         gSel.classList.toggle('active');
-        const li = gSel.closest('li'); if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.classList.toggle('visible', gSel.classList.contains('active')); }
+        const li = gSel.closest('li'); if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.hidden = !gSel.classList.contains('active'); }
         if (startQuickWinBtn) startQuickWinBtn.disabled = !(globalQuickWinsList.querySelectorAll('.select-global-activity.active').length > 0);
         return;
       }
 
-      // mode dialog activity select
+      // mode dialog selection
       const selBtn = e.target.closest('.select-activity');
       if (selBtn && selBtn.dataset && selBtn.dataset.activity) {
         e.preventDefault();
         selBtn.classList.toggle('active');
-        const li = selBtn.closest('li'); if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.classList.toggle('visible', selBtn.classList.contains('active')); }
-        if (startResetBtn) startResetBtn.disabled = dialogQuickWins && dialogQuickWins.querySelectorAll('.select-activity.active').length === 0;
+        const li = selBtn.closest('li'); if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.hidden = !selBtn.classList.contains('active'); }
+        if (startResetBtn) startResetBtn.disabled = !(dialogQuickWins.querySelectorAll('.select-activity.active').length > 0);
         return;
       }
 
@@ -321,15 +309,9 @@
         const d = e.target.closest('dialog');
         if (d) { safeCloseDialog(d); clearDialogSelections(d); }
       }
-
-      // theme toggle (works on about/index)
-      if (e.target.id === 'themeToggle' || e.target.closest('#themeToggle')) {
-        const newTheme = document.documentElement.classList.contains('light') ? 'dark' : 'light';
-        setTheme(newTheme);
-      }
     }, true);
 
-    // start quick wins button
+    // start quick wins completion
     if (startQuickWinBtn) {
       startQuickWinBtn.addEventListener('click', function() {
         const selected = Array.from(globalQuickWinsList.querySelectorAll('.select-global-activity.active'));
@@ -344,7 +326,7 @@
       });
     }
 
-    // start reset in mode dialog
+    // startResetBtn in mode dialog
     if (startResetBtn) {
       startResetBtn.addEventListener('click', function() {
         if (!dialogQuickWins) return;
@@ -371,12 +353,11 @@
       if (e.key === 'Escape') { safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections(); }
     });
 
-    // resize -> reposition ring labels
+    // resize -> re-render ring to recalc positions
     window.addEventListener('resize', function() { renderCompassRing(); });
   }
 
-  // --- Mode dialog open/populate ---
-  let currentMode = null;
+  // --- Open Mode dialog and populate activities ---
   function openModeDialog(modeId) {
     const m = modes.find(x => x.id === Number(modeId));
     if (!m) return;
@@ -397,45 +378,50 @@
               <button class="select-activity" data-activity="${escapeHtml(w)}">Select</button>
             </div>
           </div>
-          <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)"></textarea>
+          <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)" hidden></textarea>
         </li>
       `).join('');
     }
 
-    // subtle open animation handled by CSS for dialog[open]
     safeShowDialog(modeDialog);
   }
 
-  // clear dialog selections
+  // clear UI selections inside dialogs
   function clearDialogSelections(d) {
-    if (dialogQuickWins) { dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t=>{ t.classList.remove('visible'); t.value=''; }); }
-    if (globalQuickWinsList) { globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => b.classList.remove('active')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t=>{ t.classList.remove('visible'); t.value=''; }); }
+    if (dialogQuickWins) { dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t=>{ t.hidden=true; t.value=''; }); }
+    if (globalQuickWinsList) { globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => b.classList.remove('active')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t=>{ t.hidden=true; t.value=''; }); }
     if (startResetBtn) startResetBtn.disabled = true;
     if (startQuickWinBtn) startQuickWinBtn.disabled = true;
     if (d === modeDialog) currentMode = null;
   }
 
-  // --- History dialog ---
+  // --- History dialog rendering with styling ---
   function openHistoryDialog() {
     if (!historyDialog) return;
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-    const statsEl = document.getElementById('historyStats');
-    const timelineEl = document.getElementById('historyTimeline');
     const total = history.length;
     const longest = Number(localStorage.getItem(LONGEST_KEY) || 0);
-    if (statsEl) {
-      statsEl.innerHTML = `<div class="stat-card"><span class="stat-value">${total}</span><span class="stat-label">Total Resets</span></div><div class="stat-card"><span class="stat-value">${longest}</span><span class="stat-label">Longest daily streak</span></div>`;
+
+    if (historyStats) {
+      historyStats.innerHTML = `
+        <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total resets</div></div>
+        <div class="stat-card"><div class="stat-value">${longest}</div><div class="stat-label">Longest streak</div></div>
+      `;
     }
-    if (timelineEl) {
-      timelineEl.innerHTML = history.length ? history.slice().reverse().map(entry => {
+
+    if (historyTimeline) {
+      historyTimeline.innerHTML = history.length ? history.slice().reverse().map(entry => {
         const d = new Date(entry.timestamp);
-        return `<div class="history-entry" style="border-left-color:${entry.modeColor || '#00AFA0'}"><div><div class="history-entry-mode">${escapeHtml(entry.modeName||'Quick Win')}</div><div class="history-entry-time">${d.toLocaleString()}</div><div class="history-entry-action">${escapeHtml(entry.action)}</div>${entry.note?`<div class="history-entry-note">${escapeHtml(entry.note)}</div>`:''}</div></div>`;
+        return `<div class="history-entry" style="border-left-color:${entry.modeColor || '#00AFA0'}">
+          <div><strong>${escapeHtml(entry.modeName || 'Quick Win')}</strong> • ${d.toLocaleString()}<div style="margin-top:6px;color:var(--text-secondary)">${escapeHtml(entry.action)}</div>${entry.note?`<div style="margin-top:8px;color:var(--text-secondary)">${escapeHtml(entry.note)}</div>`:''}</div>
+        </div>`;
       }).join('') : '<div class="empty-history">No reset history yet. Start your first reset!</div>';
     }
+
     safeShowDialog(historyDialog);
   }
 
-  // --- Smooth arrow animation (lerp) with ARROW_MULTIPLIER ---
+  // --- Smooth arrow animation (lerp) ---
   let targetAngle = 0, currentAngle = 0, arrowAnimating = false;
   function startArrowLoop() {
     function onScroll(){
@@ -464,13 +450,18 @@
     if (name === 'light') document.documentElement.classList.add('light');
     else document.documentElement.classList.remove('light');
     try { localStorage.setItem(THEME_KEY, name); } catch (e) {}
-    if (themeToggle) themeToggle.setAttribute('aria-pressed', name === 'light');
-    if (themeIcon) themeIcon.textContent = name === 'light' ? '☀️' : '🌙';
+    // update any theme toggle UI states (multiple controls possible)
+    themeToggles.forEach(btn => btn.setAttribute('aria-pressed', name === 'light'));
+    const icon = name === 'light' ? '☀️' : '🌙';
+    themeToggles.forEach(btn => {
+      const span = btn.querySelector('span');
+      if (span) span.textContent = icon;
+    });
   }
 
   function markIntroSeen(){ try{ if (!localStorage.getItem(INTRO_SEEN_KEY)) localStorage.setItem(INTRO_SEEN_KEY, '1'); }catch(e){} }
 
-  // --- small toast ---
+  // small toast
   function showToast(text, ms = 1400) {
     const el = document.createElement('div');
     el.className = 'rc-toast';
@@ -480,11 +471,11 @@
     setTimeout(()=>{ el.classList.remove('visible'); setTimeout(()=>el.remove(),220); }, ms);
   }
 
-  // Start app
+  // Start up
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
-  // Expose helpers for debugging
+  // Debug helpers
   window.__rc = { renderModes, renderCompassRing, buildWedges, openModeDialog, setTheme };
 
 })();
