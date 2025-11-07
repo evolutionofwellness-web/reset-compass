@@ -16,16 +16,16 @@
 <body class="page-compass">
   <header class="app-header">
     <div class="header-left">
-      <h1 class="app-title">The Reset Compass</h1>
+      <a class="home-link" id="homeBtn" href="./index.html" aria-label="Home — Reset Compass">
+        <h1 class="app-title">The Reset Compass</h1>
+      </a>
     </div>
 
     <div class="header-center">
-      <!-- Quick Wins should be a first-class option outside the compass -->
       <button id="quickWinsBtn" class="header-btn" aria-label="Quick Wins">Quick Wins</button>
     </div>
 
     <div class="header-right">
-      <!-- Streak / engagement -->
       <div id="streakBadge" class="streak-badge" title="Current streak — days in a row">🔥 0</div>
 
       <button id="historyBtn" class="header-btn" aria-label="View History">
@@ -80,7 +80,7 @@
     </footer>
   </main>
 
-  <!-- Mode Detail Dialog (select an activity here, then choose Begin Activity) -->
+  <!-- Mode Detail Dialog -->
   <dialog id="modeDialog" class="mode-dialog" aria-labelledby="modeDialogTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
