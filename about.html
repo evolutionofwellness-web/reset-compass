@@ -11,11 +11,19 @@
   <link rel="icon" type="image/svg+xml" href="assets/images/compass.svg" />
   <script src="script.js" defer></script>
 </head>
-<body>
+<body class="page-about">
   <header class="app-header">
-    <h1 class="app-title">The Reset Compass</h1>
-    <div class="header-actions">
-      <a class="header-btn" href="index.html" aria-label="Home">Home</a>
+    <div class="header-left">
+      <h1 class="app-title">The Reset Compass</h1>
+    </div>
+
+    <div class="header-center">
+      <a id="returnCompassBtn" class="header-btn subtle" href="index.html" aria-label="Return to Compass">Return to Compass</a>
+      <button id="quickWinsBtn" class="header-btn" aria-label="Quick Wins">Quick Wins</button>
+    </div>
+
+    <div class="header-right">
+      <div id="streakBadge" class="streak-badge" title="Current streak — days in a row">🔥 0</div>
       <button id="themeToggle" class="header-btn" aria-pressed="false" aria-label="Toggle theme">
         <span id="themeIcon" aria-hidden="true">🌙</span>
       </button>
@@ -25,29 +33,23 @@
   <main class="main-content">
     <article class="about-section" aria-labelledby="aboutTitle">
       <h2 id="aboutTitle">About The Reset Compass</h2>
-      <p>
-        The Reset Compass was created by Evolution of Wellness to help people quickly choose a short,
-        intentional activity to reset their focus, energy or mood. Each direction represents a different
-        wellness "mode" with a set of recommended quick wins.
-      </p>
 
       <p>
-        Learn more about Evolution of Wellness at
-        <a href="https://www.evolutionofwellness.com" target="_blank" rel="noopener noreferrer">
-          evolutionofwellness.com
-        </a>.
+        The Reset Compass helps you quickly choose a short, intentional activity to reset your focus, energy, or mood.
+        Directions represent different wellness modes; each mode suggests short "Activities" you can do immediately.
       </p>
 
       <h3>How to use</h3>
       <ol>
-        <li>Pick a direction around the compass or choose a mode card below the compass.</li>
-        <li>See recommended quick wins in the modal that opens.</li>
-        <li>Tap "Begin Activity" to record the activity into your history.</li>
+        <li>From the compass: either tap a direction (top/right/bottom/left) or pick a Mode Card below.</li>
+        <li>In the Mode modal, select an Activity (it highlights) — selecting is separate from "Begin Activity".</li>
+        <li>Tap "Begin Activity" to perform and record the activity. That increments your daily streak (if applicable).</li>
+        <li>Use the "Quick Wins" button in the header for a curated list of fast actions (outside the compass).</li>
       </ol>
 
       <p class="about-note">
-        Your theme (light/dark) preference is saved. Mode colors are applied as translucent accents so they
-        flow well with the app background.
+        Your theme (light/dark) preference and streak are saved locally. There's a "Return to Compass" button in the header to return
+        to the main compass from this page.
       </p>
     </article>
   </main>
