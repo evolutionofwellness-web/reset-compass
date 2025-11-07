@@ -1,14 +1,14 @@
-// Updated script to:
-// - force canonical full names & canonical colors (prevent upstream "Exploring" from showing)
-// - render modes into the four wedges (labels are placed inside each wedge and clickable)
-// - ensure left stripe colors and wedge colors use the canonical color set
-// - increase compass arrow rotation multiplier to 720 (2x previous 360)
-// - robust event delegation so ring labels and mode cards open the mode dialog
+// script.js
+// - Force canonical names + canonical colors per mode id (prevents upstream "Exploring")
+// - Render wedge colors and place mode labels inside wedges (clickable)
+// - Ensure header/nav works identically on index and about pages
+// - Fix and wire theme toggle
+// - Add subtle dialog open animation and a completion animation that bumps the streak
 
 (function() {
   'use strict';
 
-  // Keys
+  // Storage keys
   const HISTORY_KEY = 'resetCompassHistory';
   const THEME_KEY = 'resetCompassTheme';
   const STREAK_KEY = 'resetCompassStreak';
@@ -35,10 +35,10 @@
   const themeIcon = document.getElementById('themeIcon');
   const streakBadges = document.querySelectorAll('#streakBadge');
 
-  // Arrow rotation multiplier — 720 degrees over full page scroll (2x the previous single-rotation).
+  // Arrow multiplier: 2 rotations per full-page scroll
   const ARROW_MULTIPLIER = 720;
 
-  // canonical defaults and colors (guaranteed)
+  // canonical modes (names + colors guaranteed)
   const canonical = {
     4: { id:4, name:'Growing',   description:'Small wins to build momentum', color:'#4DA6FF' },
     3: { id:3, name:'Grounded',  description:'Reset and connect: root into the present', color:'#2ECC71' },
@@ -46,6 +46,7 @@
     1: { id:1, name:'Surviving', description:'Quick resets for focus and energy', color:'#FF6B6B' }
   };
 
+  // quick wins per mode
   const quickWinsMap = {
     3: [ 'Plant your feet and do a short stretch', 'Ground with deliberate breath: 4 4 4', 'Put away one distracting item', 'Drink a glass of water' ],
     2: [ 'Take 3 deep breaths', 'Name 3 things you notice around you', 'Lie down and relax for 2 minutes', 'Slow-release breathing for 1 minute' ],
@@ -55,7 +56,7 @@
 
   let modes = [];
 
-  // --- init ---
+  // --- Initialization ---
   async function init() {
     applySavedTheme();
     await loadModes();
@@ -69,18 +70,18 @@
     markIntroSeen();
   }
 
-  // load modes.json but force canonical names/colors; allow description override only
+  // Load modes.json if present but force canonical name+color for consistency
   async function loadModes() {
     try {
       const res = await fetch('data/modes.json');
       if (res && res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length) {
+          // build by id but keep canonical name & color; allow description override only
           const byId = {};
           data.forEach(item => {
             const id = Number(item.id);
             if (!canonical[id]) return;
-            // keep canonical name and color always; allow description to come from file or canonical fallback
             byId[id] = {
               id,
               name: canonical[id].name,
@@ -93,12 +94,12 @@
         }
       }
     } catch (e) {
-      console.warn('Could not load data/modes.json, falling back to defaults', e);
+      console.warn('modes.json not loaded, using defaults', e);
     }
     modes = [canonical[4], canonical[3], canonical[2], canonical[1]];
   }
 
-  // render mode cards (below compass)
+  // --- Render modes grid (below compass) ---
   function renderModes() {
     if (!modesGrid) return;
     modesGrid.innerHTML = modes.map(m => {
@@ -117,7 +118,7 @@
     }).join('');
   }
 
-  // render compass wedges and labels (labels inside each wedge)
+  // --- Render compass wedges + labels inside each wedge ---
   function renderCompassRing() {
     if (!compassRing) return;
     compassRing.innerHTML = '';
@@ -136,13 +137,12 @@
       btn.style.background = `linear-gradient(180deg, ${base}66, rgba(0,0,0,0.08))`;
       btn.style.setProperty('--mode-color', base);
       btn.style.color = getContrastColor(base);
-      // make sure labels are above wedges
       btn.style.zIndex = 6;
       compassRing.appendChild(btn);
     });
   }
 
-  // create wedge background; wedge alpha slightly stronger for labels readability
+  // Build wedge conic-gradient using canonical colors
   function buildWedges(list) {
     if (!compassWedges) return;
     const N = (list && list.length) || 0;
@@ -176,26 +176,28 @@
     `).join('');
   }
 
-  // --- History / streak ---
-  function initHistory() {
-    try { JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { localStorage.setItem(HISTORY_KEY, '[]'); }
-  }
+  // --- History / streak helpers ---
+  function initHistory() { try { JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { localStorage.setItem(HISTORY_KEY, '[]'); } }
   function todayKey(){ return new Date().toISOString().split('T')[0]; }
-  function incrementStreakIfNeeded(){
-    try{
+  function incrementStreakIfNeeded() {
+    try {
       const last = localStorage.getItem(LAST_DAY_KEY);
       const today = todayKey();
       let streak = Number(localStorage.getItem(STREAK_KEY) || 0);
       let longest = Number(localStorage.getItem(LONGEST_KEY) || 0);
-      if (last === today) return;
-      const y = new Date(); y.setDate(y.getDate()-1); const yKey = y.toISOString().split('T')[0];
+      if (last === today) return false;
+      const y = new Date(); y.setDate(y.getDate() - 1); const yKey = y.toISOString().split('T')[0];
       if (last === yKey) streak = streak + 1; else streak = 1;
-      if (streak > longest){ localStorage.setItem(LONGEST_KEY, String(streak)); }
-      localStorage.setItem(STREAK_KEY, String(streak)); localStorage.setItem(LAST_DAY_KEY, today);
+      if (streak > longest) localStorage.setItem(LONGEST_KEY, String(streak));
+      localStorage.setItem(STREAK_KEY, String(streak));
+      localStorage.setItem(LAST_DAY_KEY, today);
       updateStreakDisplay();
-    } catch(e){ console.warn(e); }
+      // animate bump
+      streakBadges.forEach(b => { b.classList.add('streak-bump'); setTimeout(()=>b.classList.remove('streak-bump'), 420); });
+      return true;
+    } catch (e) { console.warn(e); return false; }
   }
-  function updateStreakDisplay(){
+  function updateStreakDisplay() {
     const s = Number(localStorage.getItem(STREAK_KEY) || 0);
     streakBadges.forEach(b => { if (b) b.textContent = `Daily streak: 🔥 ${s}`; });
   }
@@ -212,9 +214,9 @@
     return lum > 186 ? '#000' : '#fff';
   }
 
-  // record activities
+  // --- Record activities & animate completion ---
   function recordActivities(entries) {
-    if (!Array.isArray(entries) || !entries.length) return;
+    if (!Array.isArray(entries) || entries.length === 0) return;
     let hist;
     try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { hist = []; }
     entries.forEach(rec => {
@@ -228,46 +230,89 @@
       });
     });
     localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
-    incrementStreakIfNeeded();
-    updateStreakDisplay();
+
+    // animate modal "closing" and streak bump if needed
+    const didBump = incrementStreakIfNeeded();
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
+    // subtle pulse on mode card or ring label if present
+    if (didBump && currentMode) {
+      // pulse the ring label and card
+      const ring = document.querySelector(`.ring-btn[data-mode-id="${currentMode.id}"]`);
+      const card = document.querySelector(`.mode-card[data-mode-id="${currentMode.id}"]`);
+      [ring, card].forEach(el => {
+        if (!el) return;
+        el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }], { duration: 420, easing: 'cubic-bezier(.2,.9,.2,1)' });
+      });
+    }
   }
 
-  // toast
-  function showToast(text, ms = 1400){ const el=document.createElement('div'); el.className='rc-toast'; el.textContent=text; document.body.appendChild(el); requestAnimationFrame(()=>el.classList.add('visible')); setTimeout(()=>{ el.classList.remove('visible'); setTimeout(()=>el.remove(),220); }, ms); }
+  // --- Dialog helpers with small open animation (class applied via CSS on dialog[open]) ---
+  function safeShowDialog(d) {
+    if (!d) return;
+    if (typeof d.showModal === 'function') {
+      try {
+        d.showModal();
+        // focus first actionable element
+        const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (f) f.focus();
+      } catch (e) {
+        // fallback for older browsers
+        alert(d.querySelector('h2') ? d.querySelector('h2').textContent : '');
+      }
+    } else {
+      alert(d.querySelector('h2') ? d.querySelector('h2').textContent : '');
+    }
+  }
+  function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
-  // dialog helpers
-  function safeShowDialog(d){ if(!d) return; if(typeof d.showModal==='function'){ try{ d.showModal(); const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); if(f) f.focus(); }catch(e){ alert((d.querySelector('h2')?d.querySelector('h2').textContent+'\\n\\n':'') + Array.from(d.querySelectorAll('p,li')).map(n=>n.textContent.trim()).filter(Boolean).join('\\n')); } } else { alert('Dialog not supported'); } }
-  function safeCloseDialog(d){ if(!d) return; try { if(typeof d.close==='function' && d.open) d.close(); } catch(e){} }
-
-  // attach UI listeners (delegation)
-  function attachListeners(){
-    document.addEventListener('click', (e) => {
+  // --- Event delegation and listeners ---
+  function attachListeners() {
+    document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
       // mode card
       const modeCard = e.target.closest('.mode-card[data-mode-id]');
-      if (modeCard && modeCard.dataset.modeId) { openModeDialog(Number(modeCard.dataset.modeId)); return; }
+      if (modeCard && modeCard.dataset.modeId) {
+        openModeDialog(Number(modeCard.dataset.modeId));
+        return;
+      }
 
-      // ring label
+      // ring label click (inside wedges)
       const ring = e.target.closest('.ring-btn');
-      if (ring && ring.dataset && ring.dataset.modeId) { openModeDialog(Number(ring.dataset.modeId)); return; }
+      if (ring && ring.dataset && ring.dataset.modeId) {
+        openModeDialog(Number(ring.dataset.modeId));
+        return;
+      }
 
-      // quick wins
-      if (e.target.id === 'quickWinsBtn' || e.target.closest('#quickWinsBtn')) { safeShowDialog(quickWinsDialog); return; }
-      if (e.target.id === 'quickWinsLink' || e.target.closest('#quickWinsLink')) { safeShowDialog(quickWinsDialog); return; }
+      // quick wins (header or under link)
+      if (e.target.id === 'quickWinsBtn' || e.target.closest('#quickWinsBtn') || e.target.id === 'quickWinsLink' || e.target.closest('#quickWinsLink')) {
+        safeShowDialog(quickWinsDialog);
+        return;
+      }
 
       // history
-      if (e.target.id === 'historyBtn' || e.target.closest('#historyBtn')) { openHistoryDialog(); return; }
+      if (e.target.id === 'historyBtn' || e.target.closest('#historyBtn')) {
+        openHistoryDialog();
+        return;
+      }
 
-      // quick-wins dialog selects
+      // dialog select toggles (global quick wins)
       const gSel = e.target.closest('.select-global-activity');
       if (gSel && gSel.dataset && gSel.dataset.activity) {
         e.preventDefault();
         gSel.classList.toggle('active');
-        const li = gSel.closest('li');
-        if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.classList.toggle('visible', gSel.classList.contains('active')); }
+        const li = gSel.closest('li'); if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.classList.toggle('visible', gSel.classList.contains('active')); }
         if (startQuickWinBtn) startQuickWinBtn.disabled = !(globalQuickWinsList.querySelectorAll('.select-global-activity.active').length > 0);
+        return;
+      }
+
+      // mode dialog activity select
+      const selBtn = e.target.closest('.select-activity');
+      if (selBtn && selBtn.dataset && selBtn.dataset.activity) {
+        e.preventDefault();
+        selBtn.classList.toggle('active');
+        const li = selBtn.closest('li'); if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.classList.toggle('visible', selBtn.classList.contains('active')); }
+        if (startResetBtn) startResetBtn.disabled = dialogQuickWins && dialogQuickWins.querySelectorAll('.select-activity.active').length === 0;
         return;
       }
 
@@ -277,15 +322,16 @@
         if (d) { safeCloseDialog(d); clearDialogSelections(d); }
       }
 
-      // theme
+      // theme toggle (works on about/index)
       if (e.target.id === 'themeToggle' || e.target.closest('#themeToggle')) {
-        setTheme(document.documentElement.classList.contains('light') ? 'dark' : 'light');
+        const newTheme = document.documentElement.classList.contains('light') ? 'dark' : 'light';
+        setTheme(newTheme);
       }
     }, true);
 
-    // start quick wins action
+    // start quick wins button
     if (startQuickWinBtn) {
-      startQuickWinBtn.addEventListener('click', () => {
+      startQuickWinBtn.addEventListener('click', function() {
         const selected = Array.from(globalQuickWinsList.querySelectorAll('.select-global-activity.active'));
         if (!selected.length) return;
         const records = selected.map(b => {
@@ -298,14 +344,21 @@
       });
     }
 
-    // startResetBtn in mode dialog
+    // start reset in mode dialog
     if (startResetBtn) {
-      startResetBtn.addEventListener('click', () => {
-        const selected = Array.from(dialogQuickWins.querySelectorAll('.select-activity.active'));
-        if (!selected.length) return;
-        const records = selected.map(b => {
+      startResetBtn.addEventListener('click', function() {
+        if (!dialogQuickWins) return;
+        const selectedBtns = Array.from(dialogQuickWins.querySelectorAll('.select-activity.active'));
+        if (!selectedBtns.length) return;
+        const records = selectedBtns.map(b => {
           const li = b.closest('li'); const noteEl = li ? li.querySelector('.activity-note') : null;
-          return { modeId: currentMode.id, modeName: currentMode.name, modeColor: currentMode.color, action: b.dataset.activity, note: noteEl ? (noteEl.value || '').trim() : '' };
+          return {
+            modeId: currentMode.id,
+            modeName: currentMode.name,
+            modeColor: currentMode.color,
+            action: b.dataset.activity,
+            note: noteEl ? (noteEl.value || '').trim() : ''
+          };
         });
         recordActivities(records);
         safeCloseDialog(modeDialog);
@@ -313,19 +366,19 @@
       });
     }
 
-    // keyboard
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { safeCloseDialog(modeDialog); safeCloseDialog(quickWinsDialog); safeCloseDialog(historyDialog); clearDialogSelections(); }
+    // keyboard escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections(); }
     });
 
-    // resize -> re-render ring (to adjust label positions)
-    window.addEventListener('resize', () => { renderCompassRing(); });
+    // resize -> reposition ring labels
+    window.addEventListener('resize', function() { renderCompassRing(); });
   }
 
-  // open mode dialog
+  // --- Mode dialog open/populate ---
   let currentMode = null;
   function openModeDialog(modeId) {
-    const m = modes.find(x => Number(x.id) === Number(modeId));
+    const m = modes.find(x => x.id === Number(modeId));
     if (!m) return;
     currentMode = m;
     if (startResetBtn) startResetBtn.disabled = true;
@@ -333,9 +386,10 @@
     const descEl = document.getElementById('dialogModeDescription');
     if (titleEl) titleEl.textContent = m.name;
     if (descEl) descEl.textContent = (m.description || '').replace(/\u2014/g, ':');
+
     if (dialogQuickWins) {
-      const list = quickWinsMap[m.id] || [];
-      dialogQuickWins.innerHTML = list.map(w => `
+      const quickWins = quickWinsMap[m.id] || [];
+      dialogQuickWins.innerHTML = quickWins.map(w => `
         <li>
           <div class="activity-row">
             <span>${escapeHtml(w)}</span>
@@ -347,19 +401,21 @@
         </li>
       `).join('');
     }
+
+    // subtle open animation handled by CSS for dialog[open]
     safeShowDialog(modeDialog);
   }
 
   // clear dialog selections
   function clearDialogSelections(d) {
-    if (dialogQuickWins) { dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t=>{t.classList.remove('visible'); t.value='';}); }
-    if (globalQuickWinsList) { globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => b.classList.remove('active')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t=>{t.classList.remove('visible'); t.value='';}); }
+    if (dialogQuickWins) { dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t=>{ t.classList.remove('visible'); t.value=''; }); }
+    if (globalQuickWinsList) { globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => b.classList.remove('active')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t=>{ t.classList.remove('visible'); t.value=''; }); }
     if (startResetBtn) startResetBtn.disabled = true;
     if (startQuickWinBtn) startQuickWinBtn.disabled = true;
     if (d === modeDialog) currentMode = null;
   }
 
-  // open history dialog
+  // --- History dialog ---
   function openHistoryDialog() {
     if (!historyDialog) return;
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
@@ -379,44 +435,56 @@
     safeShowDialog(historyDialog);
   }
 
-  // smooth arrow lerp loop using ARROW_MULTIPLIER
+  // --- Smooth arrow animation (lerp) with ARROW_MULTIPLIER ---
   let targetAngle = 0, currentAngle = 0, arrowAnimating = false;
   function startArrowLoop() {
     function onScroll(){
       const max = document.documentElement.scrollHeight - window.innerHeight;
-      const pct = max>0 ? (window.scrollY/max) : 0;
+      const pct = max > 0 ? (window.scrollY / max) : 0;
       targetAngle = pct * ARROW_MULTIPLIER;
       if (!arrowAnimating) { arrowAnimating = true; requestAnimationFrame(animate); }
     }
-    window.addEventListener('scroll', () => requestAnimationFrame(onScroll), {passive:true});
+    window.addEventListener('scroll', () => { requestAnimationFrame(onScroll); }, { passive: true });
     function animate(){
       currentAngle += (targetAngle - currentAngle) * 0.12;
       if (compassArrow) compassArrow.style.transform = `translate(-50%,-50%) rotate(${currentAngle}deg)`;
-      if (Math.abs(targetAngle-currentAngle) > 0.01) requestAnimationFrame(animate); else arrowAnimating = false;
+      if (Math.abs(targetAngle - currentAngle) > 0.01) requestAnimationFrame(animate);
+      else arrowAnimating = false;
     }
     onScroll();
   }
 
-  // theme
-  function applySavedTheme(){
-    const s = localStorage.getItem(THEME_KEY);
+  // --- Theme helpers ---
+  function applySavedTheme() {
+    const saved = localStorage.getItem(THEME_KEY);
     const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    setTheme(s || (prefersLight?'light':'dark'));
+    setTheme(saved || (prefersLight ? 'light' : 'dark'));
   }
-  function setTheme(name){
-    if (name === 'light') document.documentElement.classList.add('light'); else document.documentElement.classList.remove('light');
-    try { localStorage.setItem(THEME_KEY, name); } catch(e){}
+  function setTheme(name) {
+    if (name === 'light') document.documentElement.classList.add('light');
+    else document.documentElement.classList.remove('light');
+    try { localStorage.setItem(THEME_KEY, name); } catch (e) {}
     if (themeToggle) themeToggle.setAttribute('aria-pressed', name === 'light');
     if (themeIcon) themeIcon.textContent = name === 'light' ? '☀️' : '🌙';
   }
 
   function markIntroSeen(){ try{ if (!localStorage.getItem(INTRO_SEEN_KEY)) localStorage.setItem(INTRO_SEEN_KEY, '1'); }catch(e){} }
 
-  // start
+  // --- small toast ---
+  function showToast(text, ms = 1400) {
+    const el = document.createElement('div');
+    el.className = 'rc-toast';
+    el.textContent = text;
+    document.body.appendChild(el);
+    requestAnimationFrame(()=>el.classList.add('visible'));
+    setTimeout(()=>{ el.classList.remove('visible'); setTimeout(()=>el.remove(),220); }, ms);
+  }
+
+  // Start app
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
-  // expose helpers for debugging
-  window.__rc = { renderModes, renderCompassRing, buildWedges, openModeDialog };
+  // Expose helpers for debugging
+  window.__rc = { renderModes, renderCompassRing, buildWedges, openModeDialog, setTheme };
 
 })();
