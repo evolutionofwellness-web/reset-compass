@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="The Reset Compass - Find your wellness mode and choose the right reset activity" />
+  <meta name="description" content="The Reset Compass - Find your wellness mode and choose a short activity to reset" />
   <meta name="theme-color" content="#00AFA0" />
   <title>The Reset Compass</title>
 
@@ -14,7 +14,6 @@
   <script src="script.js" defer></script>
 </head>
 <body class="page-compass">
-  <!-- Title row: The Reset Compass sits above the nav (consistent across pages) -->
   <header class="app-header" role="banner">
     <div class="app-header-top">
       <a class="home-link" id="homeBtn" href="./index.html" aria-label="Home — Reset Compass">
@@ -55,7 +54,7 @@
           </svg>
         </div>
 
-        <!-- ring labels are inserted by JS and placed inside each wedge -->
+        <!-- ring labels inserted by JS and positioned inside wedges -->
         <div id="compassRing" class="compass-ring" aria-hidden="false"></div>
       </div>
 
@@ -64,6 +63,7 @@
 
     <section class="modes-section" aria-label="Wellness Modes">
       <h2 class="section-title">Choose Your Mode</h2>
+
       <div class="modes-grid" id="modesGrid" role="list">
         <noscript>
           <p class="no-js-message">Please enable JavaScript to view the wellness modes.</p>
@@ -72,8 +72,8 @@
 
       <div class="quick-wins-under" style="text-align:center;margin-top:14px;">
         <button id="quickWinsLink" class="nav-btn">Open Quick Wins</button>
-        <p class="quick-wins-note" style="margin-top:8px;color:var(--text-secondary);font-size:0.95rem;">
-          Quick Wins are quick, single-step actions available from the Quick Wins dialog.
+        <p class="quick-wins-note" style="margin-top:8px;color:var(--text-secondary);font-size:0.95rem;max-width:820px;margin-left:auto;margin-right:auto;">
+          Quick Wins are single-step actions you can do right now to quickly reset your focus, energy, or mood — tap one to select and complete it immediately.
         </p>
       </div>
     </section>
@@ -112,12 +112,12 @@
     </div>
   </dialog>
 
-  <!-- Quick Wins Dialog (full list; opened from header Quick Wins button only) -->
+  <!-- Quick Wins Dialog -->
   <dialog id="quickWinsDialog" class="mode-dialog" aria-labelledby="quickWinsTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
       <h2 id="quickWinsTitle">Quick Wins</h2>
-      <p class="mode-description">Short, immediate activities you can do right now. Select one or more and mark them complete.</p>
+      <p class="mode-description">One-step actions you can do right now to quickly change your focus, energy, or mood. Tap to select and complete.</p>
       <ul id="globalQuickWins" class="quick-wins-list" role="list"></ul>
 
       <div class="dialog-actions">
