@@ -1,4 +1,4 @@
-// Updated script.js — improved mapping for compass ring + accessibility tweaks
+// Updated script.js — compass directions, larger spin, "Begin Activity", About button scroll
 (function() {
   'use strict';
 
@@ -7,7 +7,6 @@
   const HISTORY_KEY = 'resetCompassHistory';
   const INTRO_SEEN_KEY = 'resetCompassIntroSeen';
 
-  // small quick-wins map (kept as-is)
   const quickWinsMap = {
     1: [ 'Take 3 deep breaths', 'Drink a glass of water', 'Step outside for 2 minutes', 'Set one tiny goal for today' ],
     2: [ "Write down 3 things you're grateful for", 'Take a 10-minute walk', 'Call or text a friend', 'Tidy one small space' ],
@@ -23,6 +22,8 @@
   const compassImage = document.getElementById('compassImage');
   const historyBtn = document.getElementById('historyBtn');
   const replayBtn = document.getElementById('replayBtn');
+  const aboutBtn = document.getElementById('aboutBtn');
+  const ROTATION_MULTIPLIER = 720; // makes arrow spin more aggressively (two full rotations per page scroll)
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -53,6 +54,7 @@
       return;
     }
 
+    // Ensure name is prominent and visible next to icon
     modesGrid.innerHTML = modes.map(mode => `
       <button class="mode-card" data-mode-id="${mode.id}" aria-label="Select ${mode.name} mode" style="border-color:${mode.color}22">
         <span class="mode-icon" aria-hidden="true">${mode.icon}</span>
@@ -71,25 +73,22 @@
     });
   }
 
-  // Compass ring mapping: place first up to 4 modes around the compass in logical order.
+  // Place up to four different directions around the compass. Not literal compass required.
   function renderCompassRing() {
     if (!compassRing || !Array.isArray(modes)) return;
     compassRing.innerHTML = '';
 
-    // Determine up to 4 modes to show. Prefer stable mapping when modes include known ids; otherwise use array order.
-    const positions = ['top','right','bottom','left'];
-    const chosen = [];
-
-    // If mode IDs 4/2/1/3 exist, prefer that semantic mapping (keeps old behavior)
+    // Use prefered mapping if present, else first up to 4 modes
     const preferOrder = [4,2,1,3];
-    const hasPrefer = preferOrder.every(id => modes.find(m=>m.id===id));
+    const hasPrefer = preferOrder.every(id => modes.find(m => m.id === id));
+    const chosen = [];
     if (hasPrefer) {
-      preferOrder.forEach(id => chosen.push(modes.find(m=>m.id===id)));
+      preferOrder.forEach(id => chosen.push(modes.find(m => m.id === id)));
     } else {
-      // fallback: use first up to 4 modes
       for (let i=0;i<Math.min(4,modes.length);i++) chosen.push(modes[i]);
     }
 
+    const positions = ['top','right','bottom','left'];
     chosen.forEach((mode, idx) => {
       if (!mode) return;
       const btn = document.createElement('button');
@@ -97,8 +96,9 @@
       btn.className = `ring-btn ring-${positions[idx]}`;
       btn.setAttribute('aria-label', `${mode.name} mode`);
       btn.dataset.modeId = mode.id;
+      // ring label will shrink if too long (handled by CSS)
       btn.innerHTML = `<span class="ring-icon" aria-hidden="true">${mode.icon}</span><span class="ring-label">${mode.name}</span>`;
-      // set accessible color cue
+      // color accents
       btn.style.borderColor = mode.color + '33';
       btn.style.background = `linear-gradient(180deg, ${mode.color}18, rgba(0,0,0,0.04))`;
       btn.addEventListener('click', () => openModeDialog(mode.id));
@@ -152,7 +152,7 @@
     });
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch (e) { console.warn(e) }
     try { if (modeDialog.close) modeDialog.close(); } catch(e){}
-    showToast(`Saved: ${currentMode.name} — ${action}`);
+    showToast(`Activity started — ${currentMode.name}`);
   }
 
   function getHistory() {
@@ -223,19 +223,25 @@
       if (prefersReducedMotion) showToast('Animations disabled (reduced motion).');
       else { if (compassImage) { compassImage.style.transform = 'scale(0.98)'; setTimeout(()=>compassImage.style.transform = '', 220); } }
     });
+    if (aboutBtn) aboutBtn.addEventListener('click', () => {
+      const about = document.getElementById('about');
+      if (about) about.scrollIntoView({behavior: 'smooth', block: 'start'});
+    });
+
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') { try{ if (modeDialog.open) modeDialog.close(); }catch{} try{ if (historyDialog.open) historyDialog.close(); }catch{} }
     });
   }
 
   function setupScrollAnimation() {
-    if (!compassArrow || prefersReducedMotion) return;
+    if (!compassArrow) return;
+    if (prefersReducedMotion) return;
     let ticking = false;
     function update(){
       const scrollY = window.scrollY;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const pct = max > 0 ? scrollY / max : 0;
-      const rot = pct * 360;
+      const rot = pct * ROTATION_MULTIPLIER;
       compassArrow.style.transform = `translate(-50%, -50%) rotate(${rot}deg)`;
       ticking = false;
     }
