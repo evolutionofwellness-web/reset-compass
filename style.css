@@ -1,4 +1,4 @@
-/* Redesigned stylesheet: wedges, spaced directions, per-mode translucent accents */
+/* Redesigned stylesheet: compass wedges, proper spacing, quick wins & streak badge */
 
 /* CSS Variables (dark defaults) */
 :root{
@@ -12,8 +12,6 @@
   --border: rgba(255,255,255,0.06);
   --radius-sm: 8px;
   --shadow-md: 0 12px 40px rgba(0,0,0,0.55);
-
-  /* fallback accent when mode color isn't set */
   --mode-color: #00AFA0;
 }
 
@@ -42,28 +40,30 @@ body{
 
 /* Header */
 .app-header{
-  display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;
-  gap:1rem;background:transparent;border-bottom:1px solid var(--border);
-  position:sticky;top:0;z-index:120;backdrop-filter:blur(6px)
+  display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;gap:0.5rem;background:transparent;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:120;backdrop-filter:blur(6px)
 }
-.app-title{font-weight:800;font-size:1.125rem;background:linear-gradient(90deg,var(--brand-color),#00d4c4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.header-actions{display:flex;gap:0.5rem}
-.header-btn{background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);padding:0.5rem 0.9rem;border-radius:var(--radius-sm);font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem}
-.header-btn:focus-visible{outline:3px solid rgba(0,175,160,0.14);outline-offset:2px}
+.header-left{flex:1}
+.header-center{display:flex;gap:0.5rem;align-items:center;justify-content:center;flex:1}
+.header-right{display:flex;gap:0.5rem;align-items:center;justify-content:flex-end;flex:1}
+.app-title{font-weight:800;font-size:1.05rem;background:linear-gradient(90deg,var(--brand-color),#00d4c4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.header-btn{background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);padding:0.45rem 0.8rem;border-radius:10px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem}
+.header-btn.subtle{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:0.35rem 0.6rem}
+.header-btn:focus-visible{outline:3px solid rgba(0,175,160,0.12);outline-offset:2px}
+
+/* Streak badge */
+.streak-badge{background:linear-gradient(90deg,#ffb874,#ff7a7a);color:#081018;padding:0.35rem 0.6rem;border-radius:999px;font-weight:800;display:inline-flex;align-items:center;gap:0.5rem;box-shadow:0 6px 18px rgba(0,0,0,0.36)}
 
 /* Main container */
-.main-content{max-width:1120px;margin:0 auto;padding:2rem 1rem}
+.main-content{max-width:1120px;margin:0 auto;padding:1.5rem 1rem}
 
 /* Hero & compass */
-.hero{text-align:center;padding:2.25rem 1rem 3rem}
+.hero{text-align:center;padding:1.75rem 1rem 2.5rem}
 .compass-container{
-  position:relative;width:240px;height:240px;margin:0 auto 1.25rem;border-radius:50%;transition:transform 220ms ease,box-shadow 220ms ease;
-  background: transparent;
+  position:relative;width:240px;height:240px;margin:0 auto 1.25rem;border-radius:50%;transition:transform 220ms ease,box-shadow 220ms ease;background: radial-gradient(1200px circle at 30% 20%, rgba(255,255,255,0.01), transparent 20%);
 }
 @media(min-width:900px){ .compass-container{ width:380px;height:380px } }
 .compass-container:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
-/* De-emphasize the decorative graphic to ensure wedges/labels pop */
-.compass-image{width:100%;height:100%;display:block;opacity:0.04;filter:grayscale(60%) blur(0.2px);position:absolute;inset:0;border-radius:50%}
+.compass-image{width:100%;height:100%;display:block;opacity:0.04;filter:grayscale(60%) blur(0.2px);position:absolute;inset:0;border-radius:50%;z-index:0}
 .compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:0.95;z-index:0}
 .compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);color:var(--brand-color);pointer-events:none;transition:transform 200ms ease;z-index:2}
 .hero-intro{margin-top:0.25rem;font-size:1.05rem;color:var(--text-secondary)}
@@ -73,11 +73,10 @@ body{
 .compass-ring{position:absolute;inset:0;pointer-events:none;z-index:3}
 .ring-btn{
   position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:12px 14px;border-radius:999px;
-  min-width:150px;max-width:220px;font-weight:800;color:var(--text-primary);box-shadow:0 8px 30px rgba(0,0,0,0.45);border:none;
+  min-width:150px;max-width:240px;font-weight:800;color:var(--text-primary);box-shadow:0 8px 30px rgba(0,0,0,0.45);border:none;
   transform-origin:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
   z-index:4;
 }
-/* push ring buttons farther out from center and space them around (center-based transforms) */
 .ring-top{ top:50%; left:50%; transform: translate(-50%,-50%) translateY(-150%); }
 .ring-right{ top:50%; left:50%; transform: translate(-50%,-50%) translateX(150%); }
 .ring-bottom{ top:50%; left:50%; transform: translate(-50%,-50%) translateY(150%); }
@@ -85,7 +84,7 @@ body{
 .ring-label{font-size:clamp(14px,2.4vw,20px);line-height:1;display:block;padding:0 6px}
 
 /* Modes grid with names prominent; cards use per-mode translucent accent strip */
-.section-title{text-align:center;font-size:1.6rem;margin-bottom:1rem;color:var(--text-primary);font-weight:700}
+.section-title{text-align:center;font-size:1.45rem;margin-bottom:1rem;color:var(--text-primary);font-weight:700}
 .modes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;padding:6px;margin-top:6px}
 .mode-card{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:12px;background:var(--bg-elevated);border:1px solid var(--border);cursor:pointer;transition:transform 180ms ease,box-shadow 180ms ease;position:relative;overflow:hidden}
 .mode-card:before{
@@ -105,14 +104,18 @@ body{
 .about-note{font-size:0.95rem;margin-top:0.5rem;color:var(--muted)}
 
 /* Dialogs */
-dialog{border:none;border-radius:12px;padding:0;max-width:680px;width:calc(100% - 2rem);background:var(--bg-elevated);color:var(--text-primary);box-shadow:var(--shadow-md)}
+dialog{border:none;border-radius:12px;padding:0;max-width:720px;width:calc(100% - 2rem);background:var(--bg-elevated);color:var(--text-primary);box-shadow:var(--shadow-md)}
 dialog::backdrop{background:rgba(0,0,0,0.6);backdrop-filter:blur(4px)}
 .dialog-content{padding:1.6rem;position:relative}
 .dialog-close{position:absolute;top:12px;right:12px;background:transparent;border:none;color:var(--text-secondary);font-size:1.6rem;cursor:pointer;width:38px;height:38px;border-radius:50%}
 
 /* Quick wins list and buttons */
 .quick-wins-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem}
-.quick-wins-list li{padding:0.8rem;background:var(--bg-elevated);border-radius:8px;border-left:3px solid rgba(0,0,0,0.06);color:var(--text-secondary)}
+.quick-wins-list li{padding:0.8rem;background:var(--bg-elevated);border-radius:8px;border-left:3px solid rgba(0,0,0,0.06);color:var(--text-secondary);display:flex;align-items:center;justify-content:space-between}
+.quick-wins-list button{background:transparent;border:1px solid var(--border);padding:0.35rem 0.6rem;border-radius:8px;color:var(--text-primary);cursor:pointer}
+.quick-wins-list button.active{border-color:var(--brand-color);background:linear-gradient(90deg,var(--brand-color),#00d4c4);color: #081018;font-weight:800}
+
+/* Buttons */
 .btn-primary{background:var(--brand-color);color:var(--text-primary);padding:0.75rem 1.25rem;border-radius:10px;border:none;font-weight:700}
 .btn-secondary{background:transparent;border:1px solid var(--border);color:var(--text-primary);padding:0.6rem 1rem;border-radius:10px}
 .btn-danger{background:#dc2626;color:white;padding:0.6rem 1rem;border-radius:10px}
