@@ -26,7 +26,7 @@
     </div>
 
     <div class="header-right">
-      <div id="streakBadge" class="streak-badge" title="Current streak — days in a row">🔥 0</div>
+      <div id="streakBadge" class="streak-badge" title="Daily streak — days in a row">Daily streak — 🔥 0</div>
 
       <button id="historyBtn" class="header-btn" aria-label="View History">
         <span aria-hidden="true">📊</span> History
@@ -58,7 +58,16 @@
       </div>
 
       <p class="hero-intro">Find your current wellness mode — pick a direction or choose a card below.</p>
-      <button id="replayBtn" class="replay-btn" aria-label="Replay intro animation">🔄 Replay</button>
+    </section>
+
+    <!-- Prominent Quick Wins (separate and more noticeable) -->
+    <section id="quickWinsSection" class="quick-wins-prominent" aria-label="Quick Wins — prominent">
+      <h2 id="quickWinsHeadline">Quick Wins — small, immediate actions</h2>
+      <p class="quick-wins-sub">Tap to toggle a quick win. Click "Complete Selected" to add optional notes and mark activities complete.</p>
+      <div id="topQuickWins" class="top-quick-wins" role="list"></div>
+      <div style="margin-top:10px;">
+        <button id="topCompleteSelectedBtn" class="btn-primary" disabled>Complete Selected</button>
+      </div>
     </section>
 
     <section class="modes-section" aria-label="Wellness Modes">
@@ -93,10 +102,12 @@
       <div class="mode-actions">
         <h3>Activities</h3>
         <ul id="dialogQuickWins" class="quick-wins-list" role="list"></ul>
+
+        <p class="mode-note-help">Select one or more activities. Add optional notes per selected activity before completing.</p>
       </div>
 
       <div class="dialog-actions">
-        <button id="startResetBtn" class="btn-primary" disabled>Begin Activity</button>
+        <button id="startResetBtn" class="btn-primary" disabled>Complete Selected</button>
         <button class="btn-secondary dialog-cancel">Cancel</button>
       </div>
     </div>
@@ -107,11 +118,11 @@
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
       <h2 id="quickWinsTitle">Quick Wins</h2>
-      <p class="mode-description">Short, immediate activities you can do right now. Select one and Begin Activity to log it.</p>
+      <p class="mode-description">Short, immediate activities you can do right now. Select one or more and mark them COMPLETE.</p>
       <ul id="globalQuickWins" class="quick-wins-list" role="list"></ul>
 
       <div class="dialog-actions">
-        <button id="startQuickWinBtn" class="btn-primary" disabled>Begin Activity</button>
+        <button id="startQuickWinBtn" class="btn-primary" disabled>Complete Selected</button>
         <button class="btn-secondary dialog-cancel">Close</button>
       </div>
     </div>
