@@ -1,9 +1,9 @@
-// Robust script that:
-// - ensures modes are always rendered (canonical names and colors)
-// - attaches click handlers to mode cards and compass ring buttons
-// - Quick Wins available only from header or the "Open Quick Wins" link
-// - Title sits above nav (handled in HTML/CSS); navigation buttons respond and fit
-// - ring labels rendered inside compass; wedges visible behind labels
+// Updated script to:
+// - force canonical full names & canonical colors (prevent upstream "Exploring" from showing)
+// - render modes into the four wedges (labels are placed inside each wedge and clickable)
+// - ensure left stripe colors and wedge colors use the canonical color set
+// - increase compass arrow rotation multiplier to 720 (2x previous 360)
+// - robust event delegation so ring labels and mode cards open the mode dialog
 
 (function() {
   'use strict';
@@ -35,7 +35,10 @@
   const themeIcon = document.getElementById('themeIcon');
   const streakBadges = document.querySelectorAll('#streakBadge');
 
-  // canonical defaults
+  // Arrow rotation multiplier — 720 degrees over full page scroll (2x the previous single-rotation).
+  const ARROW_MULTIPLIER = 720;
+
+  // canonical defaults and colors (guaranteed)
   const canonical = {
     4: { id:4, name:'Growing',   description:'Small wins to build momentum', color:'#4DA6FF' },
     3: { id:3, name:'Grounded',  description:'Reset and connect: root into the present', color:'#2ECC71' },
@@ -43,7 +46,6 @@
     1: { id:1, name:'Surviving', description:'Quick resets for focus and energy', color:'#FF6B6B' }
   };
 
-  // quick-wins data
   const quickWinsMap = {
     3: [ 'Plant your feet and do a short stretch', 'Ground with deliberate breath: 4 4 4', 'Put away one distracting item', 'Drink a glass of water' ],
     2: [ 'Take 3 deep breaths', 'Name 3 things you notice around you', 'Lie down and relax for 2 minutes', 'Slow-release breathing for 1 minute' ],
@@ -53,7 +55,7 @@
 
   let modes = [];
 
-  // init
+  // --- init ---
   async function init() {
     applySavedTheme();
     await loadModes();
@@ -67,18 +69,24 @@
     markIntroSeen();
   }
 
-  // load modes.json if available, otherwise use canonical
+  // load modes.json but force canonical names/colors; allow description override only
   async function loadModes() {
     try {
       const res = await fetch('data/modes.json');
       if (res && res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length) {
-          // normalize entries and ensure canonical order and names by id
           const byId = {};
           data.forEach(item => {
             const id = Number(item.id);
-            byId[id] = Object.assign({}, canonical[id] || {}, item);
+            if (!canonical[id]) return;
+            // keep canonical name and color always; allow description to come from file or canonical fallback
+            byId[id] = {
+              id,
+              name: canonical[id].name,
+              color: canonical[id].color,
+              description: item.description ? item.description : canonical[id].description
+            };
           });
           modes = [4,3,2,1].map(id => byId[id] || canonical[id]).filter(Boolean);
           return;
@@ -87,11 +95,10 @@
     } catch (e) {
       console.warn('Could not load data/modes.json, falling back to defaults', e);
     }
-    // fallback
     modes = [canonical[4], canonical[3], canonical[2], canonical[1]];
   }
 
-  // render modes grid
+  // render mode cards (below compass)
   function renderModes() {
     if (!modesGrid) return;
     modesGrid.innerHTML = modes.map(m => {
@@ -110,11 +117,12 @@
     }).join('');
   }
 
-  // render compass ring labels and wedges
+  // render compass wedges and labels (labels inside each wedge)
   function renderCompassRing() {
     if (!compassRing) return;
     compassRing.innerHTML = '';
     buildWedges(modes);
+
     const portion = 360 / (modes.length || 4);
     modes.forEach((mode, idx) => {
       const btn = document.createElement('button');
@@ -125,15 +133,16 @@
       btn.style.setProperty('--angle', `${centerAngle}deg`);
       btn.innerHTML = `<span class="ring-label">${escapeHtml(mode.name)}</span>`;
       const base = mode.color || '#00AFA0';
-      const bg = /^#([A-Fa-f0-9]{6})$/.test(base) ? `${base}66` : `${base}66`;
-      btn.style.background = `linear-gradient(180deg, ${bg}, rgba(0,0,0,0.08))`;
+      btn.style.background = `linear-gradient(180deg, ${base}66, rgba(0,0,0,0.08))`;
       btn.style.setProperty('--mode-color', base);
       btn.style.color = getContrastColor(base);
+      // make sure labels are above wedges
+      btn.style.zIndex = 6;
       compassRing.appendChild(btn);
     });
   }
 
-  // wedges background
+  // create wedge background; wedge alpha slightly stronger for labels readability
   function buildWedges(list) {
     if (!compassWedges) return;
     const N = (list && list.length) || 0;
@@ -149,20 +158,25 @@
     compassWedges.style.background = `conic-gradient(from -45deg, ${entries.join(',')})`;
   }
 
-  // render quick wins full list (dialog)
+  // --- Quick wins dialog list ---
   function renderGlobalQuickWins() {
     if (!globalQuickWinsList) return;
     const items = new Set();
     Object.values(quickWinsMap).forEach(arr => arr.forEach(i => items.add(i)));
-    globalQuickWinsList.innerHTML = Array.from(items).map(w => {
-      return `<li>
-        <div class="activity-row"><span>${escapeHtml(w)}</span><div><button class="select-global-activity" data-activity="${escapeHtml(w)}">Select</button></div></div>
+    globalQuickWinsList.innerHTML = Array.from(items).map(w => `
+      <li>
+        <div class="activity-row">
+          <span>${escapeHtml(w)}</span>
+          <div>
+            <button class="select-global-activity" data-activity="${escapeHtml(w)}">Select</button>
+          </div>
+        </div>
         <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)"></textarea>
-      </li>`;
-    }).join('');
+      </li>
+    `).join('');
   }
 
-  // history/streak helpers
+  // --- History / streak ---
   function initHistory() {
     try { JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { localStorage.setItem(HISTORY_KEY, '[]'); }
   }
@@ -186,7 +200,7 @@
     streakBadges.forEach(b => { if (b) b.textContent = `Daily streak: 🔥 ${s}`; });
   }
 
-  // UI helpers
+  // --- UI helpers ---
   function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   function getContrastColor(hex){
     if(!hex) return '#fff';
@@ -228,32 +242,25 @@
 
   // attach UI listeners (delegation)
   function attachListeners(){
-    // delegation for mode cards & ring buttons
     document.addEventListener('click', (e) => {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
       // mode card
       const modeCard = e.target.closest('.mode-card[data-mode-id]');
-      if (modeCard && modeCard.dataset.modeId) {
-        openModeDialog(Number(modeCard.dataset.modeId));
-        return;
-      }
+      if (modeCard && modeCard.dataset.modeId) { openModeDialog(Number(modeCard.dataset.modeId)); return; }
 
-      // ring-btn
+      // ring label
       const ring = e.target.closest('.ring-btn');
-      if (ring && ring.dataset && ring.dataset.modeId) {
-        openModeDialog(Number(ring.dataset.modeId));
-        return;
-      }
+      if (ring && ring.dataset && ring.dataset.modeId) { openModeDialog(Number(ring.dataset.modeId)); return; }
 
-      // quick wins from header or link
+      // quick wins
       if (e.target.id === 'quickWinsBtn' || e.target.closest('#quickWinsBtn')) { safeShowDialog(quickWinsDialog); return; }
       if (e.target.id === 'quickWinsLink' || e.target.closest('#quickWinsLink')) { safeShowDialog(quickWinsDialog); return; }
 
       // history
       if (e.target.id === 'historyBtn' || e.target.closest('#historyBtn')) { openHistoryDialog(); return; }
 
-      // quick-wins dialog select toggles
+      // quick-wins dialog selects
       const gSel = e.target.closest('.select-global-activity');
       if (gSel && gSel.dataset && gSel.dataset.activity) {
         e.preventDefault();
@@ -270,13 +277,13 @@
         if (d) { safeCloseDialog(d); clearDialogSelections(d); }
       }
 
-      // theme toggle
+      // theme
       if (e.target.id === 'themeToggle' || e.target.closest('#themeToggle')) {
         setTheme(document.documentElement.classList.contains('light') ? 'dark' : 'light');
       }
     }, true);
 
-    // start quick wins in dialog
+    // start quick wins action
     if (startQuickWinBtn) {
       startQuickWinBtn.addEventListener('click', () => {
         const selected = Array.from(globalQuickWinsList.querySelectorAll('.select-global-activity.active'));
@@ -291,7 +298,7 @@
       });
     }
 
-    // start reset in mode dialog
+    // startResetBtn in mode dialog
     if (startResetBtn) {
       startResetBtn.addEventListener('click', () => {
         const selected = Array.from(dialogQuickWins.querySelectorAll('.select-activity.active'));
@@ -306,16 +313,16 @@
       });
     }
 
-    // keyboard escape close
+    // keyboard
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') { safeCloseDialog(modeDialog); safeCloseDialog(quickWinsDialog); safeCloseDialog(historyDialog); clearDialogSelections(); }
     });
 
-    // re-render ring on resize
+    // resize -> re-render ring (to adjust label positions)
     window.addEventListener('resize', () => { renderCompassRing(); });
   }
 
-  // open mode dialog and populate quickwins
+  // open mode dialog
   let currentMode = null;
   function openModeDialog(modeId) {
     const m = modes.find(x => Number(x.id) === Number(modeId));
@@ -343,16 +350,16 @@
     safeShowDialog(modeDialog);
   }
 
-  // clear selections
+  // clear dialog selections
   function clearDialogSelections(d) {
-    if (dialogQuickWins) { dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t => { t.classList.remove('visible'); t.value=''; }); }
-    if (globalQuickWinsList) { globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => b.classList.remove('active')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t => { t.classList.remove('visible'); t.value=''; }); }
+    if (dialogQuickWins) { dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t=>{t.classList.remove('visible'); t.value='';}); }
+    if (globalQuickWinsList) { globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => b.classList.remove('active')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t=>{t.classList.remove('visible'); t.value='';}); }
     if (startResetBtn) startResetBtn.disabled = true;
     if (startQuickWinBtn) startQuickWinBtn.disabled = true;
     if (d === modeDialog) currentMode = null;
   }
 
-  // history dialog (simple)
+  // open history dialog
   function openHistoryDialog() {
     if (!historyDialog) return;
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
@@ -372,13 +379,13 @@
     safeShowDialog(historyDialog);
   }
 
-  // smooth arrow (lerp)
+  // smooth arrow lerp loop using ARROW_MULTIPLIER
   let targetAngle = 0, currentAngle = 0, arrowAnimating = false;
   function startArrowLoop() {
     function onScroll(){
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const pct = max>0 ? (window.scrollY/max) : 0;
-      targetAngle = pct * 360;
+      targetAngle = pct * ARROW_MULTIPLIER;
       if (!arrowAnimating) { arrowAnimating = true; requestAnimationFrame(animate); }
     }
     window.addEventListener('scroll', () => requestAnimationFrame(onScroll), {passive:true});
@@ -403,14 +410,13 @@
     if (themeIcon) themeIcon.textContent = name === 'light' ? '☀️' : '🌙';
   }
 
-  // util
   function markIntroSeen(){ try{ if (!localStorage.getItem(INTRO_SEEN_KEY)) localStorage.setItem(INTRO_SEEN_KEY, '1'); }catch(e){} }
 
   // start
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
-  // expose small helpers for debugging from console
+  // expose helpers for debugging
   window.__rc = { renderModes, renderCompassRing, buildWedges, openModeDialog };
 
 })();
