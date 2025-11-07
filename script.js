@@ -1,5 +1,10 @@
-// Updated script.js: multi-select activities, per-activity notes, prominent quick-wins pills,
-// nightly-longest streak tracking, "Daily streak" label and history longest streak display.
+// Updates:
+// - Smooth arrow spin using lerp animation loop (requestAnimationFrame) for fluid rotation
+// - Quick Wins moved below modes and rendered as cards (same style as mode cards)
+// - Clicking a quick-win card opens the Quick Wins dialog with that activity preselected (notes + complete)
+// - Daily streak moved above compass; header simplified and responsive
+// - Ensures modes and quick-wins use the same preferred order and "Exploring" -> "Drifting" normalization
+
 (function() {
   'use strict';
 
@@ -14,12 +19,16 @@
   const LAST_DAY_KEY = 'resetCompassLastDay';
   const LONGEST_KEY = 'resetCompassLongest';
 
-  const ROTATION_MULTIPLIER = 720;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   let historyCache = null;
   let historyFlushTimer = null;
   const HISTORY_FLUSH_DELAY = 700;
+
+  // arrow animation state for smooth rotation
+  let targetAngle = 0;
+  let currentAngle = 0;
+  let arrowAnimating = false;
 
   // Quick wins mapping (keys are mode ids)
   const quickWinsMap = {
@@ -62,11 +71,11 @@
     initHistoryCache();
     updateStreakDisplay();
     renderModes();
+    renderTopQuickWins();  // now renders quick wins as cards
     renderCompassRing();
     renderGlobalQuickWins();
-    renderTopQuickWins();
     setupEventListeners();
-    if (!prefersReducedMotion) setupScrollAnimation();
+    if (!prefersReducedMotion) startArrowAnimationLoop();
     markIntroSeen();
   }
 
@@ -75,10 +84,13 @@
     try {
       const res = await fetch('data/modes.json');
       if (!res.ok) throw new Error('Modes load failed');
-      modes = await res.json();
-      if (!modes || !Array.isArray(modes) || modes.length === 0) throw new Error('No modes in file');
+      const loaded = await res.json();
+      if (loaded && Array.isArray(loaded) && loaded.length) {
+        modes = loaded;
+      } else {
+        throw new Error('No modes in file');
+      }
     } catch (e) {
-      // Fallback order requested: Growing, Grounded, Drifting, Surviving
       modes = [
         { id: 4, name: 'Growing',   description: 'Small wins to build momentum', color:'#4DA6FF' },
         { id: 3, name: 'Grounded',  description: 'Reset and connect — root into the present', color:'#2ECC71' },
@@ -86,17 +98,31 @@
         { id: 1, name: 'Surviving', description: 'Quick resets for focus and energy', color:'#FF6B6B' }
       ];
     }
+
+    // Normalize names: map upstream "Exploring" to "Drifting" for id 2
+    modes = modes.map(m => {
+      if (m.id === 2 && m.name && /explor/i.test(m.name)) {
+        return Object.assign({}, m, { name: 'Drifting' });
+      }
+      return m;
+    });
+
+    // Reorder to preferred visual order: Growing, Grounded, Drifting, Surviving
+    const preferOrder = [4,3,2,1];
+    const ordered = [];
+    preferOrder.forEach(id => {
+      const found = modes.find(x => Number(x.id) === id);
+      if (found) ordered.push(found);
+    });
+    // append any remaining modes
+    modes.forEach(m => { if (!ordered.find(o => o.id === m.id)) ordered.push(m); });
+    modes = ordered;
   }
 
   // --- History / Streak management ---
   function initHistoryCache() {
-    try {
-      historyCache = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-    } catch (e) {
-      historyCache = [];
-    }
+    try { historyCache = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { historyCache = []; }
   }
-
   function bufferedSaveHistory(latest) {
     historyCache = latest;
     if (historyFlushTimer) clearTimeout(historyFlushTimer);
@@ -105,18 +131,9 @@
       historyFlushTimer = null;
     }, HISTORY_FLUSH_DELAY);
   }
+  function getHistory() { if (historyCache === null) initHistoryCache(); return historyCache || []; }
+  function todayKey() { return new Date().toISOString().split('T')[0]; }
 
-  function getHistory() {
-    if (historyCache === null) initHistoryCache();
-    return historyCache || [];
-  }
-
-  function todayKey() {
-    const d = new Date();
-    return d.toISOString().split('T')[0];
-  }
-
-  // On a recorded activity, increment streak if needed and update longest
   function incrementStreakIfNeeded() {
     try {
       const lastDay = localStorage.getItem(LAST_DAY_KEY);
@@ -126,8 +143,7 @@
 
       if (lastDay === today) return;
 
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
       const yKey = yesterday.toISOString().split('T')[0];
 
       if (lastDay === yKey) streak = streak + 1;
@@ -141,25 +157,16 @@
       localStorage.setItem(STREAK_KEY, String(streak));
       localStorage.setItem(LAST_DAY_KEY, today);
       updateStreakDisplay();
-    } catch (e) {
-      console.warn('streak update failed', e);
-    }
+    } catch (e) { console.warn('streak update failed', e); }
   }
 
   function updateStreakDisplay() {
     const streak = Number(localStorage.getItem(STREAK_KEY) || 0);
-    streakBadges.forEach(b => {
-      if (b) b.textContent = `Daily streak — 🔥 ${streak}`;
-    });
+    streakBadges.forEach(b => { if (b) b.textContent = `Daily streak — 🔥 ${streak}`; });
   }
 
   // --- Helpers ---
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function(m) {
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
-    });
-  }
-
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   function getContrastColor(hex) {
     if (!hex) return '#fff';
     const h = hex.replace('#','').trim();
@@ -169,66 +176,46 @@
     const luminance = (0.299*r + 0.587*g + 0.114*b);
     return luminance > 186 ? '#000' : '#fff';
   }
-
   function safeShowDialog(d) {
     if (!d) return;
     if (typeof d.showModal === 'function') {
-      try {
-        d.showModal();
-        const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-        if (f) f.focus();
-      } catch (e) {
-        d.style.display = 'none';
-        alert(d.textContent || 'Dialog opened');
-      }
-    } else {
-      const title = d.querySelector('h2') ? d.querySelector('h2').textContent : '';
-      const txt = Array.from(d.querySelectorAll('p, li')).map(n => n.textContent.trim()).filter(Boolean).join('\n');
-      alert((title ? title + '\n\n' : '') + txt);
-    }
+      try { d.showModal(); const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); if (f) f.focus(); } catch (e) { d.style.display = 'none'; alert(d.textContent || 'Dialog opened'); }
+    } else { const title = d.querySelector('h2') ? d.querySelector('h2').textContent : ''; const txt = Array.from(d.querySelectorAll('p, li')).map(n => n.textContent.trim()).filter(Boolean).join('\n'); alert((title ? title + '\n\n' : '') + txt); }
   }
+  function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
-  function safeCloseDialog(d) {
-    if (!d) return;
-    try {
-      if (typeof d.close === 'function' && d.open) d.close();
-    } catch (e) {
-      // ignore
-    }
-  }
-
-  // --- Render modes grid ---
+  // --- Rendering ---
   function renderModes() {
     if (!modesGrid) return;
-    if (!Array.isArray(modes) || modes.length === 0) {
-      modesGrid.innerHTML = '<p class="no-js-message">No modes available.</p>';
-      return;
-    }
-
-    modesGrid.innerHTML = modes.map(mode => {
-      const safeName = escapeHtml(mode.name || 'Mode');
-      const safeDesc = escapeHtml(mode.description || '');
-      const color = mode.color || '#00AFA0';
-      const initials = safeName.split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
-      return `
-        <button class="mode-card" data-mode-id="${mode.id}" aria-label="Select ${safeName} mode" style="--mode-color:${color}">
-          <div class="meta-top">
-            <div class="mode-icon" aria-hidden="true" style="background: linear-gradient(180deg, ${color}33, transparent); color:${getContrastColor(color)}">${initials}</div>
-            <div class="mode-meta">
-              <div class="mode-name">${safeName}</div>
-              <div class="mode-desc">${safeDesc}</div>
-            </div>
-          </div>
-          <div class="mode-actions-row">
-            <div class="mode-hint">Tap to open activities</div>
-            <button class="card-begin" data-mode-id="${mode.id}" aria-label="Open ${safeName}">Open</button>
-          </div>
-        </button>
-      `;
-    }).join('');
+    if (!Array.isArray(modes) || modes.length === 0) { modesGrid.innerHTML = '<p class="no-js-message">No modes available.</p>'; return; }
+    modesGrid.innerHTML = modes.map(mode => makeModeCardHTML(mode)).join('');
   }
 
-  // --- Compass ring + wedges (aligned) ---
+  // create card HTML used for both modes and quick-wins (re-used)
+  function makeModeCardHTML(item, opts = {}) {
+    const safeName = escapeHtml(item.name || item);
+    const safeDesc = escapeHtml(item.description || '');
+    const color = item.color || opts.color || '#00AFA0';
+    const initials = (item.name || (item + '')).split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
+    const dataAttr = opts.isQuickWin ? `data-activity="${escapeHtml(typeof item === 'string' ? item : item.name)}"` : `data-mode-id="${item.id}"`;
+    return `
+      <button class="mode-card ${opts.isQuickWin ? 'quick-win-card' : ''}" ${dataAttr} aria-label="${safeName}" style="--mode-color:${color}">
+        <div class="meta-top">
+          <div class="mode-icon" aria-hidden="true" style="background: linear-gradient(180deg, ${color}33, transparent); color:${getContrastColor(color)}">${initials}</div>
+          <div class="mode-meta">
+            <div class="mode-name">${safeName}</div>
+            <div class="mode-desc">${safeDesc || (opts.isQuickWin ? '' : '')}</div>
+          </div>
+        </div>
+        <div class="mode-actions-row">
+          <div class="mode-hint">${opts.isQuickWin ? 'Tap to open quick win' : 'Tap to open activities'}</div>
+          <button class="card-begin" ${opts.isQuickWin ? `data-activity="${escapeHtml(typeof item === 'string' ? item : item.name)}"` : `data-mode-id="${item.id}"`} aria-label="Open ${safeName}">Open</button>
+        </div>
+      </button>
+    `;
+  }
+
+  // Compass ring + wedges
   function renderCompassRing() {
     if (!compassRing) return;
     compassRing.innerHTML = '';
@@ -245,46 +232,33 @@
       btn.className = `ring-btn`;
       btn.dataset.modeId = mode.id;
       btn.setAttribute('aria-label', `${mode.name} mode`);
-
-      // center of wedge (start + portion/2) and adjust for 'from -45deg' in conic gradient used below
       const centerAngle = Math.round(((idx + 0.5) * portion) - 45);
       btn.style.setProperty('--angle', `${centerAngle}deg`);
-
       btn.innerHTML = `<span class="ring-label">${escapeHtml(mode.name)}</span>`;
-
       const base = mode.color || '#00AFA0';
       const bg = /^#([A-Fa-f0-9]{6})$/.test(base) ? `${base}22` : `${base}22`;
       btn.style.background = `linear-gradient(180deg, ${bg}, rgba(0,0,0,0.06))`;
       btn.style.setProperty('--mode-color', base);
       btn.style.color = getContrastColor(base);
-
       compassRing.appendChild(btn);
     });
   }
 
-  // Preferred visual order: Growing, Grounded, Drifting, Surviving
   function getPreferredRingModes() {
     const preferOrder = [4,3,2,1];
     const chosen = [];
     preferOrder.forEach(id => {
-      const m = modes.find(x => x.id === id);
+      const m = modes.find(x => Number(x.id) === id);
       if (m) chosen.push(m);
     });
-    if (chosen.length < 4) {
-      modes.forEach(m => {
-        if (!chosen.find(x => x.id === m.id)) chosen.push(m);
-      });
-    }
+    if (chosen.length < 4) modes.forEach(m => { if (!chosen.find(x => x.id === m.id)) chosen.push(m); });
     return chosen.slice(0,4);
   }
 
   function buildWedges(chosenModes) {
     if (!compassWedges) return;
     const N = chosenModes.length || 0;
-    if (N === 0) {
-      compassWedges.style.background = 'transparent';
-      return;
-    }
+    if (N === 0) { compassWedges.style.background = 'transparent'; return; }
     const portion = 360 / N;
     const entries = chosenModes.map((m, i) => {
       const color = (m && m.color) ? m.color : '#00AFA0';
@@ -293,43 +267,20 @@
       const end = Math.round((i + 1) * portion);
       return `${stopColor} ${start}deg ${end}deg`;
     });
-    // Align wedges to match button centers by using 'from -45deg'
     compassWedges.style.background = `conic-gradient(from -45deg, ${entries.join(',')})`;
   }
 
-  // --- Mode dialog: multi-select with per-activity notes ---
-  function openModeDialog(modeId) {
-    const m = modes.find(x => x.id === Number(modeId));
-    if (!m) return;
-    currentMode = m;
-    if (startResetBtn) startResetBtn.disabled = true;
-
-    const titleEl = document.getElementById('modeDialogTitle');
-    const descEl = document.getElementById('dialogModeDescription');
-
-    if (titleEl) titleEl.textContent = m.name;
-    if (descEl) descEl.textContent = m.description || '';
-
-    // populate activities with per-activity note placeholders
-    if (dialogQuickWins) {
-      const quickWins = quickWinsMap[m.id] || [];
-      dialogQuickWins.innerHTML = quickWins.map(w => `
-        <li>
-          <div class="activity-row">
-            <span>${escapeHtml(w)}</span>
-            <div>
-              <button class="select-activity" data-activity="${escapeHtml(w)}">Select</button>
-            </div>
-          </div>
-          <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)"></textarea>
-        </li>
-      `).join('');
-    }
-
-    safeShowDialog(modeDialog);
+  // Quick wins as cards below modes (uses mode-card style)
+  function renderTopQuickWins() {
+    if (!topQuickWinsContainer) return;
+    const items = [];
+    Object.values(quickWinsMap).forEach(arr => arr.forEach(i => { if (!items.includes(i)) items.push(i); }));
+    // show more cards but keep grid responsive
+    const top = items.slice(0, 12);
+    topQuickWinsContainer.innerHTML = top.map(w => makeModeCardHTML(w, { isQuickWin: true })).join('');
   }
 
-  // --- Global quick wins rendering (dialog) ---
+  // Global quick wins dialog list (full list)
   function renderGlobalQuickWins() {
     if (!globalQuickWinsList) return;
     const items = new Set();
@@ -347,26 +298,7 @@
     `).join('');
   }
 
-  // --- Top quick wins prominent pills ---
-  function renderTopQuickWins() {
-    if (!topQuickWinsContainer) return;
-    const items = [];
-    Object.values(quickWinsMap).forEach(arr => arr.forEach(i => {
-      if (!items.includes(i)) items.push(i);
-    }));
-    const top = items.slice(0,4);
-    topQuickWinsContainer.innerHTML = top.map((w, i) => `
-      <div class="quick-win-pill" role="listitem" data-activity="${escapeHtml(w)}">
-        <div class="pill-title">${escapeHtml(w)}</div>
-        <button class="pill-action" data-activity="${escapeHtml(w)}">Toggle</button>
-      </div>
-    `).join('');
-
-    // disable topCompleteSelected until at least one pill is active
-    if (topCompleteSelectedBtn) topCompleteSelectedBtn.disabled = true;
-  }
-
-  // Record multiple activities as separate history entries
+  // --- Recording activities ---
   function recordActivities(entries) {
     if (!Array.isArray(entries) || entries.length === 0) return;
     const h = getHistory();
@@ -382,15 +314,12 @@
       h.push(entry);
     });
     bufferedSaveHistory(h);
-
-    // increment streak once per session of recorded activities
     incrementStreakIfNeeded();
     updateStreakDisplay();
-
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
   }
 
-  // --- History UI (now includes longest streak) ---
+  // --- History UI ---
   function openHistoryDialog() {
     if (!historyDialog) return;
     const history = getHistory();
@@ -423,32 +352,11 @@
     safeShowDialog(historyDialog);
   }
 
-  function exportHistory() {
-    const data = JSON.stringify(getHistory(), null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `reset-compass-history-${todayKey()}.json`;
-    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  }
-
-  function clearHistory() {
-    if (!confirm('Clear all reset history? This cannot be undone.')) return;
-    historyCache = [];
-    try { localStorage.removeItem(HISTORY_KEY); } catch (e) {}
-    try { safeCloseDialog(historyDialog); } catch (e) {}
-    showToast('History cleared');
-  }
+  function exportHistory() { const data = JSON.stringify(getHistory(), null, 2); const blob = new Blob([data], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `reset-compass-history-${todayKey()}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+  function clearHistory() { if (!confirm('Clear all reset history? This cannot be undone.')) return; historyCache = []; try { localStorage.removeItem(HISTORY_KEY); } catch (e) {} try { safeCloseDialog(historyDialog); } catch (e) {} showToast('History cleared'); }
 
   // --- UI utilities ---
-  function showToast(text, ms = 1400) {
-    const el = document.createElement('div');
-    el.className = 'rc-toast';
-    el.textContent = text;
-    document.body.appendChild(el);
-    requestAnimationFrame(() => el.classList.add('visible'));
-    setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 240); }, ms);
-  }
+  function showToast(text, ms = 1400) { const el = document.createElement('div'); el.className = 'rc-toast'; el.textContent = text; document.body.appendChild(el); requestAnimationFrame(() => el.classList.add('visible')); setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 240); }, ms); }
 
   // --- Theme ---
   function applySavedTheme() {
@@ -465,43 +373,32 @@
     if (themeIcon) themeIcon.textContent = name === 'light' ? '☀️' : '🌙';
   }
 
-  // --- Event listeners ---
+  // --- Event listeners & interactions ---
   function setupEventListeners() {
-    // Delegation for mode-cards, ring buttons, quick-win pills and activity selection
+    // Delegation for mode-cards, ring buttons, quick-win cards and activity selection
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
-      // pill toggle
-      const pill = e.target.closest('.quick-win-pill');
-      if (pill && pill.dataset && pill.dataset.activity) {
-        pill.classList.toggle('active');
-        updateTopCompleteButton();
+      // Quick-win card container or Open button
+      const qCard = e.target.closest('.quick-win-card');
+      if (qCard && qCard.dataset && qCard.dataset.activity) {
+        const activity = qCard.dataset.activity;
+        openQuickWinsDialogWithActivities([activity]);
         return;
       }
-      const pillAction = e.target.closest('.pill-action');
-      if (pillAction && pillAction.dataset && pillAction.dataset.activity) {
-        const p = pillAction.closest('.quick-win-pill');
-        if (p) { p.classList.toggle('active'); updateTopCompleteButton(); }
-        return;
-      }
-
-      // top "Complete Selected" clicked
-      if (e.target.id === 'topCompleteSelectedBtn') {
-        const selected = Array.from(document.querySelectorAll('.quick-win-pill.active')).map(p => p.dataset.activity).filter(Boolean);
-        if (!selected.length) return;
-        openQuickWinsDialogWithActivities(selected);
+      const qOpen = e.target.closest('.card-begin[data-activity]');
+      if (qOpen && qOpen.dataset.activity) {
+        openQuickWinsDialogWithActivities([qOpen.dataset.activity]);
         return;
       }
 
-      // card-begin/open CTA has priority
-      const cbtn = e.target.closest('.card-begin');
+      // Mode Open CTA or card
+      const cbtn = e.target.closest('.card-begin[data-mode-id]');
       if (cbtn && cbtn.dataset && cbtn.dataset.modeId) {
         openModeDialog(Number(cbtn.dataset.modeId));
         return;
       }
-
-      // Mode card
-      const card = e.target.closest('.mode-card');
+      const card = e.target.closest('.mode-card[data-mode-id]');
       if (card && card.dataset && card.dataset.modeId) {
         openModeDialog(Number(card.dataset.modeId));
         return;
@@ -514,48 +411,44 @@
         return;
       }
 
-      // Select activity inside mode dialog (toggle, multi-select)
+      // Select activity inside mode dialog (toggle)
       const selBtn = e.target.closest('.select-activity');
       if (selBtn && selBtn.dataset && selBtn.dataset.activity) {
         e.preventDefault();
         selBtn.classList.toggle('active');
         const li = selBtn.closest('li');
-        if (li) {
-          const ta = li.querySelector('.activity-note');
-          if (ta) ta.classList.toggle('visible', selBtn.classList.contains('active'));
-        }
-        // enable complete when at least one selected
+        if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.classList.toggle('visible', selBtn.classList.contains('active')); }
         if (startResetBtn) startResetBtn.disabled = dialogQuickWins && dialogQuickWins.querySelectorAll('.select-activity.active').length === 0;
         return;
       }
 
-      // Select activity inside global quick wins (toggle, multi-select)
+      // Select activity inside global quick wins (dialog)
       const gSel = e.target.closest('.select-global-activity');
       if (gSel && gSel.dataset && gSel.dataset.activity) {
         e.preventDefault();
         gSel.classList.toggle('active');
         const li = gSel.closest('li');
-        if (li) {
-          const ta = li.querySelector('.activity-note');
-          if (ta) ta.classList.toggle('visible', gSel.classList.contains('active'));
-        }
+        if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.classList.toggle('visible', gSel.classList.contains('active')); }
         if (startQuickWinBtn) startQuickWinBtn.disabled = globalQuickWinsList && globalQuickWinsList.querySelectorAll('.select-global-activity.active').length === 0;
         return;
       }
-    }, true /* capture early */);
 
-    // Dialog close/cancel buttons: clear selection on close
+      // header quick wins and history
+      if (e.target.id === 'quickWinsBtn' || e.target.closest('#quickWinsBtn')) { if (quickWinsDialog) safeShowDialog(quickWinsDialog); return; }
+      if (e.target.id === 'historyBtn' || e.target.closest('#historyBtn')) { openHistoryDialog(); return; }
+
+      // topCompleteSelectedBtn not present now (quick wins below)
+    }, true);
+
+    // Dialog close/cancel cleanup
     document.querySelectorAll('.dialog-close, .dialog-cancel').forEach(b => {
       b.addEventListener('click', (e) => {
         const d = e.target.closest('dialog');
-        if (d) {
-          safeCloseDialog(d);
-          clearDialogSelections(d);
-        }
+        if (d) { safeCloseDialog(d); clearDialogSelections(d); }
       });
     });
 
-    // startResetBtn: complete selected activities from mode dialog
+    // startResetBtn in mode dialog
     if (startResetBtn) {
       startResetBtn.addEventListener('click', function() {
         if (!dialogQuickWins) return;
@@ -578,7 +471,7 @@
       });
     }
 
-    // startQuickWinBtn: complete selected quick wins (multiple)
+    // startQuickWinBtn in quick wins dialog
     if (startQuickWinBtn) {
       startQuickWinBtn.addEventListener('click', function() {
         if (!globalQuickWinsList) return;
@@ -599,76 +492,66 @@
       });
     }
 
-    // header: history button, quick wins, theme toggle
-    if (historyBtn) historyBtn.addEventListener('click', openHistoryDialog);
-    if (quickWinsBtn) quickWinsBtn.addEventListener('click', () => { if (quickWinsDialog) safeShowDialog(quickWinsDialog); });
+    // header theme toggle
     if (themeToggle) themeToggle.addEventListener('click', () => setTheme(document.documentElement.classList.contains('light') ? 'dark' : 'light'));
-
-    // topCompleteSelectedBtn action (handled as delegated earlier)
-    if (topCompleteSelectedBtn) {
-      topCompleteSelectedBtn.addEventListener('click', () => {
-        const selected = Array.from(document.querySelectorAll('.quick-win-pill.active')).map(p => p.dataset.activity).filter(Boolean);
-        if (selected.length) openQuickWinsDialogWithActivities(selected);
-      });
-    }
 
     // export/clear
     const exportBtn = document.getElementById('exportHistoryBtn'); if (exportBtn) exportBtn.addEventListener('click', exportHistory);
     const clearBtn = document.getElementById('clearHistoryBtn'); if (clearBtn) clearBtn.addEventListener('click', clearHistory);
 
-    // keyboard: open focused cards with Enter/Space; Esc closes
+    // keyboard
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        safeCloseDialog(modeDialog);
-        safeCloseDialog(historyDialog);
-        safeCloseDialog(quickWinsDialog);
-        clearDialogSelections();
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        const active = document.activeElement;
-        if (active) {
-          if (active.classList.contains('mode-card') || active.classList.contains('ring-btn')) {
-            const id = Number(active.dataset.modeId);
-            if (id) { e.preventDefault(); openModeDialog(id); }
-          }
-        }
-      }
+      if (e.key === 'Escape') { safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections(); }
     });
 
-    // scroll arrow rotation (passive + rAF)
-    if (!prefersReducedMotion && compassArrow) {
-      let ticking = false;
-      window.addEventListener('scroll', function() {
-        if (!ticking) {
-          window.requestAnimationFrame(() => {
-            const scrollY = window.scrollY;
-            const max = document.documentElement.scrollHeight - window.innerHeight;
-            const pct = max > 0 ? scrollY / max : 0;
-            const rot = pct * ROTATION_MULTIPLIER;
-            if (compassArrow) compassArrow.style.transform = `translate(-50%, -50%) rotate(${rot}deg)`;
-            ticking = false;
-          });
-          ticking = true;
-        }
-      }, { passive: true });
-    }
-
-    // native dialog close event cleanup
+    // dialog close cleanup
     ['modeDialog','quickWinsDialog','historyDialog'].forEach(id => {
       const d = document.getElementById(id);
-      if (d) {
-        d.addEventListener('close', () => clearDialogSelections(d));
-      }
+      if (d) d.addEventListener('close', () => clearDialogSelections(d));
     });
+
+    // on resize, ensure ring re-renders if needed
+    window.addEventListener('resize', () => { renderCompassRing(); });
   }
 
-  // Open quick-wins dialog and preselect multiple activities
+  // open mode dialog
+  function openModeDialog(modeId) {
+    const m = modes.find(x => x.id === Number(modeId));
+    if (!m) return;
+    currentMode = m;
+    if (startResetBtn) startResetBtn.disabled = true;
+
+    const titleEl = document.getElementById('modeDialogTitle');
+    const descEl = document.getElementById('dialogModeDescription');
+
+    if (titleEl) titleEl.textContent = m.name;
+    if (descEl) descEl.textContent = m.description || '';
+
+    if (dialogQuickWins) {
+      const quickWins = quickWinsMap[m.id] || [];
+      dialogQuickWins.innerHTML = quickWins.map(w => `
+        <li>
+          <div class="activity-row">
+            <span>${escapeHtml(w)}</span>
+            <div>
+              <button class="select-activity" data-activity="${escapeHtml(w)}">Select</button>
+            </div>
+          </div>
+          <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)"></textarea>
+        </li>
+      `).join('');
+    }
+
+    safeShowDialog(modeDialog);
+  }
+
+  // open quick wins dialog preselecting activities
   function openQuickWinsDialogWithActivities(activities) {
     if (!quickWinsDialog) return;
     safeShowDialog(quickWinsDialog);
     renderGlobalQuickWins();
     setTimeout(() => {
       if (!globalQuickWinsList) return;
-      // Toggle matching buttons active and reveal notes
       globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => {
         if (activities.includes(b.dataset.activity)) {
           b.classList.add('active');
@@ -679,51 +562,53 @@
           }
         }
       });
-      if (startQuickWinBtn) {
-        startQuickWinBtn.disabled = globalQuickWinsList.querySelectorAll('.select-global-activity.active').length === 0;
-      }
-    }, 60);
+      if (startQuickWinBtn) startQuickWinBtn.disabled = globalQuickWinsList.querySelectorAll('.select-global-activity.active').length === 0;
+    }, 50);
   }
 
-  // clear selection state when dialogs close
+  // clear selections
   function clearDialogSelections(d) {
-    if (dialogQuickWins) {
-      dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active'));
-      dialogQuickWins.querySelectorAll('.activity-note').forEach(t => t.classList.remove('visible'));
-      dialogQuickWins.querySelectorAll('.activity-note').forEach(t => t.value = '');
-    }
-    if (globalQuickWinsList) {
-      globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => b.classList.remove('active'));
-      globalQuickWinsList.querySelectorAll('.activity-note').forEach(t => t.classList.remove('visible'));
-      globalQuickWinsList.querySelectorAll('.activity-note').forEach(t => t.value = '');
-    }
+    if (dialogQuickWins) { dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t => t.classList.remove('visible')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t => t.value = ''); }
+    if (globalQuickWinsList) { globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => b.classList.remove('active')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t => t.classList.remove('visible')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t => t.value = ''); }
     if (startResetBtn) startResetBtn.disabled = true;
-    if (startQuickWinBtn) {
-      startQuickWinBtn.disabled = true;
-      delete startQuickWinBtn.dataset.activity;
-    }
+    if (startQuickWinBtn) { startQuickWinBtn.disabled = true; delete startQuickWinBtn.dataset.activity; }
     if (d === modeDialog) currentMode = null;
+  }
 
-    // reset top quick-wins selection and button state
-    if (d === quickWinsDialog || d === modeDialog) {
-      updateTopCompleteButton();
-      if (topQuickWinsContainer) {
-        // leave top pill selection as-is; user can decide
+  // --- Smooth arrow animation (lerp) ---
+  function startArrowAnimationLoop() {
+    // compute targetAngle on scroll
+    let ticking = false;
+    function onScroll() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = max > 0 ? (window.scrollY / max) : 0;
+      // multiplier gives many rotations over full scroll; reduce from previous to soften
+      targetAngle = pct * 360; // one full rotation over full page scroll for smoother result
+      if (!arrowAnimating) { arrowAnimating = true; requestAnimationFrame(animateArrow); }
+    }
+
+    window.addEventListener('scroll', () => { if (!ticking) { requestAnimationFrame(() => { onScroll(); ticking = false; }); ticking = true; } }, { passive: true });
+
+    function animateArrow() {
+      // lerp towards targetAngle for smoothness
+      currentAngle += (targetAngle - currentAngle) * 0.12; // smoothing factor
+      if (compassArrow) compassArrow.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg)`;
+      // stop condition when close to target to avoid continuous CPU use
+      if (Math.abs(targetAngle - currentAngle) > 0.01) {
+        requestAnimationFrame(animateArrow);
+      } else {
+        arrowAnimating = false;
       }
     }
+
+    // initialize
+    onScroll();
   }
 
-  function updateTopCompleteButton() {
-    if (!topCompleteSelectedBtn) return;
-    const any = document.querySelectorAll('.quick-win-pill.active').length > 0;
-    topCompleteSelectedBtn.disabled = !any;
-  }
-
-  function setupScrollAnimation() { /* handled in setupEventListeners */ }
-
+  // --- start/boot ---
   function markIntroSeen() { try { if (!localStorage.getItem(INTRO_SEEN_KEY)) localStorage.setItem(INTRO_SEEN_KEY, '1'); } catch (e) {} }
 
-  // Start
+  // Start app
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
