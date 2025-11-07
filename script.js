@@ -1,4 +1,4 @@
-// The Reset Compass - Main Application Script (updated: compass ring + manifest fix)
+// The Reset Compass - Main Application Script (final, clean)
 (function() {
   'use strict';
 
@@ -9,7 +9,7 @@
   const HISTORY_KEY = 'resetCompassHistory';
   const INTRO_SEEN_KEY = 'resetCompassIntroSeen';
 
-  // Quick wins placeholder data per mode (unchanged)
+  // Quick wins placeholder data per mode
   const quickWinsMap = {
     1: [ 'Take 3 deep breaths', 'Drink a glass of water', 'Step outside for 2 minutes', 'Set one tiny goal for today' ],
     2: [ "Write down 3 things you're grateful for", 'Take a 10-minute walk', 'Call or text a friend', 'Tidy one small space' ],
@@ -36,7 +36,7 @@
     try {
       await loadModes();
       renderModes();
-      renderCompassRing(); // new: show modes as directions on compass
+      renderCompassRing(); // show modes as directions on compass
       setupEventListeners();
       setupScrollAnimation();
       playIntroAnimation();
@@ -44,11 +44,11 @@
       setupInstallPrompt();
     } catch (error) {
       console.error('Failed to initialize app:', error);
-      modesGrid.innerHTML = '<p class="no-js-message">Failed to load modes. Please refresh the page.</p>';
+      if (modesGrid) modesGrid.innerHTML = '<p class="no-js-message">Failed to load modes. Please refresh the page.</p>';
     }
   }
 
-  // Load modes from JSON (relative path to avoid host-root mismatch)
+  // Load modes from JSON (relative path)
   async function loadModes() {
     const response = await fetch('data/modes.json');
     if (!response.ok) {
@@ -59,6 +59,7 @@
 
   // Render mode cards (list under the compass)
   function renderModes() {
+    if (!modesGrid) return;
     if (!Array.isArray(modes) || modes.length === 0) {
       modesGrid.innerHTML = '<p class="no-js-message">No modes available.</p>';
       return;
@@ -89,18 +90,17 @@
     });
   }
 
-  // Render compass ring (four buttons around the compass) so directions become modes
+  // Render compass ring (four buttons around the compass)
   function renderCompassRing() {
-    if (!compassRing) return;
+    if (!compassRing || !Array.isArray(modes)) return;
     compassRing.innerHTML = '';
 
-    // Map modes to compass positions. If repo's modes are stable, map explicitly by id:
-    // top: id 4 (Growing), right: id 2 (Drifting), bottom: id 1 (Surviving), left: id 3 (Grounded)
+    // Map modes to compass positions (adjust these mappings if you later change mode order)
     const posMap = [
-      { pos: 'top', id: 4 },
-      { pos: 'right', id: 2 },
-      { pos: 'bottom', id: 1 },
-      { pos: 'left', id: 3 }
+      { pos: 'top', id: 4 },    // Growing
+      { pos: 'right', id: 2 },  // Drifting
+      { pos: 'bottom', id: 1 }, // Surviving
+      { pos: 'left', id: 3 }    // Grounded
     ];
 
     posMap.forEach(({ pos, id }) => {
@@ -111,7 +111,6 @@
       btn.setAttribute('aria-label', `${mode.name} mode`);
       btn.dataset.modeId = mode.id;
       btn.innerHTML = `<span class="ring-icon" aria-hidden="true">${mode.icon}</span><span class="ring-label">${mode.name}</span>`;
-      // color accent
       btn.style.setProperty('--mode-color', mode.color);
       btn.addEventListener('click', () => openModeDialog(mode.id));
       compassRing.appendChild(btn);
@@ -124,29 +123,33 @@
     if (!currentMode) return;
 
     // Populate dialog
-    document.getElementById('dialogModeIcon').textContent = currentMode.icon;
-    document.getElementById('modeDialogTitle').textContent = currentMode.name;
-    document.getElementById('dialogModeDescription').textContent = currentMode.description;
-    document.getElementById('dialogModeQuote').textContent = `"${currentMode.defaultQuote}"`;
+    const iconEl = document.getElementById('dialogModeIcon');
+    const titleEl = document.getElementById('modeDialogTitle');
+    const descEl = document.getElementById('dialogModeDescription');
+    const quoteEl = document.getElementById('dialogModeQuote');
+    const quickWinsEl = document.getElementById('dialogQuickWins');
 
-    // Populate quick wins
+    if (iconEl) iconEl.textContent = currentMode.icon;
+    if (titleEl) titleEl.textContent = currentMode.name;
+    if (descEl) descEl.textContent = currentMode.description;
+    if (quoteEl) quoteEl.textContent = `"${currentMode.defaultQuote}"`;
+
     const quickWins = quickWinsMap[currentMode.id] || [];
-    document.getElementById('dialogQuickWins').innerHTML = quickWins
-      .map(win => `<li><button class="quick-win-btn" data-win="${escapeHtml(win)}">${escapeHtml(win)}</button></li>`)
-      .join('');
-
-    // Attach click handlers to quick win buttons
-    document.querySelectorAll('.quick-win-btn').forEach(b => {
-      b.addEventListener('click', (e) => {
-        const winText = e.currentTarget.dataset.win;
-        startReset(winText);
+    if (quickWinsEl) {
+      quickWinsEl.innerHTML = quickWins
+        .map(win => `<li><button class="quick-win-btn" data-win="${escapeHtml(win)}">${escapeHtml(win)}</button></li>`)
+        .join('');
+      // Attach handlers
+      quickWinsEl.querySelectorAll('.quick-win-btn').forEach(b => {
+        b.addEventListener('click', (e) => {
+          const winText = e.currentTarget.dataset.win;
+          startReset(winText);
+        });
       });
-    });
+    }
 
-    // Show dialog
     if (typeof modeDialog.showModal === 'function') {
       modeDialog.showModal();
-      // Focus the close button for keyboard users
       const closeButton = modeDialog.querySelector('.dialog-close');
       if (closeButton) closeButton.focus();
     } else {
@@ -154,7 +157,7 @@
     }
   }
 
-  // Start reset and record to history (selectedAction passed from quick-win button)
+  // Start reset and record to history
   function startReset(selectedAction) {
     if (!currentMode) return;
 
@@ -169,7 +172,6 @@
       action: selectedWin
     };
 
-    // Save to localStorage
     const history = getHistory();
     history.push(historyEntry);
     try {
@@ -178,14 +180,11 @@
       console.warn('Could not save history', e);
     }
 
-    // Close dialog
-    if (typeof modeDialog.close === 'function') modeDialog.close();
-
-    // Friendly toast instead of blocking alert
+    try { if (modeDialog.close) modeDialog.close(); } catch (e) {}
     showToast(`Saved: ${currentMode.name} — ${selectedWin}`);
   }
 
-  // Get history from localStorage
+  // Get history
   function getHistory() {
     try {
       const data = localStorage.getItem(HISTORY_KEY);
@@ -200,7 +199,6 @@
   function openHistoryDialog() {
     const history = getHistory();
 
-    // Calculate stats
     const modeStats = {};
     modes.forEach(mode => {
       modeStats[mode.id] = { count: 0, name: mode.name, icon: mode.icon, color: mode.color };
@@ -212,7 +210,6 @@
 
     const totalResets = history.length;
 
-    // Render stats
     const statsHtml = `
       <div class="stat-card">
         <span class="stat-value">${totalResets}</span>
@@ -231,7 +228,6 @@
     `;
     document.getElementById('historyStats').innerHTML = statsHtml;
 
-    // Render timeline
     const timelineHtml = history.length > 0
       ? history.slice().reverse().map(entry => {
           const date = new Date(entry.timestamp);
@@ -256,7 +252,7 @@
     if (typeof historyDialog.showModal === 'function') historyDialog.showModal();
   }
 
-  // Export history as JSON
+  // Export history
   function exportHistory() {
     const history = getHistory();
     const dataStr = JSON.stringify(history, null, 2);
@@ -273,7 +269,7 @@
 
   // Clear history
   function clearHistory() {
-    if (confirm('Are you sure you want to clear all history? This cannot be undone?')) {
+    if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
       localStorage.removeItem(HISTORY_KEY);
       try { historyDialog.close(); } catch (e) {}
       showToast('History cleared');
@@ -283,21 +279,17 @@
   // Play intro animation
   function playIntroAnimation() {
     const hasSeenIntro = localStorage.getItem(INTRO_SEEN_KEY);
-
     if (!hasSeenIntro && !prefersReducedMotion) {
-      // CSS-driven animation is enough; mark as seen
       localStorage.setItem(INTRO_SEEN_KEY, 'true');
     }
   }
 
-  // Replay intro animation
+  // Replay intro
   function replayIntro() {
     if (prefersReducedMotion) {
       showToast('Animations disabled (reduced motion).');
       return;
     }
-
-    // Reset animations and replay
     compassImage.style.animation = 'none';
     const heroIntro = document.querySelector('.hero-intro');
     if (heroIntro) heroIntro.style.animation = 'none';
@@ -306,7 +298,7 @@
     if (heroIntro) heroIntro.style.animation = 'fadeInUp 1s 0.3s ease forwards';
   }
 
-  // Setup scroll-linked arrow rotation
+  // Scroll-linked arrow rotation
   function setupScrollAnimation() {
     if (prefersReducedMotion) return;
 
@@ -317,7 +309,7 @@
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = maxScroll > 0 ? scrollY / maxScroll : 0;
       const rotation = scrollPercent * 360;
-      compassArrow.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+      if (compassArrow) compassArrow.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
       ticking = false;
     }
 
@@ -333,11 +325,9 @@
 
   // Setup event listeners
   function setupEventListeners() {
-    // Mode dialog actions
     const startResetBtn = document.getElementById('startResetBtn');
     if (startResetBtn) startResetBtn.addEventListener('click', () => startReset());
 
-    // Dialog close buttons
     document.querySelectorAll('.dialog-close, .dialog-cancel').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const dialog = e.target.closest('dialog');
@@ -345,7 +335,6 @@
       });
     });
 
-    // History
     if (historyBtn) historyBtn.addEventListener('click', openHistoryDialog);
 
     const exportHistoryBtn = document.getElementById('exportHistoryBtn');
@@ -354,10 +343,8 @@
     const clearHistoryBtn = document.getElementById('clearHistoryBtn');
     if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', clearHistory);
 
-    // Replay button
     if (replayBtn) replayBtn.addEventListener('click', replayIntro);
 
-    // Keyboard handlers
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         try { if (modeDialog.open) modeDialog.close(); } catch (e) {}
@@ -378,7 +365,7 @@
     }
   }
 
-  // Setup install prompt
+  // Install prompt
   let deferredPrompt;
   function setupInstallPrompt() {
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -415,10 +402,10 @@
     setTimeout(() => { el.classList.remove('visible'); setTimeout(()=>el.remove(), 300); }, ms);
   }
 
-  // escape helper for safety
+  // escape helper
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]); }); }
 
-  // Start the app when DOM is ready
+  // Start the app
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
