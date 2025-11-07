@@ -1,4 +1,4 @@
-/* Redesigned stylesheet: large, readable direction labels; per-mode translucent accents */
+/* Redesigned stylesheet: wedges, spaced directions, per-mode translucent accents */
 
 /* CSS Variables (dark defaults) */
 :root{
@@ -57,30 +57,31 @@ body{
 /* Hero & compass */
 .hero{text-align:center;padding:2.25rem 1rem 3rem}
 .compass-container{
-  position:relative;width:220px;height:220px;margin:0 auto 1.25rem;border-radius:14px;transition:transform 220ms ease,box-shadow 220ms ease;
+  position:relative;width:240px;height:240px;margin:0 auto 1.25rem;border-radius:50%;transition:transform 220ms ease,box-shadow 220ms ease;
   background: transparent;
 }
-@media(min-width:900px){ .compass-container{ width:340px;height:340px } }
+@media(min-width:900px){ .compass-container{ width:380px;height:380px } }
 .compass-container:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
-/* De-emphasize the decorative graphic to ensure labels pop */
-.compass-image{width:100%;height:100%;display:block;opacity:0.06;filter:grayscale(60%) blur(0.2px)}
-.compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);color:var(--brand-color);pointer-events:none;transition:transform 200ms ease}
+/* De-emphasize the decorative graphic to ensure wedges/labels pop */
+.compass-image{width:100%;height:100%;display:block;opacity:0.04;filter:grayscale(60%) blur(0.2px);position:absolute;inset:0;border-radius:50%}
+.compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:0.95;z-index:0}
+.compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);color:var(--brand-color);pointer-events:none;transition:transform 200ms ease;z-index:2}
 .hero-intro{margin-top:0.25rem;font-size:1.05rem;color:var(--text-secondary)}
 .replay-btn{margin-top:0.65rem;background:transparent;border:1px solid var(--border);color:var(--text-secondary);padding:0.45rem 0.85rem;border-radius:10px}
 
-/* Compass ring: big readable labels, no icons. each button uses --mode-color (set inline by script) */
-.compass-ring{position:absolute;inset:0;pointer-events:none}
+/* Compass ring: spaced out directions and large labels */
+.compass-ring{position:absolute;inset:0;pointer-events:none;z-index:3}
 .ring-btn{
   position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:12px 14px;border-radius:999px;
-  min-width:140px;max-width:200px;font-weight:800;color:var(--text-primary);box-shadow:0 8px 30px rgba(0,0,0,0.45);border:none;
-  transform-origin:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  min-width:150px;max-width:220px;font-weight:800;color:var(--text-primary);box-shadow:0 8px 30px rgba(0,0,0,0.45);border:none;
+  transform-origin:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  z-index:4;
 }
-/* Use the per-mode color as translucent overlay; script will set inline background and text color for contrast */
-.ring-top{top:6%;left:50%;transform:translate(-50%,-0%)}
-.ring-right{top:50%;right:6%;transform:translate(0,-50%)}
-.ring-bottom{bottom:6%;left:50%;transform:translate(-50%,0)}
-.ring-left{top:50%;left:6%;transform:translate(0,-50%)}
+/* push ring buttons farther out from center and space them around (center-based transforms) */
+.ring-top{ top:50%; left:50%; transform: translate(-50%,-50%) translateY(-150%); }
+.ring-right{ top:50%; left:50%; transform: translate(-50%,-50%) translateX(150%); }
+.ring-bottom{ top:50%; left:50%; transform: translate(-50%,-50%) translateY(150%); }
+.ring-left{ top:50%; left:50%; transform: translate(-50%,-50%) translateX(-150%); }
 .ring-label{font-size:clamp(14px,2.4vw,20px);line-height:1;display:block;padding:0 6px}
 
 /* Modes grid with names prominent; cards use per-mode translucent accent strip */
@@ -89,7 +90,7 @@ body{
 .mode-card{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:12px;background:var(--bg-elevated);border:1px solid var(--border);cursor:pointer;transition:transform 180ms ease,box-shadow 180ms ease;position:relative;overflow:hidden}
 .mode-card:before{
   content:"";
-  position:absolute;left:0;top:0;height:100%;width:8px;border-radius:6px 0 0 6px;
+  position:absolute;left:0;top:0;height:100%;width:10px;border-radius:6px 0 0 6px;
   background: linear-gradient(180deg,var(--mode-color, rgba(0,175,160,0.3)), rgba(0,0,0,0));
   opacity:0.95;
 }
