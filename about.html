@@ -12,35 +12,37 @@
   <script src="script.js" defer></script>
 </head>
 <body class="page-about">
-  <header class="app-header">
-    <div class="header-left">
+  <!-- header stays identical to index for consistent navigation -->
+  <header class="app-header" role="banner">
+    <div class="app-header-top">
       <a class="home-link" id="returnCompassBtn" href="./index.html" aria-label="Return to Compass">
         <h1 class="app-title">The Reset Compass</h1>
       </a>
     </div>
 
-    <div class="header-center">
-      <a id="homeTextBtn" class="header-btn subtle" href="./index.html" aria-label="Home">Home</a>
-      <button id="quickWinsBtn" class="header-btn" aria-label="Quick Wins">Quick Wins</button>
-      <button id="historyBtn" class="header-btn" aria-label="View History">History</button>
-    </div>
+    <nav class="app-nav" role="navigation" aria-label="Primary">
+      <div class="nav-center" id="navCenterAbout">
+        <button id="quickWinsBtn" class="nav-btn" aria-label="Quick Wins">Quick Wins</button>
+        <button id="historyBtn" class="nav-btn" aria-label="View History">History</button>
+        <a class="nav-btn" id="homeTextBtn" href="./index.html" aria-label="Home">Home</a>
+      </div>
 
-    <div class="header-right">
-      <button id="themeToggle" class="header-btn" aria-pressed="false" aria-label="Toggle theme">
-        <span id="themeIcon" aria-hidden="true">🌙</span>
-      </button>
-    </div>
+      <div class="nav-right">
+        <button id="themeToggle" class="nav-btn" aria-pressed="false" aria-label="Toggle theme">
+          <span id="themeIcon" aria-hidden="true">🌙</span>
+        </button>
+      </div>
+    </nav>
   </header>
 
   <main class="main-content">
     <article class="about-hero" aria-labelledby="aboutTitle">
       <div class="about-hero-grid">
-        <!-- removed large compass image from About to avoid redundancy -->
         <div class="about-hero-text">
           <h2 id="aboutTitle">About The Reset Compass</h2>
           <p class="lead">
             The Reset Compass helps you quickly choose a short, intentional activity to reset your focus, energy, or mood.
-            Directions represent different wellness modes. Each mode suggests short activities you can do immediately.
+            Wedges represent different wellness modes. Each mode suggests short activities you can do immediately.
           </p>
         </div>
       </div>
@@ -48,10 +50,10 @@
       <section class="about-section" aria-labelledby="howTitle">
         <h3 id="howTitle">How to use</h3>
         <ol>
-          <li>From the compass: either tap a direction or pick a Mode Card below.</li>
-          <li>In the Mode modal, select one or more Activities (they highlight). Use the per-activity Notes inputs if you want.</li>
+          <li>From the compass: tap a wedge or pick a Mode Card below.</li>
+          <li>In the Mode dialog, select one or more Activities (they highlight). Use the per-activity Notes inputs if you want.</li>
           <li>Optionally add notes about each selected activity before you Complete them.</li>
-          <li>Tap "Complete Selected" to record the selected activities. That updates your daily streak if applicable.</li>
+          <li>Tap "Complete Selected" to record the selected activities. That updates your daily streak when appropriate.</li>
           <li>Quick Wins are available using the Quick Wins button in the header for quick, single-step actions with optional notes.</li>
         </ol>
 
