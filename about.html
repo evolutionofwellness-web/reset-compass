@@ -22,10 +22,10 @@
     <div class="header-center">
       <a id="homeTextBtn" class="header-btn subtle" href="./index.html" aria-label="Home">Home</a>
       <button id="quickWinsBtn" class="header-btn" aria-label="Quick Wins">Quick Wins</button>
+      <button id="historyBtn" class="header-btn" aria-label="View History">History</button>
     </div>
 
     <div class="header-right">
-      <div id="streakBadge" class="streak-badge" title="Daily streak — days in a row">Daily streak — 🔥 0</div>
       <button id="themeToggle" class="header-btn" aria-pressed="false" aria-label="Toggle theme">
         <span id="themeIcon" aria-hidden="true">🌙</span>
       </button>
@@ -35,12 +35,12 @@
   <main class="main-content">
     <article class="about-hero" aria-labelledby="aboutTitle">
       <div class="about-hero-grid">
-        <img src="assets/images/compass.svg" alt="Reset Compass" class="about-hero-image" />
+        <!-- removed large compass image from About to avoid redundancy -->
         <div class="about-hero-text">
           <h2 id="aboutTitle">About The Reset Compass</h2>
           <p class="lead">
             The Reset Compass helps you quickly choose a short, intentional activity to reset your focus, energy, or mood.
-            Directions represent different wellness modes; each mode suggests short "Activities" you can do immediately.
+            Directions represent different wellness modes. Each mode suggests short activities you can do immediately.
           </p>
         </div>
       </div>
@@ -51,8 +51,8 @@
           <li>From the compass: either tap a direction or pick a Mode Card below.</li>
           <li>In the Mode modal, select one or more Activities (they highlight). Use the per-activity Notes inputs if you want.</li>
           <li>Optionally add notes about each selected activity before you Complete them.</li>
-          <li>Tap "Complete Selected" to record the selected activities. That increments your daily streak (if applicable).</li>
-          <li>Quick Wins are shown between the compass and modes — they are separate, prominent quick actions you can Complete directly.</li>
+          <li>Tap "Complete Selected" to record the selected activities. That updates your daily streak if applicable.</li>
+          <li>Quick Wins are available using the Quick Wins button in the header for quick, single-step actions with optional notes.</li>
         </ol>
 
         <p class="about-note">
