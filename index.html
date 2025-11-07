@@ -23,23 +23,22 @@
 
     <div class="header-center" role="navigation" aria-label="Primary">
       <button id="quickWinsBtn" class="header-btn" aria-label="Quick Wins">Quick Wins</button>
-      <button id="historyBtn" class="header-btn" aria-label="View History"><span aria-hidden="true">📊</span> History</button>
+      <button id="historyBtn" class="header-btn" aria-label="View History">History</button>
+      <a class="header-btn" href="about.html" aria-label="About this app">About</a>
     </div>
 
     <div class="header-right">
       <button id="themeToggle" class="header-btn" aria-pressed="false" aria-label="Toggle theme">
         <span id="themeIcon" aria-hidden="true">🌙</span>
       </button>
-
-      <a class="header-btn" href="about.html" aria-label="About this app">About</a>
     </div>
   </header>
 
   <main class="main-content">
     <section class="hero" aria-label="Compass Hero">
-      <!-- Daily streak moved above compass for prominence -->
+      <!-- Daily streak moved above compass for prominence (no em dash usage) -->
       <div id="streakContainer" class="streak-container" aria-hidden="false">
-        <div id="streakBadge" class="streak-badge" title="Daily streak — days in a row">Daily streak — 🔥 0</div>
+        <div id="streakBadge" class="streak-badge" title="Daily streak: days in a row">Daily streak: 🔥 0</div>
       </div>
 
       <div class="compass-container" role="img" aria-label="Compass directions">
@@ -57,7 +56,7 @@
         <div id="compassRing" class="compass-ring" aria-hidden="false"></div>
       </div>
 
-      <p class="hero-intro">Find your current wellness mode — pick a direction or choose a card below.</p>
+      <p class="hero-intro">Find your current wellness mode: pick a direction or choose a card below.</p>
     </section>
 
     <section class="modes-section" aria-label="Wellness Modes">
@@ -69,14 +68,10 @@
       </div>
     </section>
 
-    <!-- Quick Wins moved below the mode list; presented in the same card format as modes -->
-    <section id="quickWinsSection" class="modes-section quick-wins-cards" aria-label="Quick Wins">
-      <h2 class="section-title">Quick Wins</h2>
-      <div class="modes-grid" id="topQuickWins" role="list"></div>
-      <p class="quick-wins-sub" style="max-width:920px;margin:12px auto 24px;color:var(--text-secondary);">
-        Quick Wins below use the same card UI as Modes. Tap a quick win card to add notes and mark it complete. For the full list use the Quick Wins button in the header.
-      </p>
-    </section>
+    <!-- Small explanatory note under header for Quick Wins (short, single button only on homepage) -->
+    <div class="quick-wins-note" aria-hidden="false" style="max-width:920px;margin:18px auto 0;text-align:center;color:var(--text-secondary)">
+      <p><strong>Quick Wins</strong> are accessible from the button in the header for fast, single-step actions and optional notes.</p>
+    </div>
 
     <footer class="app-footer">
       <div class="ad-slot" aria-label="Advertisement">
@@ -112,12 +107,12 @@
     </div>
   </dialog>
 
-  <!-- Quick Wins Dialog (full list) -->
+  <!-- Quick Wins Dialog (full list; opened from header Quick Wins button only) -->
   <dialog id="quickWinsDialog" class="mode-dialog" aria-labelledby="quickWinsTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
       <h2 id="quickWinsTitle">Quick Wins</h2>
-      <p class="mode-description">Short, immediate activities you can do right now. Select one or more and mark them COMPLETE.</p>
+      <p class="mode-description">Short, immediate activities you can do right now. Select one or more and mark them complete.</p>
       <ul id="globalQuickWins" class="quick-wins-list" role="list"></ul>
 
       <div class="dialog-actions">
