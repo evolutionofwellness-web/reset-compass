@@ -6,11 +6,11 @@
   <meta name="description" content="The Reset Compass - Find your wellness mode and choose the right reset activity">
   <meta name="theme-color" content="#00AFA0">
   <title>The Reset Compass</title>
-  
+
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="assets/images/compass.svg">
-  
+
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -29,17 +29,22 @@
   <main class="main-content">
     <section class="hero" aria-label="Compass Hero">
       <div class="compass-container">
-        <img 
-          src="assets/images/compass.svg" 
-          alt="Wellness Compass" 
+        <img
+          src="assets/images/compass.svg"
+          alt="Wellness Compass"
           class="compass-image"
           id="compassImage"
         >
         <div class="compass-arrow" id="compassArrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="80" height="80">
+          <svg viewBox="0 0 24 24" width="80" height="80" role="img" aria-hidden="true">
             <path d="M12 2 L16 12 L12 22 L8 12 Z" fill="currentColor" opacity="0.9"/>
             <circle cx="12" cy="12" r="3" fill="white"/>
           </svg>
+        </div>
+
+        <!-- Compass ring (modes rendered here) -->
+        <div id="compassRing" class="compass-ring" aria-hidden="false">
+          <!-- Buttons are injected by script.js -->
         </div>
       </div>
       <p class="hero-intro">Find your current wellness mode</p>
@@ -77,12 +82,12 @@
       </div>
       <p id="dialogModeDescription" class="mode-description"></p>
       <blockquote id="dialogModeQuote" class="mode-quote"></blockquote>
-      
+
       <div class="quick-wins-section">
         <h3>Quick Wins</h3>
         <ul id="dialogQuickWins" class="quick-wins-list"></ul>
       </div>
-      
+
       <div class="dialog-actions">
         <button id="startResetBtn" class="btn-primary">Start Reset</button>
         <button class="btn-secondary dialog-cancel">Cancel</button>
@@ -95,11 +100,11 @@
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
       <h2 id="historyDialogTitle">Your Reset History</h2>
-      
+
       <div id="historyStats" class="history-stats"></div>
-      
+
       <div id="historyTimeline" class="history-timeline"></div>
-      
+
       <div class="dialog-actions">
         <button id="exportHistoryBtn" class="btn-secondary">Export JSON</button>
         <button id="clearHistoryBtn" class="btn-danger">Clear History</button>
