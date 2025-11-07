@@ -13,11 +13,20 @@
 
   <script src="script.js" defer></script>
 </head>
-<body>
+<body class="page-compass">
   <header class="app-header">
-    <h1 class="app-title">The Reset Compass</h1>
-    <div class="header-actions">
-      <a class="header-btn" href="about.html" aria-label="About this app">About</a>
+    <div class="header-left">
+      <h1 class="app-title">The Reset Compass</h1>
+    </div>
+
+    <div class="header-center">
+      <!-- Quick Wins should be a first-class option outside the compass -->
+      <button id="quickWinsBtn" class="header-btn" aria-label="Quick Wins">Quick Wins</button>
+    </div>
+
+    <div class="header-right">
+      <!-- Streak / engagement -->
+      <div id="streakBadge" class="streak-badge" title="Current streak — days in a row">🔥 0</div>
 
       <button id="historyBtn" class="header-btn" aria-label="View History">
         <span aria-hidden="true">📊</span> History
@@ -27,19 +36,15 @@
         <span id="themeIcon" aria-hidden="true">🌙</span>
       </button>
 
-      <button id="installBtn" class="header-btn install-btn" aria-label="Install App" hidden>
-        <span aria-hidden="true">💾</span> Save App
-      </button>
+      <a class="header-btn" href="about.html" aria-label="About this app">About</a>
     </div>
   </header>
 
   <main class="main-content">
     <section class="hero" aria-label="Compass Hero">
       <div class="compass-container" role="img" aria-label="Compass directions">
-        <!-- decorative graphic; intentionally de-emphasized so labels and wedges pop -->
         <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" />
 
-        <!-- Wedges (conic gradient set by JS to reflect per-mode colors) -->
         <div id="compassWedges" class="compass-wedges" aria-hidden="true"></div>
 
         <div class="compass-arrow" id="compassArrow" aria-hidden="true">
@@ -49,11 +54,10 @@
           </svg>
         </div>
 
-        <!-- Compass ring (modes rendered here) -->
         <div id="compassRing" class="compass-ring" aria-hidden="false"></div>
       </div>
 
-      <p class="hero-intro">Find your current wellness mode — choose a direction or pick a card below.</p>
+      <p class="hero-intro">Find your current wellness mode — pick a direction or choose a card below.</p>
       <button id="replayBtn" class="replay-btn" aria-label="Replay intro animation">🔄 Replay</button>
     </section>
 
@@ -71,29 +75,44 @@
         <p class="ad-placeholder">Ad Placeholder</p>
       </div>
       <p class="footer-text">
-        <small>&copy; 2025 The Reset Compass. Find your wellness rhythm.</small>
+        <small>&copy; 2025 Evolution of Wellness — The Reset Compass</small>
       </p>
     </footer>
   </main>
 
-  <!-- Mode Detail Dialog -->
+  <!-- Mode Detail Dialog (select an activity here, then choose Begin Activity) -->
   <dialog id="modeDialog" class="mode-dialog" aria-labelledby="modeDialogTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
+
       <div class="mode-header">
         <h2 id="modeDialogTitle" class="mode-title"></h2>
+        <p id="dialogModeDescription" class="mode-description"></p>
       </div>
-      <p id="dialogModeDescription" class="mode-description"></p>
-      <blockquote id="dialogModeQuote" class="mode-quote"></blockquote>
 
-      <div class="quick-wins-section">
-        <h3>Quick Wins</h3>
-        <ul id="dialogQuickWins" class="quick-wins-list"></ul>
+      <div class="mode-actions">
+        <h3>Activities</h3>
+        <ul id="dialogQuickWins" class="quick-wins-list" role="list"></ul>
       </div>
 
       <div class="dialog-actions">
-        <button id="startResetBtn" class="btn-primary">Begin Activity</button>
+        <button id="startResetBtn" class="btn-primary" disabled>Begin Activity</button>
         <button class="btn-secondary dialog-cancel">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Quick Wins Dialog -->
+  <dialog id="quickWinsDialog" class="mode-dialog" aria-labelledby="quickWinsTitle">
+    <div class="dialog-content">
+      <button class="dialog-close" aria-label="Close dialog">&times;</button>
+      <h2 id="quickWinsTitle">Quick Wins</h2>
+      <p class="mode-description">Short, immediate activities you can do right now. Select one and Begin Activity to log it.</p>
+      <ul id="globalQuickWins" class="quick-wins-list" role="list"></ul>
+
+      <div class="dialog-actions">
+        <button id="startQuickWinBtn" class="btn-primary" disabled>Begin Activity</button>
+        <button class="btn-secondary dialog-cancel">Close</button>
       </div>
     </div>
   </dialog>
