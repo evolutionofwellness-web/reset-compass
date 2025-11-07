@@ -14,11 +14,13 @@
 <body class="page-about">
   <header class="app-header">
     <div class="header-left">
-      <h1 class="app-title">The Reset Compass</h1>
+      <a class="home-link" id="returnCompassBtn" href="./index.html" aria-label="Return to Compass">
+        <h1 class="app-title">The Reset Compass</h1>
+      </a>
     </div>
 
     <div class="header-center">
-      <a id="returnCompassBtn" class="header-btn subtle" href="index.html" aria-label="Return to Compass">Return to Compass</a>
+      <a id="homeTextBtn" class="header-btn subtle" href="./index.html" aria-label="Home">Home</a>
       <button id="quickWinsBtn" class="header-btn" aria-label="Quick Wins">Quick Wins</button>
     </div>
 
@@ -31,26 +33,31 @@
   </header>
 
   <main class="main-content">
-    <article class="about-section" aria-labelledby="aboutTitle">
-      <h2 id="aboutTitle">About The Reset Compass</h2>
+    <article class="about-hero" aria-labelledby="aboutTitle">
+      <div class="about-hero-grid">
+        <img src="assets/images/compass.svg" alt="Reset Compass" class="about-hero-image" />
+        <div class="about-hero-text">
+          <h2 id="aboutTitle">About The Reset Compass</h2>
+          <p class="lead">
+            The Reset Compass helps you quickly choose a short, intentional activity to reset your focus, energy, or mood.
+            Directions represent different wellness modes; each mode suggests short "Activities" you can do immediately.
+          </p>
+        </div>
+      </div>
 
-      <p>
-        The Reset Compass helps you quickly choose a short, intentional activity to reset your focus, energy, or mood.
-        Directions represent different wellness modes; each mode suggests short "Activities" you can do immediately.
-      </p>
+      <section class="about-section" aria-labelledby="howTitle">
+        <h3 id="howTitle">How to use</h3>
+        <ol>
+          <li>From the compass: either tap a direction or pick a Mode Card below.</li>
+          <li>In the Mode modal, select an Activity (it highlights) — selecting is separate from "Begin Activity".</li>
+          <li>Tap "Begin Activity" to perform and record the activity. That increments your daily streak (if applicable).</li>
+          <li>Use the "Quick Wins" button in the header for a curated list of fast actions (outside the compass).</li>
+        </ol>
 
-      <h3>How to use</h3>
-      <ol>
-        <li>From the compass: either tap a direction (top/right/bottom/left) or pick a Mode Card below.</li>
-        <li>In the Mode modal, select an Activity (it highlights) — selecting is separate from "Begin Activity".</li>
-        <li>Tap "Begin Activity" to perform and record the activity. That increments your daily streak (if applicable).</li>
-        <li>Use the "Quick Wins" button in the header for a curated list of fast actions (outside the compass).</li>
-      </ol>
-
-      <p class="about-note">
-        Your theme (light/dark) preference and streak are saved locally. There's a "Return to Compass" button in the header to return
-        to the main compass from this page.
-      </p>
+        <p class="about-note">
+          The current mode names used by this build are: Surviving, Drifting, Grounded, Growing. Your theme (light/dark) preference and streak are saved locally. Use the Home / Return links to get back to the compass.
+        </p>
+      </section>
     </article>
   </main>
 
