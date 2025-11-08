@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#00AFA0" />
   <title>The Reset Compass</title>
 
-  <!-- Adsense as requested -->
+  <!-- Adsense (kept per previous requests) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895"
      crossorigin="anonymous"></script>
 
@@ -24,7 +24,6 @@
         <h1 class="app-title">The Reset Compass</h1>
       </a>
 
-      <!-- Dropdown nav in top-right -->
       <div class="nav-dropdown">
         <button id="navMenuToggle" aria-haspopup="true" aria-expanded="false" aria-controls="navDropdown" aria-label="Open menu" class="nav-ellipsis">☰</button>
         <div id="navDropdown" class="nav-dropdown-menu" role="menu" aria-hidden="true">
@@ -48,19 +47,13 @@
       <div class="compass-wrap">
         <div class="compass-container" role="img" aria-label="Compass shape with four wedges" id="compassContainer">
           <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" />
-
-          <!-- wedge surface (JS sets conic-gradient). separators overlay and outer glow via CSS -->
           <div id="compassWedges" class="compass-wedges" aria-hidden="true"></div>
-
-          <!-- compass arrow -->
           <div class="compass-arrow" id="compassArrow" aria-hidden="true" aria-label="Compass arrow">
             <svg viewBox="0 0 24 24" width="88" height="88" role="img" aria-hidden="true">
               <path d="M12 2 L16 12 L12 22 L8 12 Z" fill="#000" opacity="1" />
               <circle cx="12" cy="12" r="3" fill="#fff" />
             </svg>
           </div>
-
-          <!-- ring labels inserted by JS and positioned by polar coordinates -->
           <div id="compassRing" class="compass-ring" aria-hidden="false"></div>
         </div>
       </div>
@@ -73,17 +66,11 @@
     <section class="page-section page-section--modes" aria-label="Wellness Modes">
       <h2 class="section-title">Choose Your Mode</h2>
 
-      <div class="modes-grid" id="modesGrid" role="list" aria-live="polite">
-        <noscript>
-          <p class="no-js-message">Please enable JavaScript to view the wellness modes.</p>
-        </noscript>
-      </div>
+      <div class="modes-grid" id="modesGrid" role="list" aria-live="polite"></div>
 
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
         <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">Quick Wins</button>
-        <p class="quick-wins-note">
-          Quick Wins are one-step actions you can do immediately to shift your focus, energy, or mood. Tap a Quick Win to complete it fast. (No daily limit.)
-        </p>
+        <p class="quick-wins-note">Quick Wins are one-step actions you can do immediately to shift your focus, energy, or mood. Tap a Quick Win to complete it fast. (No daily limit.)</p>
       </div>
     </section>
 
@@ -91,13 +78,11 @@
       <div class="ad-slot" aria-label="Advertisement">
         <p class="ad-placeholder">Ad Placeholder</p>
       </div>
-      <p class="footer-text">
-        <small>&copy; 2025 Evolution of Wellness — The Reset Compass</small>
-      </p>
+      <p class="footer-text"><small>&copy; 2025 Evolution of Wellness — The Reset Compass</small></p>
     </footer>
   </main>
 
-  <!-- Mode Detail Dialog -->
+  <!-- MODE DIALOG (styled cross-browser; remains <dialog> but CSS forces consistent theme) -->
   <dialog id="modeDialog" class="mode-dialog" aria-labelledby="modeDialogTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
@@ -113,7 +98,6 @@
       <div class="mode-actions">
         <h3>Activities</h3>
         <ul id="dialogQuickWins" class="quick-wins-list" role="list"></ul>
-
         <p class="mode-note-help">Select an activity and add optional notes before completing.</p>
       </div>
 
@@ -124,7 +108,7 @@
     </div>
   </dialog>
 
-  <!-- Quick Wins Dialog -->
+  <!-- QUICK WINS DIALOG -->
   <dialog id="quickWinsDialog" class="mode-dialog" aria-labelledby="quickWinsTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
@@ -139,7 +123,7 @@
     </div>
   </dialog>
 
-  <!-- History Dialog -->
+  <!-- HISTORY DIALOG -->
   <dialog id="historyDialog" class="history-dialog" aria-labelledby="historyDialogTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
@@ -159,7 +143,7 @@
     </div>
   </dialog>
 
-  <!-- Come back tomorrow dialog -->
+  <!-- COME BACK DIALOG -->
   <dialog id="comeBackDialog" class="mode-dialog" aria-labelledby="comeBackTitle">
     <div class="dialog-content">
       <h2 id="comeBackTitle">Nice work!</h2>
