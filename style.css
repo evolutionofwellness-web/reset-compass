@@ -1,10 +1,7 @@
-/* style.css
-   - Visual improvements: wedge separators, outer glow, per-mode header accents
-   - Larger wedge text/buttons, better mode header padding, clear quick-wins block
-   - Notes appear when an activity is selected (JS toggles hidden)
-*/
+/* style.css - major fixes: wedge separators aligned, dialog/modal styling restored,
+   action wiring friendly, mode header padding, per-mode accents, Quick Wins block clearer */
 
-/* CSS Variables */
+/* Variables */
 :root{
   --brand-color: #00AFA0;
   --bg-primary: #06070a;
@@ -34,94 +31,90 @@
 
 /* Base */
 *,:before,:after{box-sizing:border-box}
-html{font-size:16.5px}
+html{font-size:16.5px;scroll-behavior:smooth}
 body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(135deg,var(--bg-primary),var(--bg-secondary));color:var(--text-primary);-webkit-font-smoothing:antialiased;min-height:100vh}
 
 /* Header */
 .app-header{position:sticky;top:0;z-index:160;background:transparent;border-bottom:1px solid var(--border);backdrop-filter:blur(6px)}
 .app-header-top{display:flex;align-items:center;justify-content:center;padding:18px 16px 10px;position:relative}
-.app-title{margin:0;font-weight:900;font-size:2.2rem;color:var(--brand-color);text-shadow:0 6px 18px rgba(0,0,0,0.45);}
+.app-title{margin:0;font-weight:900;font-size:2.1rem;letter-spacing:-0.6px;color:var(--brand-color);text-shadow:0 6px 18px rgba(0,0,0,0.45)}
 
-/* Dropdown */
+/* Dropdown (index only) */
 .nav-dropdown{position:absolute;right:14px;top:10px}
 .nav-ellipsis{background:var(--bg-elevated);border:1px solid var(--border);padding:10px 12px;border-radius:12px;color:var(--text-primary);cursor:pointer}
 .nav-dropdown-menu{display:none;position:absolute;right:0;top:46px;background:linear-gradient(180deg,var(--bg-elevated), rgba(0,0,0,0.02));border-radius:12px;padding:8px;box-shadow:0 28px 80px rgba(0,0,0,0.65);min-width:180px;border:1px solid var(--border)}
 .nav-dropdown-menu[aria-hidden="false"]{display:block}
 
-/* Sections */
+/* Layout sections */
 .page-section{padding:12px 8px;margin-top:8px}
 .page-section--compass{padding-top:6px;padding-bottom:6px}
+.hero-intro{text-align:center;color:var(--text-secondary);max-width:880px;margin:8px auto 18px;font-size:1.05rem}
 
 /* Quick Wins block */
-.quick-wins-block{margin-top:28px;background:linear-gradient(180deg, rgba(0,175,160,0.03), rgba(0,0,0,0.02));padding:20px;border-radius:14px;display:flex;flex-direction:column;align-items:center;box-shadow:0 18px 60px rgba(0,0,0,0.5)}
-.quick-wins-cta{padding:16px 26px;font-size:1.08rem;border-radius:16px;background:linear-gradient(90deg,var(--brand-color),#00d4c4);color:#041018;font-weight:900;border:none}
-.quick-wins-note{margin-top:12px;color:var(--text-secondary);text-align:center;max-width:740px}
+.quick-wins-block{margin-top:28px;background:linear-gradient(180deg, rgba(0,175,160,0.03), rgba(0,0,0,0.02));padding:20px;border-radius:14px;display:flex;flex-direction:column;align-items:center;box-shadow:0 18px 60px rgba(0,0,0,0.45)}
+.quick-wins-cta{padding:14px 22px;font-size:1.06rem;border-radius:12px;background:linear-gradient(90deg,var(--brand-color),#00d4c4);color:#041018;font-weight:900;border:none}
+.quick-wins-note{margin-top:12px;color:var(--text-secondary);text-align:center;max-width:760px}
 
-/* Compass */
-.compass-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:12px}
-.compass-container{
-  position:relative;
-  width:var(--compass-size);
-  height:var(--compass-size);
-  margin:12px auto;
-  border-radius:50%;
-  overflow:visible;
-  /* subtle outer glow ring */
-  box-shadow:0 30px 110px rgba(0,0,0,0.6), 0 0 36px rgba(0,0,0,0.2);
-}
-/* wedge fill is set by JS using conic-gradient. Add separator overlay and outer glowing ring */
+/* Streak */
+.streak-row{display:flex;justify-content:center;margin-bottom:12px}
+.streak-badge{background:linear-gradient(180deg,#ffb874,#ff7a7a);color:#081018;padding:0.6rem 1rem;border-radius:999px;font-weight:900;display:inline-flex;align-items:center;gap:0.6rem;box-shadow:0 12px 28px rgba(0,0,0,0.45);font-size:1.06rem;min-width:160px}
+
+/* Main container */
+.main-content{max-width:1120px;margin:0 auto;padding:1rem}
+
+/* Compass container + wedges */
+.compass-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:10px}
+.compass-container{position:relative;width:var(--compass-size);height:var(--compass-size);margin:12px auto;border-radius:50%;overflow:visible;box-shadow:0 20px 80px rgba(0,0,0,0.6)}
+.compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.12;border-radius:50%}
+
+/* Wedge surface: JS will set conic gradient. Create crisp separators that visually align with wedge edges using an overlay pseudo-element */
 .compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:1;mix-blend-mode:normal}
-/* separators: thin darker lines between wedges using repeating-conic-gradient */
-.compass-wedges::before{
+.compass-wedges::after{
   content:"";
   position:absolute;inset:0;border-radius:50%;
-  background: repeating-conic-gradient(
-    rgba(0,0,0,0.38) 0deg 2.2deg,
-    transparent 2.2deg 90deg
-  );
-  opacity:0.18;
+  /* thin separators: repeating-conic provides subtle lines that line up with wedge stops */
+  background: repeating-conic-gradient(rgba(0,0,0,0.34) 0deg 2.4deg, transparent 2.4deg 90deg);
+  opacity:0.12;
   pointer-events:none;
 }
-/* outer glow ring */
-.compass-container::after{
-  content:"";
-  position:absolute;inset:-6%;border-radius:50%;
-  box-shadow:0 30px 160px rgba(0,175,160,0.06), 0 0 72px rgba(255,255,255,0.02);
-  pointer-events:none;
-}
-.compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.10;border-radius:50%}
-.compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);pointer-events:none;z-index:3}
+/* outer subtle glow */
+.compass-container::before{ content:""; position:absolute; inset:-6%; border-radius:50%; box-shadow:0 34px 140px rgba(0,0,0,0.7), 0 0 40px rgba(0,175,160,0.06); pointer-events:none; z-index:0; }
+
+/* Compass arrow */
+.compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;pointer-events:none}
 
 /* Ring buttons */
-.compass-ring{position:absolute;inset:0;pointer-events:none;z-index:20}
-.ring-btn{
-  position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:14px 24px;border-radius:999px;min-width:140px;max-width:300px;font-weight:900;color:var(--text-primary);border:none;transform: translate(-50%,-50%);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.04));font-size:clamp(16px,3.0vw,22px)}
-.ring-btn .ring-label{padding:0 8px}
-.ring-btn:hover{transform: translate(-50%,-50%) scale(1.04)}
+.compass-ring{position:absolute;inset:0;pointer-events:none;z-index:3}
+.ring-btn{position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:14px 22px;border-radius:999px;min-width:140px;max-width:280px;font-weight:900;color:var(--text-primary);border:none;transform:translate(-50%,-50%);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.06));font-size:clamp(16px,3.0vw,22px);box-shadow:0 28px 80px rgba(0,0,0,0.6)}
+.ring-label{padding:0 8px}
 
-/* Mode card */
+/* Modes list */
 .section-title{text-align:center;font-size:1.9rem;margin:28px 0 12px}
 .modes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
-.mode-card{padding:28px 32px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.06));border:1px solid var(--border);position:relative}
+.mode-card{padding:28px 32px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.06));border:1px solid var(--border);position:relative;overflow:hidden}
 .mode-card:before{content:"";position:absolute;left:0;top:0;height:100%;width:16px;border-radius:8px 0 0 8px;background:var(--mode-color)}
 .mode-name{font-weight:900;font-size:1.5rem;margin-bottom:6px}
 .mode-desc{font-size:1.06rem;color:var(--text-secondary)}
 
-/* Mode dialog header improvements: larger side padding and color accent */
-.mode-header{padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.03);margin-bottom:18px;display:block}
-.mode-header .mode-title{margin:0;font-size:2.1rem}
-.mode-header .mode-description{margin-top:8px;color:var(--text-secondary);font-size:1.06rem}
-.mode-header .accent{
-  display:inline-block;height:46px;width:10px;border-radius:4px;margin-right:14px;vertical-align:middle;
-}
+/* Mode dialog header: larger padded area, vertical accent */
+.mode-header{display:flex;align-items:flex-start;gap:14px;padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.mode-header .accent{width:10px;height:56px;border-radius:6px}
+.mode-head-inner{flex:1}
+.mode-title{font-size:2.0rem;margin:0}
+.mode-description{margin-top:8px;color:var(--text-secondary)}
 
-/* Activities list */
+/* Dialogs & activities */
+dialog{border:none;border-radius:12px;padding:0;max-width:880px;width:calc(100% - 2rem);background:var(--bg-elevated);color:var(--text-primary);box-shadow:0 40px 160px rgba(0,0,0,0.9)}
+.dialog-content{padding:1.4rem;position:relative}
+.dialog-close{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--text-secondary);font-size:1.6rem;cursor:pointer;width:44px;height:44px;border-radius:50%}
+
+/* Activity list */
 .quick-wins-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px}
 .quick-wins-list li{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.06));border:1px solid var(--border)}
 .activity-row{display:flex;align-items:center;justify-content:space-between}
 .activity-instruction{font-size:0.98rem;color:var(--text-secondary);margin-top:8px}
 
-/* textarea notes (hidden until selection) */
+/* notes */
 .activity-note{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-primary);resize:vertical;margin-top:10px}
 .activity-note[hidden]{display:none}
 
@@ -129,11 +122,11 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
 .select-activity, .select-global-activity{padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text-primary)}
 .select-activity.active, .select-global-activity.active{background:linear-gradient(90deg,var(--brand-color),#00d4c4);color:#041018}
 
-/* history */
+/* History */
 .history-chart-row{display:flex;justify-content:center;margin:12px 0}
 .stat-card{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.04));border:1px solid var(--border);min-width:120px;text-align:center;margin-right:8px}
 
-/* small helpers */
+/* Toast helper */
 .rc-toast{position:fixed;left:50%;transform:translateX(-50%) translateY(8px);bottom:18px;background:rgba(8,8,8,0.9);color:white;padding:10px 14px;border-radius:10px;opacity:0;transition:opacity 220ms ease,transform 220ms ease;z-index:9999}
 .rc-toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -141,6 +134,7 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
 @media (max-width:640px){
   :root{--compass-size: clamp(300px, 78vmin, 720px);}
   .app-title{font-size:1.8rem}
-  .mode-header{padding:16px 18px}
-  .mode-header .mode-title{font-size:1.6rem}
+  .mode-header{padding:14px}
+  .mode-title{font-size:1.6rem}
+  .ring-btn{font-size:15px;padding:12px 16px}
 }
