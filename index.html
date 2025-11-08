@@ -7,6 +7,10 @@
   <meta name="theme-color" content="#00AFA0" />
   <title>The Reset Compass</title>
 
+  <!-- Adsense as requested -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895"
+     crossorigin="anonymous"></script>
+
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="assets/images/compass.svg" />
@@ -34,7 +38,6 @@
   </header>
 
   <main class="main-content">
-    <!-- Compass section -->
     <section class="page-section page-section--compass" aria-label="Compass section">
       <div class="streak-row">
         <div id="streakContainer" class="streak-container" aria-hidden="false">
@@ -44,10 +47,13 @@
 
       <div class="compass-wrap">
         <div class="compass-container" role="img" aria-label="Compass shape with four wedges" id="compassContainer">
+          <!-- subtle background graphic -->
           <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" />
 
+          <!-- wedges (rendered by JS, using gradient and subtle separators to distinguish modes visually) -->
           <div id="compassWedges" class="compass-wedges" aria-hidden="true"></div>
 
+          <!-- compass arrow -->
           <div class="compass-arrow" id="compassArrow" aria-hidden="true" aria-label="Compass arrow">
             <svg viewBox="0 0 24 24" width="88" height="88" role="img" aria-hidden="true">
               <path d="M12 2 L16 12 L12 22 L8 12 Z" fill="#000" opacity="1" />
@@ -55,26 +61,20 @@
             </svg>
           </div>
 
-          <!-- ring labels inserted by JS and positioned by polar coordinates -->
+          <!-- ring buttons inserted by JS and positioned by polar coordinates -->
           <div id="compassRing" class="compass-ring" aria-hidden="false"></div>
         </div>
       </div>
     </section>
 
-    <!-- Info section dividing compass and list -->
     <section class="page-section page-section--info" aria-hidden="false">
       <p class="hero-intro">Find your current wellness mode: pick a wedge inside the compass or choose a card below.</p>
     </section>
 
-    <!-- Modes section -->
     <section class="page-section page-section--modes" aria-label="Wellness Modes">
       <h2 class="section-title">Choose Your Mode</h2>
 
-      <div class="modes-grid" id="modesGrid" role="list" aria-live="polite">
-        <noscript>
-          <p class="no-js-message">Please enable JavaScript to view the wellness modes.</p>
-        </noscript>
-      </div>
+      <div class="modes-grid" id="modesGrid" role="list" aria-live="polite"></div>
 
       <!-- Quick wins block: clearly defined cell -->
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
@@ -89,9 +89,7 @@
       <div class="ad-slot" aria-label="Advertisement">
         <p class="ad-placeholder">Ad Placeholder</p>
       </div>
-      <p class="footer-text">
-        <small>&copy; 2025 Evolution of Wellness — The Reset Compass</small>
-      </p>
+      <p class="footer-text"><small>&copy; 2025 Evolution of Wellness — The Reset Compass</small></p>
     </footer>
   </main>
 
@@ -108,7 +106,6 @@
       <div class="mode-actions">
         <h3>Activities</h3>
         <ul id="dialogQuickWins" class="quick-wins-list" role="list"></ul>
-
         <p class="mode-note-help">Select an activity and add optional notes before completing.</p>
       </div>
 
@@ -134,7 +131,7 @@
     </div>
   </dialog>
 
-  <!-- History Dialog: includes donut canvas -->
+  <!-- History Dialog -->
   <dialog id="historyDialog" class="history-dialog" aria-labelledby="historyDialogTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
@@ -158,7 +155,7 @@
   <dialog id="comeBackDialog" class="mode-dialog" aria-labelledby="comeBackTitle">
     <div class="dialog-content">
       <h2 id="comeBackTitle">Nice work!</h2>
-      <p id="comeBackMsg">You've completed a mode today — come back tomorrow for another mode. Quick Wins are still available anytime.</p>
+      <p id="comeBackMsg">You've completed a mode today — come back tomorrow to continue your streak. Quick Wins are still available anytime.</p>
       <div class="dialog-actions">
         <button class="btn-primary dialog-close">OK</button>
       </div>
