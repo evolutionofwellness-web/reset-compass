@@ -1,10 +1,7 @@
 /* style.css
-   - Improved dark-mode visibility for the compass
-   - Quick Wins in a distinct block/cell
-   - Donut chart area for history
-   - Mode card padding increased
-   - Dropdown closes on outside click (JS) and style tweaks
-   - Come-back dialog styling inherits dialog styles
+   - Improved dark-mode compass visibility, wedge gradients, larger wedge text/buttons,
+   - Quick Wins in a distinct block, larger mode title padding, donut styling
+   - Notes textarea appears when an activity is selected
 */
 
 /* CSS Variables */
@@ -78,7 +75,7 @@ a, a:visited { text-decoration:none; color:inherit }
 /* Main */
 .main-content{max-width:1120px;margin:0 auto;padding:1.25rem}
 
-/* Compass (dark-mode friendly: reduce dark overlay and increase wedge contrast) */
+/* Compass */
 .compass-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:12px}
 .compass-container{
   position:relative;
@@ -90,13 +87,13 @@ a, a:visited { text-decoration:none; color:inherit }
   box-shadow:inset 0 36px 80px rgba(0,0,0,0.6), 0 18px 60px rgba(0,0,0,0.6);
   overflow:visible;
 }
-/* lighter image layer so wedge colors are visible in dark mode */
 .compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.12;border-radius:50%}
+/* wedges are rendered with conic gradients; JS adds gradient stops and separators for clearer mode separation */
 .compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:1;z-index:1;mix-blend-mode:normal}
 .compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);pointer-events:none;z-index:3;filter:drop-shadow(0 8px 28px rgba(0,0,0,0.6))}
 .hero-intro{margin-top:8px;text-align:center;color:var(--text-secondary);max-width:880px;margin-left:auto;margin-right:auto;font-size:1.06rem}
 
-/* Ring buttons */
+/* Ring buttons: larger text and bolder weight for wedge labels */
 .compass-ring{position:absolute;inset:0;pointer-events:none;z-index:18}
 .ring-btn{
   position:absolute;
@@ -104,10 +101,10 @@ a, a:visited { text-decoration:none; color:inherit }
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:12px 18px;
+  padding:14px 22px;
   border-radius:999px;
-  min-width:120px;
-  max-width:260px;
+  min-width:140px;
+  max-width:280px;
   font-weight:900;
   color:var(--text-primary);
   border:none;
@@ -118,20 +115,21 @@ a, a:visited { text-decoration:none; color:inherit }
   text-overflow:ellipsis;
   background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));
   z-index:20;
-  font-size:clamp(15px,2.6vw,20px);
+  font-size:clamp(16px,3.0vw,22px); /* larger wedge text */
   transition:transform 200ms, box-shadow 200ms, filter 200ms;
+  letter-spacing:0.3px;
 }
-.ring-btn .ring-label{padding:0 6px}
+.ring-label{padding:0 8px; font-weight:900}
 .ring-btn:hover, .ring-btn:focus{transform: translate(-50%,-50%) scale(1.04);filter:brightness(1.06)}
 
-/* Mode cards: increased left padding to avoid text close to stripe */
+/* Mode cards: increased left padding and clear headline area */
 .section-title{text-align:center;font-size:1.9rem;margin:28px 0 12px;color:var(--text-primary);font-weight:900}
 .modes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
 .mode-card{
   display:flex;
   flex-direction:column;
   gap:14px;
-  padding:26px 26px 26px 40px; /* more left padding */
+  padding:28px 28px 28px 44px; /* more left padding to keep title away from stripe */
   border-radius:16px;
   background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.10));
   border:1px solid var(--border);
@@ -148,7 +146,7 @@ a, a:visited { text-decoration:none; color:inherit }
   background:linear-gradient(180deg,var(--mode-color, rgba(0,175,160,0.7)), rgba(0,0,0,0));
   opacity:1;
 }
-.mode-name{font-weight:900;font-size:1.44rem;color:var(--text-primary);margin-bottom:6px}
+.mode-name{font-weight:900;font-size:1.5rem;color:var(--text-primary);margin-bottom:6px}
 .mode-desc{font-size:1.08rem;color:var(--text-secondary);line-height:1.6;padding-right:6px}
 .mode-hint{font-size:1rem;color:var(--brand-color);margin-top:8px;font-weight:900;padding-top:2px}
 
@@ -157,8 +155,8 @@ dialog{border:none;border-radius:16px;padding:0;max-width:880px;width:calc(100% 
 .dialog-content{padding:1.6rem;position:relative}
 .dialog-close{position:absolute;top:12px;right:12px;background:transparent;border:none;color:var(--text-secondary);font-size:1.6rem;cursor:pointer;width:48px;height:48px;border-radius:50%;box-shadow:0 8px 28px rgba(0,0,0,0.45)}
 .mode-header{padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.02);margin-bottom:18px}
-.mode-title{margin:0 0 8px 0;font-size:1.9rem}
-.mode-description{margin:0;color:var(--text-secondary);font-size:1.05rem}
+.mode-title{margin:0 0 8px 0;font-size:2.0rem} /* larger title in mode dialog */
+.mode-description{margin:0;color:var(--text-secondary);font-size:1.06rem}
 
 /* activity list */
 .quick-wins-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px}
@@ -166,8 +164,9 @@ dialog{border:none;border-radius:16px;padding:0;max-width:880px;width:calc(100% 
 .activity-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .activity-instruction{font-size:0.98rem;color:var(--text-secondary);margin-top:8px}
 
-/* history donut row */
-.history-chart-row{display:flex;justify-content:center;margin:12px 0}
+/* notes always present but hidden until selection; visible when associated select gets .active */
+.activity-note{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-primary);resize:vertical;display:block;margin-top:10px}
+.activity-note[hidden]{display:none}
 
 /* select control */
 .select-activity, .select-global-activity{
@@ -186,41 +185,23 @@ dialog{border:none;border-radius:16px;padding:0;max-width:880px;width:calc(100% 
   color:#041018;border-color:transparent;
 }
 
-/* notes */
-.activity-note{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-primary);resize:vertical;display:block}
-.activity-note[hidden]{display:none}
+/* history donut row */
+.history-chart-row{display:flex;justify-content:center;margin:12px 0}
 
 /* buttons */
 .btn-primary{background:var(--brand-color);color:#081018;padding:12px 18px;border-radius:12px;border:none;font-weight:900}
 .btn-secondary{background:transparent;border:1px solid var(--border);color:var(--text-primary);padding:10px 14px;border-radius:10px}
 
-/* history */
-.history-stats{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-.stat-card{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.04));padding:12px;border-radius:10px;min-width:140px;text-align:center;border:1px solid var(--border)}
-.stat-value{font-size:1.6rem;font-weight:800;color:var(--brand-color)}
-.history-timeline{max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
-.history-entry{padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.04));border-radius:10px;border-left:8px solid rgba(0,0,0,0.06)}
-
-/* dialog open animation */
-dialog[open] .dialog-content{animation:dialogOpen 220ms cubic-bezier(.2,.9,.2,1)}
-@keyframes dialogOpen{from{transform:translateY(8px) scale(.995);opacity:0}to{transform:none;opacity:1}}
-
-/* glows */
-.app-title{transition:filter 220ms, text-shadow 220ms}
-.mode-card:hover:before { filter: drop-shadow(0 18px 48px rgba(0,175,160,0.06)); }
-
-/* toast */
+/* toast & misc */
 .rc-toast{position:fixed;left:50%;transform:translateX(-50%) translateY(8px);bottom:18px;background:rgba(8,8,8,0.9);color:white;padding:10px 14px;border-radius:10px;opacity:0;transition:opacity 220ms ease,transform 220ms ease;z-index:9999}
 .rc-toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* Responsive */
 @media (max-width:640px){
   :root{--compass-size: clamp(340px, 78vmin, 760px);}
-  .app-title{font-size:1.7rem}
-  .nav-ellipsis{padding:8px}
-  .nav-dropdown{right:8px;top:8px}
+  .app-title{font-size:1.8rem}
   .modes-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-  .mode-card{padding:16px 16px 16px 26px}
-  .ring-btn{min-width:96px;max-width:180px;font-size:14px;padding:12px 14px}
+  .mode-card{padding:18px 18px 18px 30px}
+  .ring-btn{min-width:96px;max-width:180px;font-size:15px;padding:12px 14px}
   .quick-wins-cta{padding:12px 18px}
 }
