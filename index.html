@@ -76,9 +76,10 @@
         </noscript>
       </div>
 
-      <div class="quick-wins-under" style="text-align:center;margin-top:40px;">
+      <!-- Quick wins block: clearly defined cell -->
+      <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
         <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">Quick Wins</button>
-        <p class="quick-wins-note" style="margin-top:16px;color:var(--text-secondary);font-size:1rem;max-width:820px;margin-left:auto;margin-right:auto;line-height:1.4;">
+        <p class="quick-wins-note">
           Quick Wins are one-step actions you can do immediately to shift your focus, energy, or mood. Tap a Quick Win to complete it fast.
         </p>
       </div>
@@ -133,13 +134,16 @@
     </div>
   </dialog>
 
-  <!-- History Dialog -->
+  <!-- History Dialog: includes donut canvas -->
   <dialog id="historyDialog" class="history-dialog" aria-labelledby="historyDialogTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
       <h2 id="historyDialogTitle">Your Reset History</h2>
 
       <div id="historyStats" class="history-stats"></div>
+      <div class="history-chart-row">
+        <canvas id="historyDonut" width="260" height="260" aria-label="Mode distribution chart"></canvas>
+      </div>
       <div id="historyTimeline" class="history-timeline"></div>
 
       <div class="dialog-actions">
