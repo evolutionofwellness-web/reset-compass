@@ -1,7 +1,13 @@
-/* style.css - major fixes: wedge separators aligned, dialog/modal styling restored,
-   action wiring friendly, mode header padding, per-mode accents, Quick Wins block clearer */
+/* style.css
+   Fixed visual regressions and restored reliable behavior:
+   - Dialogs forced to use site dark theme (dialog background & backdrop).
+   - Wedge separators aligned with conic stops (JS uses same angles).
+   - Buttons and selects styled and kept interactive (no replacing nodes).
+   - Mode header padded and accented per-mode.
+   - Quick Wins dialog darkified, Select buttons visible with good contrast.
+*/
 
-/* Variables */
+/* CSS Variables */
 :root{
   --brand-color: #00AFA0;
   --bg-primary: #06070a;
@@ -10,8 +16,7 @@
   --text-primary: #edf1f5;
   --text-secondary: #cbd2db;
   --border: rgba(255,255,255,0.06);
-
-  --compass-size: clamp(380px, 66vmin, 960px);
+  --compass-size: clamp(360px, 66vmin, 900px);
 
   --color-growing: #2f80ed;
   --color-grounded: #00c06b;
@@ -19,7 +24,7 @@
   --color-surviving: #ff5f6d;
 }
 
-/* Light theme */
+/* Light theme overrides */
 :root.light{
   --bg-primary: #f6f7fb;
   --bg-secondary: #eef1f6;
@@ -35,20 +40,22 @@ html{font-size:16.5px;scroll-behavior:smooth}
 body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(135deg,var(--bg-primary),var(--bg-secondary));color:var(--text-primary);-webkit-font-smoothing:antialiased;min-height:100vh}
 
 /* Header */
-.app-header{position:sticky;top:0;z-index:160;background:transparent;border-bottom:1px solid var(--border);backdrop-filter:blur(6px)}
+.app-header{position:sticky;top:0;z-index:180;background:transparent;border-bottom:1px solid var(--border);backdrop-filter:blur(6px)}
 .app-header-top{display:flex;align-items:center;justify-content:center;padding:18px 16px 10px;position:relative}
-.app-title{margin:0;font-weight:900;font-size:2.1rem;letter-spacing:-0.6px;color:var(--brand-color);text-shadow:0 6px 18px rgba(0,0,0,0.45)}
+.home-link{display:inline-block;text-decoration:none;flex:1;text-align:center}
+.app-title{margin:0;font-weight:900;font-size:2.1rem;letter-spacing:-0.6px;color:var(--brand-color);text-shadow:0 8px 26px rgba(0,0,0,0.45)}
 
-/* Dropdown (index only) */
+/* Dropdown nav (index only) */
 .nav-dropdown{position:absolute;right:14px;top:10px}
 .nav-ellipsis{background:var(--bg-elevated);border:1px solid var(--border);padding:10px 12px;border-radius:12px;color:var(--text-primary);cursor:pointer}
 .nav-dropdown-menu{display:none;position:absolute;right:0;top:46px;background:linear-gradient(180deg,var(--bg-elevated), rgba(0,0,0,0.02));border-radius:12px;padding:8px;box-shadow:0 28px 80px rgba(0,0,0,0.65);min-width:180px;border:1px solid var(--border)}
 .nav-dropdown-menu[aria-hidden="false"]{display:block}
+.nav-dropdown-item{display:block;width:100%;background:transparent;border:none;color:var(--text-primary);padding:12px 14px;text-align:left;border-radius:8px;cursor:pointer;font-weight:700}
 
-/* Layout sections */
+/* Sections */
 .page-section{padding:12px 8px;margin-top:8px}
 .page-section--compass{padding-top:6px;padding-bottom:6px}
-.hero-intro{text-align:center;color:var(--text-secondary);max-width:880px;margin:8px auto 18px;font-size:1.05rem}
+.hero-intro{margin-top:8px;text-align:center;color:var(--text-secondary);max-width:880px;margin-left:auto;margin-right:auto;font-size:1.06rem}
 
 /* Quick Wins block */
 .quick-wins-block{margin-top:28px;background:linear-gradient(180deg, rgba(0,175,160,0.03), rgba(0,0,0,0.02));padding:20px;border-radius:14px;display:flex;flex-direction:column;align-items:center;box-shadow:0 18px 60px rgba(0,0,0,0.45)}
@@ -59,33 +66,24 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
 .streak-row{display:flex;justify-content:center;margin-bottom:12px}
 .streak-badge{background:linear-gradient(180deg,#ffb874,#ff7a7a);color:#081018;padding:0.6rem 1rem;border-radius:999px;font-weight:900;display:inline-flex;align-items:center;gap:0.6rem;box-shadow:0 12px 28px rgba(0,0,0,0.45);font-size:1.06rem;min-width:160px}
 
-/* Main container */
+/* Main */
 .main-content{max-width:1120px;margin:0 auto;padding:1rem}
 
-/* Compass container + wedges */
+/* Compass */
 .compass-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:10px}
 .compass-container{position:relative;width:var(--compass-size);height:var(--compass-size);margin:12px auto;border-radius:50%;overflow:visible;box-shadow:0 20px 80px rgba(0,0,0,0.6)}
 .compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.12;border-radius:50%}
-
-/* Wedge surface: JS will set conic gradient. Create crisp separators that visually align with wedge edges using an overlay pseudo-element */
 .compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:1;mix-blend-mode:normal}
-.compass-wedges::after{
-  content:"";
-  position:absolute;inset:0;border-radius:50%;
-  /* thin separators: repeating-conic provides subtle lines that line up with wedge stops */
-  background: repeating-conic-gradient(rgba(0,0,0,0.34) 0deg 2.4deg, transparent 2.4deg 90deg);
-  opacity:0.12;
-  pointer-events:none;
-}
-/* outer subtle glow */
-.compass-container::before{ content:""; position:absolute; inset:-6%; border-radius:50%; box-shadow:0 34px 140px rgba(0,0,0,0.7), 0 0 40px rgba(0,175,160,0.06); pointer-events:none; z-index:0; }
+/* visual separator overlay; JS ensures wedge stops align with this */
+.compass-wedges::after{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(0,0,0,0.34) 0deg 1.8deg, transparent 1.8deg 90deg);opacity:0.09;pointer-events:none}
+.compass-container::before{content:"";position:absolute;inset:-6%;border-radius:50%;box-shadow:0 34px 140px rgba(0,0,0,0.7), 0 0 40px rgba(0,175,160,0.06);pointer-events:none}
 
-/* Compass arrow */
-.compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;pointer-events:none}
+/* arrow */
+.compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4}
 
-/* Ring buttons */
+/* ring labels */
 .compass-ring{position:absolute;inset:0;pointer-events:none;z-index:3}
-.ring-btn{position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:14px 22px;border-radius:999px;min-width:140px;max-width:280px;font-weight:900;color:var(--text-primary);border:none;transform:translate(-50%,-50%);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.06));font-size:clamp(16px,3.0vw,22px);box-shadow:0 28px 80px rgba(0,0,0,0.6)}
+.ring-btn{position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:14px 22px;border-radius:999px;min-width:140px;max-width:280px;font-weight:900;color:var(--text-primary);border:none;transform:translate(-50%,-50%);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.06));font-size:clamp(16px,3vw,22px);box-shadow:0 24px 80px rgba(0,0,0,0.6)}
 .ring-label{padding:0 8px}
 
 /* Modes list */
@@ -96,15 +94,17 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
 .mode-name{font-weight:900;font-size:1.5rem;margin-bottom:6px}
 .mode-desc{font-size:1.06rem;color:var(--text-secondary)}
 
-/* Mode dialog header: larger padded area, vertical accent */
+/* Mode dialog header */
 .mode-header{display:flex;align-items:flex-start;gap:14px;padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.03)}
 .mode-header .accent{width:10px;height:56px;border-radius:6px}
 .mode-head-inner{flex:1}
 .mode-title{font-size:2.0rem;margin:0}
 .mode-description{margin-top:8px;color:var(--text-secondary)}
 
-/* Dialogs & activities */
+/* Dialogs: force dark background even in browsers with default white UA styling.
+   Also style backdrop for clarity. */
 dialog{border:none;border-radius:12px;padding:0;max-width:880px;width:calc(100% - 2rem);background:var(--bg-elevated);color:var(--text-primary);box-shadow:0 40px 160px rgba(0,0,0,0.9)}
+dialog::backdrop{background:rgba(0,0,0,0.62)}
 .dialog-content{padding:1.4rem;position:relative}
 .dialog-close{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--text-secondary);font-size:1.6rem;cursor:pointer;width:44px;height:44px;border-radius:50%}
 
@@ -118,19 +118,19 @@ dialog{border:none;border-radius:12px;padding:0;max-width:880px;width:calc(100% 
 .activity-note{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-primary);resize:vertical;margin-top:10px}
 .activity-note[hidden]{display:none}
 
-/* select controls and buttons */
+/* selects and buttons */
 .select-activity, .select-global-activity{padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text-primary)}
 .select-activity.active, .select-global-activity.active{background:linear-gradient(90deg,var(--brand-color),#00d4c4);color:#041018}
 
-/* History */
+/* history */
 .history-chart-row{display:flex;justify-content:center;margin:12px 0}
 .stat-card{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.04));border:1px solid var(--border);min-width:120px;text-align:center;margin-right:8px}
 
-/* Toast helper */
+/* toast */
 .rc-toast{position:fixed;left:50%;transform:translateX(-50%) translateY(8px);bottom:18px;background:rgba(8,8,8,0.9);color:white;padding:10px 14px;border-radius:10px;opacity:0;transition:opacity 220ms ease,transform 220ms ease;z-index:9999}
 .rc-toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* Responsive tweaks */
+/* Responsive */
 @media (max-width:640px){
   :root{--compass-size: clamp(300px, 78vmin, 720px);}
   .app-title{font-size:1.8rem}
