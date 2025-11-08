@@ -1,7 +1,11 @@
 // script.js
-// Finalized updates to make selection notes appear, enforce one-mode-per-day with pop-up,
-// increase wedge font sizes, add clearer quick-wins block, ensure dropdown works on about,
-// and make "Complete Selected" reliably enabled and functional.
+// Final synchronized update implementing:
+// - reliable Quick Wins and Mode selection flows (notes visible when selected, buttons enable)
+// - one mode per day enforcement (come-back dialog + block)
+// - donut chart in history, clear history resets streaks + mode-day
+// - improved compass rendering (conic gradients + separators), larger wedge labels
+// - dropdown menu closes on outside click (index only); About page has no dropdown
+// - Adsense script left in head (index/about) per request
 
 (function() {
   'use strict';
@@ -37,7 +41,7 @@
   const navMenuToggleAbout = document.getElementById('navMenuToggleAbout');
   const navDropdownAbout = document.getElementById('navDropdownAbout');
 
-  const themeToggles = Array.from(document.querySelectorAll('.theme-toggle'));
+  const themeToggles = Array.from(document.querySelectorAll('.theme-toggle, .theme-toggle'));
   const streakBadges = document.querySelectorAll('#streakBadge');
 
   const ARROW_MULTIPLIER = 5760;
@@ -176,7 +180,6 @@
     const N = (list && list.length) || 0;
     if (N === 0) { compassWedges.style.background = 'transparent'; return; }
     const portion = 360 / N;
-    // include a slight radial gradient to create separation and depth in each wedge
     const entries = list.map((m, i) => {
       const color = (m && m.color) ? m.color : '#00AFA0';
       const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + 'F2' : color;
@@ -185,9 +188,8 @@
       return `${stopColor} ${start}deg ${end}deg`;
     });
     compassWedges.style.background = `conic-gradient(from -45deg, ${entries.join(',')})`;
-    // overlay subtle radial gradient for depth
-    compassWedges.style.boxShadow = 'inset 0 18px 80px rgba(0,0,0,0.35)';
-    compassWedges.style.filter = 'saturate(1.14) contrast(1.12)';
+    compassWedges.style.boxShadow = 'inset 0 18px 80px rgba(0,0,0,0.30)';
+    compassWedges.style.filter = 'saturate(1.12) contrast(1.08)';
   }
 
   function renderGlobalQuickWins() {
@@ -206,7 +208,7 @@
       </li>
     `).join('');
 
-    // wire select controls to reliably enable Quick Wins completion
+    // wire select buttons
     globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
@@ -216,7 +218,7 @@
           const ta = li.querySelector('.activity-note');
           if (ta) ta.hidden = !btn.classList.contains('active');
         }
-        if (startQuickWinBtn) startQuickWinBtn.disabled = !(globalQuickWinsList.querySelectorAll('.select-global-activity.active').length > 0);
+        startQuickWinBtn.disabled = !(globalQuickWinsList.querySelectorAll('.select-global-activity.active').length > 0);
       });
     });
   }
@@ -252,7 +254,6 @@
     if (!Array.isArray(entries) || entries.length === 0) return;
     const today = todayKey();
     const modeEntries = entries.filter(e => e.modeId);
-    // If user tries to record a mode but already did a mode today, block and show come-back
     const lastModeDay = localStorage.getItem(LAST_MODE_DAY_KEY);
     if (modeEntries.length > 0 && lastModeDay === today) {
       showComeBackDialog();
@@ -275,9 +276,7 @@
 
     const bumped = incrementStreakIfNeeded();
 
-    if (modeEntries.length > 0) {
-      localStorage.setItem(LAST_MODE_DAY_KEY, today);
-    }
+    if (modeEntries.length > 0) localStorage.setItem(LAST_MODE_DAY_KEY, today);
 
     if (bumped && currentMode) {
       const ring = document.querySelector(`.ring-btn[data-mode-id="${currentMode.id}"]`);
@@ -294,11 +293,6 @@
       openHistoryDialog();
       if (modeEntries.length > 0) setTimeout(()=>showComeBackDialog(), 700);
     }, 540);
-  }
-
-  function showComeBackDialog() {
-    if (!comeBackDialog) { showToast('You already completed a mode today — come back tomorrow.'); return; }
-    try { comeBackDialog.showModal(); } catch(e) { alert('You already completed a mode today — come back tomorrow.'); }
   }
 
   function drawHistoryDonut(counts) {
@@ -339,6 +333,7 @@
       const name = h.modeName || 'Quick Win';
       counts[name] = (counts[name] || 0) + 1;
     });
+
     if (historyStats) {
       historyStats.innerHTML = `<div class="stat-card"><div class="stat-value">${history.length}</div><div class="stat-label">Total resets</div></div>
         <div class="stat-card"><div class="stat-value">${Number(localStorage.getItem(LONGEST_KEY) || 0)}</div><div class="stat-label">Longest streak</div></div>`;
@@ -348,6 +343,7 @@
         historyStats.insertAdjacentHTML('beforeend', `<div class="stat-card" style="border-left:8px solid ${m.color};"><div class="stat-value">${c}</div><div class="stat-label">${escapeHtml(m.name)} • ${pct}%</div></div>`);
       });
     }
+
     const donutData = modes.map(m => ({ value: counts[m.name] || 0, color: m.color }));
     drawHistoryDonut(donutData);
 
@@ -371,7 +367,13 @@
   }
   function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
+  function showComeBackDialog() {
+    if (!comeBackDialog) { showToast('You already completed a mode today — come back tomorrow.'); return; }
+    try { comeBackDialog.showModal(); } catch(e) { alert('You already completed a mode today — come back tomorrow.'); }
+  }
+
   function attachListeners() {
+    // dropdown toggling (index only) - safe if elements missing (about page)
     function toggleDropdown(toggle, menu) {
       if (!toggle || !menu) return;
       toggle.addEventListener('click', (ev) => {
@@ -391,6 +393,7 @@
     toggleDropdown(navMenuToggle, navDropdown);
     toggleDropdown(navMenuToggleAbout, navDropdownAbout);
 
+    // global click delegation for actions
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
       const actionEl = e.target.closest('[data-action]');
@@ -398,8 +401,7 @@
         const action = actionEl.dataset.action;
         if (action === 'quick-wins') { safeShowDialog(quickWinsDialog); return; }
         if (action === 'history') { openHistoryDialog(); return; }
-        if (action === 'home') { window.location.href = './index.html'; return; }
-        if (action === 'about') { window.location.href = './about.html'; return; }
+        if (action === 'home' || action === 'about') { window.location.href = action === 'home' ? './index.html' : './about.html'; return; }
         if (action === 'toggle-theme') {
           const newTheme = document.documentElement.classList.contains('light') ? 'dark' : 'light';
           setTheme(newTheme);
@@ -407,37 +409,22 @@
         }
       }
 
+      // ring button click
       const ringBtn = e.target.closest('.ring-btn[data-mode-id]');
       if (ringBtn && ringBtn.dataset && ringBtn.dataset.modeId) { openModeDialog(Number(ringBtn.dataset.modeId)); return; }
 
+      // mode card click
       const modeCard = e.target.closest('.mode-card[data-mode-id]');
       if (modeCard && modeCard.dataset && modeCard.dataset.modeId) { openModeDialog(Number(modeCard.dataset.modeId)); return; }
 
-      const gSel = e.target.closest('.select-global-activity');
-      if (gSel && gSel.dataset && gSel.dataset.activity) {
-        e.preventDefault();
-        gSel.classList.toggle('active');
-        const li = gSel.closest('li'); if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.hidden = !gSel.classList.contains('active'); }
-        if (startQuickWinBtn) startQuickWinBtn.disabled = !(globalQuickWinsList.querySelectorAll('.select-global-activity.active').length > 0);
-        return;
-      }
-
-      const selBtn = e.target.closest('.select-activity');
-      if (selBtn && selBtn.dataset && selBtn.dataset.activity) {
-        e.preventDefault();
-        selBtn.classList.toggle('active');
-        const li = selBtn.closest('li'); if (li) { const ta = li.querySelector('.activity-note'); if (ta) ta.hidden = !selBtn.classList.contains('active'); }
-        if (startResetBtn) startResetBtn.disabled = !(dialogQuickWins.querySelectorAll('.select-activity.active').length > 0);
-        return;
-      }
-
+      // select inside quick wins or mode dialog handled by per-button listeners (below)
       if (e.target.closest('.dialog-close') || e.target.closest('.dialog-cancel')) {
         const d = e.target.closest('dialog');
         if (d) { safeCloseDialog(d); clearDialogSelections(d); }
       }
     }, true);
 
-    // clicking inside wedge area opens the mode
+    // clicking inside wedge area opens mode
     if (compassContainer) {
       compassContainer.addEventListener('click', function(e) {
         const rect = compassContainer.getBoundingClientRect();
@@ -461,6 +448,7 @@
       }, true);
     }
 
+    // wire quick-wins button action (enable handled when list rendered)
     if (startQuickWinBtn) {
       startQuickWinBtn.addEventListener('click', function() {
         const selected = Array.from(globalQuickWinsList.querySelectorAll('.select-global-activity.active'));
@@ -475,24 +463,7 @@
       });
     }
 
-    if (startResetBtn) {
-      startResetBtn.addEventListener('click', function() {
-        if (!dialogQuickWins) return;
-        const selectedBtns = Array.from(dialogQuickWins.querySelectorAll('.select-activity.active'));
-        if (!selectedBtns.length) return;
-        const lastModeDay = localStorage.getItem(LAST_MODE_DAY_KEY);
-        const today = todayKey();
-        if (lastModeDay === today) { showComeBackDialog(); return; }
-        const records = selectedBtns.map(b => {
-          const li = b.closest('li'); const noteEl = li ? li.querySelector('.activity-note') : null;
-          return { modeId: currentMode.id, modeName: currentMode.name, modeColor: currentMode.color, action: b.dataset.activity, note: noteEl ? (noteEl.value || '').trim() : '' };
-        });
-        recordActivities(records);
-        safeCloseDialog(modeDialog);
-        clearDialogSelections(modeDialog);
-      });
-    }
-
+    // startResetBtn click handled in openModeDialog wiring (ensures correct select buttons binding)
     if (clearHistoryBtn) {
       clearHistoryBtn.addEventListener('click', function() {
         localStorage.setItem(HISTORY_KEY, JSON.stringify([]));
@@ -511,6 +482,7 @@
       });
     }
 
+    // Escape closes dropdowns and dialogs
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         if (navDropdown && navDropdown.getAttribute('aria-hidden') === 'false') { navDropdown.setAttribute('aria-hidden','true'); navMenuToggle.setAttribute('aria-expanded','false'); }
@@ -518,8 +490,6 @@
         safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections();
       }
     });
-
-    window.addEventListener('resize', function() { renderCompassRing(); });
   }
 
   function openModeDialog(modeId) {
@@ -527,6 +497,7 @@
     if (!m) return;
     currentMode = m;
     if (startResetBtn) startResetBtn.disabled = true;
+
     const titleEl = document.getElementById('modeDialogTitle');
     const descEl = document.getElementById('dialogModeDescription');
     const header = document.getElementById('modeDialogHeader');
@@ -534,52 +505,69 @@
     if (descEl) descEl.textContent = m.description || '';
     if (header) header.style.borderLeft = `8px solid ${m.color || '#00AFA0'}`;
 
+    // remove previous injected notes
+    const next = dialogQuickWins.nextElementSibling;
+    if (next && next.classList && next.classList.contains('rc-locked-note')) next.remove();
+
+    const q = quickWinsMap[m.id] || [];
     const lastModeDay = localStorage.getItem(LAST_MODE_DAY_KEY);
     const today = todayKey();
     const locked = lastModeDay === today;
 
-    if (dialogQuickWins) {
-      // clear any previous helper note that might have been injected
-      const next = dialogQuickWins.nextElementSibling;
-      if (next && next.classList && next.classList.contains('rc-locked-note')) next.remove();
-
-      const q = quickWinsMap[m.id] || [];
-      dialogQuickWins.innerHTML = q.map(w => `
-        <li>
-          <div class="activity-row">
-            <div style="max-width:68%">${escapeHtml(w.text)}<div class="activity-instruction">${escapeHtml(w.hint)}</div></div>
-            <div>
-              <button class="select-activity" data-activity="${escapeHtml(w.text)}">${locked ? 'Locked' : 'Select'}</button>
-            </div>
+    dialogQuickWins.innerHTML = q.map(w => `
+      <li>
+        <div class="activity-row">
+          <div style="max-width:68%">${escapeHtml(w.text)}<div class="activity-instruction">${escapeHtml(w.hint)}</div></div>
+          <div>
+            <button class="select-activity" data-activity="${escapeHtml(w.text)}">${locked ? 'Locked' : 'Select'}</button>
           </div>
-          <textarea class="activity-note" data-activity="${escapeHtml(w.text)}" placeholder="Notes (optional)" hidden></textarea>
-        </li>
-      `).join('');
+        </div>
+        <textarea class="activity-note" data-activity="${escapeHtml(w.text)}" placeholder="Notes (optional)" hidden></textarea>
+      </li>
+    `).join('');
 
-      if (locked) {
-        const noteEl = document.createElement('div');
-        noteEl.className = 'rc-locked-note';
-        noteEl.style.marginTop = '12px';
-        noteEl.style.color = getComputedStyle(document.body).getPropertyValue('--text-secondary');
-        noteEl.textContent = 'You already completed a mode today — come back tomorrow to complete another mode. Quick Wins are still available.';
-        dialogQuickWins.parentNode.insertBefore(noteEl, dialogQuickWins.nextSibling);
-      }
-
-      // wire up selection buttons in mode dialog
-      dialogQuickWins.querySelectorAll('.select-activity').forEach(btn => {
-        btn.addEventListener('click', function(ev) {
-          ev.preventDefault();
-          if (locked) { showComeBackDialog(); return; }
-          btn.classList.toggle('active');
-          const li = btn.closest('li');
-          if (li) {
-            const ta = li.querySelector('.activity-note');
-            if (ta) ta.hidden = !btn.classList.contains('active');
-          }
-          if (startResetBtn) startResetBtn.disabled = !(dialogQuickWins.querySelectorAll('.select-activity.active').length > 0);
-        });
-      });
+    if (locked) {
+      const noteEl = document.createElement('div');
+      noteEl.className = 'rc-locked-note';
+      noteEl.style.marginTop = '12px';
+      noteEl.style.color = getComputedStyle(document.body).getPropertyValue('--text-secondary');
+      noteEl.textContent = 'You already completed a mode today — come back tomorrow to complete another mode. Quick Wins are still available.';
+      dialogQuickWins.parentNode.insertBefore(noteEl, dialogQuickWins.nextSibling);
     }
+
+    // wire select activity buttons now that the DOM is inserted
+    dialogQuickWins.querySelectorAll('.select-activity').forEach(btn => {
+      btn.addEventListener('click', function(ev) {
+        ev.preventDefault();
+        if (locked) { showComeBackDialog(); return; }
+        btn.classList.toggle('active');
+        const li = btn.closest('li');
+        if (li) {
+          const ta = li.querySelector('.activity-note');
+          if (ta) ta.hidden = !btn.classList.contains('active');
+        }
+        startResetBtn.disabled = !(dialogQuickWins.querySelectorAll('.select-activity.active').length > 0);
+      });
+    });
+
+    // wire startResetBtn now safely (remove existing listener first)
+    startResetBtn.replaceWith(startResetBtn.cloneNode(true));
+    const newStartResetBtn = document.getElementById('startResetBtn');
+    newStartResetBtn.disabled = true;
+    newStartResetBtn.addEventListener('click', function() {
+      const selectedBtns = Array.from(dialogQuickWins.querySelectorAll('.select-activity.active'));
+      if (!selectedBtns.length) return;
+      const lastModeDayCheck = localStorage.getItem(LAST_MODE_DAY_KEY);
+      const todayCheck = todayKey();
+      if (lastModeDayCheck === todayCheck) { showComeBackDialog(); return; }
+      const records = selectedBtns.map(b => {
+        const li = b.closest('li'); const noteEl = li ? li.querySelector('.activity-note') : null;
+        return { modeId: currentMode.id, modeName: currentMode.name, modeColor: currentMode.color, action: b.dataset.activity, note: noteEl ? (noteEl.value || '').trim() : '' };
+      });
+      recordActivities(records);
+      safeCloseDialog(modeDialog);
+      clearDialogSelections(modeDialog);
+    });
 
     safeShowDialog(modeDialog);
   }
@@ -655,10 +643,11 @@
     onScroll();
   }
 
+  // start
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
-  // expose for debug
+  // expose some helpers for debugging
   window.__rc = { renderModes, renderCompassRing, buildWedges, openModeDialog, setTheme };
 
 })();
