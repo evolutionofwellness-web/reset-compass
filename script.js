@@ -1,12 +1,12 @@
 // script.js
-// Key fixes for this update:
-// - compute ring label positions using polar math and place them via left/top so labels revolve and read upright
-// - stronger wedge alpha and vibrant color accents
-// - navigation on About page wired via data-action across pages
-// - "Complete Selected" now records, animates completed mode, and opens History dialog
-// - Quick Wins CTA larger and further spaced; Quick Wins completion opens History as well
-// - Added "add to home screen" instructions in About page (static HTML) — no JS required there
-// - Increased compass size and mode text/button sizes
+// Final updates per your last request:
+// - wedge buttons moved farther from center (rFactor increased)
+// - entire wedge area clickable (mapped by angle) so wedge itself acts as the button
+// - stronger, more vibrant colors and ring glow
+// - Complete Selected now records activities, pulses the completed mode, then opens History
+// - Clear History now implemented and wired
+// - Dropdown nav wired and works on About page
+// - Arrow rotation multiplier increased to 2880 (double previous 1440 -> 2880 degrees across page scroll)
 
 (function() {
   'use strict';
@@ -32,10 +32,16 @@
   const historyDialog = document.getElementById('historyDialog');
   const historyStats = document.getElementById('historyStats');
   const historyTimeline = document.getElementById('historyTimeline');
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+  const navMenuToggle = document.getElementById('navMenuToggle');
+  const navDropdown = document.getElementById('navDropdown');
+  const navMenuToggleAbout = document.getElementById('navMenuToggleAbout');
+  const navDropdownAbout = document.getElementById('navDropdownAbout');
   const themeToggles = Array.from(document.querySelectorAll('.theme-toggle, #themeToggle, #themeToggleAbout'));
   const streakBadges = document.querySelectorAll('#streakBadge');
 
-  const ARROW_MULTIPLIER = 720; // 2 rotations per full scroll
+  // now 2880 degrees across full scroll (double previous 1440)
+  const ARROW_MULTIPLIER = 2880;
 
   const canonical = {
     4: { id:4, name:'Growing',   description:'Small wins to build momentum', color:'#2f80ed' },
@@ -44,11 +50,32 @@
     1: { id:1, name:'Surviving', description:'Quick resets for focus and energy', color:'#ff5f6d' }
   };
 
+  // Each activity includes a short child-friendly instruction
   const quickWinsMap = {
-    3: [ 'Plant your feet and do a short stretch', 'Ground with deliberate breath: 4 4 4', 'Put away one distracting item', 'Drink a glass of water' ],
-    2: [ 'Take 3 deep breaths', 'Name 3 things you notice around you', 'Lie down and relax for 2 minutes', 'Slow-release breathing for 1 minute' ],
-    4: [ 'Try one small new challenge', 'Write a short reflection on progress', 'Do a 5-minute creative exercise', 'Send an encouraging message to someone' ],
-    1: [ 'Take 3 quick breaths', 'Drink water', 'Set one tiny goal for the next hour', 'Stand up and move for 60 seconds' ]
+    3: [
+      { text: 'Plant your feet and do a short stretch', hint: 'Stand tall, reach arms high, then let them relax down slowly.' },
+      { text: 'Ground with deliberate breath: 4 4 4', hint: 'Breathe in 4, hold 4, breathe out 4. Repeat.' },
+      { text: 'Put away one distracting item', hint: 'Pick one thing and put it out of sight for now.' },
+      { text: 'Drink a glass of water', hint: 'Take a few big sips to feel refreshed.' }
+    ],
+    2: [
+      { text: 'Take 3 deep breaths', hint: 'Slowly breathe in, then slowly out, three times.' },
+      { text: 'Name 3 things you notice around you', hint: 'Say them out loud: color, sound, or object.' },
+      { text: 'Lie down and relax for 2 minutes', hint: 'Close eyes, breathe gently, feel your body soften.' },
+      { text: 'Slow-release breathing for 1 minute', hint: 'Slow breath out longer than in to calm down.' }
+    ],
+    4: [
+      { text: 'Try one small new challenge', hint: 'Pick something tiny and fun to try right now.' },
+      { text: 'Write a short reflection on progress', hint: 'Jot one sentence about something you did well.' },
+      { text: 'Do a 5-minute creative exercise', hint: 'Draw, doodle, or write for five minutes.' },
+      { text: 'Send an encouraging message to someone', hint: 'Say something kind to a friend.' }
+    ],
+    1: [
+      { text: 'Take 3 quick breaths', hint: 'Short deep breaths to regain focus.' },
+      { text: 'Drink water', hint: 'Hydrate with a few sips.' },
+      { text: 'Set one tiny goal for the next hour', hint: 'Make a small, easy thing to do now.' },
+      { text: 'Stand up and move for 60 seconds', hint: 'Stretch or walk around for one minute.' }
+    ]
   };
 
   let modes = [];
@@ -107,7 +134,7 @@
     }).join('');
   }
 
-  // position ring labels by polar geometry, keep horizontal text
+  // place ring buttons farther from center (rFactor increased), keep them horizontal.
   function renderCompassRing() {
     if (!compassRing || !compassWedges || !compassContainer) return;
     compassRing.innerHTML = '';
@@ -123,11 +150,14 @@
     modes.forEach((mode, idx) => {
       const centerAngle = ((idx + 0.5) * portion) - 45;
       const rad = (centerAngle - 90) * (Math.PI / 180);
-      let rFactor = 0.52;
+
+      // move labels further out
+      let rFactor = 0.68;
       let rPx = radius * rFactor;
-      const minR = Math.max(40, radius * 0.28);
-      const maxR = Math.max(80, radius * 0.64);
+      const minR = Math.max(46, radius * 0.32);
+      const maxR = Math.max(110, radius * 0.78);
       rPx = Math.min(Math.max(rPx, minR), maxR);
+
       const left = cx + Math.cos(rad) * rPx;
       const top = cy + Math.sin(rad) * rPx;
 
@@ -138,16 +168,14 @@
       btn.innerHTML = `<span class="ring-label">${escapeHtml(mode.name)}</span>`;
 
       const base = mode.color || '#00AFA0';
-      btn.style.background = `linear-gradient(180deg, ${base}CC, rgba(0,0,0,0.10))`; // stronger alpha
+      btn.style.background = `linear-gradient(180deg, ${base}DD, rgba(0,0,0,0.12))`;
       btn.style.setProperty('--mode-color', base);
       btn.style.color = getContrastColor(base);
 
       btn.style.left = `${left}px`;
       btn.style.top = `${top}px`;
-      btn.style.zIndex = 12;
-
-      // subtle colored glow outline to pop
-      btn.style.boxShadow = `0 18px 50px rgba(0,0,0,0.6), 0 0 24px ${hexToRgba(base, 0.14)}`;
+      btn.style.zIndex = 16;
+      btn.style.boxShadow = `0 28px 100px rgba(0,0,0,0.7), 0 0 32px ${hexToRgba(base, 0.18)}`;
 
       compassRing.appendChild(btn);
     });
@@ -160,28 +188,30 @@
     const portion = 360 / N;
     const entries = list.map((m, i) => {
       const color = (m && m.color) ? m.color : '#00AFA0';
-      const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + 'CC' : color;
+      const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + 'EE' : color;
       const start = Math.round(i * portion);
       const end = Math.round((i + 1) * portion);
       return `${stopColor} ${start}deg ${end}deg`;
     });
     compassWedges.style.background = `conic-gradient(from -45deg, ${entries.join(',')})`;
-    compassWedges.style.filter = 'saturate(1.05) contrast(1.02)';
+    compassWedges.style.filter = 'saturate(1.12) contrast(1.08)';
   }
 
   function renderGlobalQuickWins() {
     if (!globalQuickWinsList) return;
-    const items = new Set();
-    Object.values(quickWinsMap).forEach(arr => arr.forEach(i => items.add(i)));
-    globalQuickWinsList.innerHTML = Array.from(items).map(w => `
+    const items = [];
+    Object.values(quickWinsMap).forEach(arr => arr.forEach(i => {
+      if (!items.find(s => s.text === i.text)) items.push(i);
+    }));
+    globalQuickWinsList.innerHTML = items.map(w => `
       <li>
         <div class="activity-row">
-          <span>${escapeHtml(w)}</span>
+          <div style="max-width:70%">${escapeHtml(w.text)}<div class="activity-instruction">${escapeHtml(w.hint)}</div></div>
           <div>
-            <button class="select-global-activity" data-activity="${escapeHtml(w)}">Select</button>
+            <button class="select-global-activity" data-activity="${escapeHtml(w.text)}">Select</button>
           </div>
         </div>
-        <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)" hidden></textarea>
+        <textarea class="activity-note" data-activity="${escapeHtml(w.text)}" placeholder="Notes (optional)" hidden></textarea>
       </li>
     `).join('');
   }
@@ -229,22 +259,19 @@
 
     const bumped = incrementStreakIfNeeded();
 
-    // animate completed mode (pulse ring + card)
     if (bumped && currentMode) {
       const ring = document.querySelector(`.ring-btn[data-mode-id="${currentMode.id}"]`);
       const card = document.querySelector(`.mode-card[data-mode-id="${currentMode.id}"]`);
       [ring, card].forEach(el => {
         if (!el) return;
-        el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.2,1)' });
+        el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.2,1)' });
       });
     }
 
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
 
-    // Open history after a short delay so animation is visible
-    setTimeout(() => {
-      openHistoryDialog();
-    }, 420);
+    // After a short delay, open history so user sees progress
+    setTimeout(() => { openHistoryDialog(); }, 420);
   }
 
   function safeShowDialog(d) {
@@ -256,6 +283,22 @@
   function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
   function attachListeners() {
+    // dropdown toggles
+    if (navMenuToggle && navDropdown) {
+      navMenuToggle.addEventListener('click', () => {
+        const open = navDropdown.getAttribute('aria-hidden') === 'false';
+        navDropdown.setAttribute('aria-hidden', open ? 'true' : 'false');
+        navMenuToggle.setAttribute('aria-expanded', !open);
+      });
+    }
+    if (navMenuToggleAbout && navDropdownAbout) {
+      navMenuToggleAbout.addEventListener('click', () => {
+        const open = navDropdownAbout.getAttribute('aria-hidden') === 'false';
+        navDropdownAbout.setAttribute('aria-hidden', open ? 'true' : 'false');
+        navMenuToggleAbout.setAttribute('aria-expanded', !open);
+      });
+    }
+
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
@@ -272,18 +315,12 @@
         }
       }
 
-      // ring button click
       const ringBtn = e.target.closest('.ring-btn[data-mode-id]');
       if (ringBtn && ringBtn.dataset && ringBtn.dataset.modeId) { openModeDialog(Number(ringBtn.dataset.modeId)); return; }
 
-      // mode card click
       const modeCard = e.target.closest('.mode-card[data-mode-id]');
       if (modeCard && modeCard.dataset && modeCard.dataset.modeId) { openModeDialog(Number(modeCard.dataset.modeId)); return; }
 
-      // quick wins under section
-      if (e.target.id === 'quickWinsLink' || e.target.closest('#quickWinsLink')) { safeShowDialog(quickWinsDialog); return; }
-
-      // global quick wins select
       const gSel = e.target.closest('.select-global-activity');
       if (gSel && gSel.dataset && gSel.dataset.activity) {
         e.preventDefault();
@@ -293,7 +330,6 @@
         return;
       }
 
-      // mode dialog selection
       const selBtn = e.target.closest('.select-activity');
       if (selBtn && selBtn.dataset && selBtn.dataset.activity) {
         e.preventDefault();
@@ -303,12 +339,35 @@
         return;
       }
 
-      // dialog close/cancel
       if (e.target.closest('.dialog-close') || e.target.closest('.dialog-cancel')) {
         const d = e.target.closest('dialog');
         if (d) { safeCloseDialog(d); clearDialogSelections(d); }
       }
     }, true);
+
+    // click inside compass: map angle to wedge index
+    if (compassContainer) {
+      compassContainer.addEventListener('click', function(e) {
+        const rect = compassContainer.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const x = e.clientX;
+        const y = e.clientY;
+        const dx = x - cx;
+        const dy = y - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const radius = Math.min(rect.width, rect.height) / 2;
+        if (dist > radius) return;
+        if (dist < Math.max(28, radius * 0.14)) return;
+        let angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+        angleDeg = (angleDeg + 90 + 360) % 360;
+        const adjusted = (angleDeg + 45 + 360) % 360;
+        const portion = 360 / (modes.length || 4);
+        const idx = Math.floor(adjusted / portion) % modes.length;
+        const mode = modes[idx];
+        if (mode) openModeDialog(mode.id);
+      }, true);
+    }
 
     if (startQuickWinBtn) {
       startQuickWinBtn.addEventListener('click', function() {
@@ -339,6 +398,20 @@
       });
     }
 
+    if (clearHistoryBtn) {
+      clearHistoryBtn.addEventListener('click', function() {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify([]));
+        localStorage.removeItem(STREAK_KEY);
+        localStorage.removeItem(LONGEST_KEY);
+        localStorage.removeItem(LAST_DAY_KEY);
+        updateStreakDisplay();
+        // update history dialog content
+        if (historyStats) historyStats.innerHTML = '';
+        if (historyTimeline) historyTimeline.innerHTML = '<div class="empty-history">History cleared.</div>';
+        showToast('History cleared');
+      });
+    }
+
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') { safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections(); }
     });
@@ -356,19 +429,19 @@
     const header = document.getElementById('modeDialogHeader');
     if (titleEl) titleEl.textContent = m.name;
     if (descEl) descEl.textContent = m.description || '';
-    if (header) header.style.borderLeft = `6px solid ${m.color || '#00AFA0'}`;
+    if (header) header.style.borderLeft = `8px solid ${m.color || '#00AFA0'}`;
 
     if (dialogQuickWins) {
       const q = quickWinsMap[m.id] || [];
       dialogQuickWins.innerHTML = q.map(w => `
         <li>
           <div class="activity-row">
-            <span>${escapeHtml(w)}</span>
+            <div style="max-width:68%">${escapeHtml(w.text)}<div class="activity-instruction">${escapeHtml(w.hint)}</div></div>
             <div>
-              <button class="select-activity" data-activity="${escapeHtml(w)}">Select</button>
+              <button class="select-activity" data-activity="${escapeHtml(w.text)}">Select</button>
             </div>
           </div>
-          <textarea class="activity-note" data-activity="${escapeHtml(w)}" placeholder="Notes (optional)" hidden></textarea>
+          <textarea class="activity-note" data-activity="${escapeHtml(w.text)}" placeholder="Notes (optional)" hidden></textarea>
         </li>
       `).join('');
     }
@@ -403,7 +476,7 @@
         ${modes.map(m => {
           const c = counts[m.name] || 0;
           const pct = total ? Math.round((c/total)*100) : 0;
-          return `<div class="stat-card" style="border-left:6px solid ${m.color};"><div class="stat-value">${c}</div><div class="stat-label">${escapeHtml(m.name)} • ${pct}%</div></div>`;
+          return `<div class="stat-card" style="border-left:8px solid ${m.color};"><div class="stat-value">${c}</div><div class="stat-label">${escapeHtml(m.name)} • ${pct}%</div></div>`;
         }).join('')}
       `;
     }
@@ -420,7 +493,7 @@
     safeShowDialog(historyDialog);
   }
 
-  // arrow animation
+  // arrow lerp with the updated ARROW_MULTIPLIER (2880)
   let targetAngle = 0, currentAngle = 0, arrowAnimating = false;
   function startArrowLoop() {
     function onScroll(){
@@ -439,7 +512,6 @@
     onScroll();
   }
 
-  // theme helpers
   function applySavedTheme() {
     const saved = localStorage.getItem(THEME_KEY);
     const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
