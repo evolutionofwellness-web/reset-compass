@@ -16,20 +16,20 @@
 <body class="page-compass">
   <header class="app-header" role="banner">
     <div class="app-header-top">
-      <a class="home-link" id="homeBtn" href="./index.html" aria-label="Home — Reset Compass">
+      <a class="home-link" id="homeBtn" href="./index.html" data-action="home" aria-label="Home — Reset Compass">
         <h1 class="app-title">The Reset Compass</h1>
       </a>
     </div>
 
     <nav class="app-nav" role="navigation" aria-label="Primary">
       <div class="nav-center" id="navCenter">
-        <button id="quickWinsBtn" class="nav-btn" aria-label="Quick Wins">Quick Wins</button>
-        <button id="historyBtn" class="nav-btn" aria-label="View History">History</button>
-        <a class="nav-btn" id="aboutBtn" href="about.html" aria-label="About">About</a>
+        <button id="quickWinsBtn" class="nav-btn nav-sync" data-action="quick-wins" aria-label="Quick Wins">Quick Wins</button>
+        <button id="historyBtn" class="nav-btn nav-sync" data-action="history" aria-label="History">History</button>
+        <a class="nav-btn nav-sync" id="aboutBtn" href="about.html" data-action="about" aria-label="About">About</a>
       </div>
 
       <div class="nav-right">
-        <button id="themeToggle" class="nav-btn" aria-pressed="false" aria-label="Toggle theme">
+        <button id="themeToggle" class="nav-btn theme-toggle" aria-pressed="false" data-action="toggle-theme" aria-label="Toggle theme">
           <span id="themeIcon" aria-hidden="true">🌙</span>
         </button>
       </div>
@@ -42,7 +42,7 @@
         <div id="streakBadge" class="streak-badge" title="Daily streak: days in a row">Daily streak: 🔥 0</div>
       </div>
 
-      <div class="compass-container" role="img" aria-label="Compass shape with four wedges">
+      <div class="compass-container" role="img" aria-label="Compass shape with four wedges" id="compassContainer">
         <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" />
 
         <div id="compassWedges" class="compass-wedges" aria-hidden="true"></div>
@@ -54,7 +54,7 @@
           </svg>
         </div>
 
-        <!-- ring labels inserted by JS and positioned inside wedges -->
+        <!-- ring labels inserted by JS and positioned by polar coordinates -->
         <div id="compassRing" class="compass-ring" aria-hidden="false"></div>
       </div>
 
@@ -70,10 +70,10 @@
         </noscript>
       </div>
 
-      <div class="quick-wins-under" style="text-align:center;margin-top:14px;">
-        <button id="quickWinsLink" class="nav-btn">Open Quick Wins</button>
-        <p class="quick-wins-note" style="margin-top:8px;color:var(--text-secondary);font-size:0.95rem;max-width:820px;margin-left:auto;margin-right:auto;">
-          Quick Wins are single-step actions you can do right now to quickly reset your focus, energy, or mood — tap one to select and complete it immediately.
+      <div class="quick-wins-under" style="text-align:center;margin-top:18px;">
+        <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">Open Quick Wins</button>
+        <p class="quick-wins-note" style="margin-top:10px;color:var(--text-secondary);font-size:0.95rem;max-width:820px;margin-left:auto;margin-right:auto;">
+          Quick Wins are one-step actions you can do right now to quickly shift your focus, energy, or mood — tap one to complete it immediately.
         </p>
       </div>
     </section>
@@ -93,7 +93,7 @@
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
 
-      <div class="mode-header">
+      <div class="mode-header" id="modeDialogHeader">
         <h2 id="modeDialogTitle" class="mode-title"></h2>
         <p id="dialogModeDescription" class="mode-description"></p>
       </div>
@@ -117,7 +117,7 @@
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
       <h2 id="quickWinsTitle">Quick Wins</h2>
-      <p class="mode-description">One-step actions you can do right now to quickly change your focus, energy, or mood. Tap to select and complete.</p>
+      <p class="mode-description">One-step actions you can do immediately to quickly change your focus, energy, or mood. Tap to select and complete.</p>
       <ul id="globalQuickWins" class="quick-wins-list" role="list"></ul>
 
       <div class="dialog-actions">
