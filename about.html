@@ -17,21 +17,17 @@
       <a class="home-link" id="returnCompassBtn" href="./index.html" data-action="home" aria-label="Return to Compass">
         <h1 class="app-title">The Reset Compass</h1>
       </a>
+
+      <div class="nav-dropdown">
+        <button id="navMenuToggleAbout" aria-haspopup="true" aria-expanded="false" aria-label="Open menu" class="nav-ellipsis">☰</button>
+        <div id="navDropdownAbout" class="nav-dropdown-menu" role="menu" aria-hidden="true">
+          <button class="nav-dropdown-item" data-action="quick-wins" role="menuitem">Quick Wins</button>
+          <button class="nav-dropdown-item" data-action="history" role="menuitem">History</button>
+          <a class="nav-dropdown-item" data-action="home" role="menuitem" href="./index.html">Home</a>
+          <button class="nav-dropdown-item theme-toggle" data-action="toggle-theme" role="menuitem"><span>Toggle theme</span></button>
+        </div>
+      </div>
     </div>
-
-    <nav class="app-nav" role="navigation" aria-label="Primary">
-      <div class="nav-center" id="navCenterAbout">
-        <button id="quickWinsBtnAbout" class="nav-btn nav-sync" data-action="quick-wins" aria-label="Quick Wins">Quick Wins</button>
-        <button id="historyBtnAbout" class="nav-btn nav-sync" data-action="history" aria-label="History">History</button>
-        <a class="nav-btn nav-sync" id="homeTextBtn" href="./index.html" data-action="home" aria-label="Home">Home</a>
-      </div>
-
-      <div class="nav-right">
-        <button id="themeToggleAbout" class="nav-btn theme-toggle" aria-pressed="false" data-action="toggle-theme" aria-label="Toggle theme">
-          <span id="themeIconAbout" aria-hidden="true">🌙</span>
-        </button>
-      </div>
-    </nav>
   </header>
 
   <main class="main-content">
@@ -52,7 +48,7 @@
           <li>Tap a wedge inside the compass or pick a Mode Card below.</li>
           <li>In the Mode dialog, select one or more Activities (they highlight). Use the per-activity Notes inputs if you want.</li>
           <li>Add optional notes before you Complete them.</li>
-          <li>Tap "Complete Selected" to record the selected activities; that updates your daily streak.</li>
+          <li>Tap "Complete Selected" to record the selected activities; that updates your daily streak and opens History.</li>
           <li>Quick Wins are available using the Quick Wins button in the header for very fast, one-step resets.</li>
         </ol>
 
