@@ -1,12 +1,7 @@
 // script.js
-// Updates in this version:
-// - Enforces one mode per day (but no limits on Quick Wins).
-// - Shows "come back tomorrow" modal after first mode completed that day.
-// - Ensures Complete Selected reliably records and opens History (mode flow).
-// - Adds donut rendering for history percentages.
-// - Ensures dropdown menus close on outside click (works on index + about).
-// - Improves quick-wins block, adds child-friendly hints, increases mode list padding, and improves dark-mode compass visibility.
-// - Adds explicit per-dialog wiring for select buttons to make Complete Selected enabled reliably.
+// Finalized updates to make selection notes appear, enforce one-mode-per-day with pop-up,
+// increase wedge font sizes, add clearer quick-wins block, ensure dropdown works on about,
+// and make "Complete Selected" reliably enabled and functional.
 
 (function() {
   'use strict';
@@ -16,7 +11,7 @@
   const STREAK_KEY = 'resetCompassStreak';
   const LAST_DAY_KEY = 'resetCompassLastDay';
   const LONGEST_KEY = 'resetCompassLongest';
-  const LAST_MODE_DAY_KEY = 'resetCompassLastModeDay'; // new: day when a mode was completed
+  const LAST_MODE_DAY_KEY = 'resetCompassLastModeDay';
   const INTRO_SEEN_KEY = 'resetCompassIntroSeen';
 
   const modesGrid = document.getElementById('modesGrid');
@@ -36,11 +31,13 @@
   const historyDonut = document.getElementById('historyDonut');
   const clearHistoryBtn = document.getElementById('clearHistoryBtn');
   const comeBackDialog = document.getElementById('comeBackDialog');
+
   const navMenuToggle = document.getElementById('navMenuToggle');
   const navDropdown = document.getElementById('navDropdown');
   const navMenuToggleAbout = document.getElementById('navMenuToggleAbout');
   const navDropdownAbout = document.getElementById('navDropdownAbout');
-  const themeToggles = Array.from(document.querySelectorAll('.theme-toggle, #themeToggle, #themeToggleAbout'));
+
+  const themeToggles = Array.from(document.querySelectorAll('.theme-toggle'));
   const streakBadges = document.querySelectorAll('#streakBadge');
 
   const ARROW_MULTIPLIER = 5760;
@@ -162,13 +159,13 @@
       btn.innerHTML = `<span class="ring-label">${escapeHtml(mode.name)}</span>`;
 
       const base = mode.color || '#00AFA0';
-      btn.style.background = `linear-gradient(180deg, ${base}EE, rgba(0,0,0,0.10))`;
+      btn.style.background = `linear-gradient(180deg, ${base}F0, rgba(0,0,0,0.10))`;
       btn.style.setProperty('--mode-color', base);
       btn.style.color = getContrastColor(base);
       btn.style.left = `${left}px`;
       btn.style.top = `${top}px`;
       btn.style.zIndex = 20;
-      btn.style.boxShadow = `0 28px 100px rgba(0,0,0,0.7), 0 0 40px ${hexToRgba(base, 0.22)}`;
+      btn.style.boxShadow = `0 28px 120px rgba(0,0,0,0.75), 0 0 48px ${hexToRgba(base, 0.22)}`;
 
       compassRing.appendChild(btn);
     });
@@ -179,23 +176,24 @@
     const N = (list && list.length) || 0;
     if (N === 0) { compassWedges.style.background = 'transparent'; return; }
     const portion = 360 / N;
+    // include a slight radial gradient to create separation and depth in each wedge
     const entries = list.map((m, i) => {
       const color = (m && m.color) ? m.color : '#00AFA0';
-      const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + 'F0' : color;
+      const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + 'F2' : color;
       const start = Math.round(i * portion);
       const end = Math.round((i + 1) * portion);
       return `${stopColor} ${start}deg ${end}deg`;
     });
     compassWedges.style.background = `conic-gradient(from -45deg, ${entries.join(',')})`;
-    compassWedges.style.filter = 'saturate(1.12) contrast(1.08)';
+    // overlay subtle radial gradient for depth
+    compassWedges.style.boxShadow = 'inset 0 18px 80px rgba(0,0,0,0.35)';
+    compassWedges.style.filter = 'saturate(1.14) contrast(1.12)';
   }
 
   function renderGlobalQuickWins() {
     if (!globalQuickWinsList) return;
     const items = [];
-    Object.values(quickWinsMap).forEach(arr => arr.forEach(i => {
-      if (!items.find(s => s.text === i.text)) items.push(i);
-    }));
+    Object.values(quickWinsMap).forEach(arr => arr.forEach(i => { if (!items.find(s => s.text === i.text)) items.push(i); }));
     globalQuickWinsList.innerHTML = items.map(w => `
       <li>
         <div class="activity-row">
@@ -208,15 +206,15 @@
       </li>
     `).join('');
 
-    // add event listeners to global quick-win select buttons so startQuickWinBtn enables reliably
-    globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => {
-      b.addEventListener('click', function(e) {
+    // wire select controls to reliably enable Quick Wins completion
+    globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(btn => {
+      btn.addEventListener('click', function(e) {
         e.preventDefault();
-        b.classList.toggle('active');
-        const li = b.closest('li');
+        btn.classList.toggle('active');
+        const li = btn.closest('li');
         if (li) {
           const ta = li.querySelector('.activity-note');
-          if (ta) ta.hidden = !b.classList.contains('active');
+          if (ta) ta.hidden = !btn.classList.contains('active');
         }
         if (startQuickWinBtn) startQuickWinBtn.disabled = !(globalQuickWinsList.querySelectorAll('.select-global-activity.active').length > 0);
       });
@@ -250,16 +248,13 @@
     streakBadges.forEach(b => { if (b) b.textContent = `Daily streak: 🔥 ${s}`; });
   }
 
-  // record activities: supports Quick Wins (modeId null) and Mode activities
   function recordActivities(entries) {
     if (!Array.isArray(entries) || entries.length === 0) return;
-    // If any entry is a mode activity, enforce one-mode-per-day limit:
     const today = todayKey();
     const modeEntries = entries.filter(e => e.modeId);
-    // If trying to complete a mode today but already did a mode today: prevent and show come-back
+    // If user tries to record a mode but already did a mode today, block and show come-back
     const lastModeDay = localStorage.getItem(LAST_MODE_DAY_KEY);
     if (modeEntries.length > 0 && lastModeDay === today) {
-      // show come-back dialog immediately and abort adding these entries
       showComeBackDialog();
       return;
     }
@@ -280,50 +275,32 @@
 
     const bumped = incrementStreakIfNeeded();
 
-    // If we recorded mode entries, set LAST_MODE_DAY_KEY so further mode completions are blocked for today
     if (modeEntries.length > 0) {
       localStorage.setItem(LAST_MODE_DAY_KEY, today);
     }
 
-    // pulse the completed mode (if any) for feedback
     if (bumped && currentMode) {
       const ring = document.querySelector(`.ring-btn[data-mode-id="${currentMode.id}"]`);
       const card = document.querySelector(`.mode-card[data-mode-id="${currentMode.id}"]`);
       [ring, card].forEach(el => {
         if (!el) return;
-        el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.16)' }, { transform: 'scale(1)' }], { duration: 620, easing: 'cubic-bezier(.2,.9,.2,1)' });
+        el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 620, easing: 'cubic-bezier(.2,.9,.2,1)' });
       });
     }
 
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
 
-    // After a brief delay, open History so user sees progress
     setTimeout(() => {
       openHistoryDialog();
-      // If user completed a mode today, also show come-back message within a short time
-      if (modeEntries.length > 0) {
-        setTimeout(() => showComeBackDialog(), 600);
-      }
+      if (modeEntries.length > 0) setTimeout(()=>showComeBackDialog(), 700);
     }, 540);
   }
 
-  function safeShowDialog(d) {
-    if (!d) return;
-    if (typeof d.showModal === 'function') {
-      try { d.showModal(); const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); if (f) f.focus(); } catch (e) { console.warn(e); }
-    } else { alert(d.querySelector('h2') ? d.querySelector('h2').textContent : 'Dialog'); }
-  }
-  function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
-
   function showComeBackDialog() {
-    if (!comeBackDialog) {
-      showToast('You already completed a mode today — come back tomorrow.');
-      return;
-    }
-    try { if (typeof comeBackDialog.showModal === 'function') { comeBackDialog.showModal(); } } catch (e) { alert('You already completed a mode today — come back tomorrow.'); }
+    if (!comeBackDialog) { showToast('You already completed a mode today — come back tomorrow.'); return; }
+    try { comeBackDialog.showModal(); } catch(e) { alert('You already completed a mode today — come back tomorrow.'); }
   }
 
-  // draw donut canvas for history
   function drawHistoryDonut(counts) {
     if (!historyDonut) return;
     const ctx = historyDonut.getContext('2d');
@@ -343,7 +320,6 @@
       ctx.fill();
       start += slice;
     });
-    // inner donut cutout
     ctx.beginPath();
     ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg-elevated') || '#111';
     ctx.arc(centerX, centerY, radius*0.55, 0, Math.PI*2);
@@ -357,27 +333,21 @@
   function openHistoryDialog() {
     if (!historyDialog) return;
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-
     const counts = {};
     modes.forEach(m => counts[m.name] = 0);
     history.forEach(h => {
       const name = h.modeName || 'Quick Win';
       counts[name] = (counts[name] || 0) + 1;
     });
-    const total = history.length;
-
     if (historyStats) {
-      historyStats.innerHTML = `
-        <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total resets</div></div>
-        <div class="stat-card"><div class="stat-value">${Number(localStorage.getItem(LONGEST_KEY) || 0)}</div><div class="stat-label">Longest streak</div></div>
-      `;
+      historyStats.innerHTML = `<div class="stat-card"><div class="stat-value">${history.length}</div><div class="stat-label">Total resets</div></div>
+        <div class="stat-card"><div class="stat-value">${Number(localStorage.getItem(LONGEST_KEY) || 0)}</div><div class="stat-label">Longest streak</div></div>`;
       modes.forEach(m => {
         const c = counts[m.name] || 0;
-        const pct = total ? Math.round((c/total)*100) : 0;
+        const pct = history.length ? Math.round((c/history.length)*100) : 0;
         historyStats.insertAdjacentHTML('beforeend', `<div class="stat-card" style="border-left:8px solid ${m.color};"><div class="stat-value">${c}</div><div class="stat-label">${escapeHtml(m.name)} • ${pct}%</div></div>`);
       });
     }
-
     const donutData = modes.map(m => ({ value: counts[m.name] || 0, color: m.color }));
     drawHistoryDonut(donutData);
 
@@ -392,6 +362,14 @@
 
     safeShowDialog(historyDialog);
   }
+
+  function safeShowDialog(d) {
+    if (!d) return;
+    if (typeof d.showModal === 'function') {
+      try { d.showModal(); const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); if (f) f.focus(); } catch (e) { console.warn(e); }
+    } else { alert(d.querySelector('h2') ? d.querySelector('h2').textContent : 'Dialog'); }
+  }
+  function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
   function attachListeners() {
     function toggleDropdown(toggle, menu) {
@@ -413,16 +391,15 @@
     toggleDropdown(navMenuToggle, navDropdown);
     toggleDropdown(navMenuToggleAbout, navDropdownAbout);
 
-    // document-level click delegation
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-
       const actionEl = e.target.closest('[data-action]');
       if (actionEl && actionEl.dataset && actionEl.dataset.action) {
         const action = actionEl.dataset.action;
         if (action === 'quick-wins') { safeShowDialog(quickWinsDialog); return; }
         if (action === 'history') { openHistoryDialog(); return; }
         if (action === 'home') { window.location.href = './index.html'; return; }
+        if (action === 'about') { window.location.href = './about.html'; return; }
         if (action === 'toggle-theme') {
           const newTheme = document.documentElement.classList.contains('light') ? 'dark' : 'light';
           setTheme(newTheme);
@@ -460,6 +437,7 @@
       }
     }, true);
 
+    // clicking inside wedge area opens the mode
     if (compassContainer) {
       compassContainer.addEventListener('click', function(e) {
         const rect = compassContainer.getBoundingClientRect();
@@ -497,20 +475,14 @@
       });
     }
 
-    // clicking Complete Selected in mode dialog
     if (startResetBtn) {
       startResetBtn.addEventListener('click', function() {
         if (!dialogQuickWins) return;
         const selectedBtns = Array.from(dialogQuickWins.querySelectorAll('.select-activity.active'));
         if (!selectedBtns.length) return;
-        // Before recording, check daily mode limit
         const lastModeDay = localStorage.getItem(LAST_MODE_DAY_KEY);
         const today = todayKey();
-        if (lastModeDay === today) {
-          // If user already completed a mode today, show come-back
-          showComeBackDialog();
-          return;
-        }
+        if (lastModeDay === today) { showComeBackDialog(); return; }
         const records = selectedBtns.map(b => {
           const li = b.closest('li'); const noteEl = li ? li.querySelector('.activity-note') : null;
           return { modeId: currentMode.id, modeName: currentMode.name, modeColor: currentMode.color, action: b.dataset.activity, note: noteEl ? (noteEl.value || '').trim() : '' };
@@ -562,12 +534,15 @@
     if (descEl) descEl.textContent = m.description || '';
     if (header) header.style.borderLeft = `8px solid ${m.color || '#00AFA0'}`;
 
-    // If user already completed a mode today, disable selections and show note
     const lastModeDay = localStorage.getItem(LAST_MODE_DAY_KEY);
     const today = todayKey();
     const locked = lastModeDay === today;
 
     if (dialogQuickWins) {
+      // clear any previous helper note that might have been injected
+      const next = dialogQuickWins.nextElementSibling;
+      if (next && next.classList && next.classList.contains('rc-locked-note')) next.remove();
+
       const q = quickWinsMap[m.id] || [];
       dialogQuickWins.innerHTML = q.map(w => `
         <li>
@@ -577,31 +552,29 @@
               <button class="select-activity" data-activity="${escapeHtml(w.text)}">${locked ? 'Locked' : 'Select'}</button>
             </div>
           </div>
-          <textarea class="activity-note" data-activity="${escapeHtml(w.text)}" placeholder="Notes (optional)" ${locked ? 'hidden' : 'hidden'}></textarea>
+          <textarea class="activity-note" data-activity="${escapeHtml(w.text)}" placeholder="Notes (optional)" hidden></textarea>
         </li>
       `).join('');
-      // If locked, show quick message inside dialog
+
       if (locked) {
         const noteEl = document.createElement('div');
+        noteEl.className = 'rc-locked-note';
         noteEl.style.marginTop = '12px';
         noteEl.style.color = getComputedStyle(document.body).getPropertyValue('--text-secondary');
         noteEl.textContent = 'You already completed a mode today — come back tomorrow to complete another mode. Quick Wins are still available.';
         dialogQuickWins.parentNode.insertBefore(noteEl, dialogQuickWins.nextSibling);
       }
-      // Wire up the new select buttons immediately so startResetBtn state works
-      dialogQuickWins.querySelectorAll('.select-activity').forEach(b => {
-        b.addEventListener('click', function(ev) {
+
+      // wire up selection buttons in mode dialog
+      dialogQuickWins.querySelectorAll('.select-activity').forEach(btn => {
+        btn.addEventListener('click', function(ev) {
           ev.preventDefault();
-          // if locked, ignore
-          if (lastModeDay === today) {
-            showComeBackDialog();
-            return;
-          }
-          b.classList.toggle('active');
-          const li = b.closest('li');
+          if (locked) { showComeBackDialog(); return; }
+          btn.classList.toggle('active');
+          const li = btn.closest('li');
           if (li) {
             const ta = li.querySelector('.activity-note');
-            if (ta) ta.hidden = !b.classList.contains('active');
+            if (ta) ta.hidden = !btn.classList.contains('active');
           }
           if (startResetBtn) startResetBtn.disabled = !(dialogQuickWins.querySelectorAll('.select-activity.active').length > 0);
         });
@@ -654,7 +627,6 @@
     return `rgba(${r},${g},${b},${alpha})`;
   }
 
-  // small toast helper
   function showToast(text, ms = 1400) {
     const el = document.createElement('div');
     el.className = 'rc-toast';
@@ -664,7 +636,7 @@
     setTimeout(()=>{ el.classList.remove('visible'); setTimeout(()=>el.remove(),220); }, ms);
   }
 
-  // arrow lerp
+  // arrow animation
   let targetAngle = 0, currentAngle = 0, arrowAnimating = false;
   function startArrowLoop() {
     function onScroll(){
@@ -686,6 +658,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
+  // expose for debug
   window.__rc = { renderModes, renderCompassRing, buildWedges, openModeDialog, setTheme };
 
 })();
