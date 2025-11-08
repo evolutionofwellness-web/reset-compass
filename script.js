@@ -1,12 +1,13 @@
 // script.js
-// Final updates per your last request:
-// - wedge buttons moved farther from center (rFactor increased)
-// - entire wedge area clickable (mapped by angle) so wedge itself acts as the button
-// - stronger, more vibrant colors and ring glow
-// - Complete Selected now records activities, pulses the completed mode, then opens History
-// - Clear History now implemented and wired
-// - Dropdown nav wired and works on About page
-// - Arrow rotation multiplier increased to 2880 (double previous 1440 -> 2880 degrees across page scroll)
+// Updates made to address your latest feedback:
+// - wedge buttons slightly closer to center than previous outward move (rFactor tuned)
+// - wedge click mapping remains (click anywhere inside wedge opens mode)
+// - arrow spins much more: ARROW_MULTIPLIER = 5760 (double previous 2880)
+// - Clear History wired and works; starts over streak values
+// - Dropdown menus close when clicking outside or pressing Escape (works on both pages)
+// - Mode activities now include short child-friendly instructions (already included in quickWinsMap)
+// - Added stronger glow and vibrancy in CSS; JS sets colored glow on ring buttons
+// - Complete Selected records activities, pulses mode, and opens History dialog automatically
 
 (function() {
   'use strict';
@@ -40,8 +41,8 @@
   const themeToggles = Array.from(document.querySelectorAll('.theme-toggle, #themeToggle, #themeToggleAbout'));
   const streakBadges = document.querySelectorAll('#streakBadge');
 
-  // now 2880 degrees across full scroll (double previous 1440)
-  const ARROW_MULTIPLIER = 2880;
+  // Spin multiplier: double of previous 2880 => 5760
+  const ARROW_MULTIPLIER = 5760;
 
   const canonical = {
     4: { id:4, name:'Growing',   description:'Small wins to build momentum', color:'#2f80ed' },
@@ -50,30 +51,30 @@
     1: { id:1, name:'Surviving', description:'Quick resets for focus and energy', color:'#ff5f6d' }
   };
 
-  // Each activity includes a short child-friendly instruction
+  // Activities with simple instructions
   const quickWinsMap = {
     3: [
-      { text: 'Plant your feet and do a short stretch', hint: 'Stand tall, reach arms high, then let them relax down slowly.' },
+      { text: 'Plant your feet and do a short stretch', hint: 'Stand tall, reach arms up, then slowly lower them.' },
       { text: 'Ground with deliberate breath: 4 4 4', hint: 'Breathe in 4, hold 4, breathe out 4. Repeat.' },
-      { text: 'Put away one distracting item', hint: 'Pick one thing and put it out of sight for now.' },
+      { text: 'Put away one distracting item', hint: 'Pick one thing and put it out of sight.' },
       { text: 'Drink a glass of water', hint: 'Take a few big sips to feel refreshed.' }
     ],
     2: [
       { text: 'Take 3 deep breaths', hint: 'Slowly breathe in, then slowly out, three times.' },
       { text: 'Name 3 things you notice around you', hint: 'Say them out loud: color, sound, or object.' },
-      { text: 'Lie down and relax for 2 minutes', hint: 'Close eyes, breathe gently, feel your body soften.' },
-      { text: 'Slow-release breathing for 1 minute', hint: 'Slow breath out longer than in to calm down.' }
+      { text: 'Lie down and relax for 2 minutes', hint: 'Close eyes, breathe gently, relax your body.' },
+      { text: 'Slow-release breathing for 1 minute', hint: 'Breathe out longer than you breathe in.' }
     ],
     4: [
-      { text: 'Try one small new challenge', hint: 'Pick something tiny and fun to try right now.' },
-      { text: 'Write a short reflection on progress', hint: 'Jot one sentence about something you did well.' },
-      { text: 'Do a 5-minute creative exercise', hint: 'Draw, doodle, or write for five minutes.' },
-      { text: 'Send an encouraging message to someone', hint: 'Say something kind to a friend.' }
+      { text: 'Try one small new challenge', hint: 'Pick something tiny and try it now.' },
+      { text: 'Write a short reflection on progress', hint: 'Write one sentence about something you did well.' },
+      { text: 'Do a 5-minute creative exercise', hint: 'Draw or write for five minutes.' },
+      { text: 'Send an encouraging message to someone', hint: 'Write something kind to a friend.' }
     ],
     1: [
-      { text: 'Take 3 quick breaths', hint: 'Short deep breaths to regain focus.' },
+      { text: 'Take 3 quick breaths', hint: 'Quick deep breaths to regain focus.' },
       { text: 'Drink water', hint: 'Hydrate with a few sips.' },
-      { text: 'Set one tiny goal for the next hour', hint: 'Make a small, easy thing to do now.' },
+      { text: 'Set one tiny goal for the next hour', hint: 'Create a small thing to do now.' },
       { text: 'Stand up and move for 60 seconds', hint: 'Stretch or walk around for one minute.' }
     ]
   };
@@ -134,7 +135,7 @@
     }).join('');
   }
 
-  // place ring buttons farther from center (rFactor increased), keep them horizontal.
+  // place ring buttons slightly closer to center (user requested slight inward move)
   function renderCompassRing() {
     if (!compassRing || !compassWedges || !compassContainer) return;
     compassRing.innerHTML = '';
@@ -151,11 +152,11 @@
       const centerAngle = ((idx + 0.5) * portion) - 45;
       const rad = (centerAngle - 90) * (Math.PI / 180);
 
-      // move labels further out
-      let rFactor = 0.68;
+      // Slightly closer to center than previous outward heavy placement
+      let rFactor = 0.60; // now slightly closer
       let rPx = radius * rFactor;
-      const minR = Math.max(46, radius * 0.32);
-      const maxR = Math.max(110, radius * 0.78);
+      const minR = Math.max(40, radius * 0.28);
+      const maxR = Math.max(96, radius * 0.70);
       rPx = Math.min(Math.max(rPx, minR), maxR);
 
       const left = cx + Math.cos(rad) * rPx;
@@ -168,14 +169,14 @@
       btn.innerHTML = `<span class="ring-label">${escapeHtml(mode.name)}</span>`;
 
       const base = mode.color || '#00AFA0';
-      btn.style.background = `linear-gradient(180deg, ${base}DD, rgba(0,0,0,0.12))`;
+      btn.style.background = `linear-gradient(180deg, ${base}EE, rgba(0,0,0,0.12))`;
       btn.style.setProperty('--mode-color', base);
       btn.style.color = getContrastColor(base);
 
       btn.style.left = `${left}px`;
       btn.style.top = `${top}px`;
       btn.style.zIndex = 16;
-      btn.style.boxShadow = `0 28px 100px rgba(0,0,0,0.7), 0 0 32px ${hexToRgba(base, 0.18)}`;
+      btn.style.boxShadow = `0 32px 120px rgba(0,0,0,0.75), 0 0 40px ${hexToRgba(base, 0.2)}`;
 
       compassRing.appendChild(btn);
     });
@@ -188,13 +189,13 @@
     const portion = 360 / N;
     const entries = list.map((m, i) => {
       const color = (m && m.color) ? m.color : '#00AFA0';
-      const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + 'EE' : color;
+      const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + 'F0' : color;
       const start = Math.round(i * portion);
       const end = Math.round((i + 1) * portion);
       return `${stopColor} ${start}deg ${end}deg`;
     });
     compassWedges.style.background = `conic-gradient(from -45deg, ${entries.join(',')})`;
-    compassWedges.style.filter = 'saturate(1.12) contrast(1.08)';
+    compassWedges.style.filter = 'saturate(1.14) contrast(1.10)';
   }
 
   function renderGlobalQuickWins() {
@@ -264,14 +265,14 @@
       const card = document.querySelector(`.mode-card[data-mode-id="${currentMode.id}"]`);
       [ring, card].forEach(el => {
         if (!el) return;
-        el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.2,1)' });
+        el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.14)' }, { transform: 'scale(1)' }], { duration: 620, easing: 'cubic-bezier(.2,.9,.2,1)' });
       });
     }
 
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
 
     // After a short delay, open history so user sees progress
-    setTimeout(() => { openHistoryDialog(); }, 420);
+    setTimeout(() => { openHistoryDialog(); }, 520);
   }
 
   function safeShowDialog(d) {
@@ -283,22 +284,35 @@
   function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
   function attachListeners() {
-    // dropdown toggles
-    if (navMenuToggle && navDropdown) {
-      navMenuToggle.addEventListener('click', () => {
-        const open = navDropdown.getAttribute('aria-hidden') === 'false';
-        navDropdown.setAttribute('aria-hidden', open ? 'true' : 'false');
-        navMenuToggle.setAttribute('aria-expanded', !open);
+    // dropdown toggles: open/close and close when clicking outside
+    function toggleDropdown(toggle, menu) {
+      if (!toggle || !menu) return;
+      toggle.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const open = menu.getAttribute('aria-hidden') === 'false';
+        menu.setAttribute('aria-hidden', open ? 'true' : 'false');
+        toggle.setAttribute('aria-expanded', !open);
+      });
+      // close when clicking outside
+      document.addEventListener('click', (ev) => {
+        if (!menu) return;
+        if (menu.getAttribute('aria-hidden') === 'false' && !menu.contains(ev.target) && ev.target !== toggle) {
+          menu.setAttribute('aria-hidden', 'true');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+      // close on Escape
+      document.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape' && menu.getAttribute('aria-hidden') === 'false') {
+          menu.setAttribute('aria-hidden', 'true');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
       });
     }
-    if (navMenuToggleAbout && navDropdownAbout) {
-      navMenuToggleAbout.addEventListener('click', () => {
-        const open = navDropdownAbout.getAttribute('aria-hidden') === 'false';
-        navDropdownAbout.setAttribute('aria-hidden', open ? 'true' : 'false');
-        navMenuToggleAbout.setAttribute('aria-expanded', !open);
-      });
-    }
+    toggleDropdown(navMenuToggle, navDropdown);
+    toggleDropdown(navMenuToggleAbout, navDropdownAbout);
 
+    // global click delegation for actions
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
@@ -345,7 +359,7 @@
       }
     }, true);
 
-    // click inside compass: map angle to wedge index
+    // mapping click inside compass to wedge (same as before)
     if (compassContainer) {
       compassContainer.addEventListener('click', function(e) {
         const rect = compassContainer.getBoundingClientRect();
@@ -405,7 +419,6 @@
         localStorage.removeItem(LONGEST_KEY);
         localStorage.removeItem(LAST_DAY_KEY);
         updateStreakDisplay();
-        // update history dialog content
         if (historyStats) historyStats.innerHTML = '';
         if (historyTimeline) historyTimeline.innerHTML = '<div class="empty-history">History cleared.</div>';
         showToast('History cleared');
@@ -413,7 +426,12 @@
     }
 
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') { safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections(); }
+      if (e.key === 'Escape') {
+        // close any open dropdowns
+        if (navDropdown && navDropdown.getAttribute('aria-hidden') === 'false') { navDropdown.setAttribute('aria-hidden','true'); navMenuToggle.setAttribute('aria-expanded','false'); }
+        if (navDropdownAbout && navDropdownAbout.getAttribute('aria-hidden') === 'false') { navDropdownAbout.setAttribute('aria-hidden','true'); navMenuToggleAbout.setAttribute('aria-expanded','false'); }
+        safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections();
+      }
     });
 
     window.addEventListener('resize', function() { renderCompassRing(); });
@@ -493,7 +511,7 @@
     safeShowDialog(historyDialog);
   }
 
-  // arrow lerp with the updated ARROW_MULTIPLIER (2880)
+  // arrow lerp using ARROW_MULTIPLIER
   let targetAngle = 0, currentAngle = 0, arrowAnimating = false;
   function startArrowLoop() {
     function onScroll(){
