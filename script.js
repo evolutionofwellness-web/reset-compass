@@ -1,11 +1,11 @@
 // script.js
-// Key fixes in this version:
-// - Position ring buttons by computing polar coords so they revolve around compass center
-// - Clamp radial distance so labels stay inside wedges on all viewports
-// - Wire navigation on both index and about pages via data-action attributes
-// - Enforce canonical names & colors for wedges and cards
-// - Improve quick-wins CTA, history breakdown by mode, and theme toggle support across pages
-// - Keep arrow rotation multiplier at 720 (2x rotation per full page scroll)
+// Key updates in this patch:
+// - compute ring label positions using polar math and place them using left/top so labels revolve around compass center
+// - keep ring labels horizontal (no rotation) so they read upright on all wedges
+// - clamp radial distance so labels remain inside wedges on narrow viewports
+// - sectioned layout for compass/list/quick wins; quick wins CTA text "Quick Wins" and bigger
+// - nav delegation via data-action works on both index and about pages
+// - more vibrant wedge alpha and mode card accents; history shows mode breakdown
 
 (function() {
   'use strict';
@@ -17,7 +17,6 @@
   const LONGEST_KEY = 'resetCompassLongest';
   const INTRO_SEEN_KEY = 'resetCompassIntroSeen';
 
-  // DOM refs (optional on about page)
   const modesGrid = document.getElementById('modesGrid');
   const compassRing = document.getElementById('compassRing');
   const compassWedges = document.getElementById('compassWedges');
@@ -35,9 +34,8 @@
   const themeToggles = Array.from(document.querySelectorAll('.theme-toggle, #themeToggle, #themeToggleAbout'));
   const streakBadges = document.querySelectorAll('#streakBadge');
 
-  const ARROW_MULTIPLIER = 720; // 2 full rotations
+  const ARROW_MULTIPLIER = 720; // two rotations per full scroll
 
-  // canonical modes
   const canonical = {
     4: { id:4, name:'Growing',   description:'Small wins to build momentum', color:'#4DA6FF' },
     3: { id:3, name:'Grounded',  description:'Reset and connect: root into the present', color:'#2ECC71' },
@@ -113,12 +111,13 @@
     }).join('');
   }
 
-  // Render wedge background and create ring buttons; position them using polar math centered on compassContainer
+  // compute positions for ring labels using polar math to keep them revolving around center
   function renderCompassRing() {
     if (!compassRing || !compassWedges || !compassContainer) return;
     compassRing.innerHTML = '';
     buildWedges(modes);
 
+    // get compass inner coordinates
     const rect = compassContainer.getBoundingClientRect();
     const cx = rect.width / 2;
     const cy = rect.height / 2;
@@ -127,18 +126,19 @@
     const portion = 360 / (modes.length || 4);
 
     modes.forEach((mode, idx) => {
-      const centerAngle = ((idx + 0.5) * portion) - 45; // degrees to match wedge origin
-      // compute rad with -90 offset so 0deg points up for y math (so label lands visually centered)
+      // centerAngle in degrees (0 is East by default, adjust so 0 points up visually)
+      const centerAngle = ((idx + 0.5) * portion) - 45;
+      // convert to radians and offset by -90 so 0 points up (matching visual compass)
       const rad = (centerAngle - 90) * (Math.PI / 180);
-      // radial distance factor: keep labels inside wedges, tuned to radius
-      const distanceFactor = 0.52; // middle of wedge; pulse clamp applied below
-      let rPx = radius * distanceFactor;
-      // clamp rPx so label won't go outside (tiny screens)
-      const minR = Math.max(36, radius * 0.28);
-      const maxR = Math.max(60, radius * 0.62);
+
+      // distance factor tuned to visually center label in wedge
+      let rFactor = 0.52;
+      // compute pixel distance and clamp to keep inside ring for small viewports
+      let rPx = radius * rFactor;
+      const minR = Math.max(38, radius * 0.28);
+      const maxR = Math.max(72, radius * 0.62);
       rPx = Math.min(Math.max(rPx, minR), maxR);
 
-      // compute left/top relative to container (in px)
       const left = cx + Math.cos(rad) * rPx;
       const top = cy + Math.sin(rad) * rPx;
 
@@ -146,29 +146,23 @@
       btn.type = 'button';
       btn.className = 'ring-btn';
       btn.dataset.modeId = mode.id;
-      btn.dataset.angle = String(centerAngle);
       btn.innerHTML = `<span class="ring-label">${escapeHtml(mode.name)}</span>`;
 
-      // style: background & contrast color
+      // style
       const base = mode.color || '#00AFA0';
-      btn.style.background = `linear-gradient(180deg, ${base}66, rgba(0,0,0,0.08))`;
+      btn.style.background = `linear-gradient(180deg, ${base}88, rgba(0,0,0,0.08))`; // stronger alpha
       btn.style.setProperty('--mode-color', base);
       btn.style.color = getContrastColor(base);
 
-      // set left/top and rotation (rotate the label back to horizontal)
+      // place absolutely relative to compass container
       btn.style.left = `${left}px`;
       btn.style.top = `${top}px`;
-      // rotation value is negative of centerAngle so text reads horizontal
-      btn.style.setProperty('--rotate', `${-centerAngle}deg`);
-
-      // z-index above wedges and pointer events enabled
-      btn.style.zIndex = 6;
+      btn.style.zIndex = 8;
 
       compassRing.appendChild(btn);
     });
   }
 
-  // create wedge conic gradient
   function buildWedges(list) {
     if (!compassWedges) return;
     const N = (list && list.length) || 0;
@@ -176,7 +170,7 @@
     const portion = 360 / N;
     const entries = list.map((m, i) => {
       const color = (m && m.color) ? m.color : '#00AFA0';
-      const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + '66' : color;
+      const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + '88' : color;
       const start = Math.round(i * portion);
       const end = Math.round((i + 1) * portion);
       return `${stopColor} ${start}deg ${end}deg`;
@@ -226,7 +220,6 @@
     streakBadges.forEach(b => { if (b) b.textContent = `Daily streak: 🔥 ${s}`; });
   }
 
-  // record activities and update history
   function recordActivities(entries) {
     if (!Array.isArray(entries) || entries.length === 0) return;
     let hist;
@@ -257,7 +250,6 @@
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
   }
 
-  // Show / close dialogs
   function safeShowDialog(d) {
     if (!d) return;
     if (typeof d.showModal === 'function') {
@@ -267,14 +259,13 @@
   function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
   function attachListeners() {
-    // global click delegation
+    // global nav delegation via data-action
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
-      // nav buttons with data-action (works across index/about)
-      const nav = e.target.closest('.nav-sync, .nav-btn');
-      if (nav && nav.dataset && nav.dataset.action) {
-        const action = nav.dataset.action;
+      const navEl = e.target.closest('[data-action]');
+      if (navEl && navEl.dataset && navEl.dataset.action) {
+        const action = navEl.dataset.action;
         if (action === 'quick-wins') { safeShowDialog(quickWinsDialog); return; }
         if (action === 'history') { openHistoryDialog(); return; }
         if (action === 'home') { window.location.href = './index.html'; return; }
@@ -289,14 +280,11 @@
       const ringBtn = e.target.closest('.ring-btn[data-mode-id]');
       if (ringBtn && ringBtn.dataset && ringBtn.dataset.modeId) { openModeDialog(Number(ringBtn.dataset.modeId)); return; }
 
-      // mode card click
+      // mode card
       const modeCard = e.target.closest('.mode-card[data-mode-id]');
       if (modeCard && modeCard.dataset && modeCard.dataset.modeId) { openModeDialog(Number(modeCard.dataset.modeId)); return; }
 
-      // quick-wins under-canvas CTA
-      if (e.target.id === 'quickWinsLink' || e.target.closest('#quickWinsLink')) { safeShowDialog(quickWinsDialog); return; }
-
-      // global quick wins select toggle
+      // global quick-wins select
       const gSel = e.target.closest('.select-global-activity');
       if (gSel && gSel.dataset && gSel.dataset.activity) {
         e.preventDefault();
@@ -306,7 +294,7 @@
         return;
       }
 
-      // mode dialog activity selection
+      // mode dialog selection
       const selBtn = e.target.closest('.select-activity');
       if (selBtn && selBtn.dataset && selBtn.dataset.activity) {
         e.preventDefault();
@@ -316,14 +304,14 @@
         return;
       }
 
-      // dialog close or cancel
+      // dialog close/cancel
       if (e.target.closest('.dialog-close') || e.target.closest('.dialog-cancel')) {
         const d = e.target.closest('dialog');
         if (d) { safeCloseDialog(d); clearDialogSelections(d); }
       }
     }, true);
 
-    // wire startQuickWinBtn
+    // startQuickWinBtn
     if (startQuickWinBtn) {
       startQuickWinBtn.addEventListener('click', function() {
         const selected = Array.from(globalQuickWinsList.querySelectorAll('.select-global-activity.active'));
@@ -338,7 +326,7 @@
       });
     }
 
-    // wire startResetBtn
+    // startResetBtn
     if (startResetBtn) {
       startResetBtn.addEventListener('click', function() {
         if (!dialogQuickWins) return;
@@ -354,12 +342,12 @@
       });
     }
 
-    // keyboard escape
+    // escape key closes dialogs
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') { safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections(); }
     });
 
-    // recalc label positions on resize
+    // recompute positions on resize
     window.addEventListener('resize', function() { renderCompassRing(); });
   }
 
@@ -368,15 +356,11 @@
     if (!m) return;
     currentMode = m;
     if (startResetBtn) startResetBtn.disabled = true;
-
     const titleEl = document.getElementById('modeDialogTitle');
     const descEl = document.getElementById('dialogModeDescription');
     const header = document.getElementById('modeDialogHeader');
-
     if (titleEl) titleEl.textContent = m.name;
     if (descEl) descEl.textContent = m.description || '';
-
-    // apply subtle accent color to dialog header left border using a CSS variable
     if (header) header.style.borderLeft = `6px solid ${m.color || '#00AFA0'}`;
 
     if (dialogQuickWins) {
@@ -409,7 +393,6 @@
     if (!historyDialog) return;
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
 
-    // compute mode breakdown
     const counts = {};
     modes.forEach(m => counts[m.name] = 0);
     history.forEach(h => {
@@ -417,6 +400,7 @@
       counts[name] = (counts[name] || 0) + 1;
     });
     const total = history.length;
+
     if (historyStats) {
       historyStats.innerHTML = `
         <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total resets</div></div>
@@ -441,7 +425,7 @@
     safeShowDialog(historyDialog);
   }
 
-  // arrow animation
+  // arrow lerp
   let targetAngle = 0, currentAngle = 0, arrowAnimating = false;
   function startArrowLoop() {
     function onScroll(){
@@ -460,7 +444,7 @@
     onScroll();
   }
 
-  // theme helpers
+  // theme
   function applySavedTheme() {
     const saved = localStorage.getItem(THEME_KEY);
     const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
@@ -488,27 +472,9 @@
     return lum > 186 ? '#000' : '#fff';
   }
 
-  function clearDialogSelections(d) {
-    if (dialogQuickWins) { dialogQuickWins.querySelectorAll('.select-activity').forEach(b => b.classList.remove('active')); dialogQuickWins.querySelectorAll('.activity-note').forEach(t=>{ t.hidden=true; t.value=''; }); }
-    if (globalQuickWinsList) { globalQuickWinsList.querySelectorAll('.select-global-activity').forEach(b => b.classList.remove('active')); globalQuickWinsList.querySelectorAll('.activity-note').forEach(t=>{ t.hidden=true; t.value=''; }); }
-    if (startResetBtn) startResetBtn.disabled = true;
-    if (startQuickWinBtn) startQuickWinBtn.disabled = true;
-    if (d === modeDialog) currentMode = null;
-  }
-
-  function showToast(text, ms = 1400) {
-    const el = document.createElement('div');
-    el.className = 'rc-toast';
-    el.textContent = text;
-    document.body.appendChild(el);
-    requestAnimationFrame(()=>el.classList.add('visible'));
-    setTimeout(()=>{ el.classList.remove('visible'); setTimeout(()=>el.remove(),220); }, ms);
-  }
-
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
-  // Expose helpers for debug
   window.__rc = { renderModes, renderCompassRing, buildWedges, openModeDialog, setTheme };
 
 })();
