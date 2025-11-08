@@ -1,15 +1,9 @@
-// script.js
-// Fixes and hardening:
-// - unified, robust event wiring via delegation (no node-replacement that broke handlers)
-// - conic gradient wedge stops and thin separators are computed in JS so ring labels align exactly
-// - dialog styling forced dark; quick-wins and mode selects reliably show notes and enable Complete
-// - Complete Selected records entries and opens History immediately
-// - fallback behaviors kept minimal and safe for browsers with limited <dialog> support
+// script.js — hardened, defensive, and with safe fallbacks.
+// Keeps UI rendering even if an enhancement fails.
 
 (function(){
   'use strict';
 
-  // Local storage keys
   const HISTORY_KEY = 'resetCompassHistory';
   const THEME_KEY = 'resetCompassTheme';
   const STREAK_KEY = 'resetCompassStreak';
@@ -17,117 +11,109 @@
   const LONGEST_KEY = 'resetCompassLongest';
   const LAST_MODE_DAY_KEY = 'resetCompassLastModeDay';
 
-  // Canonical modes
   const MODES = [
-    { id: 4, name: 'Growing', color: '#2f80ed', description: 'Playful prompts to try something new or expand your horizon.' },
-    { id: 3, name: 'Grounded', color: '#00c06b', description: 'Reset and connect — slow the breath and root into the present.' },
-    { id: 2, name: 'Drifting', color: '#ffbf3b', description: 'Slow down and regain clarity with small clearing practices.' },
-    { id: 1, name: 'Surviving', color: '#ff5f6d', description: 'Quick resets for focus and energy when things feel intense.' }
+    { id:4, name:'Growing', color:'#2f80ed', description:'Playful prompts to try something new or expand your horizon.' },
+    { id:3, name:'Grounded', color:'#00c06b', description:'Reset and connect — slow the breath and root into the present.' },
+    { id:2, name:'Drifting', color:'#ffbf3b', description:'Slow down and regain clarity with small clearing practices.' },
+    { id:1, name:'Surviving', color:'#ff5f6d', description:'Quick resets for focus and energy when things feel intense.' }
   ];
 
   const QUICK_WINS = {
-    4: [
-      { text: 'Try one small new challenge', hint: 'Pick something tiny and try it now.' },
-      { text: 'Write a short reflection on progress', hint: 'Jot one sentence about something you did well.' },
-      { text: 'Do a 5-minute creative exercise', hint: 'Draw or write for five minutes.' },
-      { text: 'Send an encouraging message to someone', hint: 'Say something kind to a friend.' }
-    ],
-    3: [
-      { text: 'Plant your feet and do a short stretch', hint: 'Stand tall, reach arms up, then slowly lower them.' },
-      { text: 'Ground with deliberate breath: 4 4 4', hint: 'Breathe in 4, hold 4, breathe out 4. Repeat.' },
-      { text: 'Put away one distracting item', hint: 'Pick one thing and put it out of sight.' },
-      { text: 'Drink a glass of water', hint: 'Take a few big sips to feel refreshed.' }
-    ],
-    2: [
-      { text: 'Take 3 deep breaths', hint: 'Slowly breathe in, then slowly out, three times.' },
-      { text: 'Name 3 things you notice around you', hint: 'Say them out loud: color, sound, or object.' },
-      { text: 'Lie down and relax for 2 minutes', hint: 'Close eyes, breathe gently, relax.' },
-      { text: 'Slow-release breathing for 1 minute', hint: 'Breathe out longer than in to calm down.' }
-    ],
-    1: [
-      { text: 'Take 3 quick breaths', hint: 'Quick deep breaths to regain focus.' },
-      { text: 'Drink water', hint: 'Hydrate with a few sips.' },
-      { text: 'Set one tiny goal for the next hour', hint: 'Make a small, easy plan to do next.' },
-      { text: 'Stand up and move for 60 seconds', hint: 'Stretch or walk around for one minute.' }
-    ]
+    4: [{text:'Try one small new challenge',hint:'Pick something tiny and try it now.'},{text:'Write a short reflection on progress',hint:'Jot one sentence about something you did well.'}],
+    3: [{text:'Plant your feet and do a short stretch',hint:'Stand tall, reach arms up, then slowly lower them.'},{text:'Ground with deliberate breath: 4 4 4',hint:'Breathe in 4, hold 4, breathe out 4. Repeat.'}],
+    2: [{text:'Take 3 deep breaths',hint:'Slowly breathe in, then slowly out, three times.'}],
+    1: [{text:'Take 3 quick breaths',hint:'Quick deep breaths to regain focus.'}]
   };
 
-  // DOM refs (queried once after DOMContentLoaded)
-  let compassWedges, compassRing, compassContainer, modesGrid, dialogQuickWins, startResetBtn, quickWinsDialog, globalQuickWinsList, startQuickWinBtn, historyDialog, historyDonut, historyStats, historyTimeline, clearHistoryBtn, modeDialog, modeDialogHeader, modeAccent;
+  // DOM refs (populated after DOMContentLoaded)
+  let compassWedges, compassRing, compassContainer, modesGrid, dialogQuickWins, globalQuickWinsList, startQuickWinBtn, startResetBtn, historyDialog, historyDonut, historyStats, historyTimeline, clearHistoryBtn;
 
-  function $(selector){ return document.querySelector(selector); }
-  function $all(selector){ return Array.from(document.querySelectorAll(selector)); }
+  function $(sel){ return document.querySelector(sel); }
+  function $all(sel){ return Array.from(document.querySelectorAll(sel)); }
 
-  function init() {
+  function init(){
     compassWedges = $('#compassWedges');
     compassRing = $('#compassRing');
     compassContainer = $('#compassContainer');
     modesGrid = $('#modesGrid');
     dialogQuickWins = $('#dialogQuickWins');
-    startResetBtn = $('#startResetBtn');
-    quickWinsDialog = $('#quickWinsDialog');
     globalQuickWinsList = $('#globalQuickWins');
     startQuickWinBtn = $('#startQuickWinBtn');
+    startResetBtn = $('#startResetBtn');
     historyDialog = $('#historyDialog');
     historyDonut = $('#historyDonut');
     historyStats = $('#historyStats');
     historyTimeline = $('#historyTimeline');
     clearHistoryBtn = $('#clearHistoryBtn');
-    modeDialog = $('#modeDialog');
-    modeDialogHeader = $('#modeDialogHeader');
-    modeAccent = $('#modeAccent');
 
     applySavedTheme();
-    renderModeList();
-    buildWedgesAndSeparators();
-    placeRingLabels();
+    renderModes();
+    safeBuildWedges();
+    safePlaceRingLabels();
     renderGlobalQuickWins();
     initHistory();
     updateStreakDisplay();
     wireGlobalHandlers();
-
-    // Keep compass labels correctly placed on resize
-    window.addEventListener('resize', () => {
-      buildWedgesAndSeparators();
-      placeRingLabels();
-    });
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startArrowLoop();
   }
 
-  /* ---------------------------
-     Rendering helpers
-     --------------------------- */
-
-  function renderModeList(){
+  /* Rendering */
+  function renderModes(){
     if (!modesGrid) return;
-    modesGrid.innerHTML = MODES.map(m => `
-      <button class="mode-card" data-mode-id="${m.id}" style="--mode-color:${m.color}">
-        <div class="mode-meta">
-          <div class="mode-name">${escapeHtml(m.name)}</div>
-          <div class="mode-desc">${escapeHtml(m.description)}</div>
-          <div class="mode-hint">Tap to open activities</div>
-        </div>
-      </button>
-    `).join('');
+    try {
+      modesGrid.innerHTML = MODES.map(m=>`
+        <button class="mode-card" data-mode-id="${m.id}" style="--mode-color:${m.color}">
+          <div class="mode-meta">
+            <div class="mode-name">${escapeHtml(m.name)}</div>
+            <div class="mode-desc">${escapeHtml(m.description)}</div>
+            <div class="mode-hint">Tap to open activities</div>
+          </div>
+        </button>
+      `).join('');
+    } catch (e){
+      console.error('renderModes failed', e);
+      modesGrid.innerHTML = '<p style="color:var(--text-secondary)">Modes unavailable</p>';
+    }
   }
 
-  // Build conic gradient with a small gap slice used as separator. JS computes exact stops so ring labels align.
+  function safeBuildWedges(){
+    try {
+      buildWedgesAndSeparators();
+    } catch (err) {
+      console.error('buildWedges failed, applying fallback', err);
+      // fallback: simple 4-color wheel without separators
+      if (compassWedges){
+        const colors = MODES.map(m => m.color).join(', ');
+        compassWedges.style.background = `conic-gradient(from -45deg, ${colors})`;
+      }
+    }
+  }
+
   function buildWedgesAndSeparators(){
     if (!compassWedges) return;
     const N = MODES.length;
     const portion = 360 / N;
-    const gap = 0.9; // degrees used for separator slice
-    const stops = [];
+    const gap = 0.8;
+    const parts = [];
     for (let i=0;i<N;i++){
-      const start = Math.round(i * portion * 100) / 100;
-      const end = Math.round(((i + 1) * portion) * 100) / 100;
-      const color = MODES[i].color;
+      const start = +(i*portion).toFixed(3);
+      const end = +((i+1)*portion).toFixed(3);
       const wedgeEnd = end - gap;
-      stops.push(`${color} ${start}deg ${wedgeEnd}deg`);
-      // separator slice
-      stops.push(`rgba(0,0,0,0.36) ${wedgeEnd}deg ${end}deg`);
+      const color = MODES[i].color;
+      parts.push(`${color} ${start}deg ${wedgeEnd}deg`);
+      parts.push(`rgba(0,0,0,0.36) ${wedgeEnd}deg ${end}deg`);
     }
-    compassWedges.style.background = `conic-gradient(from -45deg, ${stops.join(',')})`;
+    compassWedges.style.background = `conic-gradient(from -45deg, ${parts.join(',')})`;
     compassWedges.style.filter = 'saturate(1.08) contrast(1.03)';
+  }
+
+  function safePlaceRingLabels(){
+    try {
+      placeRingLabels();
+    } catch (e){
+      console.error('placeRingLabels failed', e);
+      // no-op: labels optional, UI should still show the wheel
+    }
   }
 
   function placeRingLabels(){
@@ -143,7 +129,6 @@
       const rPx = Math.min(Math.max(radius * rFactor, radius * 0.28), radius * 0.75);
       const left = cx + Math.cos(rad) * rPx;
       const top = cy + Math.sin(rad) * rPx;
-
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'ring-btn';
@@ -159,31 +144,28 @@
 
   function renderGlobalQuickWins(){
     if (!globalQuickWinsList) return;
-    const all = [];
-    Object.values(QUICK_WINS).forEach(arr => arr.forEach(a => { if (!all.find(x=>x.text===a.text)) all.push(a); }));
-    globalQuickWinsList.innerHTML = all.map(a => `
-      <li>
-        <div class="activity-row">
-          <div style="max-width:70%">${escapeHtml(a.text)}<div class="activity-instruction">${escapeHtml(a.hint)}</div></div>
-          <div><button class="select-global-activity" data-activity="${escapeHtml(a.text)}">Select</button></div>
-        </div>
-        <textarea class="activity-note" data-activity="${escapeHtml(a.text)}" placeholder="Notes (optional)" hidden></textarea>
-      </li>
-    `).join('');
-    if (startQuickWinBtn) startQuickWinBtn.disabled = true;
+    try {
+      const all = [];
+      Object.values(QUICK_WINS).forEach(arr => arr.forEach(a => { if (!all.find(x=>x.text===a.text)) all.push(a); }));
+      globalQuickWinsList.innerHTML = all.map(a => `
+        <li>
+          <div class="activity-row">
+            <div style="max-width:70%">${escapeHtml(a.text)}<div class="activity-instruction">${escapeHtml(a.hint)}</div></div>
+            <div><button class="select-global-activity" data-activity="${escapeHtml(a.text)}">Select</button></div>
+          </div>
+          <textarea class="activity-note" data-activity="${escapeHtml(a.text)}" placeholder="Notes (optional)" hidden></textarea>
+        </li>
+      `).join('');
+      if (startQuickWinBtn) startQuickWinBtn.disabled = true;
+    } catch (e) {
+      console.error('renderGlobalQuickWins failed', e);
+      globalQuickWinsList.innerHTML = '<li style="color:var(--text-secondary)">Quick Wins unavailable</li>';
+    }
   }
 
-  /* ---------------------------
-     History / storage helpers
-     --------------------------- */
-
-  function initHistory(){
-    try { JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) { localStorage.setItem(HISTORY_KEY, '[]'); }
-  }
-
-  function todayKey(){
-    return new Date().toISOString().split('T')[0];
-  }
+  /* History and storage */
+  function initHistory(){ try{ JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }catch(e){ localStorage.setItem(HISTORY_KEY,'[]'); } }
+  function todayKey(){ return new Date().toISOString().split('T')[0]; }
 
   function incrementStreakIfNeeded(){
     try{
@@ -192,7 +174,7 @@
       let streak = Number(localStorage.getItem(STREAK_KEY) || 0);
       let longest = Number(localStorage.getItem(LONGEST_KEY) || 0);
       if (last === today) return false;
-      const y = new Date(); y.setDate(y.getDate() - 1);
+      const y = new Date(); y.setDate(y.getDate()-1);
       const yKey = y.toISOString().split('T')[0];
       streak = (last === yKey) ? streak + 1 : 1;
       if (streak > longest) localStorage.setItem(LONGEST_KEY, String(streak));
@@ -200,7 +182,7 @@
       localStorage.setItem(LAST_DAY_KEY, today);
       updateStreakDisplay();
       return true;
-    }catch(e){ return false; }
+    } catch(e){ console.warn(e); return false; }
   }
 
   function updateStreakDisplay(){
@@ -212,15 +194,12 @@
   function recordActivities(entries){
     if (!entries || !entries.length) return;
     const today = todayKey();
-    const modeEntries = entries.filter(e=>e.modeId);
+    const modeEntries = entries.filter(e => e.modeId);
     const lastModeDay = localStorage.getItem(LAST_MODE_DAY_KEY);
-    if (modeEntries.length > 0 && lastModeDay === today){
-      showComeBackDialog();
-      return;
-    }
+    if (modeEntries.length > 0 && lastModeDay === today){ showComeBackDialog(); return; }
 
     let hist = [];
-    try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) { hist = []; }
+    try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e){ hist = []; }
     entries.forEach(r => hist.push({
       timestamp: new Date().toISOString(),
       modeId: r.modeId || null,
@@ -235,7 +214,6 @@
     if (modeEntries.length > 0) localStorage.setItem(LAST_MODE_DAY_KEY, today);
 
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
-    // Open history after brief delay so user sees the toast and potential pulse
     setTimeout(()=> openHistoryDialog(), 420);
     if (modeEntries.length > 0) setTimeout(()=> showComeBackDialog(), 900);
   }
@@ -245,9 +223,9 @@
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
     const counts = {};
     MODES.forEach(m => counts[m.name] = 0);
-    history.forEach(h => { const name = h.modeName || 'Quick Win'; counts[name] = (counts[name] || 0) + 1; });
+    history.forEach(h => { counts[h.modeName || 'Quick Win'] = (counts[h.modeName || 'Quick Win'] || 0) + 1; });
 
-    if (historyStats) {
+    if (historyStats){
       historyStats.innerHTML = '';
       const total = history.length;
       const longest = Number(localStorage.getItem(LONGEST_KEY) || 0);
@@ -260,8 +238,7 @@
       });
     }
 
-    const donutData = MODES.map(m => ({ value: counts[m.name] || 0, color: m.color }));
-    drawDonut(donutData);
+    drawDonut(MODES.map(m => ({ value: counts[m.name] || 0, color: m.color })));
 
     if (historyTimeline){
       historyTimeline.innerHTML = history.length ? history.slice().reverse().map(e=>{
@@ -275,109 +252,83 @@
 
   function drawDonut(counts){
     if (!historyDonut) return;
-    const ctx = historyDonut.getContext('2d');
-    const W = historyDonut.width, H = historyDonut.height;
-    ctx.clearRect(0,0,W,H);
-    const total = counts.reduce((s,c)=>s+c.value,0);
-    const cx = W/2, cy = H/2, r = Math.min(W,H)/2 - 8;
-    let start = -Math.PI/2;
-    counts.forEach(c=>{
-      const slice = total ? (c.value/total)*Math.PI*2 : 0;
-      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,start+slice); ctx.closePath();
-      ctx.fillStyle = c.color; ctx.fill();
-      start += slice;
-    });
-    ctx.beginPath(); ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg-elevated') || '#111'; ctx.arc(cx,cy,r*0.56,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-primary') || '#fff'; ctx.font='700 18px system-ui,Arial'; ctx.textAlign='center';
-    ctx.fillText(total, cx, cy+6);
+    try {
+      const ctx = historyDonut.getContext('2d');
+      const W = historyDonut.width, H = historyDonut.height;
+      ctx.clearRect(0,0,W,H);
+      const total = counts.reduce((s,c)=>s+c.value,0);
+      const cx = W/2, cy = H/2, r = Math.min(W,H)/2 - 8;
+      let start = -Math.PI/2;
+      counts.forEach(c=>{
+        const slice = total ? (c.value/total)*Math.PI*2 : 0;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,start+slice); ctx.closePath();
+        ctx.fillStyle = c.color; ctx.fill();
+        start += slice;
+      });
+      ctx.beginPath(); ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg-elevated') || '#111'; ctx.arc(cx,cy,r*0.56,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-primary') || '#fff'; ctx.font = '700 18px system-ui,Arial'; ctx.textAlign = 'center';
+      ctx.fillText(total, cx, cy+6);
+    } catch (e) {
+      console.error('drawDonut error', e);
+    }
   }
 
-  /* ---------------------------
-     UI wiring (delegation + stable listeners)
-     --------------------------- */
-
+  /* UI wiring (delegated) */
   function wireGlobalHandlers(){
-    // navigation toggles (nav dropdown)
-    const navToggle = document.getElementById('navMenuToggle');
-    const navMenu = document.getElementById('navDropdown');
+    // nav dropdown
+    const navToggle = $('#navMenuToggle');
+    const navMenu = $('#navDropdown');
     if (navToggle && navMenu){
       navToggle.addEventListener('click', (ev)=>{ ev.stopPropagation(); const open = navMenu.getAttribute('aria-hidden') === 'false'; navMenu.setAttribute('aria-hidden', open ? 'true' : 'false'); navToggle.setAttribute('aria-expanded', !open); });
       document.addEventListener('click', (ev)=>{ if (navMenu.getAttribute('aria-hidden') === 'false' && !navMenu.contains(ev.target) && ev.target !== navToggle) { navMenu.setAttribute('aria-hidden','true'); navToggle.setAttribute('aria-expanded','false'); }});
     }
 
-    // document-level click handling (delegated)
+    // global delegation
     document.addEventListener('click', function(e){
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
-      // data-action nav
       const actionEl = e.target.closest('[data-action]');
       if (actionEl){
         const action = actionEl.dataset.action;
-        if (action === 'quick-wins'){ safeShowDialog(quickWinsDialog); return; }
+        if (action === 'quick-wins'){ safeShowDialog($('#quickWinsDialog')); return; }
         if (action === 'history'){ openHistoryDialog(); return; }
         if (action === 'about'){ window.location.href = './about.html'; return; }
         if (action === 'home'){ window.location.href = './index.html'; return; }
         if (action === 'toggle-theme'){ toggleTheme(); return; }
       }
 
-      // ring label click
+      // ring label or mode-card
       const ringBtn = e.target.closest('.ring-btn[data-mode-id]');
       if (ringBtn){ openModeDialog(Number(ringBtn.dataset.modeId)); return; }
-
-      // mode-card click
       const modeCard = e.target.closest('.mode-card[data-mode-id]');
       if (modeCard){ openModeDialog(Number(modeCard.dataset.modeId)); return; }
 
-      // select global quick-win
+      // quick wins select
       const gsel = e.target.closest('.select-global-activity');
-      if (gsel){
-        e.preventDefault();
-        gsel.classList.toggle('active');
-        const ta = gsel.closest('li').querySelector('.activity-note');
-        if (ta) ta.hidden = !gsel.classList.contains('active');
-        const any = globalQuickWinsList.querySelectorAll('.select-global-activity.active').length > 0;
-        if (startQuickWinBtn) startQuickWinBtn.disabled = !any;
-        return;
-      }
+      if (gsel){ e.preventDefault(); gsel.classList.toggle('active'); const ta = gsel.closest('li').querySelector('.activity-note'); if (ta) ta.hidden = !gsel.classList.contains('active'); if (startQuickWinBtn) startQuickWinBtn.disabled = !(globalQuickWinsList.querySelectorAll('.select-global-activity.active').length>0); return; }
 
-      // select activity in mode dialog
+      // dialog selects
       const msel = e.target.closest('.select-activity');
-      if (msel){
-        e.preventDefault();
-        // if label says Locked, show come back
-        if (msel.textContent.trim().toLowerCase() === 'locked'){ showComeBackDialog(); return; }
-        msel.classList.toggle('active');
-        const ta = msel.closest('li').querySelector('.activity-note');
-        if (ta) ta.hidden = !msel.classList.contains('active');
-        if (startResetBtn) startResetBtn.disabled = !(dialogQuickWins.querySelectorAll('.select-activity.active').length > 0);
-        return;
-      }
+      if (msel){ e.preventDefault(); if (msel.textContent.trim().toLowerCase()==='locked'){ showComeBackDialog(); return; } msel.classList.toggle('active'); const ta = msel.closest('li').querySelector('.activity-note'); if (ta) ta.hidden = !msel.classList.contains('active'); if (startResetBtn) startResetBtn.disabled = !(dialogQuickWins.querySelectorAll('.select-activity.active').length>0); return; }
 
-      // dialog close / cancel
-      if (e.target.closest('.dialog-close') || e.target.closest('.dialog-cancel')){
-        const d = e.target.closest('dialog');
-        if (d){ safeCloseDialog(d); clearDialogSelections(); }
-      }
+      if (e.target.closest('.dialog-close') || e.target.closest('.dialog-cancel')){ const d = e.target.closest('dialog'); if (d){ safeCloseDialog(d); clearDialogSelections(); } }
     }, true);
 
-    // startQuickWinBtn handler (stable listener)
+    // startQuickWinBtn handler
     if (startQuickWinBtn){
-      startQuickWinBtn.addEventListener('click', function(){
+      startQuickWinBtn.addEventListener('click', ()=>{
         const selected = Array.from(globalQuickWinsList.querySelectorAll('.select-global-activity.active'));
         if (!selected.length) return;
-        const records = selected.map(b=>{
-          const ta = b.closest('li').querySelector('.activity-note');
-          return { modeId: null, action: b.dataset.activity, note: ta ? (ta.value||'').trim() : '' };
-        });
+        const records = selected.map(b => { const ta = b.closest('li').querySelector('.activity-note'); return { modeId:null, action: b.dataset.activity, note: ta ? (ta.value||'').trim() : '' }; });
         recordActivities(records);
-        safeCloseDialog(quickWinsDialog);
+        safeCloseDialog($('#quickWinsDialog'));
         clearDialogSelections();
       });
     }
 
     // clear history
     if (clearHistoryBtn){
-      clearHistoryBtn.addEventListener('click', function(){
+      clearHistoryBtn.addEventListener('click', ()=>{
         localStorage.setItem(HISTORY_KEY, JSON.stringify([]));
         localStorage.removeItem(STREAK_KEY);
         localStorage.removeItem(LONGEST_KEY);
@@ -391,22 +342,16 @@
     }
   }
 
-  /* ---------------------------
-     Mode dialog flow
-     --------------------------- */
-
+  /* Mode dialog flow */
   function openModeDialog(modeId){
     const m = MODES.find(x => x.id === Number(modeId));
     if (!m) return;
+    const title = $('#modeDialogTitle'); const desc = $('#dialogModeDescription'); const accent = $('#modeAccent');
+    if (title) title.textContent = m.name;
+    if (desc) desc.textContent = m.description;
+    if (accent) accent.style.background = m.color;
 
-    // fill header accent & text
-    if (modeAccent) modeAccent.style.background = m.color;
-    const titleEl = $('#modeDialogTitle');
-    const descEl = $('#dialogModeDescription');
-    if (titleEl) titleEl.textContent = m.name;
-    if (descEl) descEl.textContent = m.description;
-
-    // populate activities into dialogQuickWins
+    // populate activities
     const locked = (localStorage.getItem(LAST_MODE_DAY_KEY) === todayKey());
     const arr = QUICK_WINS[m.id] || [];
     if (!dialogQuickWins) return;
@@ -420,33 +365,41 @@
       </li>
     `).join('');
 
-    // ensure startResetBtn state
     if (startResetBtn) startResetBtn.disabled = true;
+
+    // wire startResetBtn (stable)
+    if (startResetBtn){
+      startResetBtn.onclick = function(){
+        const selected = Array.from(dialogQuickWins.querySelectorAll('.select-activity.active'));
+        if (!selected.length) return;
+        if (localStorage.getItem(LAST_MODE_DAY_KEY) === todayKey()){ showComeBackDialog(); return; }
+        const records = selected.map(b => { const ta = b.closest('li').querySelector('.activity-note'); return { modeId: m.id, modeName: m.name, modeColor: m.color, action: b.dataset.activity, note: ta ? (ta.value||'').trim() : '' }; });
+        recordActivities(records);
+        safeCloseDialog($('#modeDialog'));
+        clearDialogSelections();
+      };
+    }
 
     safeShowDialog($('#modeDialog'));
   }
 
-  /* ---------------------------
-     Dialog helpers and misc
-     --------------------------- */
-
+  /* Dialog helpers and utilities */
   function safeShowDialog(d){
     if (!d) return;
-    if (typeof d.showModal === 'function'){
-      try{ d.showModal(); const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); if (f) f.focus(); } catch(e){ console.warn(e); }
-    } else {
-      // fallback for browsers without <dialog> support: emulate by toggling a class
-      d.style.display = 'block';
-      d.setAttribute('open', '');
-    }
+    try {
+      if (typeof d.showModal === 'function') d.showModal();
+      else { d.setAttribute('open',''); d.style.display='block'; }
+      const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (f) setTimeout(()=>f.focus(), 30);
+    } catch(e){ console.warn('safeShowDialog failed', e); }
   }
 
   function safeCloseDialog(d){
     if (!d) return;
-    try{
+    try {
       if (typeof d.close === 'function' && d.open) d.close();
-      else { d.style.display = 'none'; d.removeAttribute('open'); }
-    } catch(e){ console.warn(e); }
+      else { d.removeAttribute('open'); d.style.display='none'; }
+    } catch(e){ console.warn('safeCloseDialog', e); }
   }
 
   function clearDialogSelections(){
@@ -457,67 +410,31 @@
     if (startQuickWinBtn) startQuickWinBtn.disabled = true;
   }
 
-  function showComeBackDialog(){
-    const d = $('#comeBackDialog');
-    safeShowDialog(d);
-  }
+  function showComeBackDialog(){ safeShowDialog($('#comeBackDialog')); }
 
-  /* ---------------------------
-     Utilities
-     --------------------------- */
-
+  /* Utilities */
   function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-  function hexToRgba(hex, alpha=1){
-    const h = hex.replace('#','');
-    const bigint = parseInt(h.length === 3 ? h.split('').map(c=>c+c).join('') : h, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    return `rgba(${r},${g},${b},${alpha})`;
-  }
+  function hexToRgba(hex, a=1){ try{ const h = hex.replace('#',''); const bigint = parseInt(h.length===3 ? h.split('').map(c=>c+c).join('') : h, 16); const r = (bigint>>16)&255; const g = (bigint>>8)&255; const b = bigint&255; return `rgba(${r},${g},${b},${a})`; }catch(e){ return `rgba(0,0,0,${a})`; } }
+  function showToast(text, ms=1400){ const el = document.createElement('div'); el.className='rc-toast'; el.textContent=text; document.body.appendChild(el); requestAnimationFrame(()=>el.classList.add('visible')); setTimeout(()=>{ el.classList.remove('visible'); setTimeout(()=>el.remove(),220); }, ms); }
+  function toggleTheme(){ const light = document.documentElement.classList.toggle('light'); try{ localStorage.setItem(THEME_KEY, light?'light':'dark'); }catch(e){} }
 
-  function showToast(text, ms = 1400){
-    const el = document.createElement('div');
-    el.className = 'rc-toast';
-    el.textContent = text;
-    document.body.appendChild(el);
-    requestAnimationFrame(()=>el.classList.add('visible'));
-    setTimeout(()=>{ el.classList.remove('visible'); setTimeout(()=>el.remove(),220); }, ms);
-  }
-
-  function toggleTheme(){
-    const isLight = document.documentElement.classList.toggle('light');
-    try{ localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark'); } catch(e){}
-  }
-
-  /* ---------------------------
-     Arrow animation (subtle)
-     --------------------------- */
-
-  let targetAngle = 0, currentAngle = 0, animating = false;
+  /* Arrow animation */
+  let targetAngle=0, currentAngle=0, anim=false;
   function startArrowLoop(){
-    function onScroll(){
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const pct = max > 0 ? (window.scrollY / max) : 0;
-      targetAngle = pct * ARROW_MULTIPLIER;
-      if (!animating){ animating = true; requestAnimationFrame(animate); }
-    }
-    function animate(){
-      currentAngle += (targetAngle - currentAngle) * 0.12;
-      const el = $('#compassArrow');
-      if (el) el.style.transform = `translate(-50%,-50%) rotate(${currentAngle}deg)`;
-      if (Math.abs(targetAngle - currentAngle) > 0.01) requestAnimationFrame(animate);
-      else animating = false;
-    }
-    window.addEventListener('scroll', ()=>requestAnimationFrame(onScroll), { passive: true });
+    function onScroll(){ const max = document.documentElement.scrollHeight - window.innerHeight; const pct = max>0 ? (window.scrollY/max) : 0; targetAngle = pct * 5760; if (!anim){ anim=true; requestAnimationFrame(step); } }
+    function step(){ currentAngle += (targetAngle-currentAngle)*0.12; const el = $('#compassArrow'); if (el) el.style.transform = `translate(-50%,-50%) rotate(${currentAngle}deg)`; if (Math.abs(targetAngle-currentAngle) > 0.01) requestAnimationFrame(step); else anim=false; }
+    window.addEventListener('scroll', ()=>requestAnimationFrame(onScroll), {passive:true});
     onScroll();
   }
 
-  // DOM ready
+  // init
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
   // expose for debug
   window.__rc = { buildWedgesAndSeparators, placeRingLabels, openModeDialog, recordActivities };
+
+  // global error listener to avoid total breakage
+  window.addEventListener('error', function(ev){ console.error('Unhandled error', ev.error || ev.message); showToast('An unexpected error occurred — UI fallback applied'); }, true);
 
 })();
