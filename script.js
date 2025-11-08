@@ -1,11 +1,12 @@
 // script.js
-// Key updates in this patch:
-// - compute ring label positions using polar math and place them using left/top so labels revolve around compass center
-// - keep ring labels horizontal (no rotation) so they read upright on all wedges
-// - clamp radial distance so labels remain inside wedges on narrow viewports
-// - sectioned layout for compass/list/quick wins; quick wins CTA text "Quick Wins" and bigger
-// - nav delegation via data-action works on both index and about pages
-// - more vibrant wedge alpha and mode card accents; history shows mode breakdown
+// Key fixes for this update:
+// - compute ring label positions using polar math and place them via left/top so labels revolve and read upright
+// - stronger wedge alpha and vibrant color accents
+// - navigation on About page wired via data-action across pages
+// - "Complete Selected" now records, animates completed mode, and opens History dialog
+// - Quick Wins CTA larger and further spaced; Quick Wins completion opens History as well
+// - Added "add to home screen" instructions in About page (static HTML) — no JS required there
+// - Increased compass size and mode text/button sizes
 
 (function() {
   'use strict';
@@ -34,13 +35,13 @@
   const themeToggles = Array.from(document.querySelectorAll('.theme-toggle, #themeToggle, #themeToggleAbout'));
   const streakBadges = document.querySelectorAll('#streakBadge');
 
-  const ARROW_MULTIPLIER = 720; // two rotations per full scroll
+  const ARROW_MULTIPLIER = 720; // 2 rotations per full scroll
 
   const canonical = {
-    4: { id:4, name:'Growing',   description:'Small wins to build momentum', color:'#4DA6FF' },
-    3: { id:3, name:'Grounded',  description:'Reset and connect: root into the present', color:'#2ECC71' },
-    2: { id:2, name:'Drifting',  description:'Slow down and regain clarity', color:'#F7D154' },
-    1: { id:1, name:'Surviving', description:'Quick resets for focus and energy', color:'#FF6B6B' }
+    4: { id:4, name:'Growing',   description:'Small wins to build momentum', color:'#2f80ed' },
+    3: { id:3, name:'Grounded',  description:'Reset and connect: root into the present', color:'#00c06b' },
+    2: { id:2, name:'Drifting',  description:'Slow down and regain clarity', color:'#ffbf3b' },
+    1: { id:1, name:'Surviving', description:'Quick resets for focus and energy', color:'#ff5f6d' }
   };
 
   const quickWinsMap = {
@@ -76,12 +77,7 @@
           data.forEach(item => {
             const id = Number(item.id);
             if (!canonical[id]) return;
-            byId[id] = {
-              id,
-              name: canonical[id].name,
-              color: canonical[id].color,
-              description: item.description ? item.description : canonical[id].description
-            };
+            byId[id] = { id, name: canonical[id].name, color: canonical[id].color, description: item.description ? item.description : canonical[id].description };
           });
           modes = [4,3,2,1].map(id => byId[id] || canonical[id]).filter(Boolean);
           return;
@@ -111,13 +107,12 @@
     }).join('');
   }
 
-  // compute positions for ring labels using polar math to keep them revolving around center
+  // position ring labels by polar geometry, keep horizontal text
   function renderCompassRing() {
     if (!compassRing || !compassWedges || !compassContainer) return;
     compassRing.innerHTML = '';
     buildWedges(modes);
 
-    // get compass inner coordinates
     const rect = compassContainer.getBoundingClientRect();
     const cx = rect.width / 2;
     const cy = rect.height / 2;
@@ -126,19 +121,13 @@
     const portion = 360 / (modes.length || 4);
 
     modes.forEach((mode, idx) => {
-      // centerAngle in degrees (0 is East by default, adjust so 0 points up visually)
       const centerAngle = ((idx + 0.5) * portion) - 45;
-      // convert to radians and offset by -90 so 0 points up (matching visual compass)
       const rad = (centerAngle - 90) * (Math.PI / 180);
-
-      // distance factor tuned to visually center label in wedge
       let rFactor = 0.52;
-      // compute pixel distance and clamp to keep inside ring for small viewports
       let rPx = radius * rFactor;
-      const minR = Math.max(38, radius * 0.28);
-      const maxR = Math.max(72, radius * 0.62);
+      const minR = Math.max(40, radius * 0.28);
+      const maxR = Math.max(80, radius * 0.64);
       rPx = Math.min(Math.max(rPx, minR), maxR);
-
       const left = cx + Math.cos(rad) * rPx;
       const top = cy + Math.sin(rad) * rPx;
 
@@ -148,16 +137,17 @@
       btn.dataset.modeId = mode.id;
       btn.innerHTML = `<span class="ring-label">${escapeHtml(mode.name)}</span>`;
 
-      // style
       const base = mode.color || '#00AFA0';
-      btn.style.background = `linear-gradient(180deg, ${base}88, rgba(0,0,0,0.08))`; // stronger alpha
+      btn.style.background = `linear-gradient(180deg, ${base}CC, rgba(0,0,0,0.10))`; // stronger alpha
       btn.style.setProperty('--mode-color', base);
       btn.style.color = getContrastColor(base);
 
-      // place absolutely relative to compass container
       btn.style.left = `${left}px`;
       btn.style.top = `${top}px`;
-      btn.style.zIndex = 8;
+      btn.style.zIndex = 12;
+
+      // subtle colored glow outline to pop
+      btn.style.boxShadow = `0 18px 50px rgba(0,0,0,0.6), 0 0 24px ${hexToRgba(base, 0.14)}`;
 
       compassRing.appendChild(btn);
     });
@@ -170,12 +160,13 @@
     const portion = 360 / N;
     const entries = list.map((m, i) => {
       const color = (m && m.color) ? m.color : '#00AFA0';
-      const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + '88' : color;
+      const stopColor = /^#([A-Fa-f0-9]{6})$/.test(color) ? color + 'CC' : color;
       const start = Math.round(i * portion);
       const end = Math.round((i + 1) * portion);
       return `${stopColor} ${start}deg ${end}deg`;
     });
     compassWedges.style.background = `conic-gradient(from -45deg, ${entries.join(',')})`;
+    compassWedges.style.filter = 'saturate(1.05) contrast(1.02)';
   }
 
   function renderGlobalQuickWins() {
@@ -211,7 +202,7 @@
       localStorage.setItem(STREAK_KEY, String(streak));
       localStorage.setItem(LAST_DAY_KEY, today);
       updateStreakDisplay();
-      streakBadges.forEach(b => { b.classList.add('streak-bump'); setTimeout(()=>b.classList.remove('streak-bump'), 420); });
+      streakBadges.forEach(b => { b.classList.add('streak-bump'); setTimeout(()=>b.classList.remove('streak-bump'), 520); });
       return true;
     } catch (e) { console.warn(e); return false; }
   }
@@ -238,16 +229,22 @@
 
     const bumped = incrementStreakIfNeeded();
 
+    // animate completed mode (pulse ring + card)
     if (bumped && currentMode) {
       const ring = document.querySelector(`.ring-btn[data-mode-id="${currentMode.id}"]`);
       const card = document.querySelector(`.mode-card[data-mode-id="${currentMode.id}"]`);
       [ring, card].forEach(el => {
         if (!el) return;
-        el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }], { duration: 420, easing: 'cubic-bezier(.2,.9,.2,1)' });
+        el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.2,1)' });
       });
     }
 
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
+
+    // Open history after a short delay so animation is visible
+    setTimeout(() => {
+      openHistoryDialog();
+    }, 420);
   }
 
   function safeShowDialog(d) {
@@ -259,13 +256,12 @@
   function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
   function attachListeners() {
-    // global nav delegation via data-action
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
-      const navEl = e.target.closest('[data-action]');
-      if (navEl && navEl.dataset && navEl.dataset.action) {
-        const action = navEl.dataset.action;
+      const actionEl = e.target.closest('[data-action]');
+      if (actionEl && actionEl.dataset && actionEl.dataset.action) {
+        const action = actionEl.dataset.action;
         if (action === 'quick-wins') { safeShowDialog(quickWinsDialog); return; }
         if (action === 'history') { openHistoryDialog(); return; }
         if (action === 'home') { window.location.href = './index.html'; return; }
@@ -276,15 +272,18 @@
         }
       }
 
-      // compass ring label click
+      // ring button click
       const ringBtn = e.target.closest('.ring-btn[data-mode-id]');
       if (ringBtn && ringBtn.dataset && ringBtn.dataset.modeId) { openModeDialog(Number(ringBtn.dataset.modeId)); return; }
 
-      // mode card
+      // mode card click
       const modeCard = e.target.closest('.mode-card[data-mode-id]');
       if (modeCard && modeCard.dataset && modeCard.dataset.modeId) { openModeDialog(Number(modeCard.dataset.modeId)); return; }
 
-      // global quick-wins select
+      // quick wins under section
+      if (e.target.id === 'quickWinsLink' || e.target.closest('#quickWinsLink')) { safeShowDialog(quickWinsDialog); return; }
+
+      // global quick wins select
       const gSel = e.target.closest('.select-global-activity');
       if (gSel && gSel.dataset && gSel.dataset.activity) {
         e.preventDefault();
@@ -311,7 +310,6 @@
       }
     }, true);
 
-    // startQuickWinBtn
     if (startQuickWinBtn) {
       startQuickWinBtn.addEventListener('click', function() {
         const selected = Array.from(globalQuickWinsList.querySelectorAll('.select-global-activity.active'));
@@ -326,7 +324,6 @@
       });
     }
 
-    // startResetBtn
     if (startResetBtn) {
       startResetBtn.addEventListener('click', function() {
         if (!dialogQuickWins) return;
@@ -342,12 +339,10 @@
       });
     }
 
-    // escape key closes dialogs
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') { safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections(); }
     });
 
-    // recompute positions on resize
     window.addEventListener('resize', function() { renderCompassRing(); });
   }
 
@@ -425,7 +420,7 @@
     safeShowDialog(historyDialog);
   }
 
-  // arrow lerp
+  // arrow animation
   let targetAngle = 0, currentAngle = 0, arrowAnimating = false;
   function startArrowLoop() {
     function onScroll(){
@@ -444,7 +439,7 @@
     onScroll();
   }
 
-  // theme
+  // theme helpers
   function applySavedTheme() {
     const saved = localStorage.getItem(THEME_KEY);
     const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
@@ -460,7 +455,6 @@
   }
 
   function markIntroSeen(){ try{ if (!localStorage.getItem(INTRO_SEEN_KEY)) localStorage.setItem(INTRO_SEEN_KEY, '1'); }catch(e){} }
-
   function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   function getContrastColor(hex){
     if(!hex) return '#fff';
@@ -470,6 +464,14 @@
     const b = parseInt(h.length===3? h[2]+h[2] : h.slice(h.length===3?2:4, h.length),16);
     const lum = (0.299*r + 0.587*g + 0.114*b);
     return lum > 186 ? '#000' : '#fff';
+  }
+  function hexToRgba(hex, alpha=1) {
+    const h = hex.replace('#','');
+    const bigint = parseInt(h.length===3 ? h.split('').map(c=>c+c).join('') : h, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r},${g},${b},${alpha})`;
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
