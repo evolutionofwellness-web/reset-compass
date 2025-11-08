@@ -1,9 +1,9 @@
 /* style.css
-   - positioning of ring labels is computed in JS; CSS supports absolute left/top placement
-   - increased compass size and stronger wedge visuals
-   - quick wins CTA larger and more prominent
-   - improved mode-card visuals and dialog styling
-   - history breakdown styles
+   - Fix: ring labels positioned by JS (left/top) and kept horizontal (no rotation)
+   - Divider sections between compass, info, and list
+   - Quick Wins CTA larger and more prominent
+   - More vibrant wedge colors and mode-card accents
+   - History breakdown visuals
 */
 
 /* CSS Variables */
@@ -52,11 +52,18 @@ a, a:visited { text-decoration:none; color:inherit }
 .nav-btn{background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer;white-space:nowrap;font-size:clamp(0.86rem,1.6vw,1rem)}
 .nav-right{display:flex;align-items:center;gap:8px}
 
+/* Page sections (dividers / spacing) */
+.page-section{padding:12px 8px;margin-top:8px}
+.page-section--compass{padding-top:6px;padding-bottom:6px}
+.page-section--info{border-top:1px solid rgba(255,255,255,0.03);padding:18px 12px 20px;margin-top:6px}
+.page-section--modes{border-top:1px solid rgba(255,255,255,0.03);padding:18px 12px 30px;margin-top:10px}
+
 /* Quick wins CTA below compass */
-.quick-wins-cta{padding:12px 18px;font-size:1.05rem;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.48);background:linear-gradient(90deg,var(--brand-color),#00d4c4);color:#041018;font-weight:800}
+.quick-wins-cta{padding:14px 20px;font-size:1.06rem;border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,0.5);background:linear-gradient(90deg,var(--brand-color),#00d4c4);color:#041018;font-weight:900;border:none}
 
 /* Streak */
-.streak-container{display:flex;justify-content:center;margin:12px 0}
+.streak-row{display:flex;justify-content:center;margin-bottom:12px}
+.streak-container{display:flex;justify-content:center}
 .streak-badge{background:linear-gradient(180deg,#ffb874,#ff7a7a);color:#081018;padding:0.5rem 0.95rem;border-radius:999px;font-weight:900;display:inline-flex;align-items:center;gap:0.6rem;box-shadow:0 12px 28px rgba(0,0,0,0.45);font-size:1.02rem;min-width:140px;transition:transform 240ms cubic-bezier(.2,.9,.2,1), box-shadow 200ms}
 .streak-bump{transform:scale(1.08);box-shadow:0 20px 36px rgba(0,0,0,0.45);}
 
@@ -64,22 +71,23 @@ a, a:visited { text-decoration:none; color:inherit }
 .main-content{max-width:1120px;margin:0 auto;padding:1rem}
 
 /* Compass */
+.compass-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:2px}
 .compass-container{
   position:relative;
   width:var(--compass-size);
   height:var(--compass-size);
-  margin:6px auto 1rem;
+  margin:6px auto;
   border-radius:50%;
   background:radial-gradient(circle at 30% 20%, rgba(0,175,160,0.03), rgba(0,0,0,0.06));
-  box-shadow:inset 0 30px 80px rgba(0,0,0,0.55);
+  box-shadow:inset 0 40px 100px rgba(0,0,0,0.6), 0 12px 40px rgba(0,0,0,0.5);
   overflow:visible;
 }
-.compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.26;border-radius:50%}
+.compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.28;border-radius:50%}
 .compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:0.98;z-index:1}
 .compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);color:var(--brand-color);pointer-events:none;z-index:3}
 .hero-intro{margin-top:8px;text-align:center;color:var(--text-secondary);max-width:860px;margin-left:auto;margin-right:auto}
 
-/* Ring buttons: positioned by JS (left/top) and kept horizontal using rotation var */
+/* Ring buttons: positioned by JS (left/top) and remain horizontally readable */
 .compass-ring{position:absolute;inset:0;pointer-events:none;z-index:6}
 .ring-btn{
   position:absolute;
@@ -87,25 +95,26 @@ a, a:visited { text-decoration:none; color:inherit }
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:8px 12px;
+  padding:10px 14px;
   border-radius:999px;
   min-width:88px;
   max-width:180px;
   font-weight:800;
   color:var(--text-primary);
   border:none;
-  left:0; top:0; /* JS updates left/top */
-  transform: translate(-50%,-50%) rotate(var(--rotate,0deg));
+  left:0; top:0; /* JS will place items here */
+  transform: translate(-50%,-50%); /* keep horizontal text */
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
-  z-index:6;
+  background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));
+  z-index:8;
   font-size:clamp(12px,1.6vw,15px);
   transition:transform 160ms, box-shadow 160ms;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.45);
 }
-.ring-btn:active{box-shadow:0 10px 30px rgba(0,0,0,0.4)}
-.ring-label{padding:0 6px;line-height:1}
+/* vibrant glow for ring on hover/focus (accent color via inline style var) */
+.ring-btn:hover, .ring-btn:focus{box-shadow:0 18px 40px rgba(0,0,0,0.6), 0 0 18px rgba(0,0,0,0.12)}
 
 /* Mode cards */
 .section-title{text-align:center;font-size:1.5rem;margin:20px 0;color:var(--text-primary);font-weight:800}
@@ -114,9 +123,9 @@ a, a:visited { text-decoration:none; color:inherit }
   display:flex;
   flex-direction:column;
   gap:8px;
-  padding:16px;
+  padding:18px;
   border-radius:14px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.04));
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.06));
   border:1px solid var(--border);
   cursor:pointer;
   position:relative;
@@ -127,17 +136,18 @@ a, a:visited { text-decoration:none; color:inherit }
 .mode-card:before{
   content:"";
   position:absolute;
-  left:0;top:0;height:100%;width:12px;border-radius:8px 0 0 8px;
-  background:linear-gradient(180deg,var(--mode-color, rgba(0,175,160,0.35)), rgba(0,0,0,0));
-  opacity:0.98;
+  left:0;top:0;height:100%;width:14px;border-radius:8px 0 0 8px;
+  background:linear-gradient(180deg,var(--mode-color, rgba(0,175,160,0.5)), rgba(0,0,0,0));
+  opacity:1;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35), inset 0 8px 18px rgba(255,255,255,0.02);
 }
-.mode-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,0.45)}
-.mode-name{font-weight:900;font-size:1.12rem;color:var(--text-primary);margin-bottom:6px}
+.mode-card:hover{transform:translateY(-8px);box-shadow:0 22px 56px rgba(0,0,0,0.6)}
+.mode-name{font-weight:900;font-size:1.18rem;color:var(--text-primary);margin-bottom:6px}
 .mode-desc{font-size:0.98rem;color:var(--text-secondary);line-height:1.4}
 .mode-hint{font-size:0.95rem;color:var(--brand-color);margin-top:8px;font-weight:700}
 
 /* Dialogs & activities */
-dialog{border:none;border-radius:14px;padding:0;max-width:720px;width:calc(100% - 2rem);background:var(--bg-elevated);color:var(--text-primary);box-shadow:0 18px 60px rgba(0,0,0,0.6)}
+dialog{border:none;border-radius:14px;padding:0;max-width:720px;width:calc(100% - 2rem);background:var(--bg-elevated);color:var(--text-primary);box-shadow:0 22px 80px rgba(0,0,0,0.7)}
 .dialog-content{padding:1.6rem;position:relative}
 .dialog-close{position:absolute;top:12px;right:12px;background:transparent;border:none;color:var(--text-secondary);font-size:1.6rem;cursor:pointer;width:44px;height:44px;border-radius:50%;box-shadow:0 6px 20px rgba(0,0,0,0.35)}
 .mode-header{padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.02);margin-bottom:14px}
