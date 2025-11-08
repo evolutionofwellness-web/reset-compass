@@ -1,13 +1,14 @@
 // script.js
-// Updates made to address your latest feedback:
-// - wedge buttons slightly closer to center than previous outward move (rFactor tuned)
-// - wedge click mapping remains (click anywhere inside wedge opens mode)
-// - arrow spins much more: ARROW_MULTIPLIER = 5760 (double previous 2880)
-// - Clear History wired and works; starts over streak values
-// - Dropdown menus close when clicking outside or pressing Escape (works on both pages)
-// - Mode activities now include short child-friendly instructions (already included in quickWinsMap)
-// - Added stronger glow and vibrancy in CSS; JS sets colored glow on ring buttons
-// - Complete Selected records activities, pulses mode, and opens History dialog automatically
+// Final synchronized update:
+// - Nav dropdown minimization on outside click and Escape (applies on index + about)
+// - Compass wedges clickable, ring labels placed slightly closer to center
+// - Removed heavy outer ring so compass visible in dark mode
+// - Donut chart rendered in History dialog showing percentages
+// - Quick Wins are in a distinct block
+// - Mode list padding improved; mode activities include child-friendly hints
+// - Complete Selected records activities, pulses completed-mode UI, and then opens History (donut shows updated percentages)
+// - Clear history implemented and resets streak data
+// - Extra glows applied to ring buttons via JS for consistent look
 
 (function() {
   'use strict';
@@ -33,6 +34,7 @@
   const historyDialog = document.getElementById('historyDialog');
   const historyStats = document.getElementById('historyStats');
   const historyTimeline = document.getElementById('historyTimeline');
+  const historyDonut = document.getElementById('historyDonut');
   const clearHistoryBtn = document.getElementById('clearHistoryBtn');
   const navMenuToggle = document.getElementById('navMenuToggle');
   const navDropdown = document.getElementById('navDropdown');
@@ -41,9 +43,10 @@
   const themeToggles = Array.from(document.querySelectorAll('.theme-toggle, #themeToggle, #themeToggleAbout'));
   const streakBadges = document.querySelectorAll('#streakBadge');
 
-  // Spin multiplier: double of previous 2880 => 5760
+  // very responsive arrow rotation multiplier (fast spin across full scroll)
   const ARROW_MULTIPLIER = 5760;
 
+  // canonical modes + vibrant colors
   const canonical = {
     4: { id:4, name:'Growing',   description:'Small wins to build momentum', color:'#2f80ed' },
     3: { id:3, name:'Grounded',  description:'Reset and connect: root into the present', color:'#00c06b' },
@@ -51,7 +54,7 @@
     1: { id:1, name:'Surviving', description:'Quick resets for focus and energy', color:'#ff5f6d' }
   };
 
-  // Activities with simple instructions
+  // activities include short hints
   const quickWinsMap = {
     3: [
       { text: 'Plant your feet and do a short stretch', hint: 'Stand tall, reach arms up, then slowly lower them.' },
@@ -62,19 +65,19 @@
     2: [
       { text: 'Take 3 deep breaths', hint: 'Slowly breathe in, then slowly out, three times.' },
       { text: 'Name 3 things you notice around you', hint: 'Say them out loud: color, sound, or object.' },
-      { text: 'Lie down and relax for 2 minutes', hint: 'Close eyes, breathe gently, relax your body.' },
-      { text: 'Slow-release breathing for 1 minute', hint: 'Breathe out longer than you breathe in.' }
+      { text: 'Lie down and relax for 2 minutes', hint: 'Close eyes, breathe gently, relax.' },
+      { text: 'Slow-release breathing for 1 minute', hint: 'Breathe out longer than in to calm down.' }
     ],
     4: [
       { text: 'Try one small new challenge', hint: 'Pick something tiny and try it now.' },
-      { text: 'Write a short reflection on progress', hint: 'Write one sentence about something you did well.' },
+      { text: 'Write a short reflection on progress', hint: 'Jot one sentence about something you did well.' },
       { text: 'Do a 5-minute creative exercise', hint: 'Draw or write for five minutes.' },
-      { text: 'Send an encouraging message to someone', hint: 'Write something kind to a friend.' }
+      { text: 'Send an encouraging message to someone', hint: 'Say something kind to a friend.' }
     ],
     1: [
       { text: 'Take 3 quick breaths', hint: 'Quick deep breaths to regain focus.' },
       { text: 'Drink water', hint: 'Hydrate with a few sips.' },
-      { text: 'Set one tiny goal for the next hour', hint: 'Create a small thing to do now.' },
+      { text: 'Set one tiny goal for the next hour', hint: 'Make a small, easy plan to do next.' },
       { text: 'Stand up and move for 60 seconds', hint: 'Stretch or walk around for one minute.' }
     ]
   };
@@ -111,9 +114,7 @@
           return;
         }
       }
-    } catch (e) {
-      console.warn('modes.json not loaded, using canonical', e);
-    }
+    } catch (e) { console.warn('modes.json not loaded', e); }
     modes = [canonical[4], canonical[3], canonical[2], canonical[1]];
   }
 
@@ -135,7 +136,7 @@
     }).join('');
   }
 
-  // place ring buttons slightly closer to center (user requested slight inward move)
+  // ring label placement slightly closer to center (rFactor tuned to 0.60)
   function renderCompassRing() {
     if (!compassRing || !compassWedges || !compassContainer) return;
     compassRing.innerHTML = '';
@@ -145,17 +146,16 @@
     const cx = rect.width / 2;
     const cy = rect.height / 2;
     const radius = Math.min(cx, cy);
-
     const portion = 360 / (modes.length || 4);
 
     modes.forEach((mode, idx) => {
       const centerAngle = ((idx + 0.5) * portion) - 45;
       const rad = (centerAngle - 90) * (Math.PI / 180);
 
-      // Slightly closer to center than previous outward heavy placement
-      let rFactor = 0.60; // now slightly closer
+      // Slightly closer to center per user request
+      let rFactor = 0.60;
       let rPx = radius * rFactor;
-      const minR = Math.max(40, radius * 0.28);
+      const minR = Math.max(38, radius * 0.28);
       const maxR = Math.max(96, radius * 0.70);
       rPx = Math.min(Math.max(rPx, minR), maxR);
 
@@ -169,14 +169,14 @@
       btn.innerHTML = `<span class="ring-label">${escapeHtml(mode.name)}</span>`;
 
       const base = mode.color || '#00AFA0';
-      btn.style.background = `linear-gradient(180deg, ${base}EE, rgba(0,0,0,0.12))`;
+      btn.style.background = `linear-gradient(180deg, ${base}EE, rgba(0,0,0,0.10))`;
       btn.style.setProperty('--mode-color', base);
       btn.style.color = getContrastColor(base);
-
       btn.style.left = `${left}px`;
       btn.style.top = `${top}px`;
-      btn.style.zIndex = 16;
-      btn.style.boxShadow = `0 32px 120px rgba(0,0,0,0.75), 0 0 40px ${hexToRgba(base, 0.2)}`;
+      btn.style.zIndex = 20;
+      // add a colored glow around each button so themes are more vibrant
+      btn.style.boxShadow = `0 30px 120px rgba(0,0,0,0.75), 0 0 48px ${hexToRgba(base, 0.22)}`;
 
       compassRing.appendChild(btn);
     });
@@ -195,9 +195,10 @@
       return `${stopColor} ${start}deg ${end}deg`;
     });
     compassWedges.style.background = `conic-gradient(from -45deg, ${entries.join(',')})`;
-    compassWedges.style.filter = 'saturate(1.14) contrast(1.10)';
+    compassWedges.style.filter = 'saturate(1.12) contrast(1.08)';
   }
 
+  // Build quick wins list with instruction hints
   function renderGlobalQuickWins() {
     if (!globalQuickWinsList) return;
     const items = [];
@@ -271,7 +272,7 @@
 
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
 
-    // After a short delay, open history so user sees progress
+    // show history after a short delay so the pulse is visible
     setTimeout(() => { openHistoryDialog(); }, 520);
   }
 
@@ -283,8 +284,82 @@
   }
   function safeCloseDialog(d) { if (!d) return; try { if (typeof d.close === 'function' && d.open) d.close(); } catch (e) {} }
 
+  // draw donut chart for history breakdown
+  function drawHistoryDonut(counts) {
+    if (!historyDonut) return;
+    const ctx = historyDonut.getContext('2d');
+    const W = historyDonut.width;
+    const H = historyDonut.height;
+    ctx.clearRect(0,0,W,H);
+    const total = counts.reduce((s,c)=>s+c.value,0);
+    const centerX = W/2, centerY = H/2, radius = Math.min(W,H)/2 - 10;
+    let start = -Math.PI/2;
+    counts.forEach(c => {
+      const slice = total ? (c.value / total) * Math.PI * 2 : 0;
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, start, start + slice);
+      ctx.closePath();
+      ctx.fillStyle = c.color;
+      ctx.fill();
+      start += slice;
+    });
+    // draw inner circle to make donut
+    ctx.beginPath();
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg-elevated') || '#111';
+    ctx.arc(centerX, centerY, radius*0.55, 0, Math.PI*2);
+    ctx.fill();
+
+    // write total in middle
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-primary') || '#fff';
+    ctx.font = '700 18px system-ui,Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(total, centerX, centerY + 6);
+  }
+
+  function openHistoryDialog() {
+    if (!historyDialog) return;
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+
+    const counts = {};
+    modes.forEach(m => counts[m.name] = 0);
+    history.forEach(h => {
+      const name = h.modeName || 'Quick Win';
+      counts[name] = (counts[name] || 0) + 1;
+    });
+    const total = history.length;
+
+    if (historyStats) {
+      historyStats.innerHTML = `
+        <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total resets</div></div>
+        <div class="stat-card"><div class="stat-value">${Number(localStorage.getItem(LONGEST_KEY) || 0)}</div><div class="stat-label">Longest streak</div></div>
+      `;
+      // append per-mode stat cards below main cards (keeps layout compact)
+      modes.forEach(m => {
+        const c = counts[m.name] || 0;
+        const pct = total ? Math.round((c/total)*100) : 0;
+        historyStats.insertAdjacentHTML('beforeend', `<div class="stat-card" style="border-left:8px solid ${m.color};"><div class="stat-value">${c}</div><div class="stat-label">${escapeHtml(m.name)} • ${pct}%</div></div>`);
+      });
+    }
+
+    // build donut data
+    const donutData = modes.map(m => ({ value: counts[m.name] || 0, color: m.color }));
+    drawHistoryDonut(donutData);
+
+    if (historyTimeline) {
+      historyTimeline.innerHTML = history.length ? history.slice().reverse().map(entry => {
+        const d = new Date(entry.timestamp);
+        return `<div class="history-entry" style="border-left-color:${entry.modeColor || '#00AFA0'}">
+          <div><strong>${escapeHtml(entry.modeName || 'Quick Win')}</strong> • ${d.toLocaleString()}<div style="margin-top:6px;color:var(--text-secondary)">${escapeHtml(entry.action)}</div>${entry.note?`<div style="margin-top:8px;color:var(--text-secondary)">${escapeHtml(entry.note)}</div>`:''}</div>
+        </div>`;
+      }).join('') : '<div class="empty-history">No reset history yet. Start your first reset!</div>';
+    }
+
+    safeShowDialog(historyDialog);
+  }
+
+  // attach listeners including dropdown outside-click closure & Escape handling
   function attachListeners() {
-    // dropdown toggles: open/close and close when clicking outside
     function toggleDropdown(toggle, menu) {
       if (!toggle || !menu) return;
       toggle.addEventListener('click', (ev) => {
@@ -293,17 +368,9 @@
         menu.setAttribute('aria-hidden', open ? 'true' : 'false');
         toggle.setAttribute('aria-expanded', !open);
       });
-      // close when clicking outside
       document.addEventListener('click', (ev) => {
         if (!menu) return;
         if (menu.getAttribute('aria-hidden') === 'false' && !menu.contains(ev.target) && ev.target !== toggle) {
-          menu.setAttribute('aria-hidden', 'true');
-          toggle.setAttribute('aria-expanded', 'false');
-        }
-      });
-      // close on Escape
-      document.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Escape' && menu.getAttribute('aria-hidden') === 'false') {
           menu.setAttribute('aria-hidden', 'true');
           toggle.setAttribute('aria-expanded', 'false');
         }
@@ -312,7 +379,6 @@
     toggleDropdown(navMenuToggle, navDropdown);
     toggleDropdown(navMenuToggleAbout, navDropdownAbout);
 
-    // global click delegation for actions
     document.addEventListener('click', function(e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
@@ -359,7 +425,6 @@
       }
     }, true);
 
-    // mapping click inside compass to wedge (same as before)
     if (compassContainer) {
       compassContainer.addEventListener('click', function(e) {
         const rect = compassContainer.getBoundingClientRect();
@@ -421,13 +486,16 @@
         updateStreakDisplay();
         if (historyStats) historyStats.innerHTML = '';
         if (historyTimeline) historyTimeline.innerHTML = '<div class="empty-history">History cleared.</div>';
+        if (historyDonut) {
+          const ctx = historyDonut.getContext('2d');
+          ctx.clearRect(0,0,historyDonut.width,historyDonut.height);
+        }
         showToast('History cleared');
       });
     }
 
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
-        // close any open dropdowns
         if (navDropdown && navDropdown.getAttribute('aria-hidden') === 'false') { navDropdown.setAttribute('aria-hidden','true'); navMenuToggle.setAttribute('aria-expanded','false'); }
         if (navDropdownAbout && navDropdownAbout.getAttribute('aria-hidden') === 'false') { navDropdownAbout.setAttribute('aria-hidden','true'); navMenuToggleAbout.setAttribute('aria-expanded','false'); }
         safeCloseDialog(modeDialog); safeCloseDialog(historyDialog); safeCloseDialog(quickWinsDialog); clearDialogSelections();
@@ -475,43 +543,7 @@
     if (d === modeDialog) currentMode = null;
   }
 
-  function openHistoryDialog() {
-    if (!historyDialog) return;
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-
-    const counts = {};
-    modes.forEach(m => counts[m.name] = 0);
-    history.forEach(h => {
-      const name = h.modeName || 'Quick Win';
-      counts[name] = (counts[name] || 0) + 1;
-    });
-    const total = history.length;
-
-    if (historyStats) {
-      historyStats.innerHTML = `
-        <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total resets</div></div>
-        <div class="stat-card"><div class="stat-value">${Number(localStorage.getItem(LONGEST_KEY) || 0)}</div><div class="stat-label">Longest streak</div></div>
-        ${modes.map(m => {
-          const c = counts[m.name] || 0;
-          const pct = total ? Math.round((c/total)*100) : 0;
-          return `<div class="stat-card" style="border-left:8px solid ${m.color};"><div class="stat-value">${c}</div><div class="stat-label">${escapeHtml(m.name)} • ${pct}%</div></div>`;
-        }).join('')}
-      `;
-    }
-
-    if (historyTimeline) {
-      historyTimeline.innerHTML = history.length ? history.slice().reverse().map(entry => {
-        const d = new Date(entry.timestamp);
-        return `<div class="history-entry" style="border-left-color:${entry.modeColor || '#00AFA0'}">
-          <div><strong>${escapeHtml(entry.modeName || 'Quick Win')}</strong> • ${d.toLocaleString()}<div style="margin-top:6px;color:var(--text-secondary)">${escapeHtml(entry.action)}</div>${entry.note?`<div style="margin-top:8px;color:var(--text-secondary)">${escapeHtml(entry.note)}</div>`:''}</div>
-        </div>`;
-      }).join('') : '<div class="empty-history">No reset history yet. Start your first reset!</div>';
-    }
-
-    safeShowDialog(historyDialog);
-  }
-
-  // arrow lerp using ARROW_MULTIPLIER
+  // arrow lerp animation
   let targetAngle = 0, currentAngle = 0, arrowAnimating = false;
   function startArrowLoop() {
     function onScroll(){
