@@ -1,7 +1,8 @@
 /* style.css
-   - Improved dark-mode compass visibility, wedge gradients, larger wedge text/buttons,
-   - Quick Wins in a distinct block, larger mode title padding, donut styling
-   - Notes textarea appears when an activity is selected
+   - Revised layout and theme for readability, spacing, and visual pop.
+   - Quick Wins block is a clear separated cell.
+   - Notes area shows when an activity is selected (wired in JS).
+   - Improved dark-mode compass visibility and wedge separation via conic gradient + inner overlay.
 */
 
 /* CSS Variables */
@@ -14,7 +15,7 @@
   --text-secondary: #cbd2db;
   --border: rgba(255,255,255,0.06);
 
-  --compass-size: clamp(420px, 74vmin, 1200px);
+  --compass-size: clamp(380px, 66vmin, 960px);
 
   --color-growing: #2f80ed;
   --color-grounded: #00c06b;
@@ -44,10 +45,10 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
 .app-header{position:sticky;top:0;z-index:160;background:transparent;border-bottom:1px solid var(--border);backdrop-filter:blur(6px)}
 .app-header-top{display:flex;align-items:center;justify-content:center;padding:18px 16px 10px;position:relative}
 .home-link{display:inline-block;text-decoration:none;flex:1;text-align:center}
-.app-title{margin:0;font-weight:900;font-size:2.3rem;letter-spacing:-0.6px;color:var(--brand-color);cursor:pointer;text-shadow: var(--glow-title); filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45));}
+.app-title{margin:0;font-weight:900;font-size:2.2rem;letter-spacing:-0.6px;color:var(--brand-color);cursor:pointer;text-shadow: var(--glow-title); filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45));}
 a, a:visited { text-decoration:none; color:inherit }
 
-/* Dropdown nav */
+/* Dropdown nav (index only) */
 .nav-dropdown{position:absolute;right:14px;top:10px}
 .nav-ellipsis{background:var(--bg-elevated);border:1px solid var(--border);padding:10px 12px;border-radius:12px;color:var(--text-primary);cursor:pointer}
 .nav-dropdown-menu{display:none;position:absolute;right:0;top:46px;background:linear-gradient(180deg,var(--bg-elevated), rgba(0,0,0,0.02));border-radius:12px;padding:8px;box-shadow:0 28px 80px rgba(0,0,0,0.65);min-width:180px;border:1px solid var(--border)}
@@ -84,12 +85,17 @@ a, a:visited { text-decoration:none; color:inherit }
   margin:12px auto;
   border-radius:50%;
   background:radial-gradient(circle at 30% 20%, rgba(0,175,160,0.02), rgba(0,0,0,0.04));
-  box-shadow:inset 0 36px 80px rgba(0,0,0,0.6), 0 18px 60px rgba(0,0,0,0.6);
+  box-shadow:inset 0 36px 80px rgba(0,0,0,0.55), 0 18px 60px rgba(0,0,0,0.55);
   overflow:visible;
 }
 .compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.12;border-radius:50%}
-/* wedges are rendered with conic gradients; JS adds gradient stops and separators for clearer mode separation */
-.compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:1;z-index:1;mix-blend-mode:normal}
+.compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:1;z-index:1;mix-blend-mode:normal;border-radius:50%}
+.compass-wedges::after{ /* subtle inner dark vignette to increase contrast of wedge labels */
+  content:"";
+  position:absolute;inset:6%;border-radius:50%;
+  box-shadow: inset 0 40px 90px rgba(0,0,0,0.45);
+  pointer-events:none;
+}
 .compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);pointer-events:none;z-index:3;filter:drop-shadow(0 8px 28px rgba(0,0,0,0.6))}
 .hero-intro{margin-top:8px;text-align:center;color:var(--text-secondary);max-width:880px;margin-left:auto;margin-right:auto;font-size:1.06rem}
 
@@ -115,7 +121,7 @@ a, a:visited { text-decoration:none; color:inherit }
   text-overflow:ellipsis;
   background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));
   z-index:20;
-  font-size:clamp(16px,3.0vw,22px); /* larger wedge text */
+  font-size:clamp(16px,3.0vw,22px);
   transition:transform 200ms, box-shadow 200ms, filter 200ms;
   letter-spacing:0.3px;
 }
@@ -155,7 +161,7 @@ dialog{border:none;border-radius:16px;padding:0;max-width:880px;width:calc(100% 
 .dialog-content{padding:1.6rem;position:relative}
 .dialog-close{position:absolute;top:12px;right:12px;background:transparent;border:none;color:var(--text-secondary);font-size:1.6rem;cursor:pointer;width:48px;height:48px;border-radius:50%;box-shadow:0 8px 28px rgba(0,0,0,0.45)}
 .mode-header{padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.02);margin-bottom:18px}
-.mode-title{margin:0 0 8px 0;font-size:2.0rem} /* larger title in mode dialog */
+.mode-title{margin:0 0 8px 0;font-size:2.0rem}
 .mode-description{margin:0;color:var(--text-secondary);font-size:1.06rem}
 
 /* activity list */
@@ -164,7 +170,7 @@ dialog{border:none;border-radius:16px;padding:0;max-width:880px;width:calc(100% 
 .activity-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .activity-instruction{font-size:0.98rem;color:var(--text-secondary);margin-top:8px}
 
-/* notes always present but hidden until selection; visible when associated select gets .active */
+/* notes: hidden until the activity is selected; JS toggles hidden attribute */
 .activity-note{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-primary);resize:vertical;display:block;margin-top:10px}
 .activity-note[hidden]{display:none}
 
@@ -192,16 +198,16 @@ dialog{border:none;border-radius:16px;padding:0;max-width:880px;width:calc(100% 
 .btn-primary{background:var(--brand-color);color:#081018;padding:12px 18px;border-radius:12px;border:none;font-weight:900}
 .btn-secondary{background:transparent;border:1px solid var(--border);color:var(--text-primary);padding:10px 14px;border-radius:10px}
 
-/* toast & misc */
+/* toast */
 .rc-toast{position:fixed;left:50%;transform:translateX(-50%) translateY(8px);bottom:18px;background:rgba(8,8,8,0.9);color:white;padding:10px 14px;border-radius:10px;opacity:0;transition:opacity 220ms ease,transform 220ms ease;z-index:9999}
 .rc-toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* Responsive */
 @media (max-width:640px){
-  :root{--compass-size: clamp(340px, 78vmin, 760px);}
+  :root{--compass-size: clamp(300px, 78vmin, 720px);}
   .app-title{font-size:1.8rem}
-  .modes-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-  .mode-card{padding:18px 18px 18px 30px}
   .ring-btn{min-width:96px;max-width:180px;font-size:15px;padding:12px 14px}
+  .mode-card{padding:18px 18px 18px 30px}
   .quick-wins-cta{padding:12px 18px}
+  .mode-title{font-size:1.6rem}
 }
