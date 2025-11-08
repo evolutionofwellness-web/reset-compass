@@ -1,11 +1,9 @@
 /* style.css
-   - Vibrant wedge colors, larger compass and mode text
-   - Sectioned layout (compass / info / modes)
-   - Larger Quick Wins CTA and more spacing from list
-   - Improved padding and spacing inside activity cards
-   - History breakdown visuals
-   - Top-right dropdown nav
-   - Glow effects for title, compass and modes
+   - Updated: improved contrast for dark mode, removed heavy outer ring, added glow accents
+   - Quick Wins seeded into a distinct block
+   - History donut canvas styling
+   - Mode card padding increased and decorations refined
+   - Dropdown nav behavior styling
 */
 
 /* CSS Variables */
@@ -18,13 +16,12 @@
   --text-secondary: #cbd2db;
   --border: rgba(255,255,255,0.06);
 
-  /* larger compass by default */
   --compass-size: clamp(420px, 74vmin, 1200px);
 
-  --color-growing: #2f80ed;  /* vibrant blue */
-  --color-grounded: #00c06b; /* vivid green */
-  --color-drifting: #ffbf3b; /* warm gold */
-  --color-surviving: #ff5f6d; /* strong coral */
+  --color-growing: #2f80ed;
+  --color-grounded: #00c06b;
+  --color-drifting: #ffbf3b;
+  --color-surviving: #ff5f6d;
 
   --glow-strong: 0 18px 48px rgba(0,175,160,0.22), 0 8px 30px rgba(0,175,160,0.10);
   --glow-title: 0 10px 40px rgba(0,175,160,0.16);
@@ -49,10 +46,10 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
 .app-header{position:sticky;top:0;z-index:160;background:transparent;border-bottom:1px solid var(--border);backdrop-filter:blur(6px)}
 .app-header-top{display:flex;align-items:center;justify-content:center;padding:18px 16px 10px;position:relative}
 .home-link{display:inline-block;text-decoration:none;flex:1;text-align:center}
-.app-title{margin:0;font-weight:900;font-size:2.2rem;letter-spacing:-0.6px;color:var(--brand-color);cursor:pointer;text-shadow: var(--glow-title); filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45));}
+.app-title{margin:0;font-weight:900;font-size:2.3rem;letter-spacing:-0.6px;color:var(--brand-color);cursor:pointer;text-shadow: var(--glow-title); filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45));}
 a, a:visited { text-decoration:none; color:inherit }
 
-/* Dropdown nav (top-right) */
+/* Dropdown nav */
 .nav-dropdown{position:absolute;right:14px;top:10px}
 .nav-ellipsis{background:var(--bg-elevated);border:1px solid var(--border);padding:10px 12px;border-radius:12px;color:var(--text-primary);cursor:pointer}
 .nav-dropdown-menu{display:none;position:absolute;right:0;top:46px;background:linear-gradient(180deg,var(--bg-elevated), rgba(0,0,0,0.02));border-radius:12px;padding:8px;box-shadow:0 28px 80px rgba(0,0,0,0.65);min-width:180px;border:1px solid var(--border)}
@@ -60,25 +57,27 @@ a, a:visited { text-decoration:none; color:inherit }
 .nav-dropdown-item{display:block;width:100%;background:transparent;border:none;color:var(--text-primary);padding:12px 14px;text-align:left;border-radius:8px;cursor:pointer;font-weight:800}
 .nav-dropdown-item:hover{background:rgba(255,255,255,0.02)}
 
-/* Page sections (dividers / spacing) */
+/* Page sections */
 .page-section{padding:12px 8px;margin-top:8px}
 .page-section--compass{padding-top:6px;padding-bottom:6px}
 .page-section--info{border-top:1px solid rgba(255,255,255,0.03);padding:20px 12px;margin-top:6px}
 .page-section--modes{border-top:1px solid rgba(255,255,255,0.03);padding:22px 12px 46px;margin-top:10px}
 
-/* Quick wins CTA below compass */
+/* Quick Wins block */
+.quick-wins-block{margin-top:28px;background:linear-gradient(180deg, rgba(0,175,160,0.03), rgba(0,0,0,0.02));padding:20px;border-radius:14px;display:flex;flex-direction:column;align-items:center;box-shadow:0 18px 60px rgba(0,0,0,0.5)}
 .quick-wins-cta{padding:16px 26px;font-size:1.08rem;border-radius:16px;box-shadow:var(--glow-strong);background:linear-gradient(90deg,var(--brand-color),#00d4c4);color:#041018;font-weight:900;border:none;display:inline-block}
+.quick-wins-note{margin-top:12px;color:var(--text-secondary);text-align:center;max-width:740px}
 
 /* Streak */
 .streak-row{display:flex;justify-content:center;margin-bottom:14px}
 .streak-container{display:flex;justify-content:center}
 .streak-badge{background:linear-gradient(180deg,#ffb874,#ff7a7a);color:#081018;padding:0.6rem 1rem;border-radius:999px;font-weight:900;display:inline-flex;align-items:center;gap:0.6rem;box-shadow:0 16px 36px rgba(0,0,0,0.55);font-size:1.08rem;min-width:160px;transition:transform 260ms cubic-bezier(.2,.9,.2,1), box-shadow 200ms}
-.streak-bump{transform:scale(1.08);box-shadow:0 26px 56px rgba(0,0,0,0.55);}
+.streak-bump{transform:scale(1.08);box-shadow:0 26px 56px rgba(0,0,0,0.55)}
 
 /* Main */
 .main-content{max-width:1120px;margin:0 auto;padding:1.25rem}
 
-/* Compass */
+/* Compass (reduced outer ring for dark mode: removed heavy border) */
 .compass-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:12px}
 .compass-container{
   position:relative;
@@ -87,23 +86,17 @@ a, a:visited { text-decoration:none; color:inherit }
   margin:12px auto;
   border-radius:50%;
   background:radial-gradient(circle at 30% 20%, rgba(0,175,160,0.03), rgba(0,0,0,0.06));
-  box-shadow:inset 0 80px 220px rgba(0,0,0,0.85), 0 34px 140px rgba(0,0,0,0.85);
+  box-shadow:inset 0 40px 90px rgba(0,0,0,0.7), 0 18px 60px rgba(0,0,0,0.6);
   overflow:visible;
 }
+/* remove heavy light ring so dark mode keeps compass visible */
+body.light .compass-container{box-shadow:inset 0 40px 90px rgba(0,0,0,0.28), 0 18px 60px rgba(0,0,0,0.2)}
 .compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.18;border-radius:50%}
 .compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:0.98;z-index:1;mix-blend-mode:multiply}
-.compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);color:var(--brand-color);pointer-events:none;z-index:3;filter:drop-shadow(0 8px 28px rgba(0,0,0,0.6))}
+.compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);pointer-events:none;z-index:3;filter:drop-shadow(0 8px 28px rgba(0,0,0,0.6))}
 .hero-intro{margin-top:8px;text-align:center;color:var(--text-secondary);max-width:880px;margin-left:auto;margin-right:auto;font-size:1.06rem}
 
-/* Glow on the compass (outer) */
-.compass-container::after{
-  content:"";
-  position:absolute;inset:-6%;border-radius:50%;
-  box-shadow:0 32px 150px rgba(0,175,160,0.08), inset 0 20px 80px rgba(0,0,0,0.5);
-  pointer-events:none;opacity:0.9;
-}
-
-/* Ring buttons: positioned by JS (left/top) and larger */
+/* Ring buttons: set colored glow in JS and ensure good contrast */
 .compass-ring{position:absolute;inset:0;pointer-events:none;z-index:18}
 .ring-btn{
   position:absolute;
@@ -111,56 +104,51 @@ a, a:visited { text-decoration:none; color:inherit }
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:14px 20px;
+  padding:12px 18px;
   border-radius:999px;
   min-width:120px;
   max-width:260px;
   font-weight:900;
   color:var(--text-primary);
   border:none;
-  left:0; top:0; /* JS will place items */
-  transform: translate(-50%,-50%); /* keep horizontal text */
+  left:0; top:0;
+  transform: translate(-50%,-50%);
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.02));
+  background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));
   z-index:20;
   font-size:clamp(15px,2.6vw,20px);
   transition:transform 200ms, box-shadow 200ms, filter 200ms;
-  box-shadow: 0 28px 100px rgba(0,0,0,0.75);
 }
-/* slight inner glow to match the mode color; JS adds colored outer glow */
-.ring-label{padding:0 6px}
-.ring-btn:hover, .ring-btn:focus{transform: translate(-50%,-50%) scale(1.04);box-shadow:0 36px 140px rgba(0,0,0,0.85), 0 0 44px rgba(0,0,0,0.14)}
+.ring-btn .ring-label{padding:0 6px}
+.ring-btn:hover, .ring-btn:focus{transform: translate(-50%,-50%) scale(1.04);filter:brightness(1.06)}
 
-/* Mode cards */
+/* Mode cards: more padding and left padding to avoid overlap with stripe */
 .section-title{text-align:center;font-size:1.9rem;margin:28px 0 12px;color:var(--text-primary);font-weight:900}
-.modes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.modes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
 .mode-card{
   display:flex;
   flex-direction:column;
   gap:14px;
-  padding:24px;
-  border-radius:18px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.12));
+  padding:26px 26px 26px 34px;
+  border-radius:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.10));
   border:1px solid var(--border);
   cursor:pointer;
   position:relative;
   min-height:150px;
   transition:transform 260ms, box-shadow 260ms;
   overflow:visible;
-  filter: drop-shadow(0 12px 40px rgba(0,0,0,0.6));
 }
 .mode-card:before{
   content:"";
   position:absolute;
-  left:0;top:0;height:100%;width:18px;border-radius:8px 0 0 8px;
+  left:0;top:0;height:100%;width:16px;border-radius:8px 0 0 8px;
   background:linear-gradient(180deg,var(--mode-color, rgba(0,175,160,0.7)), rgba(0,0,0,0));
   opacity:1;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.55), inset 0 8px 28px rgba(255,255,255,0.02);
 }
-.mode-card:hover{transform:translateY(-12px);box-shadow:0 44px 160px rgba(0,0,0,0.85)}
-.mode-name{font-weight:900;font-size:1.44rem;color:var(--text-primary);margin-bottom:6px;text-shadow:0 6px 20px rgba(0,0,0,0.6)}
+.mode-name{font-weight:900;font-size:1.44rem;color:var(--text-primary);margin-bottom:6px}
 .mode-desc{font-size:1.08rem;color:var(--text-secondary);line-height:1.6;padding-right:6px}
 .mode-hint{font-size:1rem;color:var(--brand-color);margin-top:8px;font-weight:900;padding-top:2px}
 
@@ -177,6 +165,9 @@ dialog{border:none;border-radius:16px;padding:0;max-width:880px;width:calc(100% 
 .quick-wins-list li{padding:14px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.10));border-radius:12px;border:1px solid var(--border);color:var(--text-primary);display:flex;flex-direction:column;gap:10px}
 .activity-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .activity-instruction{font-size:0.98rem;color:var(--text-secondary);margin-top:8px}
+
+/* history donut row */
+.history-chart-row{display:flex;justify-content:center;margin:12px 0}
 
 /* select control */
 .select-activity, .select-global-activity{
@@ -214,9 +205,8 @@ dialog{border:none;border-radius:16px;padding:0;max-width:880px;width:calc(100% 
 dialog[open] .dialog-content{animation:dialogOpen 220ms cubic-bezier(.2,.9,.2,1)}
 @keyframes dialogOpen{from{transform:translateY(8px) scale(.995);opacity:0}to{transform:none;opacity:1}}
 
-/* glows for title, modes and compass */
+/* glows for title and modes */
 .app-title{transition:filter 220ms, text-shadow 220ms}
-.compass-container:hover ~ .app-title, .app-title:hover { text-shadow: 0 12px 64px rgba(0,175,160,0.12); filter: drop-shadow(0 8px 32px rgba(0,175,160,0.08)); }
 .mode-card:hover:before { filter: drop-shadow(0 18px 48px rgba(0,175,160,0.06)); }
 
 /* toast */
@@ -226,11 +216,11 @@ dialog[open] .dialog-content{animation:dialogOpen 220ms cubic-bezier(.2,.9,.2,1)
 /* Responsive */
 @media (max-width:640px){
   :root{--compass-size: clamp(340px, 78vmin, 760px);}
-  .app-title{font-size:1.6rem}
+  .app-title{font-size:1.7rem}
   .nav-ellipsis{padding:8px}
   .nav-dropdown{right:8px;top:8px}
   .modes-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-  .mode-card{padding:16px}
+  .mode-card{padding:16px 16px 16px 26px}
   .ring-btn{min-width:96px;max-width:180px;font-size:14px;padding:12px 14px}
   .quick-wins-cta{padding:12px 18px}
 }
