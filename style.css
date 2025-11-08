@@ -1,9 +1,10 @@
 /* style.css
-   - Updated: improved contrast for dark mode, removed heavy outer ring, added glow accents
-   - Quick Wins seeded into a distinct block
-   - History donut canvas styling
-   - Mode card padding increased and decorations refined
-   - Dropdown nav behavior styling
+   - Improved dark-mode visibility for the compass
+   - Quick Wins in a distinct block/cell
+   - Donut chart area for history
+   - Mode card padding increased
+   - Dropdown closes on outside click (JS) and style tweaks
+   - Come-back dialog styling inherits dialog styles
 */
 
 /* CSS Variables */
@@ -77,7 +78,7 @@ a, a:visited { text-decoration:none; color:inherit }
 /* Main */
 .main-content{max-width:1120px;margin:0 auto;padding:1.25rem}
 
-/* Compass (reduced outer ring for dark mode: removed heavy border) */
+/* Compass (dark-mode friendly: reduce dark overlay and increase wedge contrast) */
 .compass-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:12px}
 .compass-container{
   position:relative;
@@ -85,18 +86,17 @@ a, a:visited { text-decoration:none; color:inherit }
   height:var(--compass-size);
   margin:12px auto;
   border-radius:50%;
-  background:radial-gradient(circle at 30% 20%, rgba(0,175,160,0.03), rgba(0,0,0,0.06));
-  box-shadow:inset 0 40px 90px rgba(0,0,0,0.7), 0 18px 60px rgba(0,0,0,0.6);
+  background:radial-gradient(circle at 30% 20%, rgba(0,175,160,0.02), rgba(0,0,0,0.04));
+  box-shadow:inset 0 36px 80px rgba(0,0,0,0.6), 0 18px 60px rgba(0,0,0,0.6);
   overflow:visible;
 }
-/* remove heavy light ring so dark mode keeps compass visible */
-body.light .compass-container{box-shadow:inset 0 40px 90px rgba(0,0,0,0.28), 0 18px 60px rgba(0,0,0,0.2)}
-.compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.18;border-radius:50%}
-.compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:0.98;z-index:1;mix-blend-mode:multiply}
+/* lighter image layer so wedge colors are visible in dark mode */
+.compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.12;border-radius:50%}
+.compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:1;z-index:1;mix-blend-mode:normal}
 .compass-arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);pointer-events:none;z-index:3;filter:drop-shadow(0 8px 28px rgba(0,0,0,0.6))}
 .hero-intro{margin-top:8px;text-align:center;color:var(--text-secondary);max-width:880px;margin-left:auto;margin-right:auto;font-size:1.06rem}
 
-/* Ring buttons: set colored glow in JS and ensure good contrast */
+/* Ring buttons */
 .compass-ring{position:absolute;inset:0;pointer-events:none;z-index:18}
 .ring-btn{
   position:absolute;
@@ -124,14 +124,14 @@ body.light .compass-container{box-shadow:inset 0 40px 90px rgba(0,0,0,0.28), 0 1
 .ring-btn .ring-label{padding:0 6px}
 .ring-btn:hover, .ring-btn:focus{transform: translate(-50%,-50%) scale(1.04);filter:brightness(1.06)}
 
-/* Mode cards: more padding and left padding to avoid overlap with stripe */
+/* Mode cards: increased left padding to avoid text close to stripe */
 .section-title{text-align:center;font-size:1.9rem;margin:28px 0 12px;color:var(--text-primary);font-weight:900}
 .modes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
 .mode-card{
   display:flex;
   flex-direction:column;
   gap:14px;
-  padding:26px 26px 26px 34px;
+  padding:26px 26px 26px 40px; /* more left padding */
   border-radius:16px;
   background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.10));
   border:1px solid var(--border);
@@ -205,7 +205,7 @@ dialog{border:none;border-radius:16px;padding:0;max-width:880px;width:calc(100% 
 dialog[open] .dialog-content{animation:dialogOpen 220ms cubic-bezier(.2,.9,.2,1)}
 @keyframes dialogOpen{from{transform:translateY(8px) scale(.995);opacity:0}to{transform:none;opacity:1}}
 
-/* glows for title and modes */
+/* glows */
 .app-title{transition:filter 220ms, text-shadow 220ms}
 .mode-card:hover:before { filter: drop-shadow(0 18px 48px rgba(0,175,160,0.06)); }
 
