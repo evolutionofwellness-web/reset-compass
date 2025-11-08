@@ -80,7 +80,7 @@
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
         <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">Quick Wins</button>
         <p class="quick-wins-note">
-          Quick Wins are one-step actions you can do immediately to shift your focus, energy, or mood. Tap a Quick Win to complete it fast.
+          Quick Wins are one-step actions you can do immediately to shift your focus, energy, or mood. Tap a Quick Win to complete it fast. (No daily limit.)
         </p>
       </div>
     </section>
@@ -109,7 +109,7 @@
         <h3>Activities</h3>
         <ul id="dialogQuickWins" class="quick-wins-list" role="list"></ul>
 
-        <p class="mode-note-help">Select one or more activities. Add optional notes per selected activity before completing.</p>
+        <p class="mode-note-help">Select an activity and add optional notes before completing.</p>
       </div>
 
       <div class="dialog-actions">
@@ -150,6 +150,17 @@
         <button id="exportHistoryBtn" class="btn-secondary">Export JSON</button>
         <button id="clearHistoryBtn" class="btn-danger">Clear History</button>
         <button class="btn-secondary dialog-cancel">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Come back tomorrow dialog -->
+  <dialog id="comeBackDialog" class="mode-dialog" aria-labelledby="comeBackTitle">
+    <div class="dialog-content">
+      <h2 id="comeBackTitle">Nice work!</h2>
+      <p id="comeBackMsg">You've completed a mode today — come back tomorrow for another mode. Quick Wins are still available anytime.</p>
+      <div class="dialog-actions">
+        <button class="btn-primary dialog-close">OK</button>
       </div>
     </div>
   </dialog>
