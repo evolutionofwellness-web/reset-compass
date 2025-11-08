@@ -38,7 +38,6 @@
   </header>
 
   <main class="main-content">
-    <!-- Compass section -->
     <section class="page-section page-section--compass" aria-label="Compass section">
       <div class="streak-row">
         <div id="streakContainer" class="streak-container" aria-hidden="false">
@@ -67,12 +66,10 @@
       </div>
     </section>
 
-    <!-- Info section dividing compass and list -->
     <section class="page-section page-section--info" aria-hidden="false">
       <p class="hero-intro">Find your current wellness mode: pick a wedge inside the compass or choose a card below.</p>
     </section>
 
-    <!-- Modes section -->
     <section class="page-section page-section--modes" aria-label="Wellness Modes">
       <h2 class="section-title">Choose Your Mode</h2>
 
@@ -82,7 +79,6 @@
         </noscript>
       </div>
 
-      <!-- Quick wins block: clearly defined cell -->
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
         <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">Quick Wins</button>
         <p class="quick-wins-note">
@@ -107,8 +103,11 @@
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
 
       <div class="mode-header" id="modeDialogHeader">
-        <h2 id="modeDialogTitle" class="mode-title"></h2>
-        <p id="dialogModeDescription" class="mode-description"></p>
+        <div class="accent" id="modeAccent" aria-hidden="true"></div>
+        <div class="mode-head-inner">
+          <h2 id="modeDialogTitle" class="mode-title"></h2>
+          <p id="dialogModeDescription" class="mode-description"></p>
+        </div>
       </div>
 
       <div class="mode-actions">
