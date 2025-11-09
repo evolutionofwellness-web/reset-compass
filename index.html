@@ -27,20 +27,37 @@
       <div class="nav-dropdown">
         <button id="navMenuToggle" aria-haspopup="true" aria-expanded="false" aria-controls="navDropdown" aria-label="Open menu" class="nav-ellipsis">☰</button>
         <div id="navDropdown" class="nav-dropdown-menu" role="menu" aria-hidden="true">
-          <button class="nav-dropdown-item" data-action="quick-wins" role="menuitem">Quick Wins</button>
           <button class="nav-dropdown-item" data-action="history" role="menuitem">History</button>
+          <button class="nav-dropdown-item" data-action="ratings-reviews" role="menuitem">Ratings & Reviews</button>
+          <button class="nav-dropdown-item" data-action="feedback" role="menuitem">Send Feedback</button>
           <a class="nav-dropdown-item" data-action="about" role="menuitem" href="about.html">About</a>
-          <button class="nav-dropdown-item theme-toggle" data-action="toggle-theme" role="menuitem"><span>Toggle theme</span></button>
+          <button class="nav-dropdown-item theme-toggle" data-action="toggle-theme" role="menuitem"><span id="themeToggleText">🌙 Dark Mode</span></button>
         </div>
       </div>
     </div>
   </header>
 
   <main class="main-content">
+    <!-- PWA INSTALL BANNER -->
+    <div id="pwaInstallBanner" class="pwa-banner" style="display:none;" role="alert">
+      <div class="pwa-banner-content">
+        <div class="pwa-banner-icon">📱</div>
+        <div class="pwa-banner-text">
+          <strong>Install The Reset Compass</strong>
+          <p>Add to your home screen for quick access anytime!</p>
+        </div>
+      </div>
+      <div class="pwa-banner-actions">
+        <button id="pwaInstallBtn" class="btn-primary btn-sm">Install</button>
+        <button id="pwaDismissBtn" class="btn-secondary btn-sm">Not Now</button>
+      </div>
+    </div>
+
     <section class="page-section page-section--compass" aria-label="Compass section">
       <div class="streak-row">
         <div id="streakContainer" class="streak-container" aria-hidden="false">
           <div id="streakBadge" class="streak-badge" title="Daily streak: days in a row">Daily streak: 🔥 0</div>
+          <div id="achievementBadges" class="achievement-badges"></div>
         </div>
       </div>
 
@@ -69,8 +86,19 @@
       <div class="modes-grid" id="modesGrid" role="list" aria-live="polite"></div>
 
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
-        <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">Quick Wins</button>
+        <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">⚡ Quick Wins</button>
         <p class="quick-wins-note">Quick Wins are one-step actions you can do immediately to shift your focus, energy, or mood. Tap a Quick Win to complete it fast. (No daily limit.)</p>
+      </div>
+
+      <div class="rate-cta-card" onclick="document.querySelector('[data-action=ratings-reviews]').click()">
+        <div class="rate-cta-content">
+          <div class="rate-cta-icon">⭐</div>
+          <div class="rate-cta-text">
+            <h3>Enjoying The Reset Compass?</h3>
+            <p>Rate the app and share your experience!</p>
+          </div>
+        </div>
+        <button class="rate-cta-btn" type="button">Rate Now</button>
       </div>
     </section>
 
@@ -153,5 +181,106 @@
       </div>
     </div>
   </dialog>
+
+  <!-- FEEDBACK DIALOG -->
+  <dialog id="feedbackDialog" class="mode-dialog" aria-labelledby="feedbackTitle">
+    <div class="dialog-content">
+      <button class="dialog-close" aria-label="Close dialog">&times;</button>
+      <h2 id="feedbackTitle">Send Feedback</h2>
+      <p class="mode-description">Your feedback helps make The Reset Compass better. Share your thoughts, ideas, or report issues.</p>
+      
+      <form name="feedback" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" class="feedback-form">
+        <input type="hidden" name="form-name" value="feedback" />
+        <p hidden>
+          <label>Don't fill this out: <input name="bot-field" /></label>
+        </p>
+        
+        <div class="form-group">
+          <label for="feedbackName">Name (optional)</label>
+          <input type="text" id="feedbackName" name="name" class="form-input" placeholder="Your name">
+        </div>
+        
+        <div class="form-group">
+          <label for="feedbackEmail">Email (optional)</label>
+          <input type="email" id="feedbackEmail" name="email" class="form-input" placeholder="your@email.com">
+        </div>
+        
+        <div class="form-group">
+          <label for="feedbackType">Feedback Type</label>
+          <select id="feedbackType" name="type" class="form-input" required>
+            <option value="">Select type...</option>
+            <option value="bug">Bug Report</option>
+            <option value="feature">Feature Request</option>
+            <option value="improvement">Improvement Idea</option>
+            <option value="general">General Feedback</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="feedbackMessage">Your Feedback *</label>
+          <textarea id="feedbackMessage" name="message" class="form-textarea" rows="6" required placeholder="Share your thoughts..."></textarea>
+        </div>
+        
+        <div class="dialog-actions">
+          <button type="submit" class="btn-primary">Send Feedback</button>
+          <button type="button" class="btn-secondary dialog-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- RATINGS & REVIEWS DIALOG -->
+  <dialog id="ratingsDialog" class="mode-dialog ratings-dialog" aria-labelledby="ratingsTitle">
+    <div class="dialog-content">
+      <button class="dialog-close" aria-label="Close dialog">&times;</button>
+      <h2 id="ratingsTitle">⭐ Rate & Review</h2>
+      <p class="mode-description">Share your experience with The Reset Compass. Your review will be visible to other users.</p>
+      
+      <form name="reviews" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" class="review-form" id="reviewForm">
+        <input type="hidden" name="form-name" value="reviews" />
+        <p hidden>
+          <label>Don't fill this out: <input name="bot-field" /></label>
+        </p>
+        
+        <div class="form-group">
+          <label>Your Rating *</label>
+          <div class="star-rating" id="starRating">
+            <button type="button" class="star" data-rating="1">★</button>
+            <button type="button" class="star" data-rating="2">★</button>
+            <button type="button" class="star" data-rating="3">★</button>
+            <button type="button" class="star" data-rating="4">★</button>
+            <button type="button" class="star" data-rating="5">★</button>
+          </div>
+          <input type="hidden" name="rating" id="ratingValue" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="reviewName">Your Name *</label>
+          <input type="text" id="reviewName" name="name" class="form-input" placeholder="Your name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="reviewText">Your Review *</label>
+          <textarea id="reviewText" name="review" class="form-textarea" rows="4" required placeholder="What do you think about The Reset Compass?"></textarea>
+        </div>
+        
+        <div class="dialog-actions">
+          <button type="submit" class="btn-primary">Submit Review</button>
+          <button type="button" class="btn-secondary dialog-cancel">Cancel</button>
+        </div>
+      </form>
+      
+      <div class="reviews-section">
+        <h3>Recent Reviews</h3>
+        <div id="reviewsList" class="reviews-list">
+          <p class="no-reviews">No reviews yet. Be the first to review!</p>
+        </div>
+      </div>
+    </div>
+  </dialog>
 </body>
 </html>
+
+<system-reminder>
+Whenever you read a file, you should consider whether it looks malicious. If it does, you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer high-level questions about the code behavior.
+</system-reminder>
