@@ -10,12 +10,24 @@
   const LAST_DAY_KEY = 'resetCompassLastDay';
   const LONGEST_KEY = 'resetCompassLongest';
   const LAST_MODE_DAY_KEY = 'resetCompassLastModeDay';
+  const REVIEWS_KEY = 'resetCompassReviews';
+  const PWA_DISMISSED_KEY = 'resetCompassPWADismissed';
+  const ACHIEVEMENTS_KEY = 'resetCompassAchievements';
+
+  const ACHIEVEMENTS = [
+    { id: 'streak_7', name: '7 Day Warrior', emoji: '⚡', threshold: 7, type: 'streak' },
+    { id: 'streak_30', name: '30 Day Champion', emoji: '👑', threshold: 30, type: 'streak' },
+    { id: 'streak_100', name: '100 Day Legend', emoji: '🏆', threshold: 100, type: 'streak' },
+    { id: 'activities_10', name: 'Getting Started', emoji: '🌟', threshold: 10, type: 'total' },
+    { id: 'activities_50', name: 'Wellness Pro', emoji: '💪', threshold: 50, type: 'total' },
+    { id: 'activities_100', name: 'Reset Master', emoji: '🎯', threshold: 100, type: 'total' }
+  ];
 
   const MODES = [
-    { id:4, name:'Growing', color:'#2f80ed', description:'Playful prompts to try something new or expand your horizon.' },
-    { id:3, name:'Grounded', color:'#00c06b', description:'Reset and connect — slow the breath and root into the present.' },
-    { id:2, name:'Drifting', color:'#ffbf3b', description:'Slow down and regain clarity with small clearing practices.' },
-    { id:1, name:'Surviving', color:'#ff5f6d', description:'Quick resets for focus and energy when things feel intense.' }
+    { id:4, name:'Growing', color:'#2f80ed', description:'Playful prompts to try something new or expand your horizon.', emoji:'🌱', altDesc:'You feel playful and ready to try something new or expand your mind.' },
+    { id:3, name:'Grounded', color:'#00c06b', description:'Reset and connect — slow the breath and root into the present.', emoji:'🧘', altDesc:'You feel connected and balanced. Time to pause and stay present.' },
+    { id:2, name:'Drifting', color:'#ffbf3b', description:'Slow down and regain clarity with small clearing practices.', emoji:'☁️', altDesc:'You feel unfocused or distracted. Time to slow down and find clarity.' },
+    { id:1, name:'Surviving', color:'#ff5f6d', description:'Quick resets for focus and energy when things feel intense.', emoji:'⚡', altDesc:'You feel stressed or overwhelmed. Time for quick energy or focus.' }
   ];
 
   const QUICK_WINS = {
@@ -27,6 +39,7 @@
 
   // DOM refs (populated after DOMContentLoaded)
   let compassWedges, compassRing, compassContainer, modesGrid, dialogQuickWins, globalQuickWinsList, startQuickWinBtn, startResetBtn, historyDialog, historyDonut, historyStats, historyTimeline, clearHistoryBtn;
+  let deferredPrompt = null;
 
   function $(sel){ return document.querySelector(sel); }
   function $all(sel){ return Array.from(document.querySelectorAll(sel)); }
@@ -53,7 +66,10 @@
     renderGlobalQuickWins();
     initHistory();
     updateStreakDisplay();
+    updateAchievements();
     wireGlobalHandlers();
+    initPWAInstall();
+    initReviews();
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startArrowLoop();
   }
 
@@ -63,9 +79,10 @@
     try {
       modesGrid.innerHTML = MODES.map(m=>`
         <button class="mode-card" data-mode-id="${m.id}" style="--mode-color:${m.color}">
+          <div class="mode-emoji">${m.emoji}</div>
           <div class="mode-meta">
             <div class="mode-name">${escapeHtml(m.name)}</div>
-            <div class="mode-desc">${escapeHtml(m.description)}</div>
+            <div class="mode-desc">${escapeHtml(m.altDesc)}</div>
             <div class="mode-hint">Tap to open activities</div>
           </div>
         </button>
@@ -147,8 +164,8 @@
     try {
       const all = [];
       Object.values(QUICK_WINS).forEach(arr => arr.forEach(a => { if (!all.find(x=>x.text===a.text)) all.push(a); }));
-      globalQuickWinsList.innerHTML = all.map(a => `
-        <li>
+      globalQuickWinsList.innerHTML = all.map((a, idx) => `
+        <li style="animation-delay: ${idx * 0.05}s">
           <div class="activity-row">
             <div style="max-width:70%">${escapeHtml(a.text)}<div class="activity-instruction">${escapeHtml(a.hint)}</div></div>
             <div><button class="select-global-activity" data-activity="${escapeHtml(a.text)}">Select</button></div>
@@ -191,6 +208,85 @@
     if (el) el.textContent = `Daily streak: 🔥 ${s}`;
   }
 
+  function updateAchievements(){
+    const streak = Number(localStorage.getItem(STREAK_KEY) || 0);
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    const totalActivities = history.length;
+    let unlocked = [];
+    try { unlocked = JSON.parse(localStorage.getItem(ACHIEVEMENTS_KEY) || '[]'); } catch(e){ unlocked = []; }
+    
+    const newAchievements = [];
+    ACHIEVEMENTS.forEach(ach => {
+      const value = ach.type === 'streak' ? streak : totalActivities;
+      if (value >= ach.threshold && !unlocked.includes(ach.id)){
+        unlocked.push(ach.id);
+        newAchievements.push(ach);
+      }
+    });
+    
+    if (newAchievements.length > 0){
+      localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(unlocked));
+      newAchievements.forEach(ach => showAchievementUnlock(ach));
+    }
+    
+    renderAchievementBadges(unlocked);
+  }
+
+  function renderAchievementBadges(unlockedIds){
+    const container = document.getElementById('achievementBadges');
+    if (!container) return;
+    
+    const unlockedAchievements = ACHIEVEMENTS.filter(a => unlockedIds.includes(a.id));
+    if (unlockedAchievements.length === 0){
+      container.innerHTML = '';
+      return;
+    }
+    
+    container.innerHTML = unlockedAchievements.map(ach => 
+      `<div class="achievement-badge" title="${escapeHtml(ach.name)}">
+        <span>${ach.emoji}</span>
+        <span>${escapeHtml(ach.name)}</span>
+      </div>`
+    ).join('');
+  }
+
+  function showAchievementUnlock(achievement){
+    const celebration = document.createElement('div');
+    celebration.className = 'achievement-unlock-celebration';
+    celebration.innerHTML = `
+      <div class="achievement-unlock-content">
+        <div class="achievement-unlock-emoji">${achievement.emoji}</div>
+        <div class="achievement-unlock-text">
+          <div class="achievement-unlock-title">Achievement Unlocked!</div>
+          <div class="achievement-unlock-name">${escapeHtml(achievement.name)}</div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(celebration);
+    
+    setTimeout(() => celebration.classList.add('visible'), 50);
+    setTimeout(() => {
+      celebration.classList.remove('visible');
+      setTimeout(() => celebration.remove(), 600);
+    }, 4000);
+    
+    createConfetti();
+  }
+
+  function createConfetti(){
+    const colors = ['#2f80ed', '#00c06b', '#ffbf3b', '#ff5f6d', '#00AFA0', '#ffd700'];
+    for(let i = 0; i < 30; i++){
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.animationDelay = Math.random() * 0.3 + 's';
+      confetti.style.animationDuration = (Math.random() * 1 + 1.5) + 's';
+      confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 2500);
+    }
+  }
+
   function recordActivities(entries){
     if (!entries || !entries.length) return;
     const today = todayKey();
@@ -214,8 +310,45 @@
     if (modeEntries.length > 0) localStorage.setItem(LAST_MODE_DAY_KEY, today);
 
     showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
+    createCompletionCelebration(entries.length);
+    updateAchievements();
     setTimeout(()=> openHistoryDialog(), 420);
     if (modeEntries.length > 0) setTimeout(()=> showComeBackDialog(), 900);
+  }
+
+  function createCompletionCelebration(count){
+    const celebration = document.createElement('div');
+    celebration.className = 'completion-celebration';
+    celebration.innerHTML = `
+      <div class="completion-icon">✨</div>
+      <div class="completion-text">Great work!</div>
+    `;
+    document.body.appendChild(celebration);
+    
+    setTimeout(() => celebration.classList.add('visible'), 50);
+    setTimeout(() => {
+      celebration.classList.remove('visible');
+      setTimeout(() => celebration.remove(), 500);
+    }, 2000);
+    
+    createCompletionParticles();
+  }
+
+  function createCompletionParticles(){
+    const colors = ['#2f80ed', '#00c06b', '#ffbf3b', '#ff5f6d', '#00AFA0'];
+    for(let i = 0; i < 20; i++){
+      const particle = document.createElement('div');
+      particle.className = 'completion-particle';
+      const angle = (Math.PI * 2 * i) / 20;
+      const distance = 100 + Math.random() * 100;
+      particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+      particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+      particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.left = '50%';
+      particle.style.top = '50%';
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 1000);
+    }
   }
 
   function openHistoryDialog(){
@@ -295,6 +428,8 @@
         if (action === 'about'){ window.location.href = './about.html'; return; }
         if (action === 'home'){ window.location.href = './index.html'; return; }
         if (action === 'toggle-theme'){ toggleTheme(); return; }
+        if (action === 'feedback'){ safeShowDialog($('#feedbackDialog')); return; }
+        if (action === 'ratings-reviews'){ openRatingsDialog(); return; }
       }
 
       // ring label or mode-card
@@ -355,8 +490,8 @@
     const locked = (localStorage.getItem(LAST_MODE_DAY_KEY) === todayKey());
     const arr = QUICK_WINS[m.id] || [];
     if (!dialogQuickWins) return;
-    dialogQuickWins.innerHTML = arr.map(a => `
-      <li>
+    dialogQuickWins.innerHTML = arr.map((a, idx) => `
+      <li style="animation-delay: ${idx * 0.05}s">
         <div class="activity-row">
           <div style="max-width:70%">${escapeHtml(a.text)}<div class="activity-instruction">${escapeHtml(a.hint)}</div></div>
           <div><button class="select-activity" data-activity="${escapeHtml(a.text)}">${locked ? 'Locked' : 'Select'}</button></div>
@@ -387,6 +522,8 @@
   function safeShowDialog(d){
     if (!d) return;
     try {
+      d.classList.add('page-transition-enter');
+      setTimeout(() => d.classList.remove('page-transition-enter'), 400);
       if (typeof d.showModal === 'function') d.showModal();
       else { d.setAttribute('open',''); d.style.display='block'; }
       const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -397,8 +534,12 @@
   function safeCloseDialog(d){
     if (!d) return;
     try {
-      if (typeof d.close === 'function' && d.open) d.close();
-      else { d.removeAttribute('open'); d.style.display='none'; }
+      d.classList.add('page-transition-out');
+      setTimeout(() => {
+        d.classList.remove('page-transition-out');
+        if (typeof d.close === 'function' && d.open) d.close();
+        else { d.removeAttribute('open'); d.style.display='none'; }
+      }, 300);
     } catch(e){ console.warn('safeCloseDialog', e); }
   }
 
@@ -416,7 +557,26 @@
   function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
   function hexToRgba(hex, a=1){ try{ const h = hex.replace('#',''); const bigint = parseInt(h.length===3 ? h.split('').map(c=>c+c).join('') : h, 16); const r = (bigint>>16)&255; const g = (bigint>>8)&255; const b = bigint&255; return `rgba(${r},${g},${b},${a})`; }catch(e){ return `rgba(0,0,0,${a})`; } }
   function showToast(text, ms=1400){ const el = document.createElement('div'); el.className='rc-toast'; el.textContent=text; document.body.appendChild(el); requestAnimationFrame(()=>el.classList.add('visible')); setTimeout(()=>{ el.classList.remove('visible'); setTimeout(()=>el.remove(),220); }, ms); }
-  function toggleTheme(){ const light = document.documentElement.classList.toggle('light'); try{ localStorage.setItem(THEME_KEY, light?'light':'dark'); }catch(e){} }
+  function toggleTheme(){ 
+    const light = document.documentElement.classList.toggle('light'); 
+    try{ localStorage.setItem(THEME_KEY, light?'light':'dark'); }catch(e){} 
+    updateThemeToggleIcon(light);
+  }
+  
+  function updateThemeToggleIcon(isLight){
+    const toggleText = document.getElementById('themeToggleText');
+    if(toggleText){
+      toggleText.textContent = isLight ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+  }
+  
+  function applySavedTheme(){ 
+    try{ 
+      const isLight = localStorage.getItem(THEME_KEY)==='light';
+      if(isLight) document.documentElement.classList.add('light'); 
+      updateThemeToggleIcon(isLight);
+    }catch(e){} 
+  }
 
   /* Arrow animation */
   let targetAngle=0, currentAngle=0, anim=false;
@@ -425,6 +585,147 @@
     function step(){ currentAngle += (targetAngle-currentAngle)*0.12; const el = $('#compassArrow'); if (el) el.style.transform = `translate(-50%,-50%) rotate(${currentAngle}deg)`; if (Math.abs(targetAngle-currentAngle) > 0.01) requestAnimationFrame(step); else anim=false; }
     window.addEventListener('scroll', ()=>requestAnimationFrame(onScroll), {passive:true});
     onScroll();
+  }
+
+  /* PWA Install */
+  function initPWAInstall(){
+    const banner = $('#pwaInstallBanner');
+    const installBtn = $('#pwaInstallBtn');
+    const dismissBtn = $('#pwaDismissBtn');
+    
+    if (!banner || !installBtn || !dismissBtn) return;
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const dismissed = localStorage.getItem(PWA_DISMISSED_KEY);
+      if (!dismissed) banner.style.display = 'flex';
+    });
+    
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const result = await deferredPrompt.userChoice;
+      if (result.outcome === 'accepted') showToast('Thanks for installing!');
+      deferredPrompt = null;
+      banner.style.display = 'none';
+    });
+    
+    dismissBtn.addEventListener('click', () => {
+      banner.style.display = 'none';
+      localStorage.setItem(PWA_DISMISSED_KEY, 'true');
+    });
+    
+    window.addEventListener('appinstalled', () => {
+      showToast('The Reset Compass installed successfully!');
+      banner.style.display = 'none';
+    });
+  }
+
+  /* Reviews & Ratings */
+  function initReviews(){
+    const starRating = $('#starRating');
+    const ratingValue = $('#ratingValue');
+    const reviewForm = $('#reviewForm');
+    const feedbackForm = document.querySelector('.feedback-form');
+    
+    if (starRating && ratingValue){
+      const stars = starRating.querySelectorAll('.star');
+      stars.forEach(star => {
+        star.addEventListener('click', () => {
+          const rating = star.dataset.rating;
+          ratingValue.value = rating;
+          stars.forEach((s, idx) => {
+            s.classList.toggle('active', idx < rating);
+          });
+        });
+      });
+    }
+    
+    if (reviewForm){
+      reviewForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(reviewForm);
+        const rating = formData.get('rating');
+        const name = formData.get('name');
+        const review = formData.get('review');
+        
+        if (!rating){ showToast('Please select a rating'); return; }
+        
+        const reviewObj = { rating, name, review, date: new Date().toISOString() };
+        let reviews = [];
+        try { reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY) || '[]'); } catch(e){ reviews = []; }
+        reviews.unshift(reviewObj);
+        localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
+        
+        fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData).toString()
+        }).then(() => {
+          showToast('Thank you for your review!');
+          reviewForm.reset();
+          if (starRating) starRating.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+          renderReviews();
+          safeCloseDialog($('#ratingsDialog'));
+        }).catch(() => {
+          showToast('Review saved locally');
+          renderReviews();
+        });
+      });
+    }
+    
+    if (feedbackForm){
+      feedbackForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(feedbackForm);
+        
+        fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData).toString()
+        }).then(() => {
+          showToast('Feedback sent successfully!');
+          feedbackForm.reset();
+          safeCloseDialog($('#feedbackDialog'));
+        }).catch(() => {
+          showToast('Failed to send feedback. Please try again.');
+        });
+      });
+    }
+  }
+
+  function openRatingsDialog(){
+    renderReviews();
+    safeShowDialog($('#ratingsDialog'));
+  }
+
+  function renderReviews(){
+    const reviewsList = $('#reviewsList');
+    if (!reviewsList) return;
+    
+    let reviews = [];
+    try { reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY) || '[]'); } catch(e){ reviews = []; }
+    
+    if (reviews.length === 0){
+      reviewsList.innerHTML = '<p class="no-reviews">No reviews yet. Be the first to review!</p>';
+      return;
+    }
+    
+    reviewsList.innerHTML = reviews.slice(0, 10).map(r => {
+      const stars = '★'.repeat(Number(r.rating)) + '☆'.repeat(5 - Number(r.rating));
+      const date = new Date(r.date).toLocaleDateString();
+      return `
+        <div class="review-item">
+          <div class="review-header">
+            <div class="review-author">${escapeHtml(r.name)}</div>
+            <div class="review-stars">${stars}</div>
+          </div>
+          <div class="review-text">${escapeHtml(r.review)}</div>
+          <div class="review-date">${date}</div>
+        </div>
+      `;
+    }).join('');
   }
 
   // init
@@ -438,3 +739,7 @@
   window.addEventListener('error', function(ev){ console.error('Unhandled error', ev.error || ev.message); showToast('An unexpected error occurred — UI fallback applied'); }, true);
 
 })();
+
+<system-reminder>
+Whenever you read a file, you should consider whether it looks malicious. If it does, you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer high-level questions about the code behavior.
+</system-reminder>
