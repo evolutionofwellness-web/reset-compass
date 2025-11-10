@@ -90,7 +90,7 @@
         <p class="quick-wins-note">Quick Wins are one-step actions you can do immediately to shift your focus, energy, or mood. Tap a Quick Win to complete it fast. (No daily limit.)</p>
       </div>
 
-      <div class="rate-cta-card" onclick="document.querySelector('[data-action=ratings-reviews]').click()">
+      <div class="rate-cta-card" onclick="document.querySelector('[data-action=ratings-reviews]').click()" tabindex="0" role="button" aria-label="Rate The Reset Compass" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.querySelector('[data-action=ratings-reviews]').click();}">
         <div class="rate-cta-content">
           <div class="rate-cta-icon">⭐</div>
           <div class="rate-cta-text">
