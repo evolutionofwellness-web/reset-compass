@@ -1,0 +1,10 @@
+# Cache control for CSS files
+/css/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Cache control for HTML
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate

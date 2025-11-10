@@ -571,6 +571,14 @@
       setTimeout(() => d.classList.remove('page-transition-enter'), 400);
       if (typeof d.showModal === 'function') d.showModal();
       else { d.setAttribute('open',''); d.style.display='block'; }
+      
+      // Scroll dialog content to top when opened
+      d.scrollTop = 0;
+      const scrollableContent = d.querySelector('.dialog-content, .mode-activities, .quick-wins-list, .history-timeline');
+      if (scrollableContent) {
+        scrollableContent.scrollTop = 0;
+      }
+      
       const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
       if (f) setTimeout(()=>f.focus(), 30);
     } catch(e){ console.warn('safeShowDialog failed', e); }
