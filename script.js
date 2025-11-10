@@ -97,7 +97,7 @@
   
   function getEmojiForMode(modeId){
     const emojiMap = {
-      'surviving': '⚡',
+      'surviving': '🛟',
       'drifting': '☁️',
       'grounded': '🧘',
       'growing': '🌱'
@@ -485,11 +485,43 @@
 
       // quick wins select
       const gsel = e.target.closest('.select-global-activity');
-      if (gsel){ e.preventDefault(); gsel.classList.toggle('active'); const ta = gsel.closest('li').querySelector('.activity-note'); if (ta) ta.hidden = !gsel.classList.contains('active'); if (startQuickWinBtn) startQuickWinBtn.disabled = !(globalQuickWinsList.querySelectorAll('.select-global-activity.active').length>0); return; }
+      if (gsel){ 
+        e.preventDefault(); 
+        gsel.classList.toggle('active'); 
+        const ta = gsel.closest('li').querySelector('.activity-note'); 
+        if (ta) ta.hidden = !gsel.classList.contains('active'); 
+        const activeCount = globalQuickWinsList.querySelectorAll('.select-global-activity.active').length;
+        if (startQuickWinBtn) {
+          startQuickWinBtn.disabled = activeCount === 0;
+          const hint = document.getElementById('quickWinHint');
+          if (hint) {
+            hint.textContent = activeCount === 0 ? 'Select an activity first' : `${activeCount} selected`;
+          }
+        }
+        return; 
+      }
 
       // dialog selects
       const msel = e.target.closest('.select-activity');
-      if (msel){ e.preventDefault(); if (msel.textContent.trim().toLowerCase()==='locked'){ showComeBackDialog(); return; } msel.classList.toggle('active'); const ta = msel.closest('li').querySelector('.activity-note'); if (ta) ta.hidden = !msel.classList.contains('active'); if (startResetBtn) startResetBtn.disabled = !(dialogQuickWins.querySelectorAll('.select-activity.active').length>0); return; }
+      if (msel){ 
+        e.preventDefault(); 
+        if (msel.textContent.trim().toLowerCase()==='locked'){ 
+          showComeBackDialog(); 
+          return; 
+        } 
+        msel.classList.toggle('active'); 
+        const ta = msel.closest('li').querySelector('.activity-note'); 
+        if (ta) ta.hidden = !msel.classList.contains('active'); 
+        const activeCount = dialogQuickWins.querySelectorAll('.select-activity.active').length;
+        if (startResetBtn) {
+          startResetBtn.disabled = activeCount === 0;
+          const hint = document.getElementById('completeHint');
+          if (hint) {
+            hint.textContent = activeCount === 0 ? 'Select an activity first' : `${activeCount} selected`;
+          }
+        }
+        return; 
+      }
 
       if (e.target.closest('.dialog-close') || e.target.closest('.dialog-cancel')){ const d = e.target.closest('dialog'); if (d){ safeCloseDialog(d); clearDialogSelections(); } }
     }, true);
@@ -600,8 +632,16 @@
     $all('.select-activity').forEach(b => b.classList.remove('active'));
     $all('.activity-note').forEach(t => { t.hidden = true; t.value = ''; });
     $all('.select-global-activity').forEach(b => b.classList.remove('active'));
-    if (startResetBtn) startResetBtn.disabled = true;
-    if (startQuickWinBtn) startQuickWinBtn.disabled = true;
+    if (startResetBtn) {
+      startResetBtn.disabled = true;
+      const hint = document.getElementById('completeHint');
+      if (hint) hint.textContent = 'Select an activity first';
+    }
+    if (startQuickWinBtn) {
+      startQuickWinBtn.disabled = true;
+      const hint = document.getElementById('quickWinHint');
+      if (hint) hint.textContent = 'Select an activity first';
+    }
   }
 
   function showComeBackDialog(){ safeShowDialog($('#comeBackDialog')); }

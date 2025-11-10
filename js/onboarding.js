@@ -4,7 +4,7 @@
   'use strict';
 
   const ONBOARDING_KEY = 'resetCompassOnboardingComplete';
-  const TOTAL_SLIDES = 5;
+  const TOTAL_SLIDES = 6;
   let currentSlide = 0;
 
   function $(sel) { return document.querySelector(sel); }

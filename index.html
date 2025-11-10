@@ -194,7 +194,13 @@
       </div>
 
       <div class="dialog-actions">
-        <button id="startResetBtn" class="btn-primary" disabled>Complete Selected</button>
+        <button id="startResetBtn" class="btn-primary" disabled>
+          <span class="btn-content">
+            <span class="btn-icon">✓</span>
+            <span class="btn-text">Complete Selected</span>
+          </span>
+          <span class="btn-hint" id="completeHint">Select an activity first</span>
+        </button>
         <button class="btn-secondary dialog-cancel">Cancel</button>
       </div>
     </div>
@@ -209,7 +215,13 @@
       <ul id="globalQuickWins" class="quick-wins-list" role="list"></ul>
 
       <div class="dialog-actions">
-        <button id="startQuickWinBtn" class="btn-primary" disabled>Complete Selected</button>
+        <button id="startQuickWinBtn" class="btn-primary" disabled>
+          <span class="btn-content">
+            <span class="btn-icon">✓</span>
+            <span class="btn-text">Complete Selected</span>
+          </span>
+          <span class="btn-hint" id="quickWinHint">Select an activity first</span>
+        </button>
         <button class="btn-secondary dialog-cancel">Close</button>
       </div>
     </div>
