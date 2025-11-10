@@ -257,10 +257,11 @@ body:not(.page-onboarding){min-height:100vh}
 @keyframes titleBounceIn{0%{opacity:0;transform:scale(0.8) translateY(-10px)}70%{transform:scale(1.05) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
 
 /* Dialogs (force dark theme and backdrop) */
-dialog{border:none;border-radius:20px;padding:0;max-width:880px;width:calc(100% - 2rem);background:linear-gradient(135deg, var(--bg-elevated), rgba(11,61,46,0.15));color:var(--text-primary);box-shadow:0 40px 160px rgba(0,0,0,0.9), 0 0 100px rgba(0,230,166,0.25), inset 0 0 60px rgba(0,230,166,0.05);opacity:0;transform:scale(0.85) translateY(30px) rotateX(10deg);transition:opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);overflow:hidden;max-height:90vh;border:2px solid rgba(0,230,166,0.2)}
+dialog{border:none;border-radius:20px;padding:0;max-width:880px;width:calc(100% - 2rem);background:linear-gradient(135deg, var(--bg-elevated), rgba(11,61,46,0.15));color:var(--text-primary);box-shadow:0 40px 160px rgba(0,0,0,0.9), 0 0 100px rgba(0,230,166,0.25), inset 0 0 60px rgba(0,230,166,0.05);opacity:0;transform:scale(0.85) translateY(30px) rotateX(10deg);transition:opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);overflow:hidden;max-height:90vh;border:2px solid rgba(0,230,166,0.2);overscroll-behavior:contain}
 dialog[open]{opacity:1;transform:scale(1) translateY(0) rotateX(0);animation:dialogBounceIn 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
+body:has(dialog[open]){overflow:hidden;position:fixed;width:100%;height:100%}
 dialog::backdrop{background:rgba(0,0,0,0.85);animation:backdropFade 0.4s ease-out;backdrop-filter:blur(8px)}
-.dialog-content{padding:1.4rem;position:relative;animation:dialogContentSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);display:flex;flex-direction:column}
+.dialog-content{padding:1.4rem;position:relative;animation:dialogContentSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);display:flex;flex-direction:column;overflow-y:auto;max-height:90vh;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .dialog-close{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);color:var(--text-secondary);font-size:1.8rem;cursor:pointer;width:48px;height:48px;border-radius:50%;transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);z-index:10;display:flex;align-items:center;justify-content:center;font-weight:300}
 .dialog-close:hover{background:linear-gradient(135deg, rgba(255,95,109,0.8), rgba(255,122,122,0.8));border-color:rgba(255,255,255,0.3);transform:rotate(90deg) scale(1.15);color:#fff;box-shadow:0 0 20px rgba(255,95,109,0.6)}
 .dialog-close:active{transform:rotate(90deg) scale(0.95)}
@@ -270,7 +271,7 @@ dialog::backdrop{background:rgba(0,0,0,0.85);animation:backdropFade 0.4s ease-ou
 @keyframes dialogContentSlide{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 
 /* Activity list */
-.quick-wins-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding-right:8px;flex:1;max-height:calc(70vh - 200px)}
+.quick-wins-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding-right:8px;flex:1;max-height:calc(70vh - 200px);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .quick-wins-list li{padding:16px;border-radius:12px;background:linear-gradient(135deg, rgba(0,230,166,0.05), rgba(46,127,232,0.03));border:2px solid rgba(255,255,255,0.08);transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);position:relative;box-shadow:0 4px 16px rgba(0,0,0,0.4);animation:listItemSlideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) backwards;cursor:pointer;overflow:visible;min-height:fit-content}
 .quick-wins-list li:nth-child(1){animation-delay:0.05s}
 .quick-wins-list li:nth-child(2){animation-delay:0.1s}

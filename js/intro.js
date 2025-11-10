@@ -13,11 +13,20 @@
     // Skip if user prefers reduced motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
     
+    // Skip if on onboarding page
+    if (document.body.classList.contains('page-onboarding')) return false;
+    
     return true;
   }
 
   function showIntro(){
     if (!shouldShowIntro()) return;
+
+    // Lock body scroll
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
 
     // Create intro overlay
     const overlay = document.createElement('div');
@@ -41,6 +50,11 @@
           if (overlay.parentNode) {
             overlay.parentNode.removeChild(overlay);
           }
+          // Unlock body scroll
+          document.body.style.overflow = '';
+          document.body.style.position = '';
+          document.body.style.width = '';
+          document.body.style.height = '';
         }, 800);
       }, 1200); // Show for at least 1.2s
       
