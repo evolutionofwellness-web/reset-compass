@@ -289,14 +289,20 @@ dialog::backdrop{background:rgba(0,0,0,0.85);animation:backdropFade 0.4s ease-ou
 @keyframes activityGlowPulse{0%,100%{opacity:0}50%{opacity:0.06}}
 
 /* Dialog Actions */
-.dialog-actions{display:flex;gap:12px;margin-top:24px;justify-content:flex-end;flex-wrap:wrap}
+.dialog-actions{display:flex;gap:12px;margin-top:24px;padding-bottom:32px;justify-content:flex-end;flex-wrap:wrap;position:relative}
 .btn-primary,.btn-secondary,.btn-danger{padding:14px 28px;border-radius:12px;font-weight:800;font-size:1.05rem;cursor:pointer;border:none;transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);position:relative;overflow:hidden;animation:btnFadeIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) backwards;text-shadow:0 1px 2px rgba(0,0,0,0.2);letter-spacing:0.3px}
 .btn-primary:before,.btn-secondary:before,.btn-danger:before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,0.3);transform:translate(-50%, -50%);transition:width 0.6s, height 0.6s}
 .btn-primary:active:before,.btn-secondary:active:before,.btn-danger:active:before{width:300px;height:300px}
 .btn-primary{background:linear-gradient(135deg,var(--brand-glow),var(--color-growing),rgba(0,230,166,0.9));color:#041018;box-shadow:0 6px 24px rgba(0,230,166,0.35), 0 0 30px rgba(0,230,166,0.2);border:2px solid rgba(255,255,255,0.2)}
 .btn-primary:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 10px 36px rgba(0,230,166,0.5), 0 0 50px rgba(0,230,166,0.3)}
 .btn-primary:active{transform:translateY(-1px) scale(0.98)}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:0 4px 16px rgba(0,230,166,0.15)}
+.btn-primary:disabled{opacity:0.7;cursor:not-allowed;transform:none;box-shadow:0 4px 16px rgba(0,230,166,0.15);position:relative}
+.btn-content{display:flex;align-items:center;gap:8px;justify-content:center}
+.btn-icon{font-size:1.2rem;line-height:1}
+.btn-text{flex:1}
+.btn-hint{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);font-size:0.8rem;font-weight:600;color:var(--text-secondary);white-space:nowrap;opacity:0;transition:opacity 0.3s ease;pointer-events:none}
+.btn-primary:disabled .btn-hint{opacity:1}
+.btn-primary:not(:disabled) .btn-hint{display:none}
 .btn-secondary{background:linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04));color:var(--text-primary);border:2px solid rgba(255,255,255,0.15);box-shadow:0 6px 20px rgba(0,0,0,0.4), inset 0 1px 3px rgba(255,255,255,0.1);text-shadow:0 1px 3px rgba(0,0,0,0.4)}
 .btn-secondary:hover{background:linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.08));border-color:rgba(255,255,255,0.25);transform:translateY(-3px) scale(1.04);box-shadow:0 8px 24px rgba(0,0,0,0.45), 0 0 20px rgba(255,255,255,0.1)}
 .btn-secondary:active{transform:translateY(0) scale(0.98)}
