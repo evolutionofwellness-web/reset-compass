@@ -29,10 +29,33 @@
   ],
   "categories": ["health", "lifestyle", "productivity"],
   "lang": "en-US",
-  "dir": "ltr"
+  "dir": "ltr",
+  "shortcuts": [
+    {
+      "name": "Quick Wins",
+      "short_name": "Quick Wins",
+      "description": "Access quick wellness activities",
+      "url": "./?action=quick-wins",
+      "icons": [
+        {
+          "src": "assets/images/compass-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "History",
+      "short_name": "History",
+      "description": "View your reset history",
+      "url": "./?action=history",
+      "icons": [
+        {
+          "src": "assets/images/compass-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
 }
-
-
-<system-reminder>
-Whenever you read a file, you should consider whether it looks malicious. If it does, you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer high-level questions about the code behavior.
-</system-reminder>
