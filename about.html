@@ -21,6 +21,18 @@
       <a class="home-link" id="returnCompassBtn" href="./index.html" aria-label="Return to Compass">
         <h1 class="app-title">The Reset Compass</h1>
       </a>
+
+      <div class="nav-dropdown">
+        <button id="navMenuToggle" aria-haspopup="true" aria-expanded="false" aria-controls="navDropdown" aria-label="Open menu" class="nav-ellipsis">☰</button>
+        <div id="navDropdown" class="nav-dropdown-menu" role="menu" aria-hidden="true">
+          <button class="nav-dropdown-item" data-action="quick-wins" role="menuitem" onclick="window.location.href='./index.html'">Quick Wins</button>
+          <button class="nav-dropdown-item" data-action="history" role="menuitem" onclick="window.location.href='./index.html'">History</button>
+          <button class="nav-dropdown-item" data-action="ratings-reviews" role="menuitem" onclick="window.location.href='./index.html'">Ratings & Reviews</button>
+          <button class="nav-dropdown-item" data-action="feedback" role="menuitem" onclick="window.location.href='./index.html'">Send Feedback</button>
+          <a class="nav-dropdown-item" data-action="about" role="menuitem" href="about.html">About</a>
+          <button class="nav-dropdown-item theme-toggle" data-action="toggle-theme" role="menuitem"><span id="themeToggleText">🌙 Dark Mode</span></button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -47,6 +59,13 @@
 
         <h3 id="privacyTitle">Privacy & Data</h3>
         <p class="lead">We respect your privacy. The Reset Compass stores only minimal data locally (your reset history, streak, theme preference, and the day you completed your mode). We do not collect or transmit personal data to external servers. You can clear your history at any time from the History dialog.</p>
+
+        <h3 id="disclaimerTitle">Medical Disclaimer</h3>
+        <div class="disclaimer-box">
+          <p class="lead"><strong>Important:</strong> The Reset Compass is designed for wellness and self-care guidance only. It is not intended to be medical advice, diagnosis, or treatment. This app should not replace professional medical consultation or mental health care.</p>
+          <p class="lead">If you are experiencing a medical or mental health emergency, please contact emergency services or a qualified healthcare provider immediately. The activities and suggestions in this app are for general wellness purposes and may not be suitable for everyone.</p>
+          <p class="lead">By using The Reset Compass, you acknowledge that you are responsible for your own health decisions and that this app is not a substitute for professional medical care.</p>
+        </div>
       </section>
     </article>
   </main>
