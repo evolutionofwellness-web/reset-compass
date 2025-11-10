@@ -16,16 +16,46 @@
     const btnGetStarted = $('#btnGetStarted');
     const dotsIndicator = $('#dotsIndicator');
 
-    if (!btnNext || !btnSkip || !dotsIndicator) return;
+    if (!btnNext || !btnSkip || !dotsIndicator) {
+      console.error('Required elements not found', { btnNext, btnSkip, dotsIndicator });
+      return;
+    }
 
     setupDots();
     updateUI();
+    
+    console.log('Onboarding initialized', { currentSlide, totalSlides: TOTAL_SLIDES });
 
-    btnNext.addEventListener('click', nextSlide);
-    btnSkip.addEventListener('click', completeOnboarding);
+    btnNext.addEventListener('click', () => {
+      console.log('Next button clicked');
+      nextSlide();
+    });
+    btnNext.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      console.log('Next button touched');
+      nextSlide();
+    });
+    
+    btnSkip.addEventListener('click', () => {
+      console.log('Skip button clicked');
+      completeOnboarding();
+    });
+    btnSkip.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      console.log('Skip button touched');
+      completeOnboarding();
+    });
     
     if (btnGetStarted) {
-      btnGetStarted.addEventListener('click', completeOnboarding);
+      btnGetStarted.addEventListener('click', () => {
+        console.log('Get Started button clicked');
+        completeOnboarding();
+      });
+      btnGetStarted.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        console.log('Get Started button touched');
+        completeOnboarding();
+      });
     }
 
     document.addEventListener('keydown', (e) => {
@@ -38,6 +68,17 @@
       const dot = e.target.closest('.dot');
       if (dot) {
         const index = parseInt(dot.dataset.index);
+        console.log('Dot clicked', index);
+        goToSlide(index);
+      }
+    });
+    
+    dotsIndicator.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      const dot = e.target.closest('.dot');
+      if (dot) {
+        const index = parseInt(dot.dataset.index);
+        console.log('Dot touched', index);
         goToSlide(index);
       }
     });
