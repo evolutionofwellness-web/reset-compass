@@ -1,30 +1,48 @@
-[
-  {
-    "id": 1,
-    "name": "Grounding",
-    "description": "Reset and reconnect — slow the breath and root into the present.",
-    "color": "#3BC4A3",
-    "defaultQuote": "Breathe in ease, breathe out tension."
-  },
-  {
-    "id": 2,
-    "name": "Growing",
-    "description": "Small wins to move you forward and build momentum.",
-    "color": "#7BC96F",
-    "defaultQuote": "One small step is still progress."
-  },
-  {
-    "id": 3,
-    "name": "Surviving",
-    "description": "Quick energy and focus resets when you need to steady the day.",
-    "color": "#F6C85F",
-    "defaultQuote": "You are doing enough for right now."
-  },
-  {
-    "id": 4,
-    "name": "Exploring",
-    "description": "Playful prompts to try something new or expand your horizon.",
-    "color": "#8A7AF3",
-    "defaultQuote": "Curiosity unlocks new pathways."
-  }
-]
+{
+  "modes": [
+    {
+      "id": "surviving",
+      "title": "Surviving",
+      "description": "Quick fixes to just get through the moment.",
+      "color": "#D9480F",
+      "activities": [
+        {"id":"breathe","title":"3 Deep Breaths","icon":"assets/icons/breathe.svg","explain":"Slow breaths to calm your body.","duration":60},
+        {"id":"sip","title":"Have a Sip","icon":"assets/icons/water.svg","explain":"Take a small drink of water.","duration":30},
+        {"id":"sit","title":"Sit Quiet","icon":"assets/icons/sit.svg","explain":"Sit still for one minute, eyes open.","duration":60}
+      ]
+    },
+    {
+      "id": "drifting",
+      "title": "Drifting",
+      "description": "Gentle resets to float back into focus.",
+      "color": "#6B46C1",
+      "activities": [
+        {"id":"walk","title":"Short Walk","icon":"assets/icons/walk.svg","explain":"Walk for 3–5 minutes nearby.","duration":300},
+        {"id":"music","title":"Play a Song","icon":"assets/icons/music.svg","explain":"Choose a feel-good short song.","duration":180},
+        {"id":"stretch","title":"Quick Stretch","icon":"assets/icons/stretch.svg","explain":"Stretch arms and neck slowly.","duration":90}
+      ]
+    },
+    {
+      "id": "grounded",
+      "title": "Grounded",
+      "description": "Root yourself with steady, grounding activities.",
+      "color": "#0B3D2E",
+      "activities": [
+        {"id":"breath5","title":"5-Count Breath","icon":"assets/icons/breath5.svg","explain":"Inhale 5, exhale 5, repeat 5 times.","duration":120},
+        {"id":"notice","title":"Name 3 Things","icon":"assets/icons/notice.svg","explain":"Look and name three things you see.","duration":60},
+        {"id":"posture","title":"Fix Posture","icon":"assets/icons/posture.svg","explain":"Sit tall and relax shoulders.","duration":30}
+      ]
+    },
+    {
+      "id": "growing",
+      "title": "Growing",
+      "description": "Boost your mood and energy with small wins.",
+      "color": "#0FBF84",
+      "activities": [
+        {"id":"tinywin","title":"Tiny Win","icon":"assets/icons/tinywin.svg","explain":"Do one small task you can finish now.","duration":300},
+        {"id":"journal","title":"Write 2 Lines","icon":"assets/icons/journal.svg","explain":"Write two lines about one good thing.","duration":180},
+        {"id":"compliment","title":"Give a Compliment","icon":"assets/icons/compliment.svg","explain":"Tell someone something nice.","duration":60}
+      ]
+    }
+  ]
+}

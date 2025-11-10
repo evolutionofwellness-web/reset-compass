@@ -12,10 +12,16 @@
      crossorigin="anonymous"></script>
 
   <link rel="stylesheet" href="style.css" />
+  <!-- paste after: <link rel="stylesheet" href="style.css" /> -->
+<link rel="stylesheet" href="css/cinematic.css" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="assets/images/compass.svg" />
 
   <script src="script.js" defer></script>
+  <!-- paste after: <script src="script.js" defer></script> -->
+<script src="js/modes-loader.js" defer></script>
+<script src="js/modes-ui.js" defer></script>
+<script src="js/intro.js" defer></script>
 </head>
 <body class="page-compass">
   <header class="app-header" role="banner">
@@ -84,7 +90,8 @@
       <h2 class="section-title">Choose Your Mode</h2>
 
       <div class="modes-grid" id="modesGrid" role="list" aria-live="polite"></div>
-
+<!-- optional: paste this where you want the modes grid -->
+<div id="modes-root"></div>
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
         <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">⚡ Quick Wins</button>
         <p class="quick-wins-note">Quick Wins are one-step actions you can do immediately to shift your focus, energy, or mood. Tap a Quick Win to complete it fast. (No daily limit.)</p>
