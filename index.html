@@ -75,9 +75,29 @@
           <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" />
           <div id="compassWedges" class="compass-wedges" aria-hidden="true"></div>
           <div class="compass-arrow" id="compassArrow" aria-hidden="true" aria-label="Compass arrow">
-            <svg viewBox="0 0 24 24" width="88" height="88" role="img" aria-hidden="true">
-              <path d="M12 2 L16 12 L12 22 L8 12 Z" fill="#000" opacity="1" />
-              <circle cx="12" cy="12" r="3" fill="#fff" />
+            <svg viewBox="0 0 24 60" width="60" height="150" role="img" aria-hidden="true">
+              <defs>
+                <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                  <stop offset="50%" style="stop-color:#e8e8e8;stop-opacity:0.95" />
+                  <stop offset="100%" style="stop-color:#1a1a1a;stop-opacity:0.9" />
+                </linearGradient>
+                <filter id="arrowGlow">
+                  <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <path d="M12 5 L18 30 L12 55 L6 30 Z" 
+                    fill="url(#arrowGradient)" 
+                    opacity="0.95" 
+                    filter="url(#arrowGlow)" 
+                    stroke="#ffffff" 
+                    stroke-width="0.8" />
+              <circle cx="12" cy="30" r="4" fill="#000" opacity="0.9" />
+              <circle cx="12" cy="30" r="2.5" fill="#fff" opacity="1" />
             </svg>
           </div>
           <div id="compassRing" class="compass-ring" aria-hidden="false"></div>
