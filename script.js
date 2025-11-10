@@ -446,7 +446,7 @@
     const navToggle = $('#navMenuToggle');
     const navMenu = $('#navDropdown');
     if (navToggle && navMenu){
-      navToggle.addEventListener('click', (ev)=>{ ev.stopPropagation(); const open = navMenu.getAttribute('aria-hidden') === 'false'; navMenu.setAttribute('aria-hidden', open ? 'true' : 'false'); navToggle.setAttribute('aria-expanded', !open); });
+      navToggle.addEventListener('click', (ev)=>{ ev.stopPropagation(); const isHidden = navMenu.getAttribute('aria-hidden') !== 'false'; navMenu.setAttribute('aria-hidden', isHidden ? 'false' : 'true'); navToggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false'); });
       document.addEventListener('click', (ev)=>{ if (navMenu.getAttribute('aria-hidden') === 'false' && !navMenu.contains(ev.target) && ev.target !== navToggle) { navMenu.setAttribute('aria-hidden','true'); navToggle.setAttribute('aria-expanded','false'); }});
     }
 
