@@ -275,7 +275,7 @@
     celebration.className = 'achievement-unlock-celebration';
     celebration.innerHTML = `
       <div class="achievement-unlock-content">
-        <div class="achievement-unlock-emoji">${achievement.emoji}</div>
+        <div class="achievement-unlock-emoji">${escapeHtml(achievement.emoji)}</div>
         <div class="achievement-unlock-text">
           <div class="achievement-unlock-title">Achievement Unlocked!</div>
           <div class="achievement-unlock-name">${escapeHtml(achievement.name)}</div>
