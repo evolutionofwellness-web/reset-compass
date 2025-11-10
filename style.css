@@ -132,8 +132,8 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
 /* Compass */
 .compass-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:10px}
 .compass-container{position:relative;width:var(--compass-size);height:var(--compass-size);margin:12px auto;border-radius:50%;overflow:visible;box-shadow:0 20px 80px rgba(0,0,0,0.6);animation:compassPulse 4s ease-in-out infinite}
-.compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.12;border-radius:50%;animation:compassRotate 120s linear infinite}
-.compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:1;mix-blend-mode:normal;transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);-webkit-mask:radial-gradient(circle at center, transparent 0%, transparent 35%, black 40%, black 85%, transparent 90%, transparent 100%);mask:radial-gradient(circle at center, transparent 0%, transparent 35%, black 40%, black 85%, transparent 90%, transparent 100%);opacity:0.6}
+.compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.12;border-radius:50%;animation:compassRotate 120s linear infinite;z-index:0}
+.compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:1;mix-blend-mode:normal;transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);-webkit-mask:radial-gradient(circle at center, transparent 0%, transparent 35%, black 40%, black 85%, transparent 90%, transparent 100%);mask:radial-gradient(circle at center, transparent 0%, transparent 35%, black 40%, black 85%, transparent 90%, transparent 100%);opacity:0.85;background:conic-gradient(from -45deg, #2f80ed 0deg 90deg, #00c06b 90deg 180deg, #ffbf3b 180deg 270deg, #ff5f6d 270deg 360deg)}
 .compass-wedges::before{content:"";position:absolute;inset:0;border-radius:50%;background:inherit;filter:blur(12px) brightness(1.4);opacity:0.5;-webkit-mask:radial-gradient(circle at center, transparent 0%, transparent 38%, black 42%, black 82%, transparent 88%, transparent 100%);mask:radial-gradient(circle at center, transparent 0%, transparent 38%, black 42%, black 82%, transparent 88%, transparent 100%);animation:wedgeGlow 3s ease-in-out infinite}
 .compass-wedges::after{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(0,0,0,0.34) 0deg 1.8deg, transparent 1.8deg 90deg);opacity:0.09;pointer-events:none}
 .compass-container::before{content:"";position:absolute;inset:-6%;border-radius:50%;box-shadow:0 34px 140px rgba(0,0,0,0.7);pointer-events:none}
@@ -240,6 +240,40 @@ dialog::backdrop{background:rgba(0,0,0,0.7);animation:backdropFade 0.35s ease-ou
 .rc-toast{position:fixed;left:50%;transform:translateX(-50%) translateY(8px);bottom:18px;background:rgba(8,8,8,0.9);color:white;padding:10px 14px;border-radius:10px;opacity:0;transition:opacity 220ms ease,transform 220ms ease;z-index:9999}
 .rc-toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* Encouragement Toast */
+.encouragement-toast{position:fixed;top:20%;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,rgba(0,175,160,0.98),rgba(0,212,196,0.98));color:#041018;padding:20px 32px;border-radius:16px;opacity:0;transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);z-index:9999;box-shadow:0 20px 60px rgba(0,175,160,0.6), 0 0 80px rgba(0,175,160,0.4);display:flex;align-items:center;gap:16px;max-width:90%;border:2px solid rgba(255,255,255,0.3)}
+.encouragement-toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+.encouragement-icon{font-size:2.4rem;line-height:1;animation:encouragementPulse 1s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(255,215,0,0.6))}
+.encouragement-text{font-size:1.1rem;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.2)}
+
+@keyframes encouragementPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+/* Welcome Dialog */
+.welcome-dialog{max-width:720px}
+.welcome-content{padding:0}
+.welcome-hero{text-align:center;padding:48px 32px 32px;background:linear-gradient(180deg,rgba(0,175,160,0.1),transparent);border-bottom:2px solid rgba(0,175,160,0.2)}
+.welcome-icon{font-size:5rem;line-height:1;margin-bottom:20px;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(0,175,160,0.6))}
+.welcome-hero h2{font-size:2.4rem;margin:0 0 12px 0;font-weight:900;background:linear-gradient(135deg,var(--brand-color),#00d4c4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.welcome-tagline{font-size:1.2rem;color:var(--text-secondary);margin:0;line-height:1.6}
+.welcome-steps{padding:32px;display:flex;flex-direction:column;gap:24px}
+.welcome-step{display:flex;align-items:flex-start;gap:20px;animation:slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards}
+.welcome-step:nth-child(1){animation-delay:0.2s}
+.welcome-step:nth-child(2){animation-delay:0.3s}
+.welcome-step:nth-child(3){animation-delay:0.4s}
+.step-number{background:linear-gradient(135deg,var(--brand-color),#00d4c4);color:#041018;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900;flex-shrink:0;box-shadow:0 8px 24px rgba(0,175,160,0.4)}
+.step-content h3{margin:0 0 8px 0;font-size:1.3rem;font-weight:800}
+.step-content p{margin:0;color:var(--text-secondary);line-height:1.6;font-size:1rem}
+.welcome-features{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:24px 32px;background:linear-gradient(180deg,transparent,rgba(0,175,160,0.05));border-top:1px solid rgba(0,175,160,0.1)}
+.feature-badge{background:linear-gradient(135deg,rgba(0,175,160,0.15),rgba(0,175,160,0.08));border:1px solid rgba(0,175,160,0.25);padding:10px 18px;border-radius:999px;font-size:0.96rem;font-weight:700;color:var(--text-primary);box-shadow:0 4px 12px rgba(0,0,0,0.2);animation:fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards}
+.feature-badge:nth-child(1){animation-delay:0.5s}
+.feature-badge:nth-child(2){animation-delay:0.6s}
+.feature-badge:nth-child(3){animation-delay:0.7s}
+.feature-badge:nth-child(4){animation-delay:0.8s}
+.btn-large{font-size:1.2rem;padding:16px 40px;margin:24px 32px}
+
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
 /* Achievement Unlock Celebration */
 .achievement-unlock-celebration{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%) scale(0.5);z-index:10000;background:linear-gradient(135deg,rgba(255,215,0,0.98),rgba(255,165,0,0.98));padding:32px 48px;border-radius:20px;box-shadow:0 40px 120px rgba(0,0,0,0.8), 0 0 100px rgba(255,215,0,0.6);opacity:0;transition:all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);border:4px solid rgba(255,255,255,0.4)}
 .achievement-unlock-celebration.visible{opacity:1;transform:translate(-50%, -50%) scale(1)}
@@ -256,15 +290,19 @@ dialog::backdrop{background:rgba(0,0,0,0.7);animation:backdropFade 0.35s ease-ou
 @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg)}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 
 /* Completion Celebration */
-.completion-celebration{position:fixed;top:30%;left:50%;transform:translate(-50%, -50%) scale(0);z-index:10000;opacity:0;transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);text-align:center}
+.completion-celebration{position:fixed;top:30%;left:50%;transform:translate(-50%, -50%) scale(0);z-index:10000;opacity:0;transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);text-align:center;background:linear-gradient(135deg,rgba(0,175,160,0.95),rgba(0,212,196,0.95));padding:40px 60px;border-radius:24px;box-shadow:0 40px 120px rgba(0,175,160,0.8), 0 0 100px rgba(0,175,160,0.6);border:3px solid rgba(255,255,255,0.3)}
 .completion-celebration.visible{opacity:1;transform:translate(-50%, -50%) scale(1)}
 .completion-icon{font-size:6rem;line-height:1;animation:celebrationPulse 0.6s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(255,215,0,0.8)) drop-shadow(0 8px 24px rgba(255,215,0,0.5))}
-.completion-text{font-size:2rem;font-weight:900;color:var(--brand-color);margin-top:12px;text-shadow:0 0 30px rgba(0,175,160,0.8), 0 4px 12px rgba(0,175,160,0.4)}
+.completion-text{font-size:2.4rem;font-weight:900;color:#041018;margin-top:16px;text-shadow:0 2px 8px rgba(255,255,255,0.5)}
+.completion-subtext{font-size:1.3rem;font-weight:700;color:#041018;margin-top:8px;opacity:0.9}
 
 @keyframes celebrationPulse{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.15) rotate(10deg)}}
 
 .completion-particle{position:fixed;width:12px;height:12px;border-radius:50%;z-index:9998;pointer-events:none;animation:particleExplode 1s ease-out forwards}
 @keyframes particleExplode{0%{transform:translate(-50%, -50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0);opacity:0}}
+
+.star-burst{position:fixed;font-size:2rem;z-index:9999;pointer-events:none;animation:starBurstExplode 1.5s ease-out forwards}
+@keyframes starBurstExplode{0%{transform:translate(-50%, -50%) scale(0) rotate(0deg);opacity:1}50%{transform:translate(calc(-50% + var(--tx) * 0.5), calc(-50% + var(--ty) * 0.5)) scale(1.2) rotate(180deg);opacity:1}100%{transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.3) rotate(360deg);opacity:0}}
 
 /* PWA Install Banner */
 .pwa-banner{background:linear-gradient(135deg,var(--brand-color),#00d4c4);padding:18px 24px;border-radius:14px;margin:0 0 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 12px 48px rgba(0,175,160,0.4), 0 0 50px rgba(0,175,160,0.3);animation:slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1)}
@@ -335,6 +373,24 @@ dialog::backdrop{background:rgba(0,0,0,0.7);animation:backdropFade 0.35s ease-ou
   .mode-card{padding:20px 24px}
   .dialog-actions{flex-direction:column}
   .btn-primary,.btn-secondary,.btn-danger{width:100%}
+  .welcome-hero{padding:32px 20px 24px}
+  .welcome-hero h2{font-size:1.9rem}
+  .welcome-tagline{font-size:1.05rem}
+  .welcome-steps{padding:24px 20px}
+  .welcome-step{flex-direction:column;align-items:center;text-align:center}
+  .step-number{width:40px;height:40px;font-size:1.3rem}
+  .step-content h3{font-size:1.2rem}
+  .welcome-features{padding:20px}
+  .feature-badge{font-size:0.88rem;padding:8px 14px}
+  .encouragement-toast{padding:16px 24px;max-width:85%;font-size:1rem}
+  .encouragement-icon{font-size:2rem}
+  .encouragement-text{font-size:0.98rem}
+  .completion-celebration{padding:32px 40px;max-width:85%}
+  .completion-icon{font-size:4.5rem}
+  .completion-text{font-size:2rem}
+  .completion-subtext{font-size:1.1rem}
+  .welcome-icon{font-size:4rem}
+  .btn-large{font-size:1.1rem;padding:14px 32px;margin:20px}
 }
 
 <system-reminder>
