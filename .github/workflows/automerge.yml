@@ -1,0 +1,54 @@
+name: Auto-merge PRs when checks pass
+
+on:
+  pull_request:
+    types: [opened, reopened, labeled, unlabeled, synchronize, ready_for_review]
+  check_suite:
+    types: [completed]
+  check_run:
+    types: [completed]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: read
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Auto-merge when label present and checks succeed
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request || (await github.rest.pulls.get({ owner: context.repo.owner, repo: context.repo.repo, pull_number: context.issue.number })).data;
+            if(!pr){ core.info('No pull request in context — exiting'); return; }
+            const labels = (pr.labels || []).map(l => (typeof l === 'string' ? l : l.name));
+            // Require an explicit label 'automerge' to opt-in
+            if(!labels.includes('automerge')){ core.info('PR not labeled "automerge" — nothing to do'); return; }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = pr.number;
+            const sha = pr.head.sha;
+
+            core.info(`Checking combined status for ${owner}/${repo}@${sha}`);
+            const combined = await github.rest.repos.getCombinedStatusForRef({ owner, repo, ref: sha });
+            core.info(`Combined status: ${combined.data.state}`);
+            if(combined.data.state !== 'success'){
+              core.info('Required checks have not all succeeded yet — will not merge.');
+              return;
+            }
+
+            // Check mergeable flag
+            const prInfo = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            if(prInfo.data.mergeable === false){ core.info('PR is not mergeable (mergeable==false) — abort'); return; }
+
+            try{
+              await github.rest.pulls.merge({ owner, repo, pull_number: prNumber, merge_method: 'squash' });
+              core.info(`Merged PR #${prNumber}`);
+            } catch (err){ core.warning('Merge attempt failed: ' + err.message); }
