@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Welcome to The Reset Compass - Your guide to wellness" />
+  <meta name="theme-color" content="#0B3D2E" />
+  <title>Welcome - The Reset Compass</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/cinematic.css" />
+  <link rel="stylesheet" href="css/onboarding.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="assets/images/compass.svg" />
+
+  <script src="js/onboarding.js" defer></script>
+</head>
+<body class="page-onboarding">
+  <main class="onboarding-container">
+    <div class="onboarding-progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="onboarding-slides" id="onboardingSlides">
+      <section class="onboarding-slide active" data-slide="0">
+        <div class="slide-content">
+          <img src="assets/images/app-icon.png" alt="The Reset Compass" class="app-icon-large" />
+          <h1 class="slide-title">Welcome to<br>The Reset Compass</h1>
+          <p class="slide-text">Your personal guide to wellness and mindfulness. Take control of your day with quick, meaningful resets.</p>
+        </div>
+      </section>
+
+      <section class="onboarding-slide" data-slide="1">
+        <div class="slide-content">
+          <div class="slide-icon">🌟</div>
+          <h2 class="slide-title">Four Wellness Modes</h2>
+          <div class="modes-preview">
+            <div class="mode-preview-card" style="--mode-color: #FF5F6D;">
+              <span class="mode-preview-emoji">⚡</span>
+              <span class="mode-preview-name">Surviving</span>
+            </div>
+            <div class="mode-preview-card" style="--mode-color: #FFBF3B;">
+              <span class="mode-preview-emoji">☁️</span>
+              <span class="mode-preview-name">Drifting</span>
+            </div>
+            <div class="mode-preview-card" style="--mode-color: #0FBF84;">
+              <span class="mode-preview-emoji">🧘</span>
+              <span class="mode-preview-name">Grounded</span>
+            </div>
+            <div class="mode-preview-card" style="--mode-color: #2E7FE8;">
+              <span class="mode-preview-emoji">🌱</span>
+              <span class="mode-preview-name">Growing</span>
+            </div>
+          </div>
+          <p class="slide-text">Choose the mode that matches your current state and discover personalized activities.</p>
+        </div>
+      </section>
+
+      <section class="onboarding-slide" data-slide="2">
+        <div class="slide-content">
+          <div class="slide-icon">⚡</div>
+          <h2 class="slide-title">Quick Wins</h2>
+          <p class="slide-text">Need an instant boost? Quick Wins are powerful micro-moments designed to shift your energy in under 2 minutes.</p>
+          <div class="features-list">
+            <div class="feature-item">
+              <span class="feature-icon">🎯</span>
+              <span class="feature-text">Takes less than 2 minutes</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">💫</span>
+              <span class="feature-text">Instant mood boost</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">♾️</span>
+              <span class="feature-text">Use anytime, no limit</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="onboarding-slide" data-slide="3">
+        <div class="slide-content">
+          <div class="slide-icon">🔥</div>
+          <h2 class="slide-title">Track Your Streak</h2>
+          <p class="slide-text">Build consistency with daily streaks and unlock achievements as you make wellness a habit.</p>
+          <div class="streak-preview">
+            <div class="streak-preview-badge">Daily streak: 🔥 0</div>
+            <div class="achievement-preview">
+              <span class="achievement-preview-badge">⚡ 7 Day Warrior</span>
+              <span class="achievement-preview-badge">👑 30 Day Champion</span>
+              <span class="achievement-preview-badge">🏆 100 Day Legend</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="onboarding-slide" data-slide="4">
+        <div class="slide-content">
+          <div class="slide-icon">✨</div>
+          <h2 class="slide-title">You're All Set!</h2>
+          <p class="slide-text">Ready to start your wellness journey? Remember: one small action can break the cycle and shift your entire day.</p>
+          <button class="btn-get-started" id="btnGetStarted">Get Started</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="onboarding-navigation">
+      <button class="btn-nav btn-skip" id="btnSkip">Skip</button>
+      <div class="dots-indicator" id="dotsIndicator"></div>
+      <button class="btn-nav btn-next" id="btnNext">Next</button>
+    </div>
+  </main>
+</body>
+</html>

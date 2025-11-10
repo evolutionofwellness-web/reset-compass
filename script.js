@@ -13,6 +13,7 @@
   const REVIEWS_KEY = 'resetCompassReviews';
   const PWA_DISMISSED_KEY = 'resetCompassPWADismissed';
   const ACHIEVEMENTS_KEY = 'resetCompassAchievements';
+  const ONBOARDING_KEY = 'resetCompassOnboardingComplete';
 
   const ACHIEVEMENTS = [
     { id: 'streak_7', name: '7 Day Warrior', emoji: '⚡', threshold: 7, type: 'streak' },
@@ -37,6 +38,8 @@
   function $all(sel){ return Array.from(document.querySelectorAll(sel)); }
 
   function init(){
+    checkOnboarding();
+    
     compassWedges = $('#compassWedges');
     compassRing = $('#compassRing');
     compassContainer = $('#compassContainer');
@@ -65,6 +68,12 @@
       onModesLoaded();
     } else {
       window.addEventListener('modes:loaded', onModesLoaded);
+    }
+  }
+  
+  function checkOnboarding(){
+    if (!localStorage.getItem(ONBOARDING_KEY)) {
+      window.location.href = 'onboarding.html';
     }
   }
   
