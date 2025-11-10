@@ -23,19 +23,11 @@
     { id: 'activities_100', name: 'Reset Master', emoji: '🎯', threshold: 100, type: 'total' }
   ];
 
-  const MODES = [
-    { id:4, name:'Growing', color:'#2f80ed', description:'Playful prompts to try something new or expand your horizon.', emoji:'🌱', altDesc:'You feel playful and ready to try something new or expand your mind.' },
-    { id:3, name:'Grounded', color:'#00c06b', description:'Reset and connect — slow the breath and root into the present.', emoji:'🧘', altDesc:'You feel connected and balanced. Time to pause and stay present.' },
-    { id:2, name:'Drifting', color:'#ffbf3b', description:'Slow down and regain clarity with small clearing practices.', emoji:'☁️', altDesc:'You feel unfocused or distracted. Time to slow down and find clarity.' },
-    { id:1, name:'Surviving', color:'#ff5f6d', description:'Quick resets for focus and energy when things feel intense.', emoji:'⚡', altDesc:'You feel stressed or overwhelmed. Time for quick energy or focus.' }
-  ];
+  // MODES will be loaded from window.MODES by modes-loader.js
+  let MODES = [];
 
-  const QUICK_WINS = {
-    4: [{text:'Try one small new challenge',hint:'Pick something tiny and try it now.'},{text:'Write a short reflection on progress',hint:'Jot one sentence about something you did well.'}],
-    3: [{text:'Plant your feet and do a short stretch',hint:'Stand tall, reach arms up, then slowly lower them.'},{text:'Ground with deliberate breath: 4 4 4',hint:'Breathe in 4, hold 4, breathe out 4. Repeat.'}],
-    2: [{text:'Take 3 deep breaths',hint:'Slowly breathe in, then slowly out, three times.'}],
-    1: [{text:'Take 3 quick breaths',hint:'Quick deep breaths to regain focus.'}]
-  };
+  // QUICK_WINS will be built from loaded modes
+  let QUICK_WINS = {};
 
   // DOM refs (populated after DOMContentLoaded)
   let compassWedges, compassRing, compassContainer, modesGrid, dialogQuickWins, globalQuickWinsList, startQuickWinBtn, startResetBtn, historyDialog, historyDonut, historyStats, historyTimeline, clearHistoryBtn;
@@ -60,10 +52,6 @@
     clearHistoryBtn = $('#clearHistoryBtn');
 
     applySavedTheme();
-    renderModes();
-    safeBuildWedges();
-    safePlaceRingLabels();
-    renderGlobalQuickWins();
     initHistory();
     updateStreakDisplay();
     updateAchievements();
@@ -71,6 +59,41 @@
     initPWAInstall();
     initReviews();
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startArrowLoop();
+    
+    // Wait for modes to load, then render UI
+    if (window.MODES && window.MODES.length > 0) {
+      onModesLoaded();
+    } else {
+      window.addEventListener('modes:loaded', onModesLoaded);
+    }
+  }
+  
+  function onModesLoaded(){
+    // Convert loaded modes to internal format
+    MODES = (window.MODES || []).map(m => ({
+      id: m.id,
+      name: m.title,
+      color: m.color,
+      description: m.description,
+      emoji: getEmojiForMode(m.id),
+      altDesc: m.description,
+      activities: m.activities
+    }));
+    
+    renderModes();
+    safeBuildWedges();
+    safePlaceRingLabels();
+    renderGlobalQuickWins();
+  }
+  
+  function getEmojiForMode(modeId){
+    const emojiMap = {
+      'surviving': '⚡',
+      'drifting': '☁️',
+      'grounded': '🧘',
+      'growing': '🌱'
+    };
+    return emojiMap[modeId] || '✨';
   }
 
   /* Rendering */
@@ -162,6 +185,17 @@
   function renderGlobalQuickWins(){
     if (!globalQuickWinsList) return;
     try {
+      // Build QUICK_WINS from loaded modes
+      QUICK_WINS = {};
+      MODES.forEach(m => {
+        if (m.activities) {
+          QUICK_WINS[m.id] = m.activities.map(a => ({
+            text: a.title,
+            hint: a.explain
+          }));
+        }
+      });
+      
       const all = [];
       Object.values(QUICK_WINS).forEach(arr => arr.forEach(a => { if (!all.find(x=>x.text===a.text)) all.push(a); }));
       globalQuickWinsList.innerHTML = all.map((a, idx) => `
@@ -434,9 +468,9 @@
 
       // ring label or mode-card
       const ringBtn = e.target.closest('.ring-btn[data-mode-id]');
-      if (ringBtn){ openModeDialog(Number(ringBtn.dataset.modeId)); return; }
+      if (ringBtn){ openModeDialog(ringBtn.dataset.modeId); return; }
       const modeCard = e.target.closest('.mode-card[data-mode-id]');
-      if (modeCard){ openModeDialog(Number(modeCard.dataset.modeId)); return; }
+      if (modeCard){ openModeDialog(modeCard.dataset.modeId); return; }
 
       // quick wins select
       const gsel = e.target.closest('.select-global-activity');
@@ -479,7 +513,7 @@
 
   /* Mode dialog flow */
   function openModeDialog(modeId){
-    const m = MODES.find(x => x.id === Number(modeId));
+    const m = MODES.find(x => x.id === modeId || x.id === String(modeId));
     if (!m) return;
     const title = $('#modeDialogTitle'); const desc = $('#dialogModeDescription'); const accent = $('#modeAccent');
     if (title) title.textContent = m.name;

@@ -16,13 +16,15 @@
     overlay.className = 'intro-wrap';
     overlay.innerHTML = `
       <div style="text-align:center;">
-        <div class="compass" role="img" aria-label="Intro compass animation">
-          <img src="assets/compass.svg" alt="" style="width:92%;height:92%;pointer-events:none;display:block;"/>
-          <div class="arrow" aria-hidden="true"></div>
+        <div class="compass" role="img" aria-label="Intro compass animation" style="position:relative;">
+          <img src="assets/images/compass.svg" alt="" style="width:96%;height:96%;pointer-events:none;display:block;opacity:0.3;"/>
+          <div class="arrow" aria-hidden="true" style="animation:arrowSpin 3s ease-in-out infinite;"></div>
         </div>
-        <div style="margin-top:18px;">
-          <button id="replayIntro" class="btn" aria-label="Replay intro">Replay Intro</button>
-          <button id="skipIntro" class="btn" style="margin-left:8px;background:transparent;border:1px solid rgba(255,255,255,0.08)">Skip</button>
+        <div style="margin-top:28px;animation:fadeIn 0.8s ease 1.2s both;">
+          <h2 style="color:var(--glow-accent);margin:0 0 16px 0;font-size:1.8rem;text-shadow:0 0 24px rgba(0,230,166,0.6);">The Reset Compass</h2>
+          <p style="color:var(--brand-contrast);margin:0 0 24px 0;opacity:0.85;">Find your wellness mode and reset</p>
+          <button id="skipIntro" class="btn" style="margin-right:12px;">Get Started</button>
+          <button id="replayIntro" class="btn" aria-label="Replay intro" style="background:rgba(255,255,255,0.05);box-shadow:0 4px 12px rgba(0,0,0,0.3);">Replay</button>
         </div>
       </div>
     `;
@@ -35,23 +37,26 @@
     const overlay = buildIntroOverlay();
     document.documentElement.appendChild(overlay);
     const compassEl = overlay.querySelector('.compass');
+    const arrow = overlay.querySelector('.arrow');
 
-    // initial transform
-    compassEl.style.transform = 'rotate(0deg) scale(.6)';
+    compassEl.style.transform = 'rotate(0deg) scale(.5)';
+    compassEl.style.opacity = '0';
 
-    // spin animation
-    const spin = compassEl.animate([
-      { transform: 'rotate(0deg) scale(.6)' },
-      { transform: 'rotate(1080deg) scale(1.02)' }
-    ], { duration: 1600, easing: 'cubic-bezier(.2,.9,.3,1)' });
+    const introSequence = compassEl.animate([
+      { transform: 'rotate(0deg) scale(.5)', opacity: 0, filter: 'blur(8px)' },
+      { transform: 'rotate(720deg) scale(1.1)', opacity: 1, filter: 'blur(0px)', offset: 0.6 },
+      { transform: 'rotate(1080deg) scale(1)', opacity: 1, filter: 'blur(0px)' }
+    ], { duration: 2400, easing: 'cubic-bezier(.2,.9,.3,1)', fill: 'forwards' });
 
-    spin.onfinish = ()=>{
+    introSequence.onfinish = ()=>{
       overlay.classList.add('fade-in');
-      overlay.animate([{opacity:1},{opacity:0}],{duration:520,delay:240,fill:'forwards'}).onfinish = () => {
-        overlay.classList.add('intro-hidden');
-        overlay.remove();
-        sessionStorage.setItem('introPlayed','true');
-      };
+      setTimeout(() => {
+        overlay.animate([{opacity:1},{opacity:0}],{duration:600,fill:'forwards'}).onfinish = () => {
+          overlay.classList.add('intro-hidden');
+          overlay.remove();
+          sessionStorage.setItem('introPlayed','true');
+        };
+      }, 3000);
     };
 
     overlay.querySelector('#replayIntro').addEventListener('click', ()=>{
