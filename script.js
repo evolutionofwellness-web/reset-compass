@@ -13,6 +13,7 @@
   const REVIEWS_KEY = 'resetCompassReviews';
   const PWA_DISMISSED_KEY = 'resetCompassPWADismissed';
   const ACHIEVEMENTS_KEY = 'resetCompassAchievements';
+  const WELCOME_SHOWN_KEY = 'resetCompassWelcomeShown';
 
   const ACHIEVEMENTS = [
     { id: 'streak_7', name: '7 Day Warrior', emoji: '⚡', threshold: 7, type: 'streak' },
@@ -70,6 +71,7 @@
     wireGlobalHandlers();
     initPWAInstall();
     initReviews();
+    initWelcome();
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startArrowLoop();
   }
 
@@ -309,9 +311,22 @@
     const bumped = incrementStreakIfNeeded();
     if (modeEntries.length > 0) localStorage.setItem(LAST_MODE_DAY_KEY, today);
 
-    showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
+    const encouragementMsg = getRandomEncouragement('activityComplete');
+    showEncouragementToast(encouragementMsg, 3500);
+    
     createCompletionCelebration(entries.length);
     updateAchievements();
+    
+    if (bumped){
+      const streak = Number(localStorage.getItem(STREAK_KEY) || 0);
+      if (streak % 7 === 0 || streak === 3 || streak === 5){
+        setTimeout(() => {
+          const streakMsg = getRandomEncouragement('streakMilestone');
+          showEncouragementToast(streakMsg, 4000);
+        }, 1000);
+      }
+    }
+    
     setTimeout(()=> openHistoryDialog(), 420);
     if (modeEntries.length > 0) setTimeout(()=> showComeBackDialog(), 900);
   }
@@ -322,6 +337,7 @@
     celebration.innerHTML = `
       <div class="completion-icon">✨</div>
       <div class="completion-text">Great work!</div>
+      <div class="completion-subtext">You completed ${count} ${count === 1 ? 'activity' : 'activities'}!</div>
     `;
     document.body.appendChild(celebration);
     
@@ -329,9 +345,27 @@
     setTimeout(() => {
       celebration.classList.remove('visible');
       setTimeout(() => celebration.remove(), 500);
-    }, 2000);
+    }, 2500);
     
     createCompletionParticles();
+    createStarBurst();
+  }
+
+  function createStarBurst(){
+    const stars = ['✨', '⭐', '🌟', '💫'];
+    for(let i = 0; i < 12; i++){
+      const star = document.createElement('div');
+      star.className = 'star-burst';
+      star.textContent = stars[Math.floor(Math.random() * stars.length)];
+      const angle = (Math.PI * 2 * i) / 12;
+      const distance = 150 + Math.random() * 100;
+      star.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+      star.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+      star.style.left = '50%';
+      star.style.top = '50%';
+      document.body.appendChild(star);
+      setTimeout(() => star.remove(), 1500);
+    }
   }
 
   function createCompletionParticles(){
@@ -486,6 +520,9 @@
     if (desc) desc.textContent = m.description;
     if (accent) accent.style.background = m.color;
 
+    const encouragementMsg = getRandomEncouragement('modeSelection');
+    setTimeout(() => showEncouragementToast(encouragementMsg, 2500), 300);
+
     // populate activities
     const locked = (localStorage.getItem(LAST_MODE_DAY_KEY) === todayKey());
     const arr = QUICK_WINS[m.id] || [];
@@ -585,6 +622,69 @@
     function step(){ currentAngle += (targetAngle-currentAngle)*0.12; const el = $('#compassArrow'); if (el) el.style.transform = `translate(-50%,-50%) rotate(${currentAngle}deg)`; if (Math.abs(targetAngle-currentAngle) > 0.01) requestAnimationFrame(step); else anim=false; }
     window.addEventListener('scroll', ()=>requestAnimationFrame(onScroll), {passive:true});
     onScroll();
+  }
+
+  /* Welcome Experience */
+  function initWelcome(){
+    const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY);
+    const welcomeDialog = $('#welcomeDialog');
+    const startJourneyBtn = $('#startJourneyBtn');
+    
+    if (!welcomeShown && welcomeDialog){
+      setTimeout(() => {
+        safeShowDialog(welcomeDialog);
+      }, 800);
+    }
+    
+    if (startJourneyBtn){
+      startJourneyBtn.addEventListener('click', () => {
+        localStorage.setItem(WELCOME_SHOWN_KEY, 'true');
+        safeCloseDialog(welcomeDialog);
+        showEncouragementToast('Great! Pick a mode below to begin your first reset');
+      });
+    }
+  }
+
+  /* Encouragement Messages */
+  const ENCOURAGEMENTS = {
+    modeSelection: [
+      "You've got this! Choose the mode that feels right",
+      "Great choice! Now pick an activity that resonates",
+      "Perfect! You're one step closer to your wellness goal"
+    ],
+    activityComplete: [
+      "Amazing work! You're building positive momentum",
+      "Fantastic! Your mind and body thank you",
+      "Well done! Every small step counts",
+      "Excellent! You're investing in yourself",
+      "Great job! Feel that positive energy"
+    ],
+    streakMilestone: [
+      "Incredible! Your consistency is inspiring",
+      "You're on fire! Keep that streak alive",
+      "Outstanding dedication to your wellness journey"
+    ]
+  };
+
+  function showEncouragementToast(message, duration = 3000){
+    const toast = document.createElement('div');
+    toast.className = 'encouragement-toast';
+    toast.innerHTML = `
+      <div class="encouragement-icon">✨</div>
+      <div class="encouragement-text">${escapeHtml(message)}</div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('visible'), 50);
+    setTimeout(() => {
+      toast.classList.remove('visible');
+      setTimeout(() => toast.remove(), 400);
+    }, duration);
+  }
+
+  function getRandomEncouragement(type){
+    const messages = ENCOURAGEMENTS[type] || [];
+    return messages[Math.floor(Math.random() * messages.length)];
   }
 
   /* PWA Install */
