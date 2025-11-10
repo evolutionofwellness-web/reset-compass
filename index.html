@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="The Reset Compass - Find your wellness mode and choose a short activity to reset" />
   <meta name="theme-color" content="#0B3D2E" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Reset Compass" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="assets/images/compass-192.png" />
   <title>The Reset Compass</title>
 
   <!-- Adsense (kept per previous requests) -->
@@ -12,11 +17,14 @@
      crossorigin="anonymous"></script>
 
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/cinematic.css" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="assets/images/compass.svg" />
 
-  <script src="js/modes-loader.js" defer></script>
   <script src="script.js" defer></script>
+  <script src="js/modes-loader.js" defer></script>
+  <script src="js/modes-ui.js" defer></script>
+  <script src="js/intro.js" defer></script>
 </head>
 <body class="page-compass">
   <header class="app-header" role="banner">
@@ -106,7 +114,14 @@
       <div class="ad-slot" aria-label="Advertisement">
         <p class="ad-placeholder">Ad Placeholder</p>
       </div>
-      <p class="footer-text"><small>&copy; 2025 Evolution of Wellness — The Reset Compass</small></p>
+      <div class="footer-legal">
+        <p class="footer-text"><small>&copy; 2025 Evolution of Wellness — The Reset Compass</small></p>
+        <div class="footer-links">
+          <button class="footer-link" data-action="privacy-policy">Privacy Policy</button>
+          <span class="footer-separator">•</span>
+          <button class="footer-link" data-action="terms">Terms of Service</button>
+        </div>
+      </div>
     </footer>
   </main>
 
@@ -275,6 +290,82 @@
         <div id="reviewsList" class="reviews-list">
           <p class="no-reviews">No reviews yet. Be the first to review!</p>
         </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- PRIVACY POLICY DIALOG -->
+  <dialog id="privacyDialog" class="mode-dialog" aria-labelledby="privacyTitle">
+    <div class="dialog-content">
+      <button class="dialog-close" aria-label="Close dialog">&times;</button>
+      <h2 id="privacyTitle">Privacy Policy</h2>
+      <div class="legal-content">
+        <p><strong>Last Updated:</strong> January 2025</p>
+        
+        <h3>Data We Collect</h3>
+        <p>The Reset Compass stores minimal data locally on your device using browser storage (localStorage). This includes:</p>
+        <ul>
+          <li>Your reset history (activities completed, dates, and optional notes)</li>
+          <li>Daily streak count and longest streak</li>
+          <li>Theme preference (light or dark mode)</li>
+          <li>Last mode completion date</li>
+          <li>Achievement progress</li>
+          <li>Reviews you submit (stored locally and optionally sent to our server)</li>
+        </ul>
+        
+        <h3>How We Use Your Data</h3>
+        <p>All data is stored locally on your device and is used solely to enhance your experience with the app. We do not transmit your personal wellness data to external servers. Reviews you choose to submit may be stored on our servers to display to other users.</p>
+        
+        <h3>Data Sharing</h3>
+        <p>We do not sell, trade, or otherwise transfer your personal information to third parties. The app uses Google AdSense for advertisements, which may collect anonymous usage data according to Google's privacy policy.</p>
+        
+        <h3>Your Rights</h3>
+        <p>You can clear your local data at any time using the "Clear History" button in the History dialog. This will permanently delete all locally stored wellness data.</p>
+        
+        <h3>Contact</h3>
+        <p>If you have questions about this Privacy Policy, please use the "Send Feedback" feature in the app menu.</p>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn-primary dialog-close">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- TERMS OF SERVICE DIALOG -->
+  <dialog id="termsDialog" class="mode-dialog" aria-labelledby="termsTitle">
+    <div class="dialog-content">
+      <button class="dialog-close" aria-label="Close dialog">&times;</button>
+      <h2 id="termsTitle">Terms of Service</h2>
+      <div class="legal-content">
+        <p><strong>Last Updated:</strong> January 2025</p>
+        
+        <h3>Acceptance of Terms</h3>
+        <p>By accessing and using The Reset Compass, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use this application.</p>
+        
+        <h3>Medical Disclaimer</h3>
+        <p><strong>Important:</strong> The Reset Compass is designed for wellness and self-care guidance only. It is not intended to be medical advice, diagnosis, or treatment. This app should not replace professional medical consultation or mental health care.</p>
+        <p>If you are experiencing a medical or mental health emergency, please contact emergency services or a qualified healthcare provider immediately.</p>
+        
+        <h3>Use of the Service</h3>
+        <p>You agree to use The Reset Compass only for lawful purposes and in accordance with these Terms. The activities and suggestions provided are for general wellness purposes and may not be suitable for everyone.</p>
+        
+        <h3>Intellectual Property</h3>
+        <p>The content, features, and functionality of The Reset Compass are owned by Evolution of Wellness and are protected by copyright, trademark, and other intellectual property laws.</p>
+        
+        <h3>Limitation of Liability</h3>
+        <p>Evolution of Wellness shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the service. You acknowledge that you are responsible for your own health decisions.</p>
+        
+        <h3>Changes to Terms</h3>
+        <p>We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting. Your continued use of the app constitutes acceptance of any changes.</p>
+        
+        <h3>Governing Law</h3>
+        <p>These Terms shall be governed by and construed in accordance with the laws of the United States, without regard to its conflict of law provisions.</p>
+        
+        <h3>Contact</h3>
+        <p>Questions about these Terms should be sent using the "Send Feedback" feature in the app menu.</p>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn-primary dialog-close">Close</button>
       </div>
     </div>
   </dialog>

@@ -1,0 +1,23 @@
+{
+  "passed": [
+    "Console contains \"modes loaded\"",
+    "Mode grid element (#modesGrid) exists",
+    "Mode cards rendered (found 4)",
+    "Mode dialog opens on card click",
+    "Intro overlay appears on first visit",
+    "Intro overlay fades out after animation",
+    "No uncaught exceptions in console",
+    "No network 4xx/5xx for required files"
+  ],
+  "failed": [
+    {
+      "test": "Activity click toggles checkbox",
+      "reason": "Checkbox not checked after click"
+    },
+    {
+      "test": "Complete Selected button",
+      "reason": "Button not enabled or not found"
+    }
+  ],
+  "errors": []
+}

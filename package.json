@@ -6,7 +6,15 @@
   "scripts": {
     "test": "echo \"No tests specified yet\""
   },
-  "keywords": ["wellness", "reset", "modes"],
+  "keywords": [
+    "wellness",
+    "reset",
+    "modes"
+  ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "puppeteer": "^24.29.1"
+  }
 }
