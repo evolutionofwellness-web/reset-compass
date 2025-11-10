@@ -61,7 +61,7 @@
     clearHistoryBtn = $('#clearHistoryBtn');
 
     applySavedTheme();
-    renderModes();
+    // renderModes(); // Disabled - modes-ui.js handles this from JSON
     safeBuildWedges();
     safePlaceRingLabels();
     renderGlobalQuickWins();
@@ -73,6 +73,12 @@
     initReviews();
     initWelcome();
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startArrowLoop();
+    
+    // Rebuild compass when modes are loaded
+    document.addEventListener('modes:loaded', () => {
+      safeBuildWedges();
+      safePlaceRingLabels();
+    });
   }
 
   /* Rendering */
@@ -110,7 +116,9 @@
 
   function buildWedgesAndSeparators(){
     if (!compassWedges) return;
-    const N = MODES.length;
+    // Use dynamic modes if available, otherwise fall back to hardcoded
+    const modesData = (window.MODES && window.MODES.length > 0) ? window.MODES : MODES;
+    const N = modesData.length;
     const portion = 360 / N;
     const gap = 0.8;
     const parts = [];
@@ -118,7 +126,7 @@
       const start = +(i*portion).toFixed(3);
       const end = +((i+1)*portion).toFixed(3);
       const wedgeEnd = end - gap;
-      const color = MODES[i].color;
+      const color = modesData[i].color;
       parts.push(`${color} ${start}deg ${wedgeEnd}deg`);
       parts.push(`rgba(0,0,0,0.36) ${wedgeEnd}deg ${end}deg`);
     }
@@ -138,10 +146,12 @@
   function placeRingLabels(){
     if (!compassRing || !compassContainer) return;
     compassRing.innerHTML = '';
+    // Use dynamic modes if available, otherwise fall back to hardcoded
+    const modesData = (window.MODES && window.MODES.length > 0) ? window.MODES : MODES;
     const rect = compassContainer.getBoundingClientRect();
     const cx = rect.width/2, cy = rect.height/2, radius = Math.min(cx, cy);
-    const portion = 360 / MODES.length;
-    MODES.forEach((m, idx) => {
+    const portion = 360 / modesData.length;
+    modesData.forEach((m, idx) => {
       const centerAngle = ((idx + 0.5) * portion) - 45;
       const rad = (centerAngle - 90) * (Math.PI / 180);
       const rFactor = 0.58;
@@ -152,7 +162,8 @@
       btn.type = 'button';
       btn.className = 'ring-btn';
       btn.dataset.modeId = m.id;
-      btn.innerHTML = `<span class="ring-label">${escapeHtml(m.name)}</span>`;
+      const modeName = m.title || m.name || 'Mode';
+      btn.innerHTML = `<span class="ring-label">${escapeHtml(modeName)}</span>`;
       btn.style.left = `${left}px`;
       btn.style.top = `${top}px`;
       btn.style.background = `linear-gradient(180deg, ${m.color}DD, rgba(0,0,0,0.08))`;
@@ -513,7 +524,64 @@
 
   /* Mode dialog flow */
   function openModeDialog(modeId){
-    const m = MODES.find(x => x.id === Number(modeId));
+    // Support both string IDs from JSON and numeric IDs from legacy code
+    const dynamicModes = window.MODES || [];
+    let m = null;
+    
+    // Try to find in dynamically loaded modes first
+    if (dynamicModes.length > 0) {
+      m = dynamicModes.find(x => x.id === modeId || x.id === String(modeId));
+      
+      if (m) {
+        const title = $('#modeDialogTitle'); 
+        const desc = $('#dialogModeDescription'); 
+        const accent = $('#modeAccent');
+        if (title) title.textContent = m.title;
+        if (desc) desc.textContent = m.description;
+        if (accent) accent.style.background = m.color;
+
+        const encouragementMsg = getRandomEncouragement('modeSelection');
+        setTimeout(() => showEncouragementToast(encouragementMsg, 2500), 300);
+
+        // populate activities from JSON
+        const locked = (localStorage.getItem(LAST_MODE_DAY_KEY) === todayKey());
+        const activities = m.activities || [];
+        if (!dialogQuickWins) return;
+        dialogQuickWins.innerHTML = activities.map((a, idx) => `
+          <li style="animation-delay: ${idx * 0.05}s">
+            <div class="activity-row">
+              <div style="max-width:70%">${escapeHtml(a.title)}<div class="activity-instruction">${escapeHtml(a.explain)}</div></div>
+              <div><button class="select-activity" data-activity="${escapeHtml(a.title)}">${locked ? 'Locked' : 'Select'}</button></div>
+            </div>
+            <textarea class="activity-note" data-activity="${escapeHtml(a.title)}" placeholder="Notes (optional)" hidden></textarea>
+          </li>
+        `).join('');
+
+        if (startResetBtn) startResetBtn.disabled = true;
+
+        // wire startResetBtn
+        if (startResetBtn){
+          startResetBtn.onclick = function(){
+            const selected = Array.from(dialogQuickWins.querySelectorAll('.select-activity.active'));
+            if (!selected.length) return;
+            if (localStorage.getItem(LAST_MODE_DAY_KEY) === todayKey()){ showComeBackDialog(); return; }
+            const records = selected.map(b => { 
+              const ta = b.closest('li').querySelector('.activity-note'); 
+              return { modeId: m.id, modeName: m.title, modeColor: m.color, action: b.dataset.activity, note: ta ? (ta.value||'').trim() : '' }; 
+            });
+            recordActivities(records);
+            safeCloseDialog($('#modeDialog'));
+            clearDialogSelections();
+          };
+        }
+
+        safeShowDialog($('#modeDialog'));
+        return;
+      }
+    }
+    
+    // Fall back to hardcoded modes if dynamic modes not available
+    m = MODES.find(x => x.id === Number(modeId));
     if (!m) return;
     const title = $('#modeDialogTitle'); const desc = $('#dialogModeDescription'); const accent = $('#modeAccent');
     if (title) title.textContent = m.name;
