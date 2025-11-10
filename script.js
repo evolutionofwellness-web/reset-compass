@@ -806,7 +806,8 @@
     }
     
     reviewsList.innerHTML = reviews.slice(0, 10).map(r => {
-      const stars = '★'.repeat(Number(r.rating)) + '☆'.repeat(5 - Number(r.rating));
+      const rating = Math.max(0, Math.min(5, Number(r.rating) || 0));
+      const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
       const date = new Date(r.date).toLocaleDateString();
       return `
         <div class="review-item">
