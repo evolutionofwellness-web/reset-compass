@@ -1,25 +1,14 @@
 {
   "modes": [
     {
-      "id": "surviving",
-      "title": "Surviving",
-      "description": "Quick fixes to just get through the moment.",
-      "color": "#FF5F6D",
+      "id": "growing",
+      "title": "Growing",
+      "description": "Boost your mood and energy with small wins.",
+      "color": "#2E7FE8",
       "activities": [
-        {"id":"breathe","title":"3 Deep Breaths","icon":"assets/icons/breathe.svg","explain":"Slow breaths to calm your body.","duration":60},
-        {"id":"sip","title":"Have a Sip","icon":"assets/icons/water.svg","explain":"Take a small drink of water.","duration":30},
-        {"id":"sit","title":"Sit Quiet","icon":"assets/icons/sit.svg","explain":"Sit still for one minute, eyes open.","duration":60}
-      ]
-    },
-    {
-      "id": "drifting",
-      "title": "Drifting",
-      "description": "Gentle resets to float back into focus.",
-      "color": "#FFBF3B",
-      "activities": [
-        {"id":"walk","title":"Short Walk","icon":"assets/icons/walk.svg","explain":"Walk for 3–5 minutes nearby.","duration":300},
-        {"id":"music","title":"Play a Song","icon":"assets/icons/music.svg","explain":"Choose a feel-good short song.","duration":180},
-        {"id":"stretch","title":"Quick Stretch","icon":"assets/icons/stretch.svg","explain":"Stretch arms and neck slowly.","duration":90}
+        {"id":"tinywin","title":"Tiny Win","icon":"assets/icons/tinywin.svg","explain":"Do one small task you can finish now.","duration":300},
+        {"id":"journal","title":"Write 2 Lines","icon":"assets/icons/journal.svg","explain":"Write two lines about one good thing.","duration":180},
+        {"id":"compliment","title":"Give a Compliment","icon":"assets/icons/compliment.svg","explain":"Tell someone something nice.","duration":60}
       ]
     },
     {
@@ -34,14 +23,25 @@
       ]
     },
     {
-      "id": "growing",
-      "title": "Growing",
-      "description": "Boost your mood and energy with small wins.",
-      "color": "#2E7FE8",
+      "id": "drifting",
+      "title": "Drifting",
+      "description": "Gentle resets to float back into focus.",
+      "color": "#FFBF3B",
       "activities": [
-        {"id":"tinywin","title":"Tiny Win","icon":"assets/icons/tinywin.svg","explain":"Do one small task you can finish now.","duration":300},
-        {"id":"journal","title":"Write 2 Lines","icon":"assets/icons/journal.svg","explain":"Write two lines about one good thing.","duration":180},
-        {"id":"compliment","title":"Give a Compliment","icon":"assets/icons/compliment.svg","explain":"Tell someone something nice.","duration":60}
+        {"id":"walk","title":"Short Walk","icon":"assets/icons/walk.svg","explain":"Walk for 3–5 minutes nearby.","duration":300},
+        {"id":"music","title":"Play a Song","icon":"assets/icons/music.svg","explain":"Choose a feel-good short song.","duration":180},
+        {"id":"stretch","title":"Quick Stretch","icon":"assets/icons/stretch.svg","explain":"Stretch arms and neck slowly.","duration":90}
+      ]
+    },
+    {
+      "id": "surviving",
+      "title": "Surviving",
+      "description": "Quick fixes to just get through the moment.",
+      "color": "#FF5F6D",
+      "activities": [
+        {"id":"breathe","title":"3 Deep Breaths","icon":"assets/icons/breathe.svg","explain":"Slow breaths to calm your body.","duration":60},
+        {"id":"sip","title":"Have a Sip","icon":"assets/icons/water.svg","explain":"Take a small drink of water.","duration":30},
+        {"id":"sit","title":"Sit Quiet","icon":"assets/icons/sit.svg","explain":"Sit still for one minute, eyes open.","duration":60}
       ]
     }
   ]
