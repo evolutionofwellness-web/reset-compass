@@ -22,7 +22,7 @@
         </div>
         <div style="margin-top:18px;">
           <button id="replayIntro" class="btn" aria-label="Replay intro">Replay Intro</button>
-          <button id="skipIntro" class="btn" style="margin-left:8px;background:transparent;border:1px solid rgba(255,255,255,0.08)>Skip</button>
+          <button id="skipIntro" class="btn" style="margin-left:8px;background:transparent;border:1px solid rgba(255,255,255,0.08)">Skip</button>
         </div>
       </div>
     `;
