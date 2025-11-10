@@ -1,4 +1,4 @@
-// intro.js — Cinematic intro overlay
+// intro.js - Cinematic intro overlay
 // Shows on first visit per session (respects prefers-reduced-motion)
 
 (function(){

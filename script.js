@@ -1,4 +1,4 @@
-// script.js — hardened, defensive, and with safe fallbacks.
+// script.js - hardened, defensive, and with safe fallbacks.
 // Keeps UI rendering even if an enhancement fails.
 
 (function(){
@@ -144,7 +144,7 @@
       parts.push(`rgba(0,0,0,0.36) ${wedgeEnd}deg ${end}deg`);
     }
     compassWedges.style.background = `conic-gradient(from -45deg, ${parts.join(',')})`;
-    compassWedges.style.filter = 'saturate(1.08) contrast(1.03)';
+    compassWedges.style.filter = 'saturate(1.3) contrast(1.15) brightness(1.1)';
   }
 
   function safePlaceRingLabels(){
@@ -772,7 +772,7 @@
   window.__rc = { buildWedgesAndSeparators, placeRingLabels, openModeDialog, recordActivities };
 
   // global error listener to avoid total breakage
-  window.addEventListener('error', function(ev){ console.error('Unhandled error', ev.error || ev.message); showToast('An unexpected error occurred — UI fallback applied'); }, true);
+  window.addEventListener('error', function(ev){ console.error('Unhandled error', ev.error || ev.message); showToast('An unexpected error occurred. UI fallback applied'); }, true);
 
 })();
 

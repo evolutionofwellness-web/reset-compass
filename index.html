@@ -29,7 +29,7 @@
 <body class="page-compass">
   <header class="app-header" role="banner">
     <div class="app-header-top">
-      <a class="home-link" id="homeBtn" href="./index.html" data-action="home" aria-label="Home — Reset Compass">
+      <a class="home-link" id="homeBtn" href="./index.html" data-action="home" aria-label="Home - Reset Compass">
         <h1 class="app-title">The Reset Compass</h1>
       </a>
 
@@ -94,8 +94,37 @@
 
       <div class="mode-grid" id="modesGrid" role="list" aria-live="polite"></div>
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
-        <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">⚡ Quick Wins</button>
-        <p class="quick-wins-note">Quick Wins are one-step actions you can do immediately to shift your focus, energy, or mood. Tap a Quick Win to complete it fast. (No daily limit.)</p>
+        <div class="quick-wins-header">
+          <div class="quick-wins-icon">⚡</div>
+          <div class="quick-wins-title-section">
+            <h3 class="quick-wins-title">Quick Wins</h3>
+            <p class="quick-wins-subtitle">Tiny actions. Instant impact.</p>
+          </div>
+        </div>
+        <p class="quick-wins-description">
+          Feeling stuck? Overwhelmed? Sometimes all it takes is <strong>one small action</strong> to break the cycle. 
+          Quick Wins are powerful micro-moments designed to shift your energy, lift your mood, or refocus your mind <em>right now</em>.
+        </p>
+        <div class="quick-wins-features">
+          <div class="quick-win-feature">
+            <span class="feature-icon">🎯</span>
+            <span class="feature-text">Takes less than 2 minutes</span>
+          </div>
+          <div class="quick-win-feature">
+            <span class="feature-icon">💫</span>
+            <span class="feature-text">Instant mood boost</span>
+          </div>
+          <div class="quick-win-feature">
+            <span class="feature-icon">♾️</span>
+            <span class="feature-text">Use anytime, no limit</span>
+          </div>
+        </div>
+        <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">
+          <span class="cta-icon">⚡</span>
+          <span class="cta-text">Choose Your Quick Win</span>
+          <span class="cta-arrow">→</span>
+        </button>
+        <p class="quick-wins-encouragement">You deserve this moment. Take it.</p>
       </div>
 
       <div class="rate-cta-card" onclick="document.querySelector('[data-action=ratings-reviews]').click()">
@@ -115,7 +144,7 @@
         <p class="ad-placeholder">Ad Placeholder</p>
       </div>
       <div class="footer-legal">
-        <p class="footer-text"><small>&copy; 2025 Evolution of Wellness — The Reset Compass</small></p>
+        <p class="footer-text"><small>&copy; 2025 Evolution of Wellness - The Reset Compass</small></p>
         <div class="footer-links">
           <button class="footer-link" data-action="privacy-policy">Privacy Policy</button>
           <span class="footer-separator">•</span>
@@ -190,7 +219,7 @@
   <dialog id="comeBackDialog" class="mode-dialog" aria-labelledby="comeBackTitle">
     <div class="dialog-content">
       <h2 id="comeBackTitle">Nice work!</h2>
-      <p id="comeBackMsg">You've completed a mode today — come back tomorrow to continue your streak. Quick Wins are still available anytime.</p>
+      <p id="comeBackMsg">You've completed a mode today. Come back tomorrow to continue your streak. Quick Wins are still available anytime.</p>
       <div class="dialog-actions">
         <button class="btn-primary dialog-close">OK</button>
       </div>

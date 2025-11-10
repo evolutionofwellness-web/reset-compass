@@ -1,4 +1,4 @@
-// modes-ui.js — UI rendering for mode cards and compass visuals
+// modes-ui.js - UI rendering for mode cards and compass visuals
 // Listens for 'modes:loaded' event and renders the UI
 // Separated from modes-loader.js to keep data loading distinct from UI
 // This file acts as a middleware layer ensuring proper script execution order
