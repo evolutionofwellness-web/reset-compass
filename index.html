@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="The Reset Compass - Find your wellness mode and choose a short activity to reset" />
-  <meta name="theme-color" content="#00AFA0" />
+  <meta name="theme-color" content="#0B3D2E" />
   <title>The Reset Compass</title>
 
   <!-- Adsense (kept per previous requests) -->
@@ -17,11 +17,9 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="assets/images/compass.svg" />
 
+  <script src="js/modes-loader.js" defer></script>
   <script src="script.js" defer></script>
-  <!-- paste after: <script src="script.js" defer></script> -->
-<script src="js/modes-loader.js" defer></script>
-<script src="js/modes-ui.js" defer></script>
-<script src="js/intro.js" defer></script>
+  <script src="js/intro.js" defer></script>
 </head>
 <body class="page-compass">
   <header class="app-header" role="banner">
@@ -89,9 +87,7 @@
     <section class="page-section page-section--modes" aria-label="Wellness Modes">
       <h2 class="section-title">Choose Your Mode</h2>
 
-      <div class="modes-grid" id="modesGrid" role="list" aria-live="polite"></div>
-<!-- optional: paste this where you want the modes grid -->
-<div id="modes-root"></div>
+      <div class="mode-grid" id="modesGrid" role="list" aria-live="polite"></div>
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
         <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">⚡ Quick Wins</button>
         <p class="quick-wins-note">Quick Wins are one-step actions you can do immediately to shift your focus, energy, or mood. Tap a Quick Win to complete it fast. (No daily limit.)</p>
