@@ -599,18 +599,11 @@
   function safeShowDialog(d){
     if (!d) return;
     try {
-      // Lock body scroll
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
-      
       d.classList.add('page-transition-enter');
       setTimeout(() => d.classList.remove('page-transition-enter'), 400);
       if (typeof d.showModal === 'function') d.showModal();
       else { d.setAttribute('open',''); d.style.display='block'; }
       
-      // Scroll dialog content to top when opened
       d.scrollTop = 0;
       const scrollableContent = d.querySelector('.dialog-content, .mode-activities, .quick-wins-list, .history-timeline');
       if (scrollableContent) {
@@ -630,12 +623,6 @@
         d.classList.remove('page-transition-out');
         if (typeof d.close === 'function' && d.open) d.close();
         else { d.removeAttribute('open'); d.style.display='none'; }
-        
-        // Unlock body scroll
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
-        document.body.style.height = '';
       }, 300);
     } catch(e){ console.warn('safeCloseDialog', e); }
   }
