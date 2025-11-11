@@ -10,7 +10,18 @@
   function $(sel) { return document.querySelector(sel); }
   function $all(sel) { return Array.from(document.querySelectorAll(sel)); }
 
+  function setViewportHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
+
   function init() {
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(setViewportHeight, 100);
+    });
+
     const btnNext = $('#btnNext');
     const btnSkip = $('#btnSkip');
     const btnGetStarted = $('#btnGetStarted');
