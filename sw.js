@@ -1,5 +1,5 @@
 // Service Worker for The Reset Compass
-const CACHE_VERSION = 'reset-compass-v2.0.0';
+const CACHE_VERSION = 'reset-compass-v2.0.2';
 const CACHE_NAME = `${CACHE_VERSION}`;
 
 // Files to cache on install

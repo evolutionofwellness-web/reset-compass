@@ -1,10 +1,12 @@
 /* cinematic.css - Intro overlay and cinematic animations */
 
-/* Intro Overlay */
-.intro-overlay {
+/* Intro Overlay - ONLY for compass page */
+.page-compass .intro-overlay {
   position: fixed;
   inset: 0;
-  z-index: 10000;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
   background: linear-gradient(135deg, rgba(10, 14, 12, 0.98), rgba(11, 61, 46, 0.95));
   display: flex;
   align-items: center;
@@ -16,14 +18,11 @@
   overscroll-behavior: contain;
 }
 
-body:has(.intro-overlay) {
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-  height: 100%;
+body.page-compass:has(.intro-overlay) {
+  overflow: hidden !important;
 }
 
-.intro-overlay.fade-out {
+.page-compass .intro-overlay.fade-out {
   opacity: 0;
   pointer-events: none;
 }
