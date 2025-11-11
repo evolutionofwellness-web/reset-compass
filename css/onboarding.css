@@ -3,18 +3,16 @@
 body.page-onboarding {
   background: var(--bg-primary);
   overflow: hidden;
+  width: 100%;
   height: 100vh;
   height: 100dvh;
-  min-height: -webkit-fill-available;
-  width: 100vw;
-  width: 100%;
-  margin: 0;
-  padding: 0;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  margin: 0;
+  padding: 0;
   -webkit-overflow-scrolling: touch;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -24,37 +22,37 @@ body.page-onboarding {
 body.page-onboarding::before {
   content: '';
   position: fixed;
-  inset: -50px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
-  z-index: -1;
-  width: calc(100vw + 100px);
-  height: calc(100vh + 100px);
-  min-width: calc(100vw + 100px);
-  min-height: calc(100vh + 100px);
+  z-index: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .onboarding-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-  min-height: -webkit-fill-available;
-  width: 100vw;
   width: 100%;
-  margin: 0;
-  padding: 0;
-  position: fixed;
+  height: 100%;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   background: transparent;
   z-index: 1;
 }
 
 .onboarding-progress {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
@@ -80,7 +78,7 @@ body.page-onboarding::before {
   position: relative;
   overflow: hidden;
   width: 100%;
-  padding: 1rem 1rem 6rem;
+  padding: 1rem 1rem calc(6rem + env(safe-area-inset-bottom));
   min-height: 0;
 }
 
@@ -559,12 +557,11 @@ body.page-onboarding::before {
   }
   
   .onboarding-container {
-    height: 100vh;
-    height: 100dvh;
+    height: 100%;
   }
   
   .onboarding-slides {
-    padding: 0.75rem 0.75rem 5rem;
+    padding: 0.75rem 0.75rem calc(5rem + env(safe-area-inset-bottom));
   }
   
   .slide-content {
