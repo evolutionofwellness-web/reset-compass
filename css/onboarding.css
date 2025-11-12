@@ -521,6 +521,22 @@ body.page-onboarding::before {
   transform: none;
 }
 
+.btn-back {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.3);
+  display: none;
+}
+
+.btn-back.visible {
+  display: block;
+}
+
+.btn-back:hover {
+  background: linear-gradient(135deg, rgba(0,230,166,0.15), rgba(46,127,232,0.1));
+  border-color: rgba(0,230,166,0.4);
+}
+
 .btn-next {
   background: linear-gradient(135deg, #00E6A6, #2E7FE8);
   color: #041018;

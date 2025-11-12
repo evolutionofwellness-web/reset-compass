@@ -115,7 +115,7 @@
           <div class="mode-meta">
             <div class="mode-name">${escapeHtml(m.name)}</div>
             <div class="mode-desc">${escapeHtml(m.altDesc)}</div>
-            <div class="mode-hint">Tap to open activities</div>
+            <div class="mode-hint">👆 Tap to see activities</div>
           </div>
         </button>
       `).join('');
@@ -211,9 +211,9 @@
         <li style="animation-delay: ${idx * 0.05}s">
           <div class="activity-row">
             <div style="max-width:70%">${escapeHtml(a.text)}<div class="activity-instruction">${escapeHtml(a.hint)}</div></div>
-            <div><button class="select-global-activity" data-activity="${escapeHtml(a.text)}">Select</button></div>
+            <div><button class="select-global-activity" data-activity="${escapeHtml(a.text)}">✓ Select</button></div>
           </div>
-          <textarea class="activity-note" data-activity="${escapeHtml(a.text)}" placeholder="Notes (optional)" hidden></textarea>
+          <textarea class="activity-note" data-activity="${escapeHtml(a.text)}" placeholder="Add notes (optional)" hidden></textarea>
         </li>
       `).join('');
       if (startQuickWinBtn) startQuickWinBtn.disabled = true;
@@ -571,9 +571,9 @@
       <li style="animation-delay: ${idx * 0.05}s">
         <div class="activity-row">
           <div style="max-width:70%">${escapeHtml(a.text)}<div class="activity-instruction">${escapeHtml(a.hint)}</div></div>
-          <div><button class="select-activity" data-activity="${escapeHtml(a.text)}">${locked ? 'Locked' : 'Select'}</button></div>
+          <div><button class="select-activity" data-activity="${escapeHtml(a.text)}">${locked ? '🔒 Locked' : '✓ Select'}</button></div>
         </div>
-        <textarea class="activity-note" data-activity="${escapeHtml(a.text)}" placeholder="Notes (optional)" hidden></textarea>
+        <textarea class="activity-note" data-activity="${escapeHtml(a.text)}" placeholder="Add notes (optional)" hidden></textarea>
       </li>
     `).join('');
 
@@ -684,15 +684,59 @@
     const banner = $('#pwaInstallBanner');
     const installBtn = $('#pwaInstallBtn');
     const dismissBtn = $('#pwaDismissBtn');
+    const stickyBtn = $('#stickyInstallBtn');
     
     if (!banner || !installBtn || !dismissBtn) return;
+    
+    let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    let isAndroid = /Android/.test(navigator.userAgent);
+    let isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                      window.navigator.standalone || 
+                      document.referrer.includes('android-app://');
     
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       const dismissed = localStorage.getItem(PWA_DISMISSED_KEY);
       if (!dismissed) banner.style.display = 'flex';
+      
+      if (!isStandalone && stickyBtn) {
+        setTimeout(() => {
+          stickyBtn.classList.add('show');
+        }, 3000);
+      }
     });
+    
+    if (stickyBtn) {
+      if (isIOS && !isStandalone) {
+        setTimeout(() => {
+          stickyBtn.classList.add('show');
+          stickyBtn.innerHTML = '<span class="icon">📱</span><span>Add to Home</span>';
+        }, 3000);
+      } else if (isAndroid && !isStandalone && !deferredPrompt) {
+        setTimeout(() => {
+          stickyBtn.classList.add('show');
+        }, 3000);
+      }
+      
+      stickyBtn.addEventListener('click', async () => {
+        if (isIOS) {
+          showIOSInstructions();
+        } else if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const result = await deferredPrompt.userChoice;
+          if (result.outcome === 'accepted') {
+            showToast('Thanks for installing!');
+            stickyBtn.classList.remove('show');
+          }
+          deferredPrompt = null;
+        } else if (isAndroid) {
+          showAndroidInstructions();
+        } else {
+          showToast('Open this site on your phone to install');
+        }
+      });
+    }
     
     installBtn.addEventListener('click', async () => {
       if (!deferredPrompt) return;
@@ -711,7 +755,44 @@
     window.addEventListener('appinstalled', () => {
       showToast('The Reset Compass installed successfully!');
       banner.style.display = 'none';
+      if (stickyBtn) stickyBtn.classList.remove('show');
     });
+  }
+  
+  function showIOSInstructions(){
+    const dialog = document.createElement('dialog');
+    dialog.className = 'mode-dialog';
+    dialog.innerHTML = `
+      <div class="dialog-content">
+        <button class="dialog-close" aria-label="Close dialog">&times;</button>
+        <h2>📱 Add to Home Screen</h2>
+        <p class="mode-description">Tap the Share button <strong>📤</strong> in your browser, then scroll down and tap <strong>"Add to Home Screen"</strong>.</p>
+        <div class="dialog-actions">
+          <button class="btn-primary dialog-close">Got it</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(dialog);
+    safeShowDialog(dialog);
+    dialog.addEventListener('close', () => dialog.remove());
+  }
+  
+  function showAndroidInstructions(){
+    const dialog = document.createElement('dialog');
+    dialog.className = 'mode-dialog';
+    dialog.innerHTML = `
+      <div class="dialog-content">
+        <button class="dialog-close" aria-label="Close dialog">&times;</button>
+        <h2>📱 Add to Home Screen</h2>
+        <p class="mode-description">Tap the menu button <strong>⋮</strong> in your browser, then tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong>.</p>
+        <div class="dialog-actions">
+          <button class="btn-primary dialog-close">Got it</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(dialog);
+    safeShowDialog(dialog);
+    dialog.addEventListener('close', () => dialog.remove());
   }
 
   /* Reviews & Ratings */
