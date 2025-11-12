@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="The Reset Compass - Find your wellness mode and choose a short activity to reset" />
+  <meta name="description" content="The Reset Compass - Find your wellness mode and choose a short activity to reset your focus, energy, or mood. Track daily streaks and build healthy habits." />
   <meta name="theme-color" content="#0B3D2E" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -27,6 +27,7 @@
   <script src="js/intro.js?v=9" defer></script>
 </head>
 <body class="page-compass">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <header class="app-header" role="banner">
     <div class="app-header-top">
       <a class="home-link" id="homeBtn" href="./index.html" data-action="home" aria-label="Home - Reset Compass">
@@ -46,7 +47,7 @@
     </div>
   </header>
 
-  <main class="main-content">
+  <main class="main-content" id="main-content">
     <!-- PWA INSTALL BANNER -->
     <div id="pwaInstallBanner" class="pwa-banner" style="display:none;" role="alert">
       <div class="pwa-banner-content">
@@ -106,7 +107,7 @@
     </section>
 
     <section class="page-section page-section--info" aria-hidden="false">
-      <p class="hero-intro">Find your current wellness mode: pick a wedge inside the compass or choose a card below.</p>
+      <p class="hero-intro">Find your current wellness mode by selecting a wedge inside the compass or choosing a mode card below. Each mode offers tailored activities to help you reset.</p>
     </section>
 
     <section class="page-section page-section--modes" aria-label="Wellness Modes">
@@ -159,16 +160,17 @@
       </div>
     </section>
 
-    <footer class="app-footer">
+    <footer class="app-footer" role="contentinfo">
       <div class="ad-slot" aria-label="Advertisement">
+        <!-- Google AdSense ad unit can be inserted here -->
         <p class="ad-placeholder" style="display: none;">Ad Placeholder</p>
       </div>
-      <div class="footer-legal">
-        <p class="footer-text"><small>&copy; 2025 Evolution of Wellness - The Reset Compass</small></p>
+      <div class="footer-legal" role="group" aria-label="Legal information">
+        <p class="footer-text"><small>&copy; 2025 Evolution of Wellness - The Reset Compass. All rights reserved.</small></p>
         <div class="footer-links">
-          <button class="footer-link" data-action="privacy-policy">Privacy Policy</button>
-          <span class="footer-separator">•</span>
-          <button class="footer-link" data-action="terms">Terms of Service</button>
+          <button class="footer-link" data-action="privacy-policy" aria-label="View Privacy Policy">Privacy Policy</button>
+          <span class="footer-separator" aria-hidden="true">•</span>
+          <button class="footer-link" data-action="terms" aria-label="View Terms of Service">Terms of Service</button>
         </div>
       </div>
     </footer>
@@ -190,7 +192,7 @@
       <div class="mode-actions">
         <h3>Activities</h3>
         <ul id="dialogQuickWins" class="quick-wins-list" role="list"></ul>
-        <p class="mode-note-help">Select an activity and add optional notes before completing.</p>
+        <p class="mode-note-help" role="note" aria-live="polite">Select an activity and add optional notes before completing.</p>
       </div>
 
       <div class="dialog-actions">
@@ -371,20 +373,33 @@
           <li>Theme preference (light or dark mode)</li>
           <li>Last mode completion date</li>
           <li>Achievement progress</li>
-          <li>Reviews you submit (stored locally and optionally sent to our server)</li>
+          <li>Onboarding completion status</li>
+          <li>Reviews and feedback you optionally submit (stored locally and may be sent to our servers)</li>
         </ul>
         
         <h3>How We Use Your Data</h3>
-        <p>All data is stored locally on your device and is used solely to enhance your experience with the app. We do not transmit your personal wellness data to external servers. Reviews you choose to submit may be stored on our servers to display to other users.</p>
+        <p>All wellness data is stored locally on your device and is used solely to enhance your experience with the app. We do not transmit your personal wellness data, activities, or health information to external servers. When you voluntarily submit reviews or feedback through our forms, that information may be transmitted and stored on our servers to improve the service and may be displayed to other users (reviews only).</p>
         
-        <h3>Data Sharing</h3>
-        <p>We do not sell, trade, or otherwise transfer your personal information to third parties. The app uses Google AdSense for advertisements, which may collect anonymous usage data according to Google's privacy policy.</p>
+        <h3>Data Sharing and Third Parties</h3>
+        <p>We do not sell, trade, rent, or otherwise transfer your personal information to third parties for their marketing purposes. The app uses Google AdSense for advertisements, which may collect anonymous usage data, cookies, and device identifiers according to Google's privacy policy. Google may use this information to show personalized ads based on your interests. You can learn more about Google's data practices at <strong>google.com/policies/privacy/partners</strong>.</p>
         
-        <h3>Your Rights</h3>
-        <p>You can clear your local data at any time using the "Clear History" button in the History dialog. This will permanently delete all locally stored wellness data.</p>
+        <h3>Cookies and Tracking</h3>
+        <p>This app uses browser localStorage for essential functionality. Google AdSense may use cookies and similar technologies for ad personalization. You can control cookie settings through your browser preferences.</p>
         
-        <h3>Contact</h3>
-        <p>If you have questions about this Privacy Policy, please use the "Send Feedback" feature in the app menu.</p>
+        <h3>Your Privacy Rights</h3>
+        <p>You have the right to access, modify, or delete your local data at any time using the "Clear History" button in the History dialog. This will permanently delete all locally stored wellness data. Under applicable US state privacy laws (including CCPA, CPRA, and similar statutes), you may have additional rights including the right to know what information is collected and the right to opt-out of data sales (note: we do not sell personal information).</p>
+        
+        <h3>Children's Privacy</h3>
+        <p>This app is not directed to children under 13 years of age. We do not knowingly collect personal information from children under 13. If you believe a child has provided us with personal information, please contact us to have it removed.</p>
+        
+        <h3>Data Security</h3>
+        <p>We implement reasonable security measures to protect your information. However, no method of electronic storage is 100% secure. Your wellness data remains on your device under your control.</p>
+        
+        <h3>Changes to This Policy</h3>
+        <p>We may update this Privacy Policy from time to time. The "Last Updated" date at the top of this policy indicates when it was last revised. Continued use of the app constitutes acceptance of any changes.</p>
+        
+        <h3>Contact Us</h3>
+        <p>If you have questions about this Privacy Policy or wish to exercise your privacy rights, please use the "Send Feedback" feature in the app menu or contact us through the provided feedback form.</p>
       </div>
       <div class="dialog-actions">
         <button class="btn-primary dialog-close">Close</button>
@@ -401,29 +416,72 @@
         <p><strong>Last Updated:</strong> January 2025</p>
         
         <h3>Acceptance of Terms</h3>
-        <p>By accessing and using The Reset Compass, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use this application.</p>
+        <p>By accessing and using The Reset Compass ("the app", "the service"), you accept and agree to be bound by these Terms of Service ("Terms"). If you do not agree to these terms, please discontinue use of this application immediately.</p>
         
-        <h3>Medical Disclaimer</h3>
-        <p><strong>Important:</strong> The Reset Compass is designed for wellness and self-care guidance only. It is not intended to be medical advice, diagnosis, or treatment. This app should not replace professional medical consultation or mental health care.</p>
-        <p>If you are experiencing a medical or mental health emergency, please contact emergency services or a qualified healthcare provider immediately.</p>
+        <h3>Medical Disclaimer and No Professional Advice</h3>
+        <p><strong>IMPORTANT - PLEASE READ CAREFULLY:</strong> The Reset Compass is designed for general wellness, self-care guidance, and stress management only. It is NOT intended to be, and should not be considered as, medical advice, mental health treatment, diagnosis, therapy, counseling, or any form of professional healthcare service.</p>
+        <p>This app should NOT replace consultation with qualified healthcare providers, licensed therapists, psychiatrists, psychologists, counselors, or other mental health professionals. The activities and suggestions provided are for general wellness purposes only and may not be suitable for everyone, especially individuals with existing medical or mental health conditions.</p>
+        <p><strong>If you are experiencing a medical emergency, mental health crisis, thoughts of self-harm, or suicidal ideation, please contact emergency services immediately by calling 911 (US), visiting your nearest emergency room, or contacting the National Suicide Prevention Lifeline at 988 (US) or 1-800-273-8255.</strong></p>
+        <p>Always seek the advice of qualified healthcare professionals regarding any medical condition, mental health concern, or treatment. Never disregard professional medical advice or delay seeking it because of something you have read in this app.</p>
         
         <h3>Use of the Service</h3>
-        <p>You agree to use The Reset Compass only for lawful purposes and in accordance with these Terms. The activities and suggestions provided are for general wellness purposes and may not be suitable for everyone.</p>
+        <p>You agree to use The Reset Compass only for lawful purposes and in accordance with these Terms. You are responsible for your own health and wellness decisions. You agree not to use this service to:</p>
+        <ul>
+          <li>Violate any applicable laws or regulations</li>
+          <li>Infringe on the rights of others</li>
+          <li>Submit false, misleading, or inappropriate content through forms</li>
+          <li>Attempt to reverse engineer, hack, or compromise the security of the service</li>
+          <li>Use automated systems to access the service without authorization</li>
+        </ul>
+        
+        <h3>User-Generated Content</h3>
+        <p>When you submit reviews, feedback, or other content through the app, you grant us a non-exclusive, worldwide, royalty-free license to use, display, and distribute that content for the purpose of operating and improving the service. You represent that you own or have rights to any content you submit. We reserve the right to remove any content that violates these Terms or is otherwise inappropriate.</p>
         
         <h3>Intellectual Property</h3>
-        <p>The content, features, and functionality of The Reset Compass are owned by Evolution of Wellness and are protected by copyright, trademark, and other intellectual property laws.</p>
+        <p>The content, features, functionality, design, logos, and user interface of The Reset Compass are owned by Evolution of Wellness and are protected by United States and international copyright, trademark, patent, trade secret, and other intellectual property laws. You may not copy, modify, distribute, sell, or lease any part of the service without express written permission.</p>
         
         <h3>Limitation of Liability</h3>
-        <p>Evolution of Wellness shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the service. You acknowledge that you are responsible for your own health decisions.</p>
+        <p><strong>TO THE FULLEST EXTENT PERMITTED BY LAW:</strong> Evolution of Wellness, its affiliates, officers, directors, employees, agents, and licensors shall NOT be liable for any indirect, incidental, special, consequential, punitive, or exemplary damages (including but not limited to damages for loss of profits, data, use, goodwill, or other intangible losses) resulting from:</p>
+        <ul>
+          <li>Your use of or inability to use the service</li>
+          <li>Any health or wellness outcomes or lack thereof</li>
+          <li>Any actions or inactions taken based on information or activities in the app</li>
+          <li>Unauthorized access to or alteration of your data</li>
+          <li>Third-party advertisements or links</li>
+          <li>Any other matter relating to the service</li>
+        </ul>
+        <p>IN NO EVENT SHALL OUR TOTAL LIABILITY TO YOU FOR ALL DAMAGES EXCEED THE AMOUNT PAID BY YOU TO US IN THE PAST 12 MONTHS (WHICH IS $0 FOR THIS FREE SERVICE).</p>
+        <p>You acknowledge that you use the service at your own risk and are solely responsible for any health, wellness, or safety decisions you make.</p>
+        
+        <h3>Disclaimer of Warranties</h3>
+        <p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR COURSE OF PERFORMANCE. We do not warrant that the service will be uninterrupted, secure, or error-free.</p>
+        
+        <h3>Indemnification</h3>
+        <p>You agree to indemnify, defend, and hold harmless Evolution of Wellness and its affiliates from any claims, damages, losses, liabilities, and expenses (including reasonable attorneys' fees) arising from your use of the service or violation of these Terms.</p>
+        
+        <h3>Third-Party Services and Advertisements</h3>
+        <p>This app displays advertisements through Google AdSense. We are not responsible for the content of third-party advertisements or the practices of advertisers. Your interactions with advertisers are solely between you and the advertiser. We do not endorse any advertised products or services.</p>
+        
+        <h3>Modifications to the Service</h3>
+        <p>We reserve the right to modify, suspend, or discontinue the service (or any part thereof) at any time, with or without notice, for any reason. We shall not be liable to you or any third party for any such modification, suspension, or discontinuation.</p>
         
         <h3>Changes to Terms</h3>
-        <p>We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting. Your continued use of the app constitutes acceptance of any changes.</p>
+        <p>We reserve the right to modify these Terms at any time. Changes will be effective immediately upon posting to the service. The "Last Updated" date indicates when the Terms were last revised. Your continued use of the service after changes constitutes acceptance of the modified Terms.</p>
         
-        <h3>Governing Law</h3>
-        <p>These Terms shall be governed by and construed in accordance with the laws of the United States, without regard to its conflict of law provisions.</p>
+        <h3>Dispute Resolution and Arbitration</h3>
+        <p>Any dispute arising from these Terms or the service shall be resolved through binding arbitration in accordance with the rules of the American Arbitration Association, rather than in court, except that you may assert claims in small claims court if your claims qualify. You waive any right to a jury trial or to participate in a class action lawsuit or class-wide arbitration.</p>
         
-        <h3>Contact</h3>
-        <p>Questions about these Terms should be sent using the "Send Feedback" feature in the app menu.</p>
+        <h3>Governing Law and Jurisdiction</h3>
+        <p>These Terms shall be governed by and construed in accordance with the laws of the United States and the state in which Evolution of Wellness is domiciled, without regard to its conflict of law provisions. Any legal action or proceeding shall be brought exclusively in the state or federal courts located in that jurisdiction.</p>
+        
+        <h3>Severability</h3>
+        <p>If any provision of these Terms is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary, and the remaining provisions shall remain in full force and effect.</p>
+        
+        <h3>Entire Agreement</h3>
+        <p>These Terms, together with our Privacy Policy, constitute the entire agreement between you and Evolution of Wellness regarding the service and supersede all prior agreements and understandings.</p>
+        
+        <h3>Contact Us</h3>
+        <p>Questions about these Terms should be sent using the "Send Feedback" feature in the app menu or through the provided feedback form.</p>
       </div>
       <div class="dialog-actions">
         <button class="btn-primary dialog-close">Close</button>
