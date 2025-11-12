@@ -23,6 +23,7 @@
     });
 
     const btnNext = $('#btnNext');
+    const btnBack = $('#btnBack');
     const btnSkip = $('#btnSkip');
     const btnGetStarted = $('#btnGetStarted');
     const dotsIndicator = $('#dotsIndicator');
@@ -46,6 +47,18 @@
       console.log('Next button touched');
       nextSlide();
     });
+    
+    if (btnBack) {
+      btnBack.addEventListener('click', () => {
+        console.log('Back button clicked');
+        prevSlide();
+      });
+      btnBack.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        console.log('Back button touched');
+        prevSlide();
+      });
+    }
     
     btnSkip.addEventListener('click', () => {
       console.log('Skip button clicked');
@@ -114,6 +127,7 @@
     const dots = $all('.dot');
     const progressBar = $('#progressBar');
     const btnNext = $('#btnNext');
+    const btnBack = $('#btnBack');
 
     slides.forEach((slide, index) => {
       slide.classList.remove('active', 'prev');
@@ -138,6 +152,14 @@
         btnNext.style.display = 'none';
       } else {
         btnNext.style.display = 'block';
+      }
+    }
+    
+    if (btnBack) {
+      if (currentSlide === 0) {
+        btnBack.classList.remove('visible');
+      } else {
+        btnBack.classList.add('visible');
       }
     }
   }

@@ -118,6 +118,12 @@
   </header>
 
   <main class="main-content" id="main-content">
+    <!-- STICKY INSTALL BUTTON -->
+    <button id="stickyInstallBtn" class="sticky-install-btn" aria-label="Add to home screen">
+      <span class="icon">📱</span>
+      <span>Add to Home</span>
+    </button>
+
     <!-- PWA INSTALL BANNER -->
     <div id="pwaInstallBanner" class="pwa-banner" style="display:none;" role="alert">
       <div class="pwa-banner-content">
@@ -139,6 +145,10 @@
           <div id="streakBadge" class="streak-badge" title="Daily streak: days in a row">Daily streak: 🔥 0</div>
           <div id="achievementBadges" class="achievement-badges"></div>
         </div>
+      </div>
+      
+      <div class="helpful-tip">
+        💡 Tip: Tap any wedge on the compass below to quickly select how you're feeling
       </div>
 
       <div class="compass-wrap">
@@ -177,11 +187,14 @@
     </section>
 
     <section class="page-section page-section--info" aria-hidden="false">
-      <p class="hero-intro">Find your current wellness mode by selecting a wedge inside the compass or choosing a mode card below. Each mode offers tailored activities to help you reset.</p>
+      <p class="hero-intro">Select how you feel right now by tapping a wedge inside the compass or choosing a mode card below. Each mode offers tailored activities to help you reset.</p>
+      <div class="helpful-tip">
+        🎯 Remember: You can complete one mode per day, but Quick Wins have no limit!
+      </div>
     </section>
 
     <section class="page-section page-section--modes" aria-label="Wellness Modes">
-      <h2 class="section-title">Choose Your Mode</h2>
+      <h2 class="section-title">Select How You Feel</h2>
 
       <div class="mode-grid" id="modesGrid" role="list" aria-live="polite"></div>
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
@@ -262,7 +275,7 @@
       <div class="mode-actions">
         <h3>Activities</h3>
         <ul id="dialogQuickWins" class="quick-wins-list" role="list"></ul>
-        <p class="mode-note-help" role="note" aria-live="polite">Select an activity and add optional notes before completing.</p>
+        <p class="mode-note-help" role="note" aria-live="polite">Tap an activity to select it, then add optional notes if you'd like. Tap 'Complete Selected' when ready.</p>
       </div>
 
       <div class="dialog-actions">
@@ -283,7 +296,7 @@
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
       <h2 id="quickWinsTitle">Quick Wins</h2>
-      <p class="mode-description">One-step actions you can do now to quickly change your focus, energy, or mood. Tap to select and complete immediately.</p>
+      <p class="mode-description">Quick actions you can do right now to change your focus, energy, or mood. Tap an activity to select it.</p>
       <ul id="globalQuickWins" class="quick-wins-list" role="list"></ul>
 
       <div class="dialog-actions">
