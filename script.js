@@ -752,6 +752,9 @@
 
   function getRandomEncouragement(type){
     const messages = ENCOURAGEMENTS[type] || [];
+    if (messages.length === 0) {
+      return "Keep going! You're doing great!";
+    }
     return messages[Math.floor(Math.random() * messages.length)];
   }
 
