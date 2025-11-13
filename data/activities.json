@@ -228,6 +228,8 @@
     {"id": "qw-say-alphabet", "text": "Say the alphabet backward", "icon": ""},
     {"id": "qw-spell-name", "text": "Spell your name backward", "icon": ""},
     {"id": "qw-name-animals", "text": "Name 5 animals fast", "icon": ""},
-    {"id": "qw-count-backward-qw", "text": "Count backward from 20", "icon": ""}
+    {"id": "qw-count-backward-qw", "text": "Count backward from 20", "icon": ""},
+    {"id": "qw-hop-foot", "text": "Hop on one foot 10 times", "icon": ""},
+    {"id": "qw-touch-sky", "text": "Reach for the sky 5 times", "icon": ""}
   ]
 }

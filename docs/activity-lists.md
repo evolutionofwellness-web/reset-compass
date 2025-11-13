@@ -249,8 +249,8 @@ Tiny actions with instant impact - use anytime, no limit!
 96. Spell your name backward
 97. Name 5 animals fast
 98. Count backward from 20
-99. (Reserved for future addition)
-100. (Reserved for future addition)
+99. Hop on one foot 10 times
+100. Reach for the sky 5 times
 
 ## Icon TODO List
 
