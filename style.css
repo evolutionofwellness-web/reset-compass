@@ -242,7 +242,7 @@ dialog::backdrop{background:rgba(0,0,0,0.7);animation:backdropFade 0.35s ease-ou
 .rc-toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* Encouragement Toast */
-.encouragement-toast{position:fixed;top:20%;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,rgba(0,175,160,0.98),rgba(0,212,196,0.98));color:#041018;padding:20px 32px;border-radius:16px;opacity:0;transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);z-index:9999;box-shadow:0 20px 60px rgba(0,175,160,0.6), 0 0 80px rgba(0,175,160,0.4);display:flex;align-items:center;gap:16px;max-width:90%;border:2px solid rgba(255,255,255,0.3)}
+.encouragement-toast{position:fixed;top:max(80px, 15%);left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,rgba(0,175,160,0.98),rgba(0,212,196,0.98));color:#041018;padding:20px 32px;border-radius:16px;opacity:0;transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);z-index:9999;box-shadow:0 20px 60px rgba(0,175,160,0.6), 0 0 80px rgba(0,175,160,0.4);display:flex;align-items:center;gap:16px;max-width:90%;border:2px solid rgba(255,255,255,0.3)}
 .encouragement-toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
 .encouragement-icon{font-size:2.4rem;line-height:1;animation:encouragementPulse 1s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(255,215,0,0.6))}
 .encouragement-text{font-size:1.1rem;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.2)}
