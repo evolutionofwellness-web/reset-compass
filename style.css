@@ -299,10 +299,10 @@ dialog::backdrop{background:rgba(0,0,0,0.7);animation:backdropFade 0.35s ease-ou
 
 @keyframes celebrationPulse{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.15) rotate(10deg)}}
 
-.completion-particle{position:fixed;width:12px;height:12px;border-radius:50%;z-index:9998;pointer-events:none;animation:particleExplode 1s ease-out forwards}
+.completion-particle{position:fixed;width:12px;height:12px;border-radius:50%;z-index:10001;pointer-events:none;animation:particleExplode 1s ease-out forwards}
 @keyframes particleExplode{0%{transform:translate(-50%, -50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0);opacity:0}}
 
-.star-burst{position:fixed;font-size:2rem;z-index:9999;pointer-events:none;animation:starBurstExplode 1.5s ease-out forwards}
+.star-burst{position:fixed;font-size:2rem;z-index:10001;pointer-events:none;animation:starBurstExplode 1.5s ease-out forwards}
 @keyframes starBurstExplode{0%{transform:translate(-50%, -50%) scale(0) rotate(0deg);opacity:1}50%{transform:translate(calc(-50% + var(--tx) * 0.5), calc(-50% + var(--ty) * 0.5)) scale(1.2) rotate(180deg);opacity:1}100%{transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.3) rotate(360deg);opacity:0}}
 
 /* PWA Install Banner */
