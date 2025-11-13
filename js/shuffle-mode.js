@@ -465,9 +465,6 @@
      * Cleanup on close
      */
     cleanup() {
-      // Remove keyboard listener
-      document.removeEventListener('keydown', this.handleKeyboard);
-      
       // Clear session
       this.session = null;
       if (this.modal && typeof this.modal.destroy === 'function') {
