@@ -466,6 +466,13 @@
       const actionEl = e.target.closest('[data-action]');
       if (actionEl){
         const action = actionEl.dataset.action;
+        if (action === 'shuffle-mode') {
+          // Open shuffle mode dialog
+          if (window.ShuffleModeUI) {
+            window.ShuffleModeUI.open();
+          }
+          return;
+        }
         if (action === 'quick-wins'){ 
           safeShowDialog($('#quickWinsDialog')); 
           // Initialize new Quick Wins view with shuffle
