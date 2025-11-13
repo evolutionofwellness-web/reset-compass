@@ -126,7 +126,7 @@
               </button>
             </div>
             ${this.openFullList ? `
-              <button class="btn-link mode-activity-view-all" style="
+              <button class="btn-link mode-activity-shuffle" style="
                 margin-top: 16px;
                 color: var(--text-secondary);
                 text-decoration: underline;
@@ -134,7 +134,7 @@
                 border: none;
                 cursor: pointer;
                 font-size: 14px;
-              ">View All Activities</button>
+              ">🔀 Try Shuffle Mode</button>
             ` : ''}
           </div>
           <textarea class="activity-note" placeholder="Add notes (optional)" style="
@@ -163,7 +163,7 @@
     wireEvents() {
       const doneBtn = document.querySelector('.mode-activity-done');
       const newBtn = document.querySelector('.mode-activity-new');
-      const viewAllBtn = document.querySelector('.mode-activity-view-all');
+      const shuffleBtn = document.querySelector('.mode-activity-shuffle');
       
       if (doneBtn) {
         doneBtn.addEventListener('click', () => this.handleDone());
@@ -173,10 +173,17 @@
         newBtn.addEventListener('click', () => this.showRandomActivity());
       }
       
-      if (viewAllBtn && this.openFullList) {
-        viewAllBtn.addEventListener('click', () => {
-          if (this.openFullList) {
-            this.openFullList(this.currentMode);
+      if (shuffleBtn) {
+        shuffleBtn.addEventListener('click', () => {
+          // Close current dialog and open Shuffle Mode
+          const currentDialog = document.getElementById('modeDialog');
+          if (currentDialog && typeof currentDialog.close === 'function') {
+            currentDialog.close();
+          }
+          
+          // Open Shuffle Mode
+          if (window.ShuffleModeUI) {
+            window.ShuffleModeUI.open();
           }
         });
       }

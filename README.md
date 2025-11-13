@@ -10,6 +10,14 @@ A polished, mobile-first Progressive Web App (PWA) that helps you find your well
 - **Grounded** 🌿 - Root yourself with steady, grounding activities  
 - **Growing** 🚀 - Boost your mood and expand your capacity
 
+### 🔀 Shuffle Mode
+- **Randomized Discovery** - Activities presented in random order using Fisher-Yates shuffle
+- **Non-Repeating Deck** - No duplicates until you've seen all activities
+- **Keyboard & Swipe Navigation** - Use arrow keys or swipe gestures
+- **Optional Repeat Mode** - Enable continuous shuffling when deck exhausted
+- **Progress Tracking** - Visual progress bar showing position in deck
+- **Smooth Animations** - Hardware-accelerated transitions with reduced-motion support
+
 ### ✨ Premium Experience
 - Cinematic intro animation with compass spin and fade
 - Vibrant glow effects on primary brand color (#0B3D2E)
