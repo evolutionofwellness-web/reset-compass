@@ -42,6 +42,7 @@
 
   <link rel="stylesheet" href="style.css?v=9" />
   <link rel="stylesheet" href="css/cinematic.css?v=9" />
+  <link rel="stylesheet" href="css/shuffle-mode.css?v=1" />
   <link rel="manifest" href="manifest.json" />
   
   <!-- Favicons -->
@@ -56,6 +57,9 @@
   <script src="js/intro.js?v=10" defer></script>
   <script src="js/mode-activity-view.js?v=10" defer></script>
   <script src="js/quick-wins-view.js?v=10" defer></script>
+  <script src="js/shuffle-mode.js?v=1" defer></script>
+  <script src="js/shuffle-mode-ui.js?v=1" defer></script>
+  <script src="node_modules/focus-trap/dist/focus-trap.umd.js" defer></script>
   
   <!-- Structured Data (JSON-LD) -->
   <script type="application/ld+json">
@@ -233,6 +237,40 @@
         <p class="quick-wins-encouragement">You deserve this moment. Take it.</p>
       </div>
 
+      <!-- SHUFFLE MODE SECTION -->
+      <div class="shuffle-mode-block" role="region" aria-label="Shuffle Mode section">
+        <div class="shuffle-mode-header">
+          <div class="shuffle-mode-icon">🔀</div>
+          <div class="shuffle-mode-title-section">
+            <h3 class="shuffle-mode-title">Shuffle Mode</h3>
+            <p class="shuffle-mode-subtitle">Discover activities in random order</p>
+          </div>
+        </div>
+        <p class="shuffle-mode-description">
+          Not sure what you need? Let us guide you! <strong>Shuffle Mode</strong> presents all activities in a randomized order, 
+          helping you discover new favorites and break out of routines.
+        </p>
+        <div class="shuffle-mode-features">
+          <div class="shuffle-mode-feature">
+            <span class="feature-icon">🎲</span>
+            <span class="feature-text">Randomized discovery</span>
+          </div>
+          <div class="shuffle-mode-feature">
+            <span class="feature-icon">🎯</span>
+            <span class="feature-text">No repeats until deck exhausted</span>
+          </div>
+          <div class="shuffle-mode-feature">
+            <span class="feature-icon">⌨️</span>
+            <span class="feature-text">Keyboard & swipe navigation</span>
+          </div>
+        </div>
+        <button id="shuffleModeLink" class="nav-btn shuffle-mode-cta" data-action="shuffle-mode">
+          <span class="cta-icon">🔀</span>
+          <span class="cta-text">Enter Shuffle Mode</span>
+          <span class="cta-arrow">→</span>
+        </button>
+      </div>
+
       <div class="rate-cta-card" onclick="document.querySelector('[data-action=ratings-reviews]').click()">
         <div class="rate-cta-content">
           <div class="rate-cta-icon">⭐</div>
@@ -289,6 +327,59 @@
           <span class="btn-hint" id="completeHint">Select an activity first</span>
         </button>
         <button class="btn-secondary dialog-cancel">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- SHUFFLE MODE DIALOG -->
+  <dialog id="shuffleModeDialog" class="mode-dialog" aria-labelledby="shuffleModeTitle">
+    <div class="dialog-content">
+      <button class="dialog-close" aria-label="Close dialog">&times;</button>
+      
+      <div class="shuffle-header">
+        <h2 id="shuffleModeTitle">🔀 Shuffle Mode</h2>
+        <p class="shuffle-instructions">
+          We'll present activities in a randomized order — tap Shuffle Now to reshuffle, or swipe/use arrow keys to navigate. 
+          Activities won't repeat until the deck is exhausted (unless you enable "Allow Repeat").
+        </p>
+      </div>
+
+      <div class="shuffle-controls">
+        <button id="shuffleNowBtn" class="btn-primary">
+          <span>🔀 Shuffle Now</span>
+        </button>
+        <label class="allow-repeat-control">
+          <input type="checkbox" id="allowRepeatToggle" />
+          <span>Allow Repeat</span>
+        </label>
+      </div>
+
+      <div class="shuffle-progress-container">
+        <div class="shuffle-progress-bar">
+          <div id="shuffleProgress" class="shuffle-progress-fill"></div>
+        </div>
+        <div id="shuffleProgressText" class="shuffle-progress-text">Activity 1 of X</div>
+      </div>
+
+      <div id="shuffleActivityCard" class="shuffle-activity-card">
+        <!-- Activity content will be rendered here -->
+      </div>
+
+      <div class="shuffle-navigation">
+        <button id="shufflePrevBtn" class="btn-secondary">
+          <span aria-hidden="true">←</span> Previous
+        </button>
+        <button id="shuffleNextBtn" class="btn-secondary">
+          Next <span aria-hidden="true">→</span>
+        </button>
+      </div>
+
+      <div class="shuffle-actions">
+        <button id="completeShuffleActivityBtn" class="btn-primary">
+          <span class="btn-icon">✓</span>
+          <span class="btn-text">Complete This Activity</span>
+        </button>
+        <button class="btn-secondary dialog-cancel">Close</button>
       </div>
     </div>
   </dialog>

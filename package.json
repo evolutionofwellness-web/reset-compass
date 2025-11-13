@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "focus-trap": "^7.6.6",
     "http-server": "^14.1.1",
     "puppeteer": "^24.29.1"
   }

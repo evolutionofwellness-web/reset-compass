@@ -18,6 +18,15 @@
   --color-grounded: #0FBF84;
   --color-drifting: #FFBF3B;
   --color-surviving: #FF5F6D;
+
+  /* Spacing tokens */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
 }
 
 /* Light theme overrides */
@@ -270,7 +279,7 @@ dialog{border:none;border-radius:20px;padding:0;max-width:880px;width:calc(100% 
 dialog[open]{opacity:1;transform:scale(1) translateY(0) rotateX(0);animation:dialogBounceIn 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
 body:not(.page-onboarding):has(dialog[open]){overflow:hidden;position:fixed;width:100%;height:100%}
 dialog::backdrop{background:rgba(0,0,0,0.92);animation:backdropFade 0.4s ease-out;backdrop-filter:blur(12px)}
-.dialog-content{padding:1.4rem;position:relative;animation:dialogContentSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);display:flex;flex-direction:column;overflow-y:auto;max-height:90vh;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.dialog-content{padding:1.4rem;position:relative;animation:dialogContentSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);display:flex;flex-direction:column;overflow-y:auto;max-height:calc(90vh - 48px);max-height:calc(90vh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overscroll-behavior:contain;-webkit-overflow-scrolling:touch;transform:translateZ(0)}
 .dialog-close{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);color:var(--text-secondary);font-size:1.8rem;cursor:pointer;width:48px;height:48px;border-radius:50%;transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);z-index:100;display:flex;align-items:center;justify-content:center;font-weight:300}
 .dialog-close:hover{background:linear-gradient(135deg, rgba(255,95,109,0.8), rgba(255,122,122,0.8));border-color:rgba(255,255,255,0.3);transform:rotate(90deg) scale(1.15);color:#fff;box-shadow:0 0 20px rgba(255,95,109,0.6)}
 .dialog-close:active{transform:rotate(90deg) scale(0.95)}
