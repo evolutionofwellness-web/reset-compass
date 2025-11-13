@@ -159,7 +159,7 @@
               display: flex;
               align-items: center;
               justify-content: center;
-            ">${escapeHtml(activity.text)}</div>
+            ">${escapeHtml(activity.title || activity.text)}</div>
             
             <div class="shuffle-progress" style="
               font-size: 13px;
@@ -286,7 +286,10 @@
         const payload = {
           type: 'mode',
           mode: this.currentMode,
-          activity: activity,
+          activity: {
+            text: activity.title || activity.text,
+            id: activity.id
+          },
           timestamp: new Date().toISOString(),
           note: note
         };
