@@ -375,8 +375,11 @@
       star.style.left = '50%';
       star.style.top = '50%';
       document.body.appendChild(star);
-      setTimeout(() => star.remove(), 1500);
     }
+    // Batch remove all star-burst elements after animation duration
+    setTimeout(() => {
+      document.querySelectorAll('.star-burst').forEach(star => star.remove());
+    }, 1500);
   }
 
   function createCompletionParticles(){
