@@ -470,6 +470,9 @@
       
       // Clear session
       this.session = null;
+      if (this.modal && typeof this.modal.destroy === 'function') {
+        this.modal.destroy();
+      }
       this.modal = null;
     }
   };
