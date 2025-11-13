@@ -64,7 +64,7 @@
         } else {
           // Stay at last item, user must reset manually
           this.currentIndex = this.shuffledDeck.length - 1;
-          return null; // Indicate exhaustion
+          return this.current(); // Indicate exhaustion, but return last item
         }
       }
 
