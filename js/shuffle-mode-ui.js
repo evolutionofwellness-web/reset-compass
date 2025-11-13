@@ -286,15 +286,34 @@
         <h3>Deck Complete!</h3>
         <p>You've gone through all activities. Enable "Allow Repeat" or close and come back later for a fresh shuffle.</p>
         <div class="completion-actions">
-          <button class="btn-primary" onclick="document.getElementById('allowRepeatToggle').checked = true; document.getElementById('allowRepeatToggle').dispatchEvent(new Event('change')); window.ShuffleMode.reshuffle(); window.ShuffleModeUI.renderCurrentActivity('shuffle'); window.ShuffleModeUI.updateProgress();">
+          <button class="btn-primary" id="enableRepeatBtn">
             Enable Repeat & Continue
           </button>
-          <button class="btn-secondary" onclick="window.ShuffleModeUI.close();">Close</button>
+          <button class="btn-secondary" id="closeCompletionBtn">Close</button>
         </div>
       </div>
     `;
-  }
 
+    // Attach event listeners after rendering
+    const enableRepeatBtn = document.getElementById('enableRepeatBtn');
+    if (enableRepeatBtn) {
+      enableRepeatBtn.addEventListener('click', function() {
+        const toggle = document.getElementById('allowRepeatToggle');
+        if (toggle) {
+          toggle.checked = true;
+          toggle.dispatchEvent(new Event('change'));
+        }
+        window.ShuffleMode.reshuffle();
+        renderCurrentActivity('shuffle');
+        updateProgress();
+      });
+    }
+    const closeCompletionBtn = document.getElementById('closeCompletionBtn');
+    if (closeCompletionBtn) {
+      closeCompletionBtn.addEventListener('click', function() {
+        close();
+      });
+    }
   // Handle next button
   function handleNext() {
     const next = window.ShuffleMode.next();
