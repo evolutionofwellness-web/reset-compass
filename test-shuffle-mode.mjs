@@ -123,7 +123,6 @@ async function main() {
     if (!window.ShuffleMode) return false;
     
     window.ShuffleMode.initialize(false);
-    const firstActivity = window.ShuffleMode.getCurrent();
     
     window.ShuffleMode.reshuffle();
     const session = window.ShuffleMode.getSession();
