@@ -581,7 +581,7 @@
     }
     
     // Fall back to hardcoded modes if dynamic modes not available
-    m = MODES.find(x => x.id === Number(modeId));
+    m = MODES.find(x => x.id === modeId || x.id === String(modeId) || x.id === Number(modeId));
     if (!m) return;
     const title = $('#modeDialogTitle'); const desc = $('#dialogModeDescription'); const accent = $('#modeAccent');
     if (title) title.textContent = m.name;
