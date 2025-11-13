@@ -1,2 +1,17 @@
 # Local Netlify folder
 .netlify
+
+# Test files
+manual-test.mjs
+test-results.json
+node_modules/
+
+# Build artifacts
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
