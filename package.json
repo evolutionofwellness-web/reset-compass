@@ -4,7 +4,7 @@
   "description": "A wellness app that helps users understand their current state through four wellness modes",
   "type": "module",
   "scripts": {
-    "test": "echo \"No tests specified yet\""
+    "test": "node test-shuffle-mode.mjs"
   },
   "keywords": [
     "wellness",
@@ -16,5 +16,8 @@
   "devDependencies": {
     "http-server": "^14.1.1",
     "puppeteer": "^24.29.1"
+  },
+  "dependencies": {
+    "focus-trap": "^7.6.6"
   }
 }
