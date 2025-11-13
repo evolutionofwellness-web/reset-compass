@@ -2,7 +2,6 @@
 // Simple integration test for Shuffle Mode functionality
 
 import { readFileSync } from 'fs';
-import { join } from 'path';
 
 const tests = [];
 let passed = 0;
