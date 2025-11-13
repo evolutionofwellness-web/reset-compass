@@ -466,7 +466,26 @@
       const actionEl = e.target.closest('[data-action]');
       if (actionEl){
         const action = actionEl.dataset.action;
-        if (action === 'quick-wins'){ safeShowDialog($('#quickWinsDialog')); return; }
+        if (action === 'quick-wins'){ 
+          safeShowDialog($('#quickWinsDialog')); 
+          // Initialize new Quick Wins view with shuffle
+          if (window.QuickWinsView) {
+            window.QuickWinsView.init({
+              logActivity: function(payload) {
+                // Convert to existing format
+                const entry = {
+                  modeId: null,
+                  modeName: 'Quick Win',
+                  modeColor: '#00AFA0',
+                  action: payload.activity.text,
+                  note: ''
+                };
+                recordActivities([entry]);
+              }
+            });
+          }
+          return; 
+        }
         if (action === 'history'){ openHistoryDialog(); return; }
         if (action === 'about'){ window.location.href = './about.html'; return; }
         if (action === 'home'){ window.location.href = './index.html'; return; }
@@ -563,15 +582,76 @@
     if (desc) desc.textContent = m.description;
     if (accent) accent.style.background = m.color;
 
-    // populate activities
+    // Check if mode is locked for today
     const locked = (localStorage.getItem(LAST_MODE_DAY_KEY) === todayKey());
+    
+    if (locked) {
+      // Show locked message
+      if (!dialogQuickWins) return;
+      dialogQuickWins.innerHTML = `
+        <li style="text-align: center; padding: 40px 20px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">🔒</div>
+          <div style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
+            Mode completed for today
+          </div>
+          <div style="font-size: 14px; color: var(--text-secondary);">
+            Come back tomorrow to continue your streak!<br>
+            Quick Wins are always available.
+          </div>
+        </li>
+      `;
+      safeShowDialog($('#modeDialog'));
+      return;
+    }
+
+    // Use new single-activity view if available
+    if (window.ModeActivityView) {
+      safeShowDialog($('#modeDialog'));
+      window.ModeActivityView.init({
+        mode: modeId,
+        playAnimation: async () => {
+          // Optional: play existing animation here
+          await new Promise(resolve => setTimeout(resolve, 300));
+        },
+        logActivity: function(payload) {
+          // Convert to existing format
+          const entry = {
+            modeId: payload.mode,
+            modeName: m.name,
+            modeColor: m.color,
+            action: payload.activity.text,
+            note: payload.note || ''
+          };
+          recordActivities([entry]);
+          safeCloseDialog($('#modeDialog'));
+          clearDialogSelections();
+        },
+        openFullList: function(mode) {
+          // Show full list view (existing behavior)
+          showFullActivityList(mode);
+        },
+        onClose: function() {
+          safeCloseDialog($('#modeDialog'));
+        }
+      });
+      return;
+    }
+
+    // Fallback to original full list view
+    showFullActivityList(modeId);
+  }
+  
+  // Helper function for full activity list view (original behavior)
+  function showFullActivityList(modeId) {
+    const m = MODES.find(x => x.id === modeId || x.id === String(modeId));
+    if (!m || !dialogQuickWins) return;
+    
     const arr = QUICK_WINS[m.id] || [];
-    if (!dialogQuickWins) return;
     dialogQuickWins.innerHTML = arr.map((a, idx) => `
       <li style="animation-delay: ${idx * 0.05}s">
         <div class="activity-row">
           <div style="max-width:70%">${escapeHtml(a.text)}<div class="activity-instruction">${escapeHtml(a.hint)}</div></div>
-          <div><button class="select-activity" data-activity="${escapeHtml(a.text)}">${locked ? '🔒 Locked' : '✓ Select'}</button></div>
+          <div><button class="select-activity" data-activity="${escapeHtml(a.text)}">✓ Select</button></div>
         </div>
         <textarea class="activity-note" data-activity="${escapeHtml(a.text)}" placeholder="Add notes (optional)" hidden></textarea>
       </li>
@@ -905,8 +985,9 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
-  // expose for debug
+  // expose for debug and for new modules
   window.__rc = { buildWedgesAndSeparators, placeRingLabels, openModeDialog, recordActivities };
+  window.showToast = showToast; // Expose showToast globally for new modules
 
   // global error listener to avoid total breakage
   window.addEventListener('error', function(ev){ console.error('Unhandled error', ev.error || ev.message); showToast('An unexpected error occurred. UI fallback applied'); }, true);
