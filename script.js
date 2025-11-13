@@ -604,31 +604,28 @@
       return;
     }
 
-    // Use new single-activity view if available
-    if (window.ModeActivityView) {
+    // Use Shuffle Mode for all activities
+    if (window.ShuffleMode) {
       safeShowDialog($('#modeDialog'));
-      window.ModeActivityView.init({
+      
+      // Get activities for this mode
+      const activities = m.activities || [];
+      
+      window.ShuffleMode.init({
         mode: modeId,
-        playAnimation: async () => {
-          // Optional: play existing animation here
-          await new Promise(resolve => setTimeout(resolve, 300));
-        },
+        activities: activities,
         logActivity: function(payload) {
           // Convert to existing format
           const entry = {
             modeId: payload.mode,
             modeName: m.name,
             modeColor: m.color,
-            action: payload.activity.text,
+            action: payload.activity.text || payload.activity.title,
             note: payload.note || ''
           };
           recordActivities([entry]);
           safeCloseDialog($('#modeDialog'));
           clearDialogSelections();
-        },
-        openFullList: function(mode) {
-          // Show full list view (existing behavior)
-          showFullActivityList(mode);
         },
         onClose: function() {
           safeCloseDialog($('#modeDialog'));
@@ -690,14 +687,66 @@
         scrollableContent.scrollTop = 0;
       }
       
+      // Setup focus trap for accessibility
+      setupFocusTrap(d);
+      
       const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
       if (f) setTimeout(()=>f.focus(), 30);
     } catch(e){ console.warn('safeShowDialog failed', e); }
+  }
+  
+  /**
+   * Setup focus trap for modal dialogs (accessibility)
+   * Ensures Tab/Shift+Tab cycles within the dialog
+   */
+  function setupFocusTrap(dialog) {
+    if (!dialog) return;
+    
+    // Remove any existing focus trap listener
+    if (dialog._focusTrapHandler) {
+      dialog.removeEventListener('keydown', dialog._focusTrapHandler);
+    }
+    
+    dialog._focusTrapHandler = function(e) {
+      if (e.key !== 'Tab') return;
+      
+      const focusableElements = dialog.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      
+      if (focusableElements.length === 0) return;
+      
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      
+      // Shift + Tab: moving backwards
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } 
+      // Tab: moving forwards
+      else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+    
+    dialog.addEventListener('keydown', dialog._focusTrapHandler);
   }
 
   function safeCloseDialog(d){
     if (!d) return;
     try {
+      // Clean up focus trap
+      if (d._focusTrapHandler) {
+        d.removeEventListener('keydown', d._focusTrapHandler);
+        d._focusTrapHandler = null;
+      }
+      
       d.classList.add('page-transition-out');
       setTimeout(() => {
         d.classList.remove('page-transition-out');
