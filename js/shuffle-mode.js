@@ -456,9 +456,14 @@
      * Escape HTML to prevent XSS
      */
     escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      };
+      return String(str).replace(/[&<>"']/g, function(m) { return map[m]; });
     },
     
     /**
