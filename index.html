@@ -56,6 +56,7 @@
   <script src="js/intro.js?v=10" defer></script>
   <script src="js/mode-activity-view.js?v=10" defer></script>
   <script src="js/quick-wins-view.js?v=10" defer></script>
+  <script src="js/shuffle-mode.js?v=10" defer></script>
   
   <!-- Structured Data (JSON-LD) -->
   <script type="application/ld+json">
@@ -199,6 +200,41 @@
       <h2 class="section-title">Select How You Feel</h2>
 
       <div class="mode-grid" id="modesGrid" role="list" aria-live="polite"></div>
+      
+      <div class="shuffle-mode-block" role="region" aria-label="Shuffle Mode section">
+        <div class="shuffle-mode-header">
+          <div class="shuffle-mode-icon">🔀</div>
+          <div class="shuffle-mode-title-section">
+            <h3 class="shuffle-mode-title">All Activities (Shuffle)</h3>
+            <p class="shuffle-mode-subtitle">Discover activities across all modes</p>
+          </div>
+        </div>
+        <p class="shuffle-mode-description">
+          Not sure which mode fits? Try <strong>Shuffle Mode</strong>! We'll present activities from all modes in a randomized order. 
+          Swipe through different activities until you find one that resonates.
+        </p>
+        <div class="shuffle-mode-features">
+          <div class="shuffle-feature">
+            <span class="feature-icon">🎲</span>
+            <span class="feature-text">Random activities from all modes</span>
+          </div>
+          <div class="shuffle-feature">
+            <span class="feature-icon">🔄</span>
+            <span class="feature-text">No repeats until deck exhausted</span>
+          </div>
+          <div class="shuffle-feature">
+            <span class="feature-icon">⌨️</span>
+            <span class="feature-text">Keyboard & swipe navigation</span>
+          </div>
+        </div>
+        <button id="shuffleModeLink" class="nav-btn shuffle-mode-cta" data-action="shuffle-mode">
+          <span class="cta-icon">🔀</span>
+          <span class="cta-text">Start Shuffle Mode</span>
+          <span class="cta-arrow">→</span>
+        </button>
+        <p class="shuffle-mode-encouragement">Let's find what you need today.</p>
+      </div>
+      
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
         <div class="quick-wins-header">
           <div class="quick-wins-icon">⚡</div>

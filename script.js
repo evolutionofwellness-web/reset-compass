@@ -486,6 +486,39 @@
           }
           return; 
         }
+        if (action === 'shuffle-mode') {
+          safeShowDialog($('#modeDialog'));
+          // Update dialog title for shuffle mode
+          const title = $('#modeDialogTitle');
+          const desc = $('#dialogModeDescription');
+          const accent = $('#modeAccent');
+          if (title) title.textContent = 'All Activities (Shuffle Mode)';
+          if (desc) desc.textContent = 'Explore activities from all modes in randomized order';
+          if (accent) accent.style.background = 'linear-gradient(90deg, #2E7FE8, #0FBF84, #FFBF3B, #FF5F6D)';
+          
+          // Initialize Shuffle Mode
+          if (window.ShuffleMode) {
+            window.ShuffleMode.init({
+              logActivity: function(payload) {
+                const m = MODES.find(x => x.id === payload.mode);
+                const entry = {
+                  modeId: payload.mode,
+                  modeName: m ? m.name : 'Activity',
+                  modeColor: m ? m.color : '#00AFA0',
+                  action: payload.activity.title || payload.activity.text,
+                  note: payload.note || ''
+                };
+                recordActivities([entry]);
+                safeCloseDialog($('#modeDialog'));
+                clearDialogSelections();
+              },
+              onClose: function() {
+                safeCloseDialog($('#modeDialog'));
+              }
+            });
+          }
+          return;
+        }
         if (action === 'history'){ openHistoryDialog(); return; }
         if (action === 'about'){ window.location.href = './about.html'; return; }
         if (action === 'home'){ window.location.href = './index.html'; return; }
@@ -619,16 +652,12 @@
             modeId: payload.mode,
             modeName: m.name,
             modeColor: m.color,
-            action: payload.activity.text,
+            action: payload.activity.title || payload.activity.text,
             note: payload.note || ''
           };
           recordActivities([entry]);
           safeCloseDialog($('#modeDialog'));
           clearDialogSelections();
-        },
-        openFullList: function(mode) {
-          // Show full list view (existing behavior)
-          showFullActivityList(mode);
         },
         onClose: function() {
           safeCloseDialog($('#modeDialog'));
@@ -675,7 +704,7 @@
     safeShowDialog($('#modeDialog'));
   }
 
-  /* Dialog helpers and utilities */
+   /* Dialog helpers and utilities */
   function safeShowDialog(d){
     if (!d) return;
     try {
@@ -690,6 +719,44 @@
         scrollableContent.scrollTop = 0;
       }
       
+      // Add ESC key handler
+      if (!d._escHandler) {
+        d._escHandler = function(e) {
+          if (e.key === 'Escape' && d.open) {
+            e.preventDefault();
+            safeCloseDialog(d);
+          }
+        };
+        document.addEventListener('keydown', d._escHandler);
+      }
+      
+      // Focus trapping
+      if (!d._focusTrapHandler) {
+        d._focusTrapHandler = function(e) {
+          if (e.key === 'Tab' && d.open) {
+            const focusableElements = d.querySelectorAll(
+              'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled])'
+            );
+            const focusableArray = Array.from(focusableElements);
+            const firstFocusable = focusableArray[0];
+            const lastFocusable = focusableArray[focusableArray.length - 1];
+            
+            if (e.shiftKey) {
+              if (document.activeElement === firstFocusable) {
+                e.preventDefault();
+                lastFocusable.focus();
+              }
+            } else {
+              if (document.activeElement === lastFocusable) {
+                e.preventDefault();
+                firstFocusable.focus();
+              }
+            }
+          }
+        };
+        d.addEventListener('keydown', d._focusTrapHandler);
+      }
+      
       const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
       if (f) setTimeout(()=>f.focus(), 30);
     } catch(e){ console.warn('safeShowDialog failed', e); }
@@ -698,6 +765,21 @@
   function safeCloseDialog(d){
     if (!d) return;
     try {
+      // Clean up event handlers
+      if (d._escHandler) {
+        document.removeEventListener('keydown', d._escHandler);
+        d._escHandler = null;
+      }
+      if (d._focusTrapHandler) {
+        d.removeEventListener('keydown', d._focusTrapHandler);
+        d._focusTrapHandler = null;
+      }
+      
+      // Clean up shuffle mode if it was active
+      if (window.ShuffleMode && window.ShuffleMode.cleanup) {
+        window.ShuffleMode.cleanup();
+      }
+      
       d.classList.add('page-transition-out');
       setTimeout(() => {
         d.classList.remove('page-transition-out');

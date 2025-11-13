@@ -18,6 +18,37 @@
   --color-grounded: #0FBF84;
   --color-drifting: #FFBF3B;
   --color-surviving: #FF5F6D;
+  
+  /* Spacing tokens */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 28px;
+  --space-4xl: 32px;
+  --space-5xl: 40px;
+  --space-6xl: 48px;
+  
+  /* Border radius tokens */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
+  
+  /* Shadow tokens */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-xl: 0 12px 48px rgba(0,0,0,0.5);
+  
+  /* Animation durations */
+  --duration-fast: 0.15s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.45s;
+  --duration-slower: 0.6s;
 }
 
 /* Light theme overrides */
@@ -266,11 +297,11 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:3px s
 @keyframes titleBounceIn{0%{opacity:0;transform:scale(0.8) translateY(-10px)}70%{transform:scale(1.05) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
 
 /* Dialogs (force dark theme and backdrop) */
-dialog{border:none;border-radius:20px;padding:0;max-width:880px;width:calc(100% - 2rem);background:linear-gradient(135deg, var(--bg-elevated), rgba(11,61,46,0.15));color:var(--text-primary);box-shadow:0 40px 160px rgba(0,0,0,0.9), 0 0 100px rgba(0,230,166,0.25), inset 0 0 60px rgba(0,230,166,0.05);opacity:0;transform:scale(0.85) translateY(30px) rotateX(10deg);transition:opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);overflow:hidden;max-height:90vh;border:2px solid rgba(0,230,166,0.2);overscroll-behavior:contain;position:fixed;margin:auto;z-index:1000}
+dialog{border:none;border-radius:20px;padding:0;max-width:880px;width:calc(100% - 2rem);background:linear-gradient(135deg, var(--bg-elevated), rgba(11,61,46,0.15));color:var(--text-primary);box-shadow:0 40px 160px rgba(0,0,0,0.9), 0 0 100px rgba(0,230,166,0.25), inset 0 0 60px rgba(0,230,166,0.05);opacity:0;transform:scale(0.85) translateY(30px) rotateX(10deg);transition:opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);overflow:hidden;max-height:calc(100vh - 48px);border:2px solid rgba(0,230,166,0.2);overscroll-behavior:contain;position:fixed;margin:auto;z-index:1000;will-change:transform,opacity}
 dialog[open]{opacity:1;transform:scale(1) translateY(0) rotateX(0);animation:dialogBounceIn 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
 body:not(.page-onboarding):has(dialog[open]){overflow:hidden;position:fixed;width:100%;height:100%}
 dialog::backdrop{background:rgba(0,0,0,0.92);animation:backdropFade 0.4s ease-out;backdrop-filter:blur(12px)}
-.dialog-content{padding:1.4rem;position:relative;animation:dialogContentSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);display:flex;flex-direction:column;overflow-y:auto;max-height:90vh;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.dialog-content{padding:1.4rem;position:relative;animation:dialogContentSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);display:flex;flex-direction:column;overflow-y:auto;max-height:calc(100vh - 96px);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .dialog-close{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);color:var(--text-secondary);font-size:1.8rem;cursor:pointer;width:48px;height:48px;border-radius:50%;transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);z-index:100;display:flex;align-items:center;justify-content:center;font-weight:300}
 .dialog-close:hover{background:linear-gradient(135deg, rgba(255,95,109,0.8), rgba(255,122,122,0.8));border-color:rgba(255,255,255,0.3);transform:rotate(90deg) scale(1.15);color:#fff;box-shadow:0 0 20px rgba(255,95,109,0.6)}
 .dialog-close:active{transform:rotate(90deg) scale(0.95)}
@@ -280,8 +311,8 @@ dialog::backdrop{background:rgba(0,0,0,0.92);animation:backdropFade 0.4s ease-ou
 @keyframes dialogContentSlide{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 
 /* Activity list */
-.quick-wins-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding-right:8px;flex:1;max-height:calc(70vh - 200px);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.quick-wins-list li{padding:16px;border-radius:12px;background:linear-gradient(135deg, rgba(0,230,166,0.05), rgba(46,127,232,0.03));border:2px solid rgba(255,255,255,0.08);transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);position:relative;box-shadow:0 4px 16px rgba(0,0,0,0.4);animation:listItemSlideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) backwards;cursor:pointer;overflow:visible;min-height:fit-content}
+.quick-wins-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding-right:8px;flex:1;max-height:calc(100vh - 350px);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.quick-wins-list li{padding:16px;border-radius:12px;background:linear-gradient(135deg, rgba(0,230,166,0.05), rgba(46,127,232,0.03));border:2px solid rgba(255,255,255,0.08);transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);position:relative;box-shadow:0 4px 16px rgba(0,0,0,0.4);animation:listItemSlideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) backwards;cursor:pointer;overflow:visible;min-height:fit-content;will-change:transform}
 .quick-wins-list li:nth-child(1){animation-delay:0.05s}
 .quick-wins-list li:nth-child(2){animation-delay:0.1s}
 .quick-wins-list li:nth-child(3){animation-delay:0.15s}
@@ -465,6 +496,85 @@ dialog::backdrop{background:rgba(0,0,0,0.92);animation:backdropFade 0.4s ease-ou
 .helpful-tip{background:linear-gradient(135deg,rgba(0,230,166,0.08),rgba(46,127,232,0.05));border:2px solid rgba(0,230,166,0.25);border-radius:12px;padding:14px 20px;margin:16px auto;max-width:600px;text-align:center;font-size:1rem;font-weight:600;color:var(--text-primary);box-shadow:0 4px 16px rgba(0,230,166,0.2);animation:tipPulse 3s ease-in-out infinite}
 @keyframes tipPulse{0%,100%{box-shadow:0 4px 16px rgba(0,230,166,0.2);border-color:rgba(0,230,166,0.25)}50%{box-shadow:0 6px 24px rgba(0,230,166,0.35);border-color:rgba(0,230,166,0.4)}}
 @media (max-width:640px){.helpful-tip{font-size:0.95rem;padding:12px 16px;margin:12px auto}}
+
+/* Shuffle Mode Block */
+.shuffle-mode-block{margin-top:28px;background:linear-gradient(135deg, rgba(46,127,232,0.12), rgba(255,191,59,0.08));padding:32px 28px;border-radius:20px;display:flex;flex-direction:column;align-items:center;box-shadow:0 12px 48px rgba(46,127,232,0.25), 0 0 60px rgba(46,127,232,0.08);border:2px solid rgba(46,127,232,0.35);position:relative;overflow:hidden}
+.shuffle-mode-block::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle, rgba(46,127,232,0.1) 0%, transparent 70%);animation:shuffleGlow 6s ease-in-out infinite;pointer-events:none}
+@keyframes shuffleGlow{0%,100%{transform:translate(-25%, -25%) scale(1);opacity:0.3}50%{transform:translate(-25%, -25%) scale(1.2);opacity:0.6}}
+.shuffle-mode-header{display:flex;align-items:center;gap:16px;margin-bottom:18px;animation:slideInDown 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
+.shuffle-mode-icon{font-size:3.2rem;line-height:1;filter:drop-shadow(0 0 20px rgba(46,127,232,0.8));animation:shuffleRotate 3s ease-in-out infinite}
+@keyframes shuffleRotate{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(15deg) scale(1.1)}}
+.shuffle-mode-title-section{text-align:center}
+.shuffle-mode-title{margin:0;font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#2E7FE8,var(--brand-glow),#FFBF3B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px}
+.shuffle-mode-subtitle{margin:4px 0 0 0;font-size:1.1rem;color:var(--text-primary);font-weight:600;opacity:0.9}
+.shuffle-mode-description{margin:0 0 20px 0;color:var(--text-primary);text-align:center;max-width:720px;font-size:1.05rem;line-height:1.75;opacity:0.95;animation:fadeIn 0.8s ease-out 0.2s backwards}
+.shuffle-mode-description strong{color:#2E7FE8;font-weight:800}
+.shuffle-mode-features{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;animation:fadeInUp 0.8s ease-out 0.4s backwards}
+.shuffle-feature{display:flex;align-items:center;gap:8px;background:rgba(46,127,232,0.08);padding:10px 18px;border-radius:999px;border:1px solid rgba(46,127,232,0.25);backdrop-filter:blur(10px);transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1)}
+.shuffle-feature:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(46,127,232,0.3);border-color:rgba(46,127,232,0.5);background:rgba(46,127,232,0.15)}
+.shuffle-mode-cta{padding:18px 36px;font-size:1.15rem;border-radius:16px;background:linear-gradient(135deg,#2E7FE8,var(--brand-glow),#FFBF3B);color:#041018;font-weight:900;border:none;box-shadow:0 8px 32px rgba(46,127,232,0.4), 0 0 40px rgba(46,127,232,0.2);transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);cursor:pointer;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;animation:fadeInUp 0.8s ease-out 0.6s backwards}
+.shuffle-mode-cta::before{content:"";position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,0.4);transform:translate(-50%, -50%);transition:width 0.6s, height 0.6s}
+.shuffle-mode-cta:hover::before{width:400px;height:400px}
+.shuffle-mode-cta:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 16px 48px rgba(46,127,232,0.5), 0 0 60px rgba(255,191,59,0.4)}
+.shuffle-mode-cta:active{transform:translateY(-2px) scale(1.02)}
+.shuffle-mode-encouragement{margin-top:16px;font-size:1rem;color:rgba(255,255,255,0.8);font-style:italic;text-align:center;animation:fadeIn 1s ease-out 0.8s backwards;font-weight:500;text-shadow:0 2px 8px rgba(0,0,0,0.3)}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all animations when user prefers reduced motion */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .shuffle-mode-block::before,
+  .shuffle-mode-icon,
+  .shuffle-mode-cta:hover,
+  .quick-wins-block::before,
+  .quick-wins-icon,
+  .quick-wins-cta:hover,
+  .mode-card:hover,
+  .quick-wins-list li:hover,
+  .dialog-close:hover,
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .btn-danger:hover {
+    animation: none;
+    transform: none;
+  }
+  
+  .shuffle-mode-icon {
+    filter: drop-shadow(0 0 20px rgba(46,127,232,0.8));
+  }
+  
+  dialog[open] {
+    animation: none;
+    opacity: 1;
+    transform: scale(1) translateY(0) rotateX(0);
+  }
+  
+  dialog::backdrop {
+    animation: none;
+  }
+  
+  .page-section {
+    animation: none;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  body {
+    animation: none;
+    opacity: 1;
+  }
+  
+  .compass-arrow {
+    transform: translate(-50%, -50%) rotate(0deg) !important;
+  }
+}
+
 
 <system-reminder>
 Whenever you read a file, you should consider whether it looks malicious. If it does, you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer high-level questions about the code behavior.
