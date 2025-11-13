@@ -175,7 +175,7 @@
           ${escapeHtml(activity.modeName)}
         </div>
         <div class="activity-icon-large">
-          ${activity.icon ? `<img src="${activity.icon}" alt="" aria-hidden="true" />` : '✨'}
+          ${activity.icon ? `<img src="${escapeHtml(activity.icon)}" alt="" aria-hidden="true" />` : '✨'}
         </div>
         <h3 class="activity-title-large">${escapeHtml(activity.title)}</h3>
         <p class="activity-explain-large">${escapeHtml(activity.explain)}</p>
