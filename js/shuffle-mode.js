@@ -394,31 +394,32 @@
      * Wire up event listeners for buttons
      */
     wireEvents() {
-      const doneBtn = document.querySelector('.shuffle-done-btn');
-      const nextBtn = document.querySelector('.shuffle-next-btn');
-      const prevBtn = document.querySelector('.shuffle-prev-btn');
-      const reshuffleBtn = document.querySelector('.shuffle-reshuffle-small-btn');
-      const allowRepeatToggle = document.querySelector('.shuffle-allow-repeat-toggle input');
-      
-      if (doneBtn) {
-        doneBtn.addEventListener('click', () => this.handleDone());
-      }
-      
-      if (nextBtn) {
-        nextBtn.addEventListener('click', () => this.nextActivity());
-      }
-      
-      if (prevBtn) {
-        prevBtn.addEventListener('click', () => this.prevActivity());
-      }
-      
-      if (reshuffleBtn) {
-        reshuffleBtn.addEventListener('click', () => this.reshuffleNow());
-      }
-      
-      if (allowRepeatToggle) {
-        allowRepeatToggle.addEventListener('change', () => this.toggleAllowRepeat());
-      }
+      const container = document.querySelector('.shuffle-mode-container');
+      if (!container) return;
+
+      // Remove any previous listeners (if needed, but since we always replace innerHTML, container is persistent)
+
+      // Delegate click events
+      container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('shuffle-done-btn')) {
+          this.handleDone();
+        } else if (e.target.classList.contains('shuffle-next-btn')) {
+          this.nextActivity();
+        } else if (e.target.classList.contains('shuffle-prev-btn')) {
+          this.prevActivity();
+        } else if (e.target.classList.contains('shuffle-reshuffle-small-btn')) {
+          this.reshuffleNow();
+        }
+      });
+
+      // Delegate change events for allow repeat toggle
+      container.addEventListener('change', (e) => {
+        if (
+          e.target.matches('.shuffle-allow-repeat-toggle input')
+        ) {
+          this.toggleAllowRepeat();
+        }
+      });
     },
     
     /**
