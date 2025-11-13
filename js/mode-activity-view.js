@@ -17,13 +17,11 @@
      * @param {string} options.mode - Mode ID (surviving, drifting, grounded, growing)
      * @param {Function} options.playAnimation - Optional async function to play animation
      * @param {Function} options.logActivity - Function to log activity completion
-     * @param {Function} options.openFullList - Optional function to open full activity list
      * @param {Function} options.onClose - Optional function called when view closes
      */
     async init(options) {
       this.currentMode = options.mode;
       this.logActivity = options.logActivity;
-      this.openFullList = options.openFullList;
       this.onClose = options.onClose;
       
       // Load activities for this mode
@@ -125,17 +123,6 @@
                 <span class="btn-text">New One</span>
               </button>
             </div>
-            ${this.openFullList ? `
-              <button class="btn-link mode-activity-view-all" style="
-                margin-top: 16px;
-                color: var(--text-secondary);
-                text-decoration: underline;
-                background: none;
-                border: none;
-                cursor: pointer;
-                font-size: 14px;
-              ">View All Activities</button>
-            ` : ''}
           </div>
           <textarea class="activity-note" placeholder="Add notes (optional)" style="
             width: 100%;
@@ -163,7 +150,6 @@
     wireEvents() {
       const doneBtn = document.querySelector('.mode-activity-done');
       const newBtn = document.querySelector('.mode-activity-new');
-      const viewAllBtn = document.querySelector('.mode-activity-view-all');
       
       if (doneBtn) {
         doneBtn.addEventListener('click', () => this.handleDone());
@@ -171,14 +157,6 @@
       
       if (newBtn) {
         newBtn.addEventListener('click', () => this.showRandomActivity());
-      }
-      
-      if (viewAllBtn && this.openFullList) {
-        viewAllBtn.addEventListener('click', () => {
-          if (this.openFullList) {
-            this.openFullList(this.currentMode);
-          }
-        });
       }
     },
     
