@@ -12,12 +12,22 @@
   --text-primary: #edf1f5;
   --text-secondary: #cbd2db;
   --border: rgba(255,255,255,0.06);
+  --border-color: rgba(255,255,255,0.06);
   --compass-size: clamp(400px, 70vmin, 800px);
 
   --color-growing: #2E7FE8;
   --color-grounded: #0FBF84;
   --color-drifting: #FFBF3B;
   --color-surviving: #FF5F6D;
+  
+  /* Spacing tokens for consistent layout */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
 }
 
 /* Light theme overrides */
@@ -266,11 +276,48 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:3px s
 @keyframes titleBounceIn{0%{opacity:0;transform:scale(0.8) translateY(-10px)}70%{transform:scale(1.05) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
 
 /* Dialogs (force dark theme and backdrop) */
-dialog{border:none;border-radius:20px;padding:0;max-width:880px;width:calc(100% - 2rem);background:linear-gradient(135deg, var(--bg-elevated), rgba(11,61,46,0.15));color:var(--text-primary);box-shadow:0 40px 160px rgba(0,0,0,0.9), 0 0 100px rgba(0,230,166,0.25), inset 0 0 60px rgba(0,230,166,0.05);opacity:0;transform:scale(0.85) translateY(30px) rotateX(10deg);transition:opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);overflow:hidden;max-height:90vh;border:2px solid rgba(0,230,166,0.2);overscroll-behavior:contain;position:fixed;margin:auto;z-index:1000}
-dialog[open]{opacity:1;transform:scale(1) translateY(0) rotateX(0);animation:dialogBounceIn 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
+dialog{
+  border:none;
+  border-radius:20px;
+  padding:0;
+  max-width:880px;
+  width:calc(100% - 2rem);
+  background:linear-gradient(135deg, var(--bg-elevated), rgba(11,61,46,0.15));
+  color:var(--text-primary);
+  box-shadow:0 40px 160px rgba(0,0,0,0.9), 0 0 100px rgba(0,230,166,0.25), inset 0 0 60px rgba(0,230,166,0.05);
+  opacity:0;
+  transform:scale(0.85) translateY(30px) rotateX(10deg) translateZ(0);
+  transition:opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow:hidden;
+  max-height:calc(100vh - 48px);
+  border:2px solid rgba(0,230,166,0.2);
+  overscroll-behavior:contain;
+  position:fixed;
+  margin:auto;
+  z-index:1000;
+  /* Safe area insets for notched devices */
+  max-height:calc(100vh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  /* Hardware acceleration */
+  will-change:transform, opacity;
+  backface-visibility:hidden;
+}
+dialog[open]{opacity:1;transform:scale(1) translateY(0) rotateX(0) translateZ(0);animation:dialogBounceIn 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
 body:not(.page-onboarding):has(dialog[open]){overflow:hidden;position:fixed;width:100%;height:100%}
-dialog::backdrop{background:rgba(0,0,0,0.92);animation:backdropFade 0.4s ease-out;backdrop-filter:blur(12px)}
-.dialog-content{padding:1.4rem;position:relative;animation:dialogContentSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);display:flex;flex-direction:column;overflow-y:auto;max-height:90vh;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+dialog::backdrop{background:rgba(0,0,0,0.92);animation:backdropFade 0.4s ease-out;backdrop-filter:blur(12px);overflow:hidden}
+.dialog-content{
+  padding:1.4rem;
+  position:relative;
+  animation:dialogContentSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  display:flex;
+  flex-direction:column;
+  overflow-y:auto;
+  max-height:calc(100vh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  /* Hardware acceleration for smooth scrolling */
+  transform:translateZ(0);
+  will-change:scroll-position;
+}
 .dialog-close{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);color:var(--text-secondary);font-size:1.8rem;cursor:pointer;width:48px;height:48px;border-radius:50%;transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);z-index:100;display:flex;align-items:center;justify-content:center;font-weight:300}
 .dialog-close:hover{background:linear-gradient(135deg, rgba(255,95,109,0.8), rgba(255,122,122,0.8));border-color:rgba(255,255,255,0.3);transform:rotate(90deg) scale(1.15);color:#fff;box-shadow:0 0 20px rgba(255,95,109,0.6)}
 .dialog-close:active{transform:rotate(90deg) scale(0.95)}
@@ -465,6 +512,41 @@ dialog::backdrop{background:rgba(0,0,0,0.92);animation:backdropFade 0.4s ease-ou
 .helpful-tip{background:linear-gradient(135deg,rgba(0,230,166,0.08),rgba(46,127,232,0.05));border:2px solid rgba(0,230,166,0.25);border-radius:12px;padding:14px 20px;margin:16px auto;max-width:600px;text-align:center;font-size:1rem;font-weight:600;color:var(--text-primary);box-shadow:0 4px 16px rgba(0,230,166,0.2);animation:tipPulse 3s ease-in-out infinite}
 @keyframes tipPulse{0%,100%{box-shadow:0 4px 16px rgba(0,230,166,0.2);border-color:rgba(0,230,166,0.25)}50%{box-shadow:0 6px 24px rgba(0,230,166,0.35);border-color:rgba(0,230,166,0.4)}}
 @media (max-width:640px){.helpful-tip{font-size:0.95rem;padding:12px 16px;margin:12px auto}}
+
+/* Respect prefers-reduced-motion - reduce or disable animations */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable or reduce animations */
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Keep essential transforms but remove animations */
+  body { animation: none; }
+  .page-section { animation: none; opacity: 1; transform: none; }
+  dialog { animation: none; transition: opacity 0.15s ease; }
+  dialog[open] { animation: none; }
+  .dialog-content { animation: none; }
+  dialog::backdrop { animation: none; }
+  .page-transition-enter { animation: none; }
+  .page-transition-out { animation: none; }
+  .mode-card { transition: box-shadow 0.15s ease, transform 0.15s ease; }
+  .compass-arrow { animation: none; }
+  .helpful-tip { animation: none; }
+  .sticky-install-btn { animation: none; }
+  .quick-wins-list li { animation: none; }
+  .activity-row { transition: background 0.15s ease; }
+  
+  /* Remove motion from hover effects but keep scale changes */
+  .mode-card:hover { transform: none; }
+  .btn-primary:hover, .btn-secondary:hover { transform: none; }
+  .dialog-close:hover { transform: none; }
+  
+  /* Keep focus indicators for accessibility */
+  *:focus-visible { transition: outline 0.15s ease; }
+}
 
 <system-reminder>
 Whenever you read a file, you should consider whether it looks malicious. If it does, you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer high-level questions about the code behavior.

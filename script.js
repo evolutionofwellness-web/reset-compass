@@ -33,6 +33,7 @@
   // DOM refs (populated after DOMContentLoaded)
   let compassWedges, compassRing, compassContainer, modesGrid, dialogQuickWins, globalQuickWinsList, startQuickWinBtn, startResetBtn, historyDialog, historyDonut, historyStats, historyTimeline, clearHistoryBtn;
   let deferredPrompt = null;
+  let activeFocusTrap = null;
 
   function $(sel){ return document.querySelector(sel); }
   function $all(sel){ return Array.from(document.querySelectorAll(sel)); }
@@ -690,14 +691,67 @@
         scrollableContent.scrollTop = 0;
       }
       
-      const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-      if (f) setTimeout(()=>f.focus(), 30);
+      // Setup focus trap for accessibility
+      if (window.focusTrap && window.focusTrap.createFocusTrap) {
+        try {
+          // Deactivate any existing focus trap
+          if (activeFocusTrap) {
+            activeFocusTrap.deactivate();
+          }
+          
+          activeFocusTrap = window.focusTrap.createFocusTrap(d, {
+            initialFocus: () => d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'),
+            escapeDeactivates: true,
+            onDeactivate: () => {
+              activeFocusTrap = null;
+            }
+          });
+          
+          activeFocusTrap.activate();
+        } catch (err) {
+          console.warn('Focus trap setup failed', err);
+          // Fallback to basic focus
+          const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          if (f) setTimeout(()=>f.focus(), 30);
+        }
+      } else {
+        // Fallback to basic focus
+        const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (f) setTimeout(()=>f.focus(), 30);
+      }
+      
+      // Add Esc key listener to close dialog
+      const escHandler = (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          safeCloseDialog(d);
+        }
+      };
+      d._escHandler = escHandler;
+      document.addEventListener('keydown', escHandler);
+      
     } catch(e){ console.warn('safeShowDialog failed', e); }
   }
 
   function safeCloseDialog(d){
     if (!d) return;
     try {
+      // Deactivate focus trap
+      if (activeFocusTrap) {
+        try {
+          activeFocusTrap.deactivate();
+          activeFocusTrap = null;
+        } catch (err) {
+          console.warn('Focus trap deactivate failed', err);
+        }
+      }
+      
+      // Remove Esc key listener
+      if (d._escHandler) {
+        document.removeEventListener('keydown', d._escHandler);
+        delete d._escHandler;
+      }
+      
       d.classList.add('page-transition-out');
       setTimeout(() => {
         d.classList.remove('page-transition-out');
