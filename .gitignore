@@ -4,6 +4,9 @@
 # Test files
 manual-test.mjs
 test-results.json
+test-shuffle-mode.mjs
+test-shuffle-inline.mjs
+test-*.mjs
 node_modules/
 
 # Build artifacts
