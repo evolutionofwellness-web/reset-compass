@@ -627,8 +627,23 @@
           clearDialogSelections();
         },
         openFullList: function(mode) {
-          // Show full list view (existing behavior)
-          showFullActivityList(mode);
+          // Open Shuffle Mode instead of full list
+          if (window.ShuffleMode) {
+            safeCloseDialog($('#modeDialog'));
+            window.ShuffleMode.init({
+              mode: mode,
+              logActivity: function(payload) {
+                const entry = {
+                  modeId: payload.mode,
+                  modeName: m.name,
+                  modeColor: m.color,
+                  action: payload.activity.text,
+                  note: payload.note || ''
+                };
+                recordActivities([entry]);
+              }
+            });
+          }
         },
         onClose: function() {
           safeCloseDialog($('#modeDialog'));

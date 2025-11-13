@@ -11,8 +11,23 @@
   --bg-elevated: #14201a;
   --text-primary: #edf1f5;
   --text-secondary: #cbd2db;
+  --text-tertiary: #999;
   --border: rgba(255,255,255,0.06);
+  --border-color: rgba(255,255,255,0.06);
   --compass-size: clamp(400px, 70vmin, 800px);
+  --color-primary: #0B3D2E;
+  --color-success: #00c06b;
+
+  /* Spacing tokens */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-base: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 48px;
+  --spacing-4xl: 64px;
 
   --color-growing: #2E7FE8;
   --color-grounded: #0FBF84;
@@ -27,7 +42,11 @@
   --bg-elevated: #ffffff;
   --text-primary: #0a0e0c;
   --text-secondary: #2d3e36;
+  --text-tertiary: #666;
   --border: rgba(11,61,46,0.12);
+  --border-color: rgba(11,61,46,0.12);
+  --color-primary: #0B3D2E;
+  --color-success: #00c06b;
 }
 
 :root.light .compass-wedges{opacity:0.95}
