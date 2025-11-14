@@ -1,5 +1,5 @@
 // Service Worker for The Reset Compass
-const CACHE_VERSION = 'reset-compass-v2.0.2';
+const CACHE_VERSION = 'reset-compass-v2.0.3';
 const CACHE_NAME = `${CACHE_VERSION}`;
 
 // Files to cache on install
@@ -118,6 +118,18 @@ self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
+});
+
+// Notify clients when a new version is ready
+self.addEventListener('controllerchange', () => {
+  self.clients.matchAll({ type: 'window' }).then(clients => {
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'SW_UPDATED',
+        message: 'A new version is available!'
+      });
+    });
+  });
 });
 
 
