@@ -109,7 +109,7 @@
             text-align: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
           ">
-            ${activity.icon ? `<div class="activity-icon" style="font-size: 48px; margin-bottom: 16px;">${activity.icon}</div>` : ''}
+            ${activity.icon && !activity.icon.includes('/') && !activity.icon.includes('.') ? `<div class="activity-icon" style="font-size: 48px; margin-bottom: 16px;">${activity.icon}</div>` : ''}
             <div class="activity-text" style="
               font-size: 20px;
               font-weight: 600;

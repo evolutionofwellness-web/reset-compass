@@ -162,23 +162,6 @@
       // Render shuffle mode UI
       dialogQuickWins.innerHTML = `
         <li class="shuffle-mode-view ${animationClass}" style="list-style: none;">
-          <div class="shuffle-header" style="
-            text-align: center;
-            padding: 20px 16px;
-            background: linear-gradient(135deg, rgba(0, 230, 166, 0.1), rgba(46, 127, 232, 0.1));
-            border-radius: 12px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(0, 230, 166, 0.2);
-          ">
-            <div class="shuffle-icon" style="font-size: 42px; margin-bottom: 12px;">🔀</div>
-            <h3 style="
-              font-size: 20px;
-              font-weight: 700;
-              color: var(--text-primary);
-              margin: 0;
-            ">Shuffle Mode</h3>
-          </div>
-          
           <div class="activity-card shuffle-card" style="
             background: var(--bg-elevated);
             border: 2px solid var(--border-color);
@@ -191,7 +174,7 @@
             transform: translateZ(0);
             will-change: transform;
           ">
-            ${activity.icon ? `<div class="activity-icon" style="font-size: 56px; margin-bottom: 20px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));">${activity.icon}</div>` : ''}
+            ${activity.icon && !activity.icon.includes('/') && !activity.icon.includes('.') ? `<div class="activity-icon" style="font-size: 56px; margin-bottom: 20px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));">${activity.icon}</div>` : ''}
             
             <div class="activity-text" style="
               font-size: 22px;

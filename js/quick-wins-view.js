@@ -114,7 +114,7 @@
               font-weight: 600;
             ">⚡ Quick Win</div>
             
-            ${activity.icon ? `<div class="quick-win-icon" style="font-size: 56px; margin-bottom: 20px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));">${activity.icon}</div>` : '<div style="height: 20px;"></div>'}
+            ${activity.icon && !activity.icon.includes('/') && !activity.icon.includes('.') ? `<div class="quick-win-icon" style="font-size: 56px; margin-bottom: 20px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));">${activity.icon}</div>` : '<div style="height: 20px;"></div>'}
             
             <div class="quick-win-text" style="
               font-size: 22px;

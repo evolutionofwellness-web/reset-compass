@@ -1,5 +1,5 @@
 // Service Worker for The Reset Compass
-const CACHE_VERSION = 'reset-compass-v2.0.3';
+const CACHE_VERSION = 'reset-compass-v2.0.4';
 const CACHE_NAME = `${CACHE_VERSION}`;
 
 // Files to cache on install
@@ -10,16 +10,25 @@ const STATIC_ASSETS = [
   '/script.js',
   '/manifest.json',
   '/data/modes.json',
+  '/data/activities.json',
   '/assets/images/compass.svg',
   '/assets/images/compass.png',
   '/about.html',
+  '/onboarding.html',
   '/css/cinematic.css',
+  '/css/onboarding.css',
   '/js/intro.js',
   '/js/modes-loader.js',
   '/js/modes-ui.js',
+  '/js/onboarding.js',
+  '/js/mode-activity-view.js',
+  '/js/quick-wins-view.js',
+  '/js/shuffle-mode.js',
   '/assets/compass.svg',
   '/assets/images/compass-192.png',
-  '/assets/images/compass-512.png'
+  '/assets/images/compass-512.png',
+  '/assets/images/app-icon.png',
+  '/assets/images/app-icon-rounded.png'
 ];
 
 // Install event - cache static assets

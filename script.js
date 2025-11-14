@@ -953,8 +953,11 @@
         const review = formData.get('review');
         
         if (!rating){ showToast('Please select a rating'); return; }
+        if (!name || name.trim() === ''){ showToast('Please enter your name'); return; }
+        if (!review || review.trim() === ''){ showToast('Please enter your review'); return; }
+        if (review.trim().length < 10){ showToast('Review must be at least 10 characters'); return; }
         
-        const reviewObj = { rating, name, review, date: new Date().toISOString() };
+        const reviewObj = { rating, name: name.trim(), review: review.trim(), date: new Date().toISOString() };
         let reviews = [];
         try { reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY) || '[]'); } catch(e){ reviews = []; }
         reviews.unshift(reviewObj);
@@ -970,7 +973,8 @@
           if (starRating) starRating.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
           renderReviews();
           safeCloseDialog($('#ratingsDialog'));
-        }).catch(() => {
+        }).catch((err) => {
+          console.error('Failed to submit review:', err);
           showToast('Review saved locally');
           renderReviews();
         });
@@ -981,6 +985,12 @@
       feedbackForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(feedbackForm);
+        const feedbackType = formData.get('type');
+        const feedbackMessage = formData.get('message');
+        
+        if (!feedbackType || feedbackType === ''){ showToast('Please select feedback type'); return; }
+        if (!feedbackMessage || feedbackMessage.trim() === ''){ showToast('Please enter your feedback'); return; }
+        if (feedbackMessage.trim().length < 10){ showToast('Feedback must be at least 10 characters'); return; }
         
         fetch('/', {
           method: 'POST',
@@ -990,7 +1000,8 @@
           showToast('Feedback sent successfully!');
           feedbackForm.reset();
           safeCloseDialog($('#feedbackDialog'));
-        }).catch(() => {
+        }).catch((err) => {
+          console.error('Failed to submit feedback:', err);
           showToast('Failed to send feedback. Please try again.');
         });
       });
