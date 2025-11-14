@@ -320,7 +320,7 @@ dialog::backdrop{background:rgba(0,0,0,0.92);animation:backdropFade 0.4s ease-ou
   transform:translateZ(0);
 }
 .dialog-close{
-  position:fixed;
+  position:absolute;
   top:var(--spacing-md);
   right:var(--spacing-md);
   background:rgba(255,255,255,0.05);
