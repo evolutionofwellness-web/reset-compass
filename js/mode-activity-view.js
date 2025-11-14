@@ -20,34 +20,52 @@
      * @param {Function} options.onClose - Optional function called when view closes
      */
     async init(options) {
-      this.currentMode = options.mode;
-      this.logActivity = options.logActivity;
-      this.onClose = options.onClose;
-      
-      // Load activities for this mode
       try {
-        const response = await fetch('data/activities.json');
-        const data = await response.json();
-        this.activities = data.modes[options.mode] || [];
-        
-        if (this.activities.length === 0) {
-          console.error('No activities found for mode:', options.mode);
+        if (!options || !options.mode) {
+          console.error('[ModeActivityView] Invalid options: mode is required');
+          this.showError('Unable to load activities');
           return;
         }
+
+        this.currentMode = options.mode;
+        this.logActivity = options.logActivity;
+        this.onClose = options.onClose;
         
-        // Play animation if provided
-        if (options.playAnimation && typeof options.playAnimation === 'function') {
-          await options.playAnimation();
-        } else {
-          // Small delay to mimic animation
-          await new Promise(resolve => setTimeout(resolve, 300));
+        // Load activities for this mode
+        try {
+          const response = await fetch('data/activities.json');
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          this.activities = data.modes[options.mode] || [];
+          
+          if (this.activities.length === 0) {
+            console.error('[ModeActivityView] No activities found for mode:', options.mode);
+            this.showError('No activities available for this mode');
+            return;
+          }
+          
+          // Play animation if provided
+          if (options.playAnimation && typeof options.playAnimation === 'function') {
+            await options.playAnimation();
+          } else {
+            // Small delay to mimic animation
+            await new Promise(resolve => setTimeout(resolve, 300));
+          }
+          
+          // Show random activity
+          this.showRandomActivity();
+          
+        } catch (error) {
+          console.error('[ModeActivityView] Failed to load activities:', error);
+          this.showError('Failed to load activities. Please try again.');
         }
-        
-        // Show random activity
-        this.showRandomActivity();
-        
       } catch (error) {
-        console.error('Failed to load activities:', error);
+        console.error('[ModeActivityView] Initialization error:', error);
+        this.showError('Failed to initialize activity view');
       }
     },
     
@@ -164,25 +182,70 @@
      * Handle Done button click
      */
     handleDone() {
-      const noteTextarea = document.querySelector('.activity-note');
-      const note = noteTextarea ? noteTextarea.value.trim() : '';
-      
-      // Call logActivity with standardized payload
-      if (this.logActivity) {
-        const payload = {
-          type: 'mode',
-          mode: this.currentMode,
-          activity: this.currentActivity,
-          timestamp: new Date().toISOString(),
-          note: note
-        };
+      try {
+        const noteTextarea = document.querySelector('.activity-note');
+        const note = noteTextarea ? noteTextarea.value.trim() : '';
         
-        this.logActivity(payload);
+        if (!this.currentActivity) {
+          console.error('[ModeActivityView] No activity to log');
+          this.showError('Unable to save activity');
+          return;
+        }
+        
+        // Call logActivity with standardized payload
+        if (this.logActivity && typeof this.logActivity === 'function') {
+          const payload = {
+            type: 'mode',
+            mode: this.currentMode,
+            activity: this.currentActivity,
+            timestamp: new Date().toISOString(),
+            note: note
+          };
+          
+          this.logActivity(payload);
+        } else {
+          console.warn('[ModeActivityView] logActivity callback not provided');
+        }
+        
+        // Call onClose if provided
+        if (this.onClose && typeof this.onClose === 'function') {
+          this.onClose();
+        }
+      } catch (error) {
+        console.error('[ModeActivityView] Error handling done:', error);
+        this.showError('Failed to complete activity');
       }
-      
-      // Call onClose if provided
-      if (this.onClose) {
-        this.onClose();
+    },
+    
+    /**
+     * Display error message to user
+     */
+    showError(message) {
+      try {
+        const dialogQuickWins = document.getElementById('dialogQuickWins');
+        if (!dialogQuickWins) {
+          console.error('[ModeActivityView] Cannot show error: dialogQuickWins not found');
+          return;
+        }
+        
+        dialogQuickWins.innerHTML = `
+          <li class="single-activity-view" style="list-style: none; text-align: center; padding: 40px 20px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+            <div style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
+              ${escapeHtml(message)}
+            </div>
+            <div style="font-size: 14px; color: var(--text-secondary);">
+              Please try again or contact support if the problem persists.
+            </div>
+          </li>
+        `;
+        
+        // Use global toast if available
+        if (window.showToast) {
+          window.showToast(message);
+        }
+      } catch (error) {
+        console.error('[ModeActivityView] Error showing error message:', error);
       }
     }
   };

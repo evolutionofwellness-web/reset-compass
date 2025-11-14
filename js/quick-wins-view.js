@@ -125,13 +125,6 @@
               text-shadow: 0 1px 2px rgba(0,0,0,0.1);
             ">${escapeHtml(activity.text)}</div>
             
-            <div class="quick-win-progress" style="
-              font-size: 13px;
-              color: var(--text-secondary);
-              margin-bottom: 24px;
-              opacity: 0.7;
-            ">${progressText}</div>
-            
             <div class="quick-win-tip" style="
               background: rgba(255, 191, 59, 0.1);
               border-left: 3px solid #FFBF3B;
