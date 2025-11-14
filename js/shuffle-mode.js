@@ -125,21 +125,6 @@
     },
     
     /**
-     * Shuffle and show a new random activity immediately
-     */
-    shuffleNow() {
-      try {
-        // Reshuffle the deck
-        this.shuffledActivities = this.shuffle(this.shuffledActivities);
-        this.currentIndex = 0;
-        this.showCurrentActivity();
-      } catch (error) {
-        console.error('[ShuffleMode] Error shuffling:', error);
-        this.showError('Failed to shuffle activities');
-      }
-    },
-    
-    /**
      * Render the shuffle mode view
      */
     render(activity, progressText) {
@@ -193,7 +178,6 @@
               gap: 12px;
               justify-content: center;
               flex-wrap: wrap;
-              margin-bottom: 20px;
             ">
               <button class="btn-primary shuffle-done" style="
                 flex: 1;
@@ -216,23 +200,6 @@
                 <span class="btn-text">Next Activity</span>
               </button>
             </div>
-            
-            <button class="btn-shuffle shuffle-now" style="
-              width: 100%;
-              background: linear-gradient(135deg, rgba(0, 230, 166, 0.15), rgba(46, 127, 232, 0.15));
-              border: 2px solid rgba(0, 230, 166, 0.3);
-              color: var(--text-primary);
-              font-weight: 600;
-              padding: 12px 20px;
-              border-radius: 10px;
-              cursor: pointer;
-              font-size: 15px;
-              transform: translateZ(0);
-              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            ">
-              <span style="font-size: 18px; margin-right: 8px;">🔀</span>
-              <span>Shuffle Now</span>
-            </button>
           </div>
           
           <textarea class="activity-note" placeholder="Add notes (optional)" style="
@@ -268,7 +235,6 @@
       try {
         const doneBtn = document.querySelector('.shuffle-done');
         const nextBtn = document.querySelector('.shuffle-next');
-        const shuffleBtn = document.querySelector('.shuffle-now');
         const noteTextarea = document.querySelector('.activity-note');
         
         if (doneBtn) {
@@ -277,10 +243,6 @@
         
         if (nextBtn) {
           nextBtn.addEventListener('click', () => this.nextActivity());
-        }
-        
-        if (shuffleBtn) {
-          shuffleBtn.addEventListener('click', () => this.shuffleNow());
         }
         
         // Add focus styles
@@ -452,16 +414,6 @@
         transform: translateY(-2px) translateZ(0) scale(1.02);
       }
       
-      .shuffle-now:hover {
-        background: linear-gradient(135deg, rgba(0, 230, 166, 0.25), rgba(46, 127, 232, 0.25));
-        border-color: rgba(0, 230, 166, 0.5);
-        transform: translateY(-2px) translateZ(0);
-        box-shadow: 0 4px 16px rgba(0, 230, 166, 0.3);
-      }
-      
-      .shuffle-now:active {
-        transform: scale(0.98) translateZ(0);
-      }
       
       /* Reduced motion support */
       @media (prefers-reduced-motion: reduce) {
@@ -473,12 +425,7 @@
         }
         
         .shuffle-done:hover,
-        .shuffle-next:hover,
-        .shuffle-now:hover {
-          transform: none;
-        }
-        
-        .shuffle-now:active {
+        .shuffle-next:hover {
           transform: none;
         }
       }

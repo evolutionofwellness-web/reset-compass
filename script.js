@@ -575,8 +575,14 @@
 
   /* Mode dialog flow */
   function openModeDialog(modeId){
+    console.log('[OpenModeDialog] Opening mode:', modeId);
     const m = MODES.find(x => x.id === modeId || x.id === String(modeId));
-    if (!m) return;
+    if (!m) {
+      console.error('[OpenModeDialog] Mode not found:', modeId);
+      return;
+    }
+    console.log('[OpenModeDialog] Found mode:', m.name, 'with', m.activities?.length || 0, 'activities');
+    
     const title = $('#modeDialogTitle'); const desc = $('#dialogModeDescription'); const accent = $('#modeAccent');
     if (title) title.textContent = m.name;
     if (desc) desc.textContent = m.description;
@@ -586,6 +592,7 @@
     const locked = (localStorage.getItem(LAST_MODE_DAY_KEY) === todayKey());
     
     if (locked) {
+      console.log('[OpenModeDialog] Mode is locked for today');
       // Show locked message
       if (!dialogQuickWins) return;
       dialogQuickWins.innerHTML = `
@@ -610,6 +617,26 @@
       
       // Get activities for this mode
       const activities = m.activities || [];
+      console.log('[OpenModeDialog] Passing', activities.length, 'activities to ShuffleMode');
+      
+      // Additional validation
+      if (activities.length === 0) {
+        console.error('[OpenModeDialog] No activities available for mode:', modeId);
+        if (dialogQuickWins) {
+          dialogQuickWins.innerHTML = `
+            <li style="text-align: center; padding: 40px 20px;">
+              <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+              <div style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
+                No activities available
+              </div>
+              <div style="font-size: 14px; color: var(--text-secondary);">
+                Please try again later or contact support.
+              </div>
+            </li>
+          `;
+        }
+        return;
+      }
       
       window.ShuffleMode.init({
         mode: modeId,
