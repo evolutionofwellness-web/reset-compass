@@ -23,25 +23,43 @@
      * @param {Function} options.onClose - Optional function called when view closes
      */
     async init(options) {
-      this.currentMode = options.mode;
-      this.logActivity = options.logActivity;
-      this.onClose = options.onClose;
-      
-      // If we already have a session, continue it
-      if (!this.sessionActive || this.currentMode !== options.mode) {
-        // Start new shuffle session
-        this.shuffledActivities = this.shuffle([...options.activities]);
-        this.currentIndex = 0;
-        this.sessionActive = true;
+      try {
+        if (!options || !options.mode) {
+          console.error('[ShuffleMode] Invalid options: mode is required');
+          this.showError('Unable to initialize shuffle mode');
+          return;
+        }
+
+        if (!Array.isArray(options.activities) || options.activities.length === 0) {
+          console.error('[ShuffleMode] No activities provided');
+          this.showError('No activities available');
+          return;
+        }
+
+        this.currentMode = options.mode;
+        this.logActivity = options.logActivity;
+        this.onClose = options.onClose;
+        
+        // If we already have a session, continue it
+        if (!this.sessionActive || this.currentMode !== options.mode) {
+          // Start new shuffle session
+          this.shuffledActivities = this.shuffle([...options.activities]);
+          this.currentIndex = 0;
+          this.sessionActive = true;
+        }
+        
+        if (this.shuffledActivities.length === 0) {
+          console.error('[ShuffleMode] No activities to shuffle');
+          this.showError('No activities available');
+          return;
+        }
+        
+        // Show the current activity
+        this.showCurrentActivity();
+      } catch (error) {
+        console.error('[ShuffleMode] Initialization error:', error);
+        this.showError('Failed to start shuffle mode');
       }
-      
-      if (this.shuffledActivities.length === 0) {
-        console.error('No activities to shuffle');
-        return;
-      }
-      
-      // Show the current activity
-      this.showCurrentActivity();
     },
     
     /**
@@ -63,48 +81,83 @@
      * Show the current activity with animation
      */
     showCurrentActivity() {
-      if (!this.shuffledActivities || this.shuffledActivities.length === 0) return;
-      
-      const activity = this.shuffledActivities[this.currentIndex];
-      const progressText = `${this.currentIndex + 1} of ${this.shuffledActivities.length}`;
-      
-      this.render(activity, progressText);
+      try {
+        if (!this.shuffledActivities || this.shuffledActivities.length === 0) {
+          console.error('[ShuffleMode] No activities available to show');
+          this.showError('No activities available');
+          return;
+        }
+        
+        const activity = this.shuffledActivities[this.currentIndex];
+        if (!activity) {
+          console.error('[ShuffleMode] Invalid activity at index', this.currentIndex);
+          this.showError('Unable to load activity');
+          return;
+        }
+
+        const progressText = `${this.currentIndex + 1} of ${this.shuffledActivities.length}`;
+        
+        this.render(activity, progressText);
+      } catch (error) {
+        console.error('[ShuffleMode] Error showing activity:', error);
+        this.showError('Failed to display activity');
+      }
     },
     
     /**
      * Move to next activity in shuffle
      */
     nextActivity() {
-      this.currentIndex++;
-      
-      // If we've gone through all activities, reshuffle
-      if (this.currentIndex >= this.shuffledActivities.length) {
-        this.shuffledActivities = this.shuffle(this.shuffledActivities);
-        this.currentIndex = 0;
+      try {
+        this.currentIndex++;
+        
+        // If we've gone through all activities, reshuffle
+        if (this.currentIndex >= this.shuffledActivities.length) {
+          this.shuffledActivities = this.shuffle(this.shuffledActivities);
+          this.currentIndex = 0;
+        }
+        
+        this.showCurrentActivity();
+      } catch (error) {
+        console.error('[ShuffleMode] Error moving to next activity:', error);
+        this.showError('Failed to load next activity');
       }
-      
-      this.showCurrentActivity();
     },
     
     /**
      * Shuffle and show a new random activity immediately
      */
     shuffleNow() {
-      // Reshuffle the deck
-      this.shuffledActivities = this.shuffle(this.shuffledActivities);
-      this.currentIndex = 0;
-      this.showCurrentActivity();
+      try {
+        // Reshuffle the deck
+        this.shuffledActivities = this.shuffle(this.shuffledActivities);
+        this.currentIndex = 0;
+        this.showCurrentActivity();
+      } catch (error) {
+        console.error('[ShuffleMode] Error shuffling:', error);
+        this.showError('Failed to shuffle activities');
+      }
     },
     
     /**
      * Render the shuffle mode view
      */
     render(activity, progressText) {
-      const dialogQuickWins = document.getElementById('dialogQuickWins');
-      if (!dialogQuickWins) return;
-      
-      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const animationClass = reducedMotion ? 'fade-in' : 'shuffle-slide-in';
+      try {
+        const dialogQuickWins = document.getElementById('dialogQuickWins');
+        if (!dialogQuickWins) {
+          console.error('[ShuffleMode] dialogQuickWins element not found');
+          return;
+        }
+
+        if (!activity || (!activity.text && !activity.title)) {
+          console.error('[ShuffleMode] Invalid activity object');
+          this.showError('Invalid activity data');
+          return;
+        }
+        
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const animationClass = reducedMotion ? 'fade-in' : 'shuffle-slide-in';
       
       // Render shuffle mode UI
       dialogQuickWins.innerHTML = `
@@ -122,17 +175,8 @@
               font-size: 20px;
               font-weight: 700;
               color: var(--text-primary);
-              margin: 0 0 8px 0;
-            ">Shuffle Mode</h3>
-            <p style="
-              font-size: 14px;
-              color: var(--text-secondary);
               margin: 0;
-              line-height: 1.5;
-            ">
-              Activities in randomized order — tap <strong>Shuffle Now</strong> to reshuffle, 
-              or swipe through with <strong>Next Activity</strong>. No repeats until the whole deck is done!
-            </p>
+            ">Shuffle Mode</h3>
           </div>
           
           <div class="activity-card shuffle-card" style="
@@ -153,21 +197,13 @@
               font-size: 22px;
               font-weight: 700;
               color: var(--text-primary);
-              margin-bottom: 16px;
+              margin-bottom: 24px;
               line-height: 1.5;
               min-height: 60px;
               display: flex;
               align-items: center;
               justify-content: center;
             ">${escapeHtml(activity.title || activity.text)}</div>
-            
-            <div class="shuffle-progress" style="
-              font-size: 13px;
-              color: var(--text-secondary);
-              margin-bottom: 24px;
-              opacity: 0.7;
-              font-weight: 500;
-            ">${progressText}</div>
             
             <div class="shuffle-actions" style="
               display: flex;
@@ -236,39 +272,47 @@
       
       // Wire up event listeners
       this.wireEvents();
+      } catch (error) {
+        console.error('[ShuffleMode] Render error:', error);
+        this.showError('Failed to render activity');
+      }
     },
     
     /**
      * Wire up event listeners for buttons
      */
     wireEvents() {
-      const doneBtn = document.querySelector('.shuffle-done');
-      const nextBtn = document.querySelector('.shuffle-next');
-      const shuffleBtn = document.querySelector('.shuffle-now');
-      const noteTextarea = document.querySelector('.activity-note');
-      
-      if (doneBtn) {
-        doneBtn.addEventListener('click', () => this.handleDone());
-      }
-      
-      if (nextBtn) {
-        nextBtn.addEventListener('click', () => this.nextActivity());
-      }
-      
-      if (shuffleBtn) {
-        shuffleBtn.addEventListener('click', () => this.shuffleNow());
-      }
-      
-      // Add focus styles
-      if (noteTextarea) {
-        noteTextarea.addEventListener('focus', (e) => {
-          e.target.style.borderColor = 'var(--brand-glow)';
-          e.target.style.boxShadow = '0 0 0 3px rgba(0, 230, 166, 0.1)';
-        });
-        noteTextarea.addEventListener('blur', (e) => {
-          e.target.style.borderColor = 'var(--border-color)';
-          e.target.style.boxShadow = 'none';
-        });
+      try {
+        const doneBtn = document.querySelector('.shuffle-done');
+        const nextBtn = document.querySelector('.shuffle-next');
+        const shuffleBtn = document.querySelector('.shuffle-now');
+        const noteTextarea = document.querySelector('.activity-note');
+        
+        if (doneBtn) {
+          doneBtn.addEventListener('click', () => this.handleDone());
+        }
+        
+        if (nextBtn) {
+          nextBtn.addEventListener('click', () => this.nextActivity());
+        }
+        
+        if (shuffleBtn) {
+          shuffleBtn.addEventListener('click', () => this.shuffleNow());
+        }
+        
+        // Add focus styles
+        if (noteTextarea) {
+          noteTextarea.addEventListener('focus', (e) => {
+            e.target.style.borderColor = 'var(--brand-glow)';
+            e.target.style.boxShadow = '0 0 0 3px rgba(0, 230, 166, 0.1)';
+          });
+          noteTextarea.addEventListener('blur', (e) => {
+            e.target.style.borderColor = 'var(--border-color)';
+            e.target.style.boxShadow = 'none';
+          });
+        }
+      } catch (error) {
+        console.error('[ShuffleMode] Error wiring events:', error);
       }
     },
     
@@ -276,33 +320,46 @@
      * Handle Done button click
      */
     handleDone() {
-      const noteTextarea = document.querySelector('.activity-note');
-      const note = noteTextarea ? noteTextarea.value.trim() : '';
-      
-      const activity = this.shuffledActivities[this.currentIndex];
-      
-      // Call logActivity with standardized payload
-      if (this.logActivity) {
-        const payload = {
-          type: 'mode',
-          mode: this.currentMode,
-          activity: {
-            text: activity.title || activity.text,
-            id: activity.id
-          },
-          timestamp: new Date().toISOString(),
-          note: note
-        };
+      try {
+        const noteTextarea = document.querySelector('.activity-note');
+        const note = noteTextarea ? noteTextarea.value.trim() : '';
         
-        this.logActivity(payload);
-      }
-      
-      // End shuffle session
-      this.sessionActive = false;
-      
-      // Call onClose if provided
-      if (this.onClose) {
-        this.onClose();
+        const activity = this.shuffledActivities[this.currentIndex];
+        
+        if (!activity) {
+          console.error('[ShuffleMode] No activity to log');
+          this.showError('Unable to save activity');
+          return;
+        }
+        
+        // Call logActivity with standardized payload
+        if (this.logActivity && typeof this.logActivity === 'function') {
+          const payload = {
+            type: 'mode',
+            mode: this.currentMode,
+            activity: {
+              text: activity.title || activity.text,
+              id: activity.id
+            },
+            timestamp: new Date().toISOString(),
+            note: note
+          };
+          
+          this.logActivity(payload);
+        } else {
+          console.warn('[ShuffleMode] logActivity callback not provided');
+        }
+        
+        // End shuffle session
+        this.sessionActive = false;
+        
+        // Call onClose if provided
+        if (this.onClose && typeof this.onClose === 'function') {
+          this.onClose();
+        }
+      } catch (error) {
+        console.error('[ShuffleMode] Error handling done:', error);
+        this.showError('Failed to complete activity');
       }
     },
     
@@ -310,9 +367,45 @@
      * End the current shuffle session
      */
     endSession() {
-      this.sessionActive = false;
-      this.shuffledActivities = [];
-      this.currentIndex = 0;
+      try {
+        this.sessionActive = false;
+        this.shuffledActivities = [];
+        this.currentIndex = 0;
+      } catch (error) {
+        console.error('[ShuffleMode] Error ending session:', error);
+      }
+    },
+    
+    /**
+     * Display error message to user
+     */
+    showError(message) {
+      try {
+        const dialogQuickWins = document.getElementById('dialogQuickWins');
+        if (!dialogQuickWins) {
+          console.error('[ShuffleMode] Cannot show error: dialogQuickWins not found');
+          return;
+        }
+        
+        dialogQuickWins.innerHTML = `
+          <li style="list-style: none; text-align: center; padding: 40px 20px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+            <div style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
+              ${escapeHtml(message)}
+            </div>
+            <div style="font-size: 14px; color: var(--text-secondary);">
+              Please try again or contact support if the problem persists.
+            </div>
+          </li>
+        `;
+        
+        // Use global toast if available
+        if (window.showToast) {
+          window.showToast(message);
+        }
+      } catch (error) {
+        console.error('[ShuffleMode] Error showing error message:', error);
+      }
     }
   };
   
