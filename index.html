@@ -58,6 +58,112 @@
   <script src="js/quick-wins-view.js?v=10" defer></script>
   <script src="js/shuffle-mode.js?v=10" defer></script>
   
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('[App] Service Worker registered:', registration.scope);
+            
+            // Check for updates periodically
+            setInterval(() => {
+              registration.update();
+            }, 60000); // Check every minute
+            
+            // Handle waiting service worker
+            if (registration.waiting) {
+              showUpdateNotification(registration.waiting);
+            }
+            
+            // Listen for new service worker
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  showUpdateNotification(newWorker);
+                }
+              });
+            });
+          })
+          .catch((error) => {
+            console.error('[App] Service Worker registration failed:', error);
+          });
+          
+        // Listen for messages from service worker
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data && event.data.type === 'SW_UPDATED') {
+            showUpdateNotification();
+          }
+        });
+        
+        // Handle controller change (new SW activated)
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
+      });
+      
+      function showUpdateNotification(worker) {
+        // Create and show update notification
+        const updateBanner = document.createElement('div');
+        updateBanner.className = 'pwa-banner update-banner';
+        updateBanner.style.cssText = 'display: flex; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; background: #0B3D2E; color: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 90%; animation: slideDown 0.3s ease;';
+        updateBanner.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 24px;">🔄</span>
+            <div>
+              <strong style="display: block; margin-bottom: 4px;">Update Available</strong>
+              <p style="margin: 0; font-size: 14px; opacity: 0.9;">A new version of The Reset Compass is ready!</p>
+            </div>
+            <button id="updateBtn" style="background: white; color: #0B3D2E; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-left: 12px;">Update</button>
+            <button id="dismissUpdateBtn" style="background: transparent; color: white; border: 1px solid white; padding: 8px 16px; border-radius: 8px; cursor: pointer;">Later</button>
+          </div>
+        `;
+        document.body.appendChild(updateBanner);
+        
+        const updateBtn = updateBanner.querySelector('#updateBtn');
+        const dismissBtn = updateBanner.querySelector('#dismissUpdateBtn');
+        
+        updateBtn.addEventListener('click', () => {
+          if (worker) {
+            worker.postMessage({ type: 'SKIP_WAITING' });
+          } else {
+            window.location.reload();
+          }
+        });
+        
+        dismissBtn.addEventListener('click', () => {
+          updateBanner.remove();
+        });
+        
+        // Auto-dismiss after 30 seconds
+        setTimeout(() => {
+          if (updateBanner.parentNode) {
+            updateBanner.remove();
+          }
+        }, 30000);
+      }
+    }
+  </script>
+  
+  <style>
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+  </style>
+  
   <!-- Structured Data (JSON-LD) -->
   <script type="application/ld+json">
   {
