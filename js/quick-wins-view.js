@@ -1,6 +1,6 @@
 // js/quick-wins-view.js
 // Shows Quick Wins one at a time with shuffle and "New One" button
-// TODO: add icon support once icons are added to data/activities.json
+// Enhanced with error handling and fallbacks
 
 (function(){
   'use strict';
@@ -20,15 +20,32 @@
       this.logActivity = options.logActivity;
       
       try {
-        // Load Quick Wins
-        const response = await fetch('data/activities.json');
-        const data = await response.json();
-        const quickWins = data.quickWins || [];
+        let quickWins = [];
+        
+        // Try to use globally loaded ACTIVITIES first (preferred)
+        if (window.ACTIVITIES && window.ACTIVITIES.quickWins && window.ACTIVITIES.quickWins.length > 0) {
+          quickWins = window.ACTIVITIES.quickWins;
+          console.log('[QuickWinsView] Using globally loaded Quick Wins:', quickWins.length);
+        } else {
+          // Fallback: Load Quick Wins directly
+          console.log('[QuickWinsView] Loading Quick Wins from activities.json');
+          const response = await fetch('/data/activities.json', {cache: 'no-store'});
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          quickWins = data.quickWins || [];
+        }
         
         if (quickWins.length === 0) {
-          console.error('No Quick Wins found');
+          console.error('[QuickWinsView] No Quick Wins found');
+          this.showError('No Quick Wins available');
           return;
         }
+        
+        console.log('[QuickWinsView] Loaded', quickWins.length, 'Quick Wins');
         
         // Shuffle the activities
         this.shuffledActivities = this.shuffle([...quickWins]);
@@ -38,7 +55,8 @@
         this.showCurrentQuickWin();
         
       } catch (error) {
-        console.error('Failed to load Quick Wins:', error);
+        console.error('[QuickWinsView] Failed to load Quick Wins:', error);
+        this.showError('Failed to load Quick Wins. Please try again.');
       }
     },
     
@@ -48,228 +66,331 @@
      * @returns {Array} Shuffled array
      */
     shuffle(array) {
-      const shuffled = [...array];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      try {
+        if (!Array.isArray(array) || array.length === 0) {
+          console.error('[QuickWinsView] Invalid array for shuffling');
+          return array;
+        }
+        
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        console.log('[QuickWinsView] Shuffled', shuffled.length, 'activities');
+        return shuffled;
+      } catch (error) {
+        console.error('[QuickWinsView] Shuffle error:', error);
+        return array;
       }
-      return shuffled;
     },
     
     /**
      * Show the current Quick Win
      */
     showCurrentQuickWin() {
-      if (!this.shuffledActivities || this.shuffledActivities.length === 0) return;
-      
-      const activity = this.shuffledActivities[this.currentIndex];
-      this.render(activity);
+      try {
+        if (!this.shuffledActivities || this.shuffledActivities.length === 0) {
+          console.error('[QuickWinsView] No activities to display');
+          this.showError('No Quick Wins available');
+          return;
+        }
+        
+        const activity = this.shuffledActivities[this.currentIndex];
+        if (!activity) {
+          console.error('[QuickWinsView] Invalid activity at index', this.currentIndex);
+          this.showError('Unable to load Quick Win');
+          return;
+        }
+        
+        this.render(activity);
+      } catch (error) {
+        console.error('[QuickWinsView] Error showing Quick Win:', error);
+        this.showError('Failed to display Quick Win');
+      }
     },
     
     /**
      * Move to next Quick Win
      */
     nextQuickWin() {
-      this.currentIndex = (this.currentIndex + 1) % this.shuffledActivities.length;
-      
-      // If we've cycled through all, re-shuffle
-      if (this.currentIndex === 0) {
-        this.shuffledActivities = this.shuffle(this.shuffledActivities);
+      try {
+        this.currentIndex = (this.currentIndex + 1) % this.shuffledActivities.length;
+        
+        // If we've cycled through all, re-shuffle
+        if (this.currentIndex === 0) {
+          console.log('[QuickWinsView] Cycling complete, reshuffling');
+          this.shuffledActivities = this.shuffle(this.shuffledActivities);
+        }
+        
+        this.showCurrentQuickWin();
+      } catch (error) {
+        console.error('[QuickWinsView] Error moving to next Quick Win:', error);
+        this.showError('Failed to load next Quick Win');
       }
-      
-      this.showCurrentQuickWin();
     },
     
     /**
      * Render the Quick Win view
      */
     render(activity) {
-      const globalQuickWins = document.getElementById('globalQuickWins');
-      if (!globalQuickWins) return;
-      
-      const progressText = `${this.currentIndex + 1} of ${this.shuffledActivities.length}`;
-      
-      // Render single Quick Win with animation
-      globalQuickWins.innerHTML = `
-        <li class="quick-win-single-view" style="animation: slideIn 0.3s ease-out; list-style: none;">
-          <div class="quick-win-card" style="
-            background: linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-primary) 100%);
-            border: 2px solid rgba(255, 191, 59, 0.3);
-            border-radius: 16px;
-            padding: 32px 24px;
-            text-align: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            position: relative;
-            overflow: hidden;
-          ">
-            <div class="quick-win-badge" style="
-              position: absolute;
-              top: 12px;
-              right: 12px;
-              background: rgba(255, 191, 59, 0.2);
-              color: #FFBF3B;
-              padding: 4px 12px;
-              border-radius: 20px;
-              font-size: 12px;
-              font-weight: 600;
-            ">⚡ Quick Win</div>
+      try {
+        const globalQuickWins = document.getElementById('globalQuickWins');
+        if (!globalQuickWins) {
+          console.error('[QuickWinsView] globalQuickWins element not found');
+          return;
+        }
+        
+        if (!activity || (!activity.text && !activity.title)) {
+          console.error('[QuickWinsView] Invalid activity object');
+          this.showError('Invalid Quick Win data');
+          return;
+        }
+        
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const animationClass = reducedMotion ? 'fade-in' : 'quick-win-slide-in';
+        
+        // Render single Quick Win with animation
+        globalQuickWins.innerHTML = `
+          <li class="quick-win-single-view ${animationClass}" style="list-style: none;">
+            <div class="quick-win-card" style="
+              background: linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-primary) 100%);
+              border: 2px solid rgba(255, 191, 59, 0.3);
+              border-radius: 16px;
+              padding: 32px 24px;
+              text-align: center;
+              box-shadow: 0 8px 24px rgba(255, 191, 59, 0.2);
+              transform: translateZ(0);
+            ">
+              ${activity.icon && !activity.icon.includes('/') && !activity.icon.includes('.') ? `<div class="quick-win-icon" style="font-size: 56px; margin-bottom: 20px;">${activity.icon}</div>` : ''}
+              
+              <div class="quick-win-text" style="
+                font-size: 20px;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 20px;
+                line-height: 1.5;
+                min-height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              ">${escapeHtml(activity.title || activity.text)}</div>
+              
+              <div class="quick-win-actions" style="
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+                flex-wrap: wrap;
+              ">
+                <button class="btn-primary quick-win-done" style="
+                  flex: 1;
+                  min-width: 130px;
+                  max-width: 200px;
+                  transform: translateZ(0);
+                  transition: transform 0.2s ease, box-shadow 0.2s ease;
+                ">
+                  <span class="btn-icon">✓</span>
+                  <span class="btn-text">Done</span>
+                </button>
+                <button class="btn-secondary quick-win-next" style="
+                  flex: 1;
+                  min-width: 130px;
+                  max-width: 200px;
+                  transform: translateZ(0);
+                  transition: transform 0.2s ease;
+                ">
+                  <span class="btn-icon">→</span>
+                  <span class="btn-text">New One</span>
+                </button>
+              </div>
+            </div>
             
-            ${activity.icon && !activity.icon.includes('/') && !activity.icon.includes('.') ? `<div class="quick-win-icon" style="font-size: 56px; margin-bottom: 20px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));">${activity.icon}</div>` : '<div style="height: 20px;"></div>'}
-            
-            <div class="quick-win-text" style="
-              font-size: 22px;
-              font-weight: 700;
-              color: var(--text-primary);
-              margin-bottom: 20px;
-              line-height: 1.5;
-              text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            ">${escapeHtml(activity.text)}</div>
-            
-            <div class="quick-win-tip" style="
+            <div class="quick-wins-tip" style="
+              text-align: center;
+              margin-top: 20px;
+              padding: 16px;
               background: rgba(255, 191, 59, 0.1);
-              border-left: 3px solid #FFBF3B;
-              padding: 12px 16px;
-              border-radius: 8px;
+              border-radius: 10px;
               font-size: 14px;
               color: var(--text-secondary);
-              margin-bottom: 24px;
-              text-align: left;
             ">
-              💡 <strong>Tip:</strong> Quick Wins are logged automatically and don't count toward your daily mode limit!
+              <strong style="color: var(--text-primary);">💡 Tip:</strong> Quick Wins have no limit - do as many as you want!
             </div>
-            
-            <div class="quick-win-actions" style="
-              display: flex;
-              gap: 12px;
-              justify-content: center;
-              flex-wrap: wrap;
-            ">
-              <button class="btn-primary quick-win-done" style="
-                flex: 1;
-                min-width: 140px;
-                max-width: 220px;
-                background: linear-gradient(135deg, #00c06b 0%, #0FBF84 100%);
-                border: none;
-                box-shadow: 0 4px 12px rgba(0, 192, 107, 0.3);
-              ">
-                <span class="btn-icon">✓</span>
-                <span class="btn-text">Done!</span>
-              </button>
-              <button class="btn-secondary quick-win-new" style="
-                flex: 1;
-                min-width: 140px;
-                max-width: 220px;
-              ">
-                <span class="btn-icon">🔄</span>
-                <span class="btn-text">New One</span>
-              </button>
-            </div>
-          </div>
-        </li>
-      `;
-      
-      // Wire up event listeners
-      this.wireEvents();
+          </li>
+        `;
+        
+        // Wire up event listeners
+        this.wireEvents();
+      } catch (error) {
+        console.error('[QuickWinsView] Render error:', error);
+        this.showError('Failed to render Quick Win');
+      }
     },
     
     /**
-     * Wire up event listeners
+     * Wire up event listeners for buttons
      */
     wireEvents() {
-      const doneBtn = document.querySelector('.quick-win-done');
-      const newBtn = document.querySelector('.quick-win-new');
-      
-      if (doneBtn) {
-        doneBtn.addEventListener('click', () => this.handleDone());
-      }
-      
-      if (newBtn) {
-        newBtn.addEventListener('click', () => this.nextQuickWin());
+      try {
+        const doneBtn = document.querySelector('.quick-win-done');
+        const nextBtn = document.querySelector('.quick-win-next');
+        
+        if (doneBtn) {
+          doneBtn.addEventListener('click', () => this.handleDone());
+        }
+        
+        if (nextBtn) {
+          nextBtn.addEventListener('click', () => this.nextQuickWin());
+        }
+      } catch (error) {
+        console.error('[QuickWinsView] Error wiring events:', error);
       }
     },
     
     /**
-     * Handle Done button - log and move to next
+     * Handle Done button click
      */
     handleDone() {
-      const activity = this.shuffledActivities[this.currentIndex];
-      
-      // Log the Quick Win
-      if (this.logActivity) {
-        const payload = {
-          type: 'quickwin',
-          activity: activity,
-          timestamp: new Date().toISOString()
-        };
+      try {
+        const activity = this.shuffledActivities[this.currentIndex];
         
-        this.logActivity(payload);
+        if (!activity) {
+          console.error('[QuickWinsView] No activity to log');
+          this.showError('Unable to save Quick Win');
+          return;
+        }
+        
+        // Call logActivity with standardized payload
+        if (this.logActivity && typeof this.logActivity === 'function') {
+          const payload = {
+            type: 'quickwin',
+            activity: activity,
+            timestamp: new Date().toISOString()
+          };
+          
+          this.logActivity(payload);
+        } else {
+          console.warn('[QuickWinsView] logActivity callback not provided');
+        }
+        
+        // Move to next Quick Win automatically
+        this.nextQuickWin();
+        
+        // Show toast notification
+        if (window.showToast) {
+          window.showToast('Quick Win logged! ⚡');
+        }
+      } catch (error) {
+        console.error('[QuickWinsView] Error handling done:', error);
+        this.showError('Failed to complete Quick Win');
       }
-      
-      // Move to next Quick Win
-      this.nextQuickWin();
-      
-      // Show toast notification
-      if (window.showToast) {
-        window.showToast('Quick Win logged! ⚡');
+    },
+    
+    /**
+     * Display error message to user
+     */
+    showError(message) {
+      try {
+        const globalQuickWins = document.getElementById('globalQuickWins');
+        if (!globalQuickWins) {
+          console.error('[QuickWinsView] Cannot show error: globalQuickWins not found');
+          return;
+        }
+        
+        globalQuickWins.innerHTML = `
+          <li style="list-style: none; text-align: center; padding: 40px 20px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+            <div style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
+              ${escapeHtml(message)}
+            </div>
+            <div style="font-size: 14px; color: var(--text-secondary);">
+              Please try again or contact support if the problem persists.
+            </div>
+          </li>
+        `;
+        
+        // Use global toast if available
+        if (window.showToast) {
+          window.showToast(message);
+        }
+      } catch (error) {
+        console.error('[QuickWinsView] Error showing error message:', error);
       }
     }
   };
   
   // Helper function to escape HTML
   function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
   }
   
-  // Add animation CSS if not already present
+  // Add Quick Wins animation CSS if not already present
   if (!document.querySelector('#quick-wins-view-styles')) {
     const style = document.createElement('style');
     style.id = 'quick-wins-view-styles';
     style.textContent = `
-      @keyframes slideIn {
+      @keyframes quick-win-slide-in {
         0% {
-          transform: translateX(20px);
+          transform: translateY(20px);
           opacity: 0;
         }
         100% {
-          transform: translateX(0);
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      
+      .quick-win-slide-in {
+        animation: quick-win-slide-in 0.3s ease-out;
+      }
+      
+      .fade-in {
+        animation: fade-in 0.3s ease-out;
+      }
+      
+      @keyframes fade-in {
+        0% {
+          opacity: 0;
+        }
+        100% {
           opacity: 1;
         }
       }
       
       .quick-win-single-view {
-        animation: slideIn 0.3s ease-out;
+        transform: translateZ(0);
       }
       
       .quick-win-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transform: translateZ(0);
+        backface-visibility: hidden;
       }
       
-      .quick-win-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.2);
-      }
-      
+      /* Hover effects */
       .quick-win-done:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 16px rgba(0, 192, 107, 0.4) !important;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 6px 20px rgba(255, 191, 59, 0.3);
       }
       
-      .quick-win-new:hover {
-        transform: scale(1.05);
+      .quick-win-next:hover {
+        transform: translateY(-2px) scale(1.02);
       }
       
-      .quick-win-badge {
-        animation: pulse 2s ease-in-out infinite;
-      }
-      
-      @keyframes pulse {
-        0%, 100% {
-          opacity: 1;
+      /* Reduced motion support */
+      @media (prefers-reduced-motion: reduce) {
+        .quick-win-slide-in,
+        .fade-in {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
         }
-        50% {
-          opacity: 0.7;
+        
+        .quick-win-done:hover,
+        .quick-win-next:hover {
+          transform: none;
         }
       }
     `;
