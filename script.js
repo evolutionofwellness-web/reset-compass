@@ -714,12 +714,40 @@
         scrollableContent.scrollTop = 0;
       }
       
+      // Store the element that was focused before opening the modal
+      d._previouslyFocused = document.activeElement;
+      
       // Setup focus trap for accessibility
       setupFocusTrap(d);
+      
+      // Setup ESC key handler
+      setupEscapeHandler(d);
       
       const f = d.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
       if (f) setTimeout(()=>f.focus(), 30);
     } catch(e){ console.warn('safeShowDialog failed', e); }
+  }
+  
+  /**
+   * Setup ESC key handler to close modal dialogs
+   */
+  function setupEscapeHandler(dialog) {
+    if (!dialog) return;
+    
+    // Remove any existing escape handler
+    if (dialog._escapeHandler) {
+      dialog.removeEventListener('keydown', dialog._escapeHandler);
+    }
+    
+    dialog._escapeHandler = function(e) {
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        e.preventDefault();
+        safeCloseDialog(dialog);
+        clearDialogSelections();
+      }
+    };
+    
+    dialog.addEventListener('keydown', dialog._escapeHandler);
   }
   
   /**
@@ -774,11 +802,23 @@
         d._focusTrapHandler = null;
       }
       
+      // Clean up escape handler
+      if (d._escapeHandler) {
+        d.removeEventListener('keydown', d._escapeHandler);
+        d._escapeHandler = null;
+      }
+      
       d.classList.add('page-transition-out');
       setTimeout(() => {
         d.classList.remove('page-transition-out');
         if (typeof d.close === 'function' && d.open) d.close();
         else { d.removeAttribute('open'); d.style.display='none'; }
+        
+        // Return focus to previously focused element
+        if (d._previouslyFocused && typeof d._previouslyFocused.focus === 'function') {
+          d._previouslyFocused.focus();
+          d._previouslyFocused = null;
+        }
       }, 300);
     } catch(e){ console.warn('safeCloseDialog', e); }
   }
