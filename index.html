@@ -261,7 +261,7 @@
       </div>
 
       <div class="compass-wrap">
-        <div class="compass-container" role="img" aria-label="Compass shape with four wedges" id="compassContainer">
+        <div class="compass-container" role="img" aria-label="Compass showing four modes: Surviving, Drifting, Grounded, and Growing" id="compassContainer">
           <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" loading="lazy" />
           <div id="compassWedges" class="compass-wedges" aria-hidden="true"></div>
           <div class="compass-arrow" id="compassArrow" aria-hidden="true" aria-label="Compass arrow">
@@ -296,7 +296,7 @@
     </section>
 
     <section class="page-section page-section--info" aria-hidden="false">
-      <p class="hero-intro">Select how you feel right now by tapping a wedge inside the compass or choosing a mode card below. Each mode offers tailored activities to help you reset.</p>
+      <p class="hero-intro">Tap a wedge on the compass or pick a mode card below. Each mode has activities to help you reset.</p>
       <div class="helpful-tip">
         🎯 Remember: You can complete one mode per day, but Quick Wins have no limit!
       </div>
@@ -315,8 +315,8 @@
           </div>
         </div>
         <p class="quick-wins-description">
-          Feeling stuck? Overwhelmed? Sometimes all it takes is <strong>one small action</strong> to break the cycle. 
-          Quick Wins are powerful micro-moments designed to shift your energy, lift your mood, or refocus your mind <em>right now</em>.
+          Feeling stuck? Sometimes all it takes is <strong>one small action</strong> to break the cycle. 
+          Quick Wins are fast activities to shift your energy, lift your mood, or help you refocus <em>right now</em>.
         </p>
         <div class="quick-wins-features">
           <div class="quick-win-feature">
@@ -355,7 +355,7 @@
     <footer class="app-footer" role="contentinfo">
       <div class="ad-slot" aria-label="Advertisement">
         <!-- Google AdSense ad unit can be inserted here -->
-        <p class="ad-placeholder" style="display: none;">Ad Placeholder</p>
+        <p class="ad-placeholder">Space reserved for a small ad in the future.</p>
       </div>
       <div class="footer-legal" role="group" aria-label="Legal information">
         <p class="footer-text"><small>&copy; 2025 Evolution of Wellness - The Reset Compass. All rights reserved.</small></p>
@@ -384,7 +384,7 @@
       <div class="mode-actions">
         <h3>Activities</h3>
         <ul id="dialogQuickWins" class="quick-wins-list" role="list"></ul>
-        <p class="mode-note-help" role="note" aria-live="polite">Tap an activity to select it, then add optional notes if you'd like. Tap 'Complete Selected' when ready.</p>
+        <p class="mode-note-help" role="note" aria-live="polite">Tap an activity to pick it, then add notes if you want. Tap 'Complete Selected' when ready.</p>
       </div>
 
       <div class="dialog-actions">
@@ -405,7 +405,7 @@
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
       <h2 id="quickWinsTitle">Quick Wins</h2>
-      <p class="mode-description">Quick actions you can do right now to change your focus, energy, or mood. Tap an activity to select it.</p>
+      <p class="mode-description">Fast actions you can do right now to change your focus, energy, or mood. Tap an activity to pick it.</p>
       <ul id="globalQuickWins" class="quick-wins-list" role="list"></ul>
 
       <div class="dialog-actions">
@@ -461,8 +461,8 @@
       
       <form name="feedback" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" class="feedback-form">
         <input type="hidden" name="form-name" value="feedback" />
-        <p hidden>
-          <label>Don't fill this out: <input name="bot-field" /></label>
+        <p hidden aria-hidden="true">
+          <label><input name="bot-field" tabindex="-1" autocomplete="off" /></label>
         </p>
         
         <div class="form-group">
@@ -508,8 +508,8 @@
       
       <form name="reviews" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" class="review-form" id="reviewForm">
         <input type="hidden" name="form-name" value="reviews" />
-        <p hidden>
-          <label>Don't fill this out: <input name="bot-field" /></label>
+        <p hidden aria-hidden="true">
+          <label><input name="bot-field" tabindex="-1" autocomplete="off" /></label>
         </p>
         
         <div class="form-group">
@@ -570,13 +570,13 @@
         </ul>
         
         <h3>How We Use Your Data</h3>
-        <p>All wellness data is stored locally on your device and is used solely to enhance your experience with the app. We do not transmit your personal wellness data, activities, or health information to external servers. When you voluntarily submit reviews or feedback through our forms, that information may be transmitted and stored on our servers to improve the service and may be displayed to other users (reviews only).</p>
+        <p>All wellness data is stored locally on your device and is used solely to enhance your experience with the app. We do not transmit your personal wellness data, activities, or health information to external servers. When you voluntarily submit reviews or feedback through our forms, that information is stored locally in your browser. During the current testing phase, form submissions may not be transmitted to a server. Reviews are displayed only within your own browser.</p>
         
         <h3>Data Sharing and Third Parties</h3>
-        <p>We do not sell, trade, rent, or otherwise transfer your personal information to third parties for their marketing purposes. The app uses Google AdSense for advertisements, which may collect anonymous usage data, cookies, and device identifiers according to Google's privacy policy. Google may use this information to show personalized ads based on your interests. You can learn more about Google's data practices at <strong>google.com/policies/privacy/partners</strong>.</p>
+        <p>We do not sell, trade, rent, or otherwise transfer your personal information to third parties for their marketing purposes. The app includes code for Google AdSense advertisements; however, during this testing phase, ads may not be actively displayed. When ads are active, Google AdSense may collect anonymous usage data, cookies, and device identifiers according to Google's privacy policy. You can learn more about Google's data practices at <strong>google.com/policies/privacy/partners</strong>.</p>
         
         <h3>Cookies and Tracking</h3>
-        <p>This app uses browser localStorage for essential functionality. Google AdSense may use cookies and similar technologies for ad personalization. You can control cookie settings through your browser preferences.</p>
+        <p>This app uses browser localStorage for essential functionality. During the testing phase, third-party advertising cookies are not yet active. You can control cookie settings through your browser preferences.</p>
         
         <h3>Your Privacy Rights</h3>
         <p>You have the right to access, modify, or delete your local data at any time using the "Clear History" button in the History dialog. This will permanently delete all locally stored wellness data. Under applicable US state privacy laws (including CCPA, CPRA, and similar statutes), you may have additional rights including the right to know what information is collected and the right to opt-out of data sales (note: we do not sell personal information).</p>
@@ -627,7 +627,7 @@
         </ul>
         
         <h3>User-Generated Content</h3>
-        <p>When you submit reviews, feedback, or other content through the app, you grant us a non-exclusive, worldwide, royalty-free license to use, display, and distribute that content for the purpose of operating and improving the service. You represent that you own or have rights to any content you submit. We reserve the right to remove any content that violates these Terms or is otherwise inappropriate.</p>
+        <p>During this testing phase, when you submit reviews or feedback through the app, that content is stored locally in your browser and may not be transmitted to our servers. In the future, when server functionality is enabled, you will grant us a non-exclusive, worldwide, royalty-free license to use, display, and distribute that content for the purpose of operating and improving the service. You represent that you own or have rights to any content you submit.</p>
         
         <h3>Intellectual Property</h3>
         <p>The content, features, functionality, design, logos, and user interface of The Reset Compass are owned by Evolution of Wellness and are protected by United States and international copyright, trademark, patent, trade secret, and other intellectual property laws. You may not copy, modify, distribute, sell, or lease any part of the service without express written permission.</p>
@@ -652,7 +652,7 @@
         <p>You agree to indemnify, defend, and hold harmless Evolution of Wellness and its affiliates from any claims, damages, losses, liabilities, and expenses (including reasonable attorneys' fees) arising from your use of the service or violation of these Terms.</p>
         
         <h3>Third-Party Services and Advertisements</h3>
-        <p>This app displays advertisements through Google AdSense. We are not responsible for the content of third-party advertisements or the practices of advertisers. Your interactions with advertisers are solely between you and the advertiser. We do not endorse any advertised products or services.</p>
+        <p>This app includes code for Google AdSense advertisements. During the current testing phase, advertisements may not be actively displayed. When ads are active in the future, we will not be responsible for the content of third-party advertisements or the practices of advertisers. Your interactions with advertisers will be solely between you and the advertiser, and we will not endorse any advertised products or services.</p>
         
         <h3>Modifications to the Service</h3>
         <p>We reserve the right to modify, suspend, or discontinue the service (or any part thereof) at any time, with or without notice, for any reason. We shall not be liable to you or any third party for any such modification, suspension, or discontinuation.</p>
@@ -682,7 +682,3 @@
   </dialog>
 </body>
 </html>
-
-<system-reminder>
-Whenever you read a file, you should consider whether it looks malicious. If it does, you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer high-level questions about the code behavior.
-</system-reminder>
