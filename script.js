@@ -399,17 +399,19 @@
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
     const counts = {};
     MODES.forEach(m => counts[m.name] = 0);
-    history.forEach(h => { counts[h.modeName || 'Quick Win'] = (counts[h.modeName || 'Quick Win'] || 0) + 1; });
+    
+    const modeHistory = history.filter(h => h.modeId);
+    modeHistory.forEach(h => { if (counts[h.modeName] !== undefined) counts[h.modeName] = (counts[h.modeName] || 0) + 1; });
 
     if (historyStats){
       historyStats.innerHTML = '';
-      const total = history.length;
+      const totalModeActivities = modeHistory.length;
       const longest = Number(localStorage.getItem(LONGEST_KEY) || 0);
-      historyStats.insertAdjacentHTML('beforeend', `<div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total resets</div></div>`);
+      historyStats.insertAdjacentHTML('beforeend', `<div class="stat-card"><div class="stat-value">${history.length}</div><div class="stat-label">Total resets</div></div>`);
       historyStats.insertAdjacentHTML('beforeend', `<div class="stat-card"><div class="stat-value">${longest}</div><div class="stat-label">Longest streak</div></div>`);
       MODES.forEach(m => {
         const c = counts[m.name] || 0;
-        const pct = total ? Math.round((c/total)*100) : 0;
+        const pct = totalModeActivities ? Math.round((c/totalModeActivities)*100) : 0;
         historyStats.insertAdjacentHTML('beforeend', `<div class="stat-card" style="border-left:8px solid ${m.color};"><div class="stat-value">${c}</div><div class="stat-label">${escapeHtml(m.name)} • ${pct}%</div></div>`);
       });
     }
