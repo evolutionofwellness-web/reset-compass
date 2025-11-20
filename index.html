@@ -120,8 +120,8 @@
               <strong style="display: block; margin-bottom: 4px;">Update Available</strong>
               <p style="margin: 0; font-size: 14px; opacity: 0.9;">A new version of The Reset Compass is ready!</p>
             </div>
-            <button id="updateBtn" style="background: white; color: #0B3D2E; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-left: 12px;">Update</button>
-            <button id="dismissUpdateBtn" style="background: transparent; color: white; border: 1px solid white; padding: 8px 16px; border-radius: 8px; cursor: pointer;">Later</button>
+            <button id="updateBtn" style="background: white; color: #0B3D2E; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-left: 12px;" aria-label="Update app now">Update</button>
+            <button id="dismissUpdateBtn" style="background: transparent; color: white; border: 1px solid white; padding: 8px 16px; border-radius: 8px; cursor: pointer;" aria-label="Dismiss update notification">Later</button>
           </div>
         `;
         document.body.appendChild(updateBanner);
@@ -243,8 +243,8 @@
         </div>
       </div>
       <div class="pwa-banner-actions">
-        <button id="pwaInstallBtn" class="btn-primary btn-sm">Install</button>
-        <button id="pwaDismissBtn" class="btn-secondary btn-sm">Not Now</button>
+        <button id="pwaInstallBtn" class="btn-primary btn-sm" aria-label="Install The Reset Compass">Install</button>
+        <button id="pwaDismissBtn" class="btn-secondary btn-sm" aria-label="Dismiss installation prompt">Not Now</button>
       </div>
     </div>
 
@@ -332,23 +332,23 @@
             <span class="feature-text">Use anytime, no limit</span>
           </div>
         </div>
-        <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins">
-          <span class="cta-icon">⚡</span>
+        <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins" aria-label="Choose Your Quick Win">
+          <span class="cta-icon" aria-hidden="true">⚡</span>
           <span class="cta-text">Choose Your Quick Win</span>
-          <span class="cta-arrow">→</span>
+          <span class="cta-arrow" aria-hidden="true">→</span>
         </button>
         <p class="quick-wins-encouragement">You deserve this moment. Take it.</p>
       </div>
 
-      <div class="rate-cta-card" onclick="document.querySelector('[data-action=ratings-reviews]').click()">
+      <div class="rate-cta-card" role="button" tabindex="0" onclick="document.querySelector('[data-action=ratings-reviews]').click()" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); document.querySelector('[data-action=ratings-reviews]').click(); }" aria-label="Rate The Reset Compass">
         <div class="rate-cta-content">
-          <div class="rate-cta-icon">⭐</div>
+          <div class="rate-cta-icon" aria-hidden="true">⭐</div>
           <div class="rate-cta-text">
             <h3>Enjoying The Reset Compass?</h3>
             <p>Rate the app and share your experience!</p>
           </div>
         </div>
-        <button class="rate-cta-btn" type="button">Rate Now</button>
+        <button class="rate-cta-btn" type="button" aria-label="Rate Now">Rate Now</button>
       </div>
     </section>
 
@@ -514,12 +514,12 @@
         
         <div class="form-group">
           <label>Your Rating *</label>
-          <div class="star-rating" id="starRating">
-            <button type="button" class="star" data-rating="1">★</button>
-            <button type="button" class="star" data-rating="2">★</button>
-            <button type="button" class="star" data-rating="3">★</button>
-            <button type="button" class="star" data-rating="4">★</button>
-            <button type="button" class="star" data-rating="5">★</button>
+          <div class="star-rating" id="starRating" role="radiogroup" aria-label="Rate from 1 to 5 stars" aria-required="true">
+            <button type="button" class="star" data-rating="1" role="radio" aria-checked="false" aria-label="1 star">★</button>
+            <button type="button" class="star" data-rating="2" role="radio" aria-checked="false" aria-label="2 stars">★</button>
+            <button type="button" class="star" data-rating="3" role="radio" aria-checked="false" aria-label="3 stars">★</button>
+            <button type="button" class="star" data-rating="4" role="radio" aria-checked="false" aria-label="4 stars">★</button>
+            <button type="button" class="star" data-rating="5" role="radio" aria-checked="false" aria-label="5 stars">★</button>
           </div>
           <input type="hidden" name="rating" id="ratingValue" required />
         </div>
