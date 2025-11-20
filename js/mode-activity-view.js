@@ -73,8 +73,12 @@
      * Pick and display a random activity
      */
     showRandomActivity() {
-      if (!this.activities || this.activities.length === 0) return;
-      
+      if (!this.activities || this.activities.length === 0) {
+        console.error('[ModeActivityView] No activities available');
+        this.showError('No activities available for this mode');
+        return;
+      }
+
       // Pick random activity (avoid showing same one twice in a row if possible)
       let newActivity;
       if (this.activities.length > 1) {
@@ -84,7 +88,20 @@
       } else {
         newActivity = this.activities[0];
       }
-      
+
+      // Validate activity has required fields
+      if (!newActivity || !newActivity.text) {
+        console.error('[ModeActivityView] Invalid activity data:', newActivity);
+        this.showError('Activity data is incomplete');
+        return;
+      }
+
+      // Validate duration if present
+      if (newActivity.duration !== undefined && (typeof newActivity.duration !== 'number' || newActivity.duration < 0)) {
+        console.warn('[ModeActivityView] Invalid duration for activity:', newActivity.id, newActivity.duration);
+        newActivity.duration = null; // Fallback to no duration display
+      }
+
       this.currentActivity = newActivity;
       this.render();
     },
@@ -117,6 +134,22 @@
               margin-bottom: 16px;
               line-height: 1.4;
             ">${escapeHtml(activity.text)}</div>
+            ${activity.explain ? `<div class="activity-explain" style="
+              font-size: 16px;
+              color: var(--text-secondary);
+              margin-bottom: 16px;
+              line-height: 1.6;
+              text-align: left;
+              padding: 16px;
+              background: rgba(0, 0, 0, 0.02);
+              border-radius: 8px;
+            ">${escapeHtml(activity.explain)}</div>` : ''}
+            ${activity.duration ? `<div class="activity-duration" style="
+              font-size: 14px;
+              color: var(--text-tertiary);
+              margin-bottom: 16px;
+              font-weight: 500;
+            ">⏱️ About ${formatDuration(activity.duration)}</div>` : ''}
             <div class="activity-actions" style="
               display: flex;
               gap: 12px;
@@ -255,6 +288,18 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  // Helper function to format duration in seconds to human-readable time
+  function formatDuration(seconds) {
+    if (!seconds || seconds < 0) return 'unknown time';
+    if (seconds < 60) return `${seconds} seconds`;
+    if (seconds < 120) return '1 minute';
+    if (seconds < 3600) return `${Math.round(seconds / 60)} minutes`;
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.round((seconds % 3600) / 60);
+    if (mins === 0) return `${hours} hour${hours > 1 ? 's' : ''}`;
+    return `${hours} hour${hours > 1 ? 's' : ''} ${mins} min`;
   }
   
   // Add pop-in animation CSS if not already present

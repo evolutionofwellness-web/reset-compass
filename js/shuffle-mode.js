@@ -87,7 +87,7 @@
           this.showError('No activities available');
           return;
         }
-        
+
         const activity = this.shuffledActivities[this.currentIndex];
         if (!activity) {
           console.error('[ShuffleMode] Invalid activity at index', this.currentIndex);
@@ -95,8 +95,21 @@
           return;
         }
 
+        // Validate activity has required text or title
+        if (!activity.text && !activity.title) {
+          console.error('[ShuffleMode] Activity missing text/title:', activity);
+          this.showError('Activity data is incomplete');
+          return;
+        }
+
+        // Validate duration if present
+        if (activity.duration !== undefined && (typeof activity.duration !== 'number' || activity.duration < 0)) {
+          console.warn('[ShuffleMode] Invalid duration for activity:', activity.id, activity.duration);
+          activity.duration = null; // Fallback to no duration display
+        }
+
         const progressText = `${this.currentIndex + 1} of ${this.shuffledActivities.length}`;
-        
+
         this.render(activity, progressText);
       } catch (error) {
         console.error('[ShuffleMode] Error showing activity:', error);
@@ -160,18 +173,36 @@
             will-change: transform;
           ">
             ${activity.icon && !activity.icon.includes('/') && !activity.icon.includes('.') ? `<div class="activity-icon" style="font-size: 56px; margin-bottom: 20px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));">${activity.icon}</div>` : ''}
-            
+
             <div class="activity-text" style="
               font-size: 22px;
               font-weight: 700;
               color: var(--text-primary);
-              margin-bottom: 24px;
+              margin-bottom: 16px;
               line-height: 1.5;
-              min-height: 60px;
+              min-height: 50px;
               display: flex;
               align-items: center;
               justify-content: center;
             ">${escapeHtml(activity.title || activity.text)}</div>
+
+            ${activity.explain ? `<div class="activity-explain" style="
+              font-size: 15px;
+              color: var(--text-secondary);
+              margin-bottom: 16px;
+              line-height: 1.6;
+              text-align: left;
+              padding: 16px;
+              background: rgba(0, 0, 0, 0.02);
+              border-radius: 8px;
+            ">${escapeHtml(activity.explain)}</div>` : ''}
+
+            ${activity.duration ? `<div class="activity-duration" style="
+              font-size: 14px;
+              color: var(--text-tertiary);
+              margin-bottom: 20px;
+              font-weight: 500;
+            ">⏱️ About ${formatDuration(activity.duration)}</div>` : ''}
             
             <div class="shuffle-actions" style="
               display: flex;
@@ -359,6 +390,18 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  // Helper function to format duration in seconds to human-readable time
+  function formatDuration(seconds) {
+    if (!seconds || seconds < 0) return 'unknown time';
+    if (seconds < 60) return `${seconds} seconds`;
+    if (seconds < 120) return '1 minute';
+    if (seconds < 3600) return `${Math.round(seconds / 60)} minutes`;
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.round((seconds % 3600) / 60);
+    if (mins === 0) return `${hours} hour${hours > 1 ? 's' : ''}`;
+    return `${hours} hour${hours > 1 ? 's' : ''} ${mins} min`;
   }
   
   // Add shuffle mode animation CSS
