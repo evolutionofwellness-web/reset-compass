@@ -1,10 +1,41 @@
-# Cache control for CSS files
+# Service Worker - no caching, always fetch fresh
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Service-Worker-Allowed: /
+
+# Manifest - no caching to ensure updates
+/manifest.json
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Cache control for HTML - no caching for immediate updates
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Cache control for CSS files - no caching for immediate updates
 /css/*
   Cache-Control: public, max-age=0, must-revalidate
 
 /*.css
   Cache-Control: public, max-age=0, must-revalidate
 
-# Cache control for HTML
-/*.html
-  Cache-Control: no-cache, no-store, must-revalidate
+# Cache control for JavaScript - no caching for immediate updates
+/js/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Cache control for data files - no caching for immediate updates
+/data/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Cache control for images - can be cached longer
+/assets/images/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# General security headers
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()

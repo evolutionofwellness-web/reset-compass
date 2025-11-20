@@ -2,7 +2,7 @@
   "name": "The Reset Compass",
   "short_name": "Reset Compass",
   "description": "Find your wellness mode and choose a short activity to reset your focus, energy, or mood",
-  "start_url": "./",
+  "start_url": "./?utm_source=homescreen",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -57,5 +57,9 @@
     }
   ],
   "screenshots": [],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "id": "/?utm_source=homescreen",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }
