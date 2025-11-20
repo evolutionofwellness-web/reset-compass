@@ -95,14 +95,32 @@
           this.showError('No Quick Wins available');
           return;
         }
-        
+
         const activity = this.shuffledActivities[this.currentIndex];
         if (!activity) {
           console.error('[QuickWinsView] Invalid activity at index', this.currentIndex);
           this.showError('Unable to load Quick Win');
           return;
         }
-        
+
+        // Validate activity has required text or title
+        if (!activity.text && !activity.title) {
+          console.error('[QuickWinsView] Activity missing text/title:', activity);
+          this.showError('Quick Win data is incomplete');
+          return;
+        }
+
+        // Validate duration if present (Quick Wins should be under 60 seconds)
+        if (activity.duration !== undefined) {
+          if (typeof activity.duration !== 'number' || activity.duration < 0) {
+            console.warn('[QuickWinsView] Invalid duration for Quick Win:', activity.id, activity.duration);
+            activity.duration = null;
+          } else if (activity.duration > 60) {
+            console.warn('[QuickWinsView] Quick Win duration exceeds 60 seconds:', activity.id, activity.duration);
+            // Still allow it but log warning
+          }
+        }
+
         this.render(activity);
       } catch (error) {
         console.error('[QuickWinsView] Error showing Quick Win:', error);
@@ -163,18 +181,35 @@
               transform: translateZ(0);
             ">
               ${activity.icon && !activity.icon.includes('/') && !activity.icon.includes('.') ? `<div class="quick-win-icon" style="font-size: 56px; margin-bottom: 20px;">${activity.icon}</div>` : ''}
-              
+
               <div class="quick-win-text" style="
                 font-size: 20px;
                 font-weight: 600;
                 color: var(--text-primary);
-                margin-bottom: 20px;
+                margin-bottom: 12px;
                 line-height: 1.5;
-                min-height: 60px;
+                min-height: 50px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
               ">${escapeHtml(activity.title || activity.text)}</div>
+
+              ${activity.explain ? `<div class="quick-win-explain" style="
+                font-size: 14px;
+                color: var(--text-secondary);
+                margin-bottom: 12px;
+                line-height: 1.5;
+                padding: 12px;
+                background: rgba(255, 191, 59, 0.05);
+                border-radius: 8px;
+              ">${escapeHtml(activity.explain)}</div>` : ''}
+
+              ${activity.duration ? `<div class="quick-win-duration" style="
+                font-size: 12px;
+                color: var(--text-tertiary);
+                margin-bottom: 16px;
+                font-weight: 500;
+              ">⚡ ${formatDuration(activity.duration)}</div>` : ''}
               
               <div class="quick-win-actions" style="
                 display: flex;
@@ -325,6 +360,18 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  // Helper function to format duration in seconds to human-readable time
+  function formatDuration(seconds) {
+    if (!seconds || seconds < 0) return 'unknown time';
+    if (seconds < 60) return `${seconds} seconds`;
+    if (seconds < 120) return '1 minute';
+    if (seconds < 3600) return `${Math.round(seconds / 60)} minutes`;
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.round((seconds % 3600) / 60);
+    if (mins === 0) return `${hours} hour${hours > 1 ? 's' : ''}`;
+    return `${hours} hour${hours > 1 ? 's' : ''} ${mins} min`;
   }
   
   // Add Quick Wins animation CSS if not already present
