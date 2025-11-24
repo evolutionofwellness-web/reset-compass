@@ -1,5 +1,5 @@
 // Service Worker for The Reset Compass
-const CACHE_VERSION = 'reset-compass-v2.1.0';
+const CACHE_VERSION = 'reset-compass-v2.2.0';
 const CACHE_NAME = `${CACHE_VERSION}`;
 
 // Files to cache on install (offline fallback)
@@ -28,7 +28,9 @@ const STATIC_ASSETS = [
   '/assets/images/compass-192.png',
   '/assets/images/compass-512.png',
   '/assets/images/app-icon.png',
-  '/assets/images/app-icon-rounded.png'
+  '/assets/images/app-icon-rounded.png',
+  '/robots.txt',
+  '/sitemap.xml'
 ];
 
 // Define which files should use network-first vs cache-first

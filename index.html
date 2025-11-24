@@ -1,15 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="description" content="The Reset Compass - Find your wellness mode and choose a short activity to reset your focus, energy, or mood. Track daily streaks and build healthy habits." />
+  <meta name="keywords" content="wellness app, mental health, self care, reset activities, mindfulness, stress relief, mood tracker, wellness tracker, daily habits, mental wellness, emotional wellbeing, focus improvement, energy boost, grounding exercises, personal growth, wellness modes, quick wins, meditation, breathing exercises, wellness journal" />
+  <meta name="author" content="Evolution of Wellness" />
   <meta name="theme-color" content="#0B3D2E" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Reset Compass" />
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="apple-touch-icon" href="assets/images/compass-192.png" />
+
+  <!-- DNS Prefetch and Preconnect for Performance -->
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+
+  <!-- Preload Critical Resources -->
+  <link rel="preload" href="style.css?v=9" as="style" />
+  <link rel="preload" href="script.js?v=10" as="script" />
+  <link rel="preload" href="data/modes.json" as="fetch" crossorigin />
+  <link rel="preload" href="assets/images/compass.svg" as="image" />
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
@@ -175,15 +188,38 @@
     "description": "Find your wellness mode and choose a short activity to reset your focus, energy, or mood. Track daily streaks and build healthy habits.",
     "applicationCategory": "HealthApplication",
     "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript. Works best with modern browsers.",
+    "softwareVersion": "2.1.0",
+    "datePublished": "2025-01-01",
+    "dateModified": "2025-01-24",
+    "inLanguage": "en-US",
+    "isAccessibleForFree": true,
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "USD"
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "Evolution of Wellness",
+      "url": "https://evolutionofwellness.com"
     },
     "author": {
       "@type": "Organization",
       "name": "Evolution of Wellness",
       "url": "https://evolutionofwellness.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Evolution of Wellness",
+      "url": "https://evolutionofwellness.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://evolutionofwellness.com/assets/images/compass-512.png",
+        "width": 512,
+        "height": 512
+      }
     },
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -198,10 +234,24 @@
       "Daily streak tracking",
       "Achievement badges",
       "Activity history and progress tracking",
-      "Dark mode support"
+      "Dark mode support",
+      "Offline support with PWA",
+      "Privacy-focused local data storage"
     ],
     "screenshot": "https://evolutionofwellness.com/assets/images/compass-512.png",
-    "browserRequirements": "Requires JavaScript. Works best with modern browsers."
+    "applicationSubCategory": "Wellness & Mental Health",
+    "installUrl": "https://evolutionofwellness.com/",
+    "potentialAction": {
+      "@type": "UseAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://evolutionofwellness.com/",
+        "actionPlatform": [
+          "https://schema.org/DesktopWebPlatform",
+          "https://schema.org/MobileWebPlatform"
+        ]
+      }
+    }
   }
   </script>
 </head>
@@ -248,11 +298,12 @@
       </div>
     </div>
 
-    <section class="page-section page-section--compass" aria-label="Compass section">
+    <section class="page-section page-section--compass" aria-labelledby="compass-heading">
+      <h2 id="compass-heading" class="visually-hidden">Wellness Mode Compass</h2>
       <div class="streak-row">
-        <div id="streakContainer" class="streak-container" aria-hidden="false">
-          <div id="streakBadge" class="streak-badge" title="Daily streak: days in a row">Daily streak: 🔥 0</div>
-          <div id="achievementBadges" class="achievement-badges"></div>
+        <div id="streakContainer" class="streak-container" aria-live="polite" aria-atomic="true">
+          <div id="streakBadge" class="streak-badge" role="status" aria-label="Daily streak: 0 days in a row">Daily streak: 🔥 0</div>
+          <div id="achievementBadges" class="achievement-badges" role="list" aria-label="Achievements"></div>
         </div>
       </div>
       

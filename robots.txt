@@ -1,0 +1,16 @@
+# robots.txt for The Reset Compass
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://evolutionofwellness.com/sitemap.xml
+
+# Disallow crawling of admin/test files
+Disallow: /test-*.mjs
+Disallow: /manual-test.mjs
+Disallow: /verify-integration.mjs
+Disallow: /.netlify/
+Disallow: /node_modules/
+Disallow: /.git/
