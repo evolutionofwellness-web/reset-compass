@@ -14,15 +14,13 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="apple-touch-icon" href="assets/images/compass-192.png" />
 
-  <!-- DNS Prefetch and Preconnect for Performance -->
-  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
-  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
-
-  <!-- Preload Critical Resources -->
+  <!-- Preload Critical Resources for LCP -->
   <link rel="preload" href="style.css?v=9" as="style" />
-  <link rel="preload" href="script.js?v=10" as="script" />
+  <link rel="preload" href="assets/images/compass.svg" as="image" fetchpriority="high" />
   <link rel="preload" href="data/modes.json" as="fetch" crossorigin />
-  <link rel="preload" href="assets/images/compass.svg" as="image" />
+
+  <!-- DNS Prefetch for ads (deferred) -->
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
@@ -49,10 +47,6 @@
   
   <title>The Reset Compass - Find Your Wellness Mode | Evolution of Wellness</title>
 
-  <!-- Adsense (kept per previous requests) -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895"
-     crossorigin="anonymous"></script>
-
   <link rel="stylesheet" href="style.css?v=9" />
   <link rel="stylesheet" href="css/cinematic.css?v=9" />
   <link rel="manifest" href="manifest.json" />
@@ -71,95 +65,55 @@
   <script src="js/quick-wins-view.js?v=10" defer></script>
   <script src="js/shuffle-mode.js?v=10" defer></script>
   
-  <!-- Service Worker Registration -->
+  <!-- Service Worker Registration - deferred for FCP -->
   <script>
+    // Defer service worker registration until after main content loads
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then((registration) => {
-            console.log('[App] Service Worker registered:', registration.scope);
-            
-            // Check for updates periodically
-            setInterval(() => {
-              registration.update();
-            }, 60000); // Check every minute
-            
-            // Handle waiting service worker
-            if (registration.waiting) {
-              showUpdateNotification(registration.waiting);
-            }
-            
-            // Listen for new service worker
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  showUpdateNotification(newWorker);
-                }
+        // Use requestIdleCallback if available, otherwise setTimeout
+        const registerSW = () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('[App] Service Worker registered:', registration.scope);
+
+              // Check for updates less frequently to reduce overhead
+              setInterval(() => registration.update(), 300000); // Every 5 minutes
+
+              if (registration.waiting) showUpdateNotification(registration.waiting);
+
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    showUpdateNotification(newWorker);
+                  }
+                });
               });
-            });
-          })
-          .catch((error) => {
-            console.error('[App] Service Worker registration failed:', error);
+            })
+            .catch((error) => console.error('[App] SW registration failed:', error));
+
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) { refreshing = true; window.location.reload(); }
           });
-          
-        // Listen for messages from service worker
-        navigator.serviceWorker.addEventListener('message', (event) => {
-          if (event.data && event.data.type === 'SW_UPDATED') {
-            showUpdateNotification();
-          }
-        });
-        
-        // Handle controller change (new SW activated)
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (!refreshing) {
-            refreshing = true;
-            window.location.reload();
-          }
-        });
+        };
+
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(registerSW, { timeout: 2000 });
+        } else {
+          setTimeout(registerSW, 1000);
+        }
       });
-      
+
       function showUpdateNotification(worker) {
-        // Create and show update notification
         const updateBanner = document.createElement('div');
         updateBanner.className = 'pwa-banner update-banner';
-        updateBanner.style.cssText = 'display: flex; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; background: #0B3D2E; color: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-width: 90%; animation: slideDown 0.3s ease;';
-        updateBanner.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="font-size: 24px;">🔄</span>
-            <div>
-              <strong style="display: block; margin-bottom: 4px;">Update Available</strong>
-              <p style="margin: 0; font-size: 14px; opacity: 0.9;">A new version of The Reset Compass is ready!</p>
-            </div>
-            <button id="updateBtn" style="background: white; color: #0B3D2E; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-left: 12px;" aria-label="Update app now">Update</button>
-            <button id="dismissUpdateBtn" style="background: transparent; color: white; border: 1px solid white; padding: 8px 16px; border-radius: 8px; cursor: pointer;" aria-label="Dismiss update notification">Later</button>
-          </div>
-        `;
+        updateBanner.style.cssText = 'display:flex;position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:10000;background:#0B3D2E;color:white;padding:16px 20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.3);max-width:90%;animation:slideDown 0.3s ease';
+        updateBanner.innerHTML = '<div style="display:flex;align-items:center;gap:12px"><span style="font-size:24px">🔄</span><div><strong style="display:block;margin-bottom:4px">Update Available</strong><p style="margin:0;font-size:14px;opacity:0.9">A new version is ready!</p></div><button id="updateBtn" style="background:white;color:#0B3D2E;border:none;padding:8px 16px;border-radius:8px;font-weight:bold;cursor:pointer;margin-left:12px">Update</button><button id="dismissUpdateBtn" style="background:transparent;color:white;border:1px solid white;padding:8px 16px;border-radius:8px;cursor:pointer">Later</button></div>';
         document.body.appendChild(updateBanner);
-        
-        const updateBtn = updateBanner.querySelector('#updateBtn');
-        const dismissBtn = updateBanner.querySelector('#dismissUpdateBtn');
-        
-        updateBtn.addEventListener('click', () => {
-          if (worker) {
-            worker.postMessage({ type: 'SKIP_WAITING' });
-          } else {
-            window.location.reload();
-          }
-        });
-        
-        dismissBtn.addEventListener('click', () => {
-          updateBanner.remove();
-        });
-        
-        // Auto-dismiss after 30 seconds
-        setTimeout(() => {
-          if (updateBanner.parentNode) {
-            updateBanner.remove();
-          }
-        }, 30000);
+        updateBanner.querySelector('#updateBtn').onclick = () => worker ? worker.postMessage({ type: 'SKIP_WAITING' }) : window.location.reload();
+        updateBanner.querySelector('#dismissUpdateBtn').onclick = () => updateBanner.remove();
+        setTimeout(() => updateBanner.parentNode && updateBanner.remove(), 30000);
       }
     }
   </script>
@@ -313,7 +267,7 @@
 
       <div class="compass-wrap">
         <div class="compass-container" role="img" aria-label="Compass showing four modes: Surviving, Drifting, Grounded, and Growing" id="compassContainer">
-          <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" loading="lazy" />
+          <img src="assets/images/compass.svg" alt="" aria-hidden="true" class="compass-image" id="compassImage" fetchpriority="high" width="800" height="800" />
           <div id="compassWedges" class="compass-wedges" aria-hidden="true"></div>
           <div class="compass-arrow" id="compassArrow" aria-hidden="true" aria-label="Compass arrow">
             <svg viewBox="0 0 24 60" width="60" height="150" role="img" aria-hidden="true">
@@ -731,5 +685,29 @@
       </div>
     </div>
   </dialog>
+
+  <!-- Adsense - deferred to not block initial render -->
+  <script>
+    // Load AdSense after page is interactive
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        const script = document.createElement('script');
+        script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895';
+        script.async = true;
+        script.crossOrigin = 'anonymous';
+        document.head.appendChild(script);
+      }, { timeout: 5000 });
+    } else {
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const script = document.createElement('script');
+          script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9323656111800895';
+          script.async = true;
+          script.crossOrigin = 'anonymous';
+          document.head.appendChild(script);
+        }, 3000);
+      });
+    }
+  </script>
 </body>
 </html>
