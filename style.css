@@ -112,7 +112,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:3px s
 /* Header */
 .app-header{position:sticky;top:0;z-index:180;background:var(--bg-elevated);border-bottom:1px solid rgba(0,230,166,0.25);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 4px 24px rgba(0,0,0,0.3);transition:all 0.3s ease}
 .app-header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;position:relative;gap:10px}
-.app-title{margin:0;font-weight:900;font-size:clamp(0.95rem, 2.8vw, 1.4rem);letter-spacing:-0.5px;color:var(--text-primary);text-shadow:0 0 20px var(--brand-glow), 0 4px 16px rgba(0,230,166,0.3);text-align:left;line-height:1.2;animation:titleGlow 3s ease-in-out infinite alternate;transition:color 0.3s ease, text-shadow 0.3s ease;white-space:nowrap;overflow:visible}
+.app-title{margin:0;font-weight:900;font-size:clamp(0.95rem, 2.8vw, 1.4rem);letter-spacing:-0.5px;color:var(--text-primary);text-shadow:0 0 20px var(--brand-glow), 0 4px 16px rgba(0,230,166,0.3);text-align:left;line-height:1.2;transition:color 0.3s ease, text-shadow 0.3s ease;white-space:nowrap;overflow:visible}
 .home-link{text-decoration:none;flex:1;display:flex;justify-content:flex-start;border:none;outline:none;padding-left:0}
 .home-link:hover,.home-link:focus,.home-link:active{text-decoration:none;border:none;outline:none}
 
@@ -139,11 +139,11 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:3px s
 
 /* Quick Wins block */
 .quick-wins-block{margin-top:24px;background:linear-gradient(135deg, rgba(0,230,166,0.12), rgba(46,127,232,0.08));padding:24px 20px;border-radius:20px;display:flex;flex-direction:column;align-items:center;box-shadow:0 12px 48px rgba(0,230,166,0.25), 0 0 60px rgba(0,230,166,0.08);border:2px solid rgba(0,230,166,0.35);position:relative;overflow:hidden}
-.quick-wins-block::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);animation:quickWinsGlow 6s ease-in-out infinite;pointer-events:none}
+.quick-wins-block::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);opacity:0.4;pointer-events:none}
 @keyframes quickWinsGlow{0%,100%{transform:translate(-25%, -25%) scale(1);opacity:0.3}50%{transform:translate(-25%, -25%) scale(1.2);opacity:0.6}}
 .quick-wins-header{display:flex;align-items:center;gap:16px;margin-bottom:18px;animation:slideInDown 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
 @keyframes slideInDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-.quick-wins-icon{font-size:3.2rem;line-height:1;filter:drop-shadow(0 0 20px rgba(255,215,0,0.8));animation:pulseGlow 2s ease-in-out infinite}
+.quick-wins-icon{font-size:3.2rem;line-height:1;filter:drop-shadow(0 0 20px rgba(255,215,0,0.8))}
 @keyframes pulseGlow{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(255,215,0,0.8))}50%{transform:scale(1.1);filter:drop-shadow(0 0 30px rgba(255,215,0,1))}}
 .quick-wins-title-section{text-align:center}
 .quick-wins-title{margin:0;font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#FFD700,var(--brand-glow),var(--color-growing));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px}
@@ -163,7 +163,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:3px s
 .quick-wins-cta:hover::before{width:400px;height:400px}
 .quick-wins-cta:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 16px 48px rgba(0,230,166,0.5), 0 0 60px rgba(255,215,0,0.4)}
 .quick-wins-cta:active{transform:translateY(-2px) scale(1.02)}
-.cta-icon{font-size:1.4rem;line-height:1;animation:sparkle 1.5s ease-in-out infinite}
+.cta-icon{font-size:1.4rem;line-height:1}
 @keyframes sparkle{0%,100%{transform:rotate(0deg) scale(1)}25%{transform:rotate(-15deg) scale(1.2)}75%{transform:rotate(15deg) scale(1.2)}}
 .cta-text{position:relative;z-index:1;font-size:1.15rem}
 .cta-arrow{font-size:1.3rem;line-height:1;transition:transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
@@ -201,11 +201,11 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:3px s
 
 /* Compass */
 .compass-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:10px}
-.compass-container{position:relative;width:var(--compass-size);height:var(--compass-size);margin:12px auto;border-radius:50%;overflow:visible;box-shadow:0 20px 80px rgba(0,0,0,0.6);animation:compassPulse 4s ease-in-out infinite}
-.compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.12;border-radius:50%;animation:compassRotate 120s linear infinite}
+.compass-container{position:relative;width:var(--compass-size);height:var(--compass-size);margin:12px auto;border-radius:50%;overflow:visible;box-shadow:0 20px 80px rgba(0,0,0,0.6)}
+.compass-image{position:absolute;inset:0;width:100%;height:100%;opacity:0.12;border-radius:50%}
 .compass-wedges{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:1;mix-blend-mode:normal;transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);-webkit-mask:radial-gradient(circle at center, black 0%, black 100%);mask:radial-gradient(circle at center, black 0%, black 100%);opacity:1;filter:saturate(1.4) contrast(1.2) brightness(1.15)}
 .compass-wedges::before{content:"";position:absolute;inset:0;border-radius:50%;background:inherit;filter:blur(16px) brightness(1.4) saturate(1.2);opacity:0.35;-webkit-mask:radial-gradient(circle at center, transparent 0%, transparent 32%, black 38%, black 70%, transparent 85%, transparent 100%);mask:radial-gradient(circle at center, transparent 0%, transparent 32%, black 38%, black 70%, transparent 85%, transparent 100%);pointer-events:none}
-.compass-wedges::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 40%), repeating-conic-gradient(rgba(255,255,255,0.08) 0deg 0.5deg, transparent 0.5deg 90deg);opacity:0.3;pointer-events:none;animation:wedgeShimmer 4s ease-in-out infinite}
+.compass-wedges::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 40%), repeating-conic-gradient(rgba(255,255,255,0.08) 0deg 0.5deg, transparent 0.5deg 90deg);opacity:0.3;pointer-events:none}
 .compass-container::before{content:"";position:absolute;inset:-6%;border-radius:50%;box-shadow:0 34px 140px rgba(0,0,0,0.7);pointer-events:none}
 
 @keyframes compassPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
@@ -220,7 +220,6 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:3px s
   transform:translate(-50%,-50%);
   z-index:4;
   filter:drop-shadow(0 0 20px rgba(255,255,255,0.6)) drop-shadow(0 0 40px rgba(255,255,255,0.4));
-  animation:arrowPulseGlow 3s ease-in-out infinite;
 }
 
 @keyframes arrowPulseGlow{
@@ -253,7 +252,7 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:3px s
 .mode-card:hover:after{opacity:0.08}
 .mode-card:hover .mode-emoji{transform:scale(1.2) rotate(10deg);animation:bounce 0.6s ease-in-out}
 .mode-card:active{transform:translateY(-6px) scale(0.98) rotate(0deg)}
-.mode-emoji{font-size:3.8rem;line-height:1;flex-shrink:0;filter:drop-shadow(0 0 8px var(--mode-color));animation:float 3s ease-in-out infinite;transition:transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
+.mode-emoji{font-size:3.8rem;line-height:1;flex-shrink:0;filter:drop-shadow(0 0 8px var(--mode-color));transition:transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
 .mode-meta{flex:1;z-index:1}
 .mode-name{font-weight:900;font-size:1.5rem;margin-bottom:6px;text-shadow:0 0 10px var(--mode-color);color:var(--text-primary);transition:transform 0.3s ease}
 .mode-card:hover .mode-name{transform:translateX(4px)}
@@ -658,7 +657,7 @@ dialog::backdrop{background:rgba(0,0,0,0.92);animation:backdropFade 0.4s ease-ou
 @media (max-width:640px){.sticky-install-btn{bottom:80px;right:15px;padding:14px 20px;font-size:1rem}.sticky-install-btn .icon{font-size:1.3rem}}
 
 /* Helpful Tips */
-.helpful-tip{background:linear-gradient(135deg,rgba(0,230,166,0.08),rgba(46,127,232,0.05));border:2px solid rgba(0,230,166,0.25);border-radius:12px;padding:14px 20px;margin:16px auto;max-width:600px;text-align:center;font-size:1rem;font-weight:600;color:var(--text-primary);box-shadow:0 4px 16px rgba(0,230,166,0.2);animation:tipPulse 3s ease-in-out infinite}
+.helpful-tip{background:linear-gradient(135deg,rgba(0,230,166,0.08),rgba(46,127,232,0.05));border:2px solid rgba(0,230,166,0.25);border-radius:12px;padding:14px 20px;margin:16px auto;max-width:600px;text-align:center;font-size:1rem;font-weight:600;color:var(--text-primary);box-shadow:0 4px 16px rgba(0,230,166,0.2)}
 @keyframes tipPulse{0%,100%{box-shadow:0 4px 16px rgba(0,230,166,0.2);border-color:rgba(0,230,166,0.25)}50%{box-shadow:0 6px 24px rgba(0,230,166,0.35);border-color:rgba(0,230,166,0.4)}}
 @media (max-width:640px){.helpful-tip{font-size:0.95rem;padding:12px 16px;margin:12px auto}}
 
