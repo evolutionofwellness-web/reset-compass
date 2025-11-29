@@ -370,7 +370,7 @@
               ${escapeHtml(message)}
             </div>
             <div style="font-size: 14px; color: var(--text-secondary);">
-              Please try again or contact support if the problem persists.
+              Try again in a moment. If this keeps happening, let us know.
             </div>
           </li>
         `;

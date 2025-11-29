@@ -3,45 +3,45 @@
     {
       "id": "growing",
       "title": "Growing",
-      "description": "Boost your mood and energy with small wins.",
+      "description": "Ready to build? Small wins that add up.",
       "color": "#2E7FE8",
       "activities": [
-        {"id":"tinywin","title":"Tiny Win","icon":"assets/icons/tinywin.svg","explain":"Do one small task you can finish now.","duration":300},
-        {"id":"journal","title":"Write 2 Lines","icon":"assets/icons/journal.svg","explain":"Write two lines about one good thing.","duration":180},
-        {"id":"compliment","title":"Give a Compliment","icon":"assets/icons/compliment.svg","explain":"Tell someone something nice.","duration":60}
+        {"id":"learn-15","title":"Learn for 15 Minutes","icon":"assets/icons/learn.svg","explain":"Pick something you want to know more about. Read, watch, or listen for 15 minutes.","duration":900},
+        {"id":"skill-practice","title":"Practice a Skill","icon":"assets/icons/skill.svg","explain":"Choose one skill you're building. Practice for 15 minutes with focus.","duration":900},
+        {"id":"goal-step","title":"Take One Step Toward a Goal","icon":"assets/icons/goal.svg","explain":"Think of a goal you've been putting off. Do one small thing toward it right now.","duration":600}
       ]
     },
     {
       "id": "grounded",
       "title": "Grounded",
-      "description": "Root yourself with steady, grounding activities.",
+      "description": "Feeling steady? Stay there.",
       "color": "#0FBF84",
       "activities": [
-        {"id":"breath5","title":"5-Count Breath","icon":"assets/icons/breath5.svg","explain":"Inhale 5, exhale 5, repeat 5 times.","duration":120},
-        {"id":"notice","title":"Name 3 Things","icon":"assets/icons/notice.svg","explain":"Look and name three things you see.","duration":60},
-        {"id":"posture","title":"Fix Posture","icon":"assets/icons/posture.svg","explain":"Sit tall and relax shoulders.","duration":30}
+        {"id":"mindful-tea","title":"Mindful Tea or Coffee","icon":"assets/icons/tea.svg","explain":"Make a warm drink. Sit with it. Sip slowly. Notice the warmth, taste, and smell.","duration":300},
+        {"id":"body-scan","title":"Full Body Scan","icon":"assets/icons/body.svg","explain":"Sit or lie down. Notice your head, then shoulders, chest, belly, legs. Just notice.","duration":600},
+        {"id":"gratitude-write","title":"Write 3 Gratitudes","icon":"assets/icons/gratitude.svg","explain":"Write down three things you're grateful for today. They can be small.","duration":180}
       ]
     },
     {
       "id": "drifting",
       "title": "Drifting",
-      "description": "Gentle resets to float back into focus.",
+      "description": "Feeling disconnected? Find something real.",
       "color": "#FFBF3B",
       "activities": [
-        {"id":"walk","title":"Short Walk","icon":"assets/icons/walk.svg","explain":"Walk for 3–5 minutes nearby.","duration":300},
-        {"id":"music","title":"Play a Song","icon":"assets/icons/music.svg","explain":"Choose a feel-good short song.","duration":180},
-        {"id":"stretch","title":"Quick Stretch","icon":"assets/icons/stretch.svg","explain":"Stretch arms and neck slowly.","duration":90}
+        {"id":"outdoor-walk","title":"5-Minute Walk Outside","icon":"assets/icons/walk.svg","explain":"Put on shoes. Step outside. Walk for 5 minutes. Let the air wake you up.","duration":300},
+        {"id":"energize-song","title":"One Energizing Song","icon":"assets/icons/music.svg","explain":"Pick a song that makes you feel something. Press play. Listen to the whole thing.","duration":240},
+        {"id":"text-friend","title":"Text a Friend","icon":"assets/icons/message.svg","explain":"Think of someone you like. Send them a simple hello. No need for a long chat.","duration":120}
       ]
     },
     {
       "id": "surviving",
       "title": "Surviving",
-      "description": "Quick fixes to just get through the moment.",
+      "description": "Hard day? Here's the simplest stuff.",
       "color": "#FF5F6D",
       "activities": [
-        {"id":"breathe","title":"3 Deep Breaths","icon":"assets/icons/breathe.svg","explain":"Slow breaths to calm your body.","duration":60},
-        {"id":"sip","title":"Have a Sip","icon":"assets/icons/water.svg","explain":"Take a small drink of water.","duration":30},
-        {"id":"sit","title":"Sit Quiet","icon":"assets/icons/sit.svg","explain":"Sit still for one minute, eyes open.","duration":60}
+        {"id":"478-breath","title":"4-7-8 Breathing","icon":"assets/icons/breathe.svg","explain":"Breathe in for 4 seconds. Hold for 7. Breathe out for 8. Do it 3 times.","duration":90},
+        {"id":"cold-face","title":"Cold Water on Face","icon":"assets/icons/water.svg","explain":"Go to a sink. Splash cold water on your face 3 times. Pat dry.","duration":60},
+        {"id":"feet-ground","title":"Feet on Ground","icon":"assets/icons/ground.svg","explain":"Press both feet into the floor. Feel the solid ground. Hold for 10 seconds.","duration":30}
       ]
     }
   ]

@@ -39,7 +39,7 @@
       <div class="intro-content">
         <div class="intro-logo">🧭</div>
         <h1 class="intro-title">The Reset Compass</h1>
-        <p class="intro-subtitle">Find your wellness mode</p>
+        <p class="intro-subtitle">How are you feeling today?</p>
         <div class="intro-spinner"></div>
       </div>
     `;

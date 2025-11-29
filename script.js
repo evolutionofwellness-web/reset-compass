@@ -16,12 +16,12 @@
   const ONBOARDING_KEY = 'resetCompassOnboardingComplete';
 
   const ACHIEVEMENTS = [
-    { id: 'streak_7', name: '7 Day Warrior', emoji: '⚡', threshold: 7, type: 'streak' },
-    { id: 'streak_30', name: '30 Day Champion', emoji: '👑', threshold: 30, type: 'streak' },
-    { id: 'streak_100', name: '100 Day Legend', emoji: '🏆', threshold: 100, type: 'streak' },
-    { id: 'activities_10', name: 'Getting Started', emoji: '🌟', threshold: 10, type: 'total' },
-    { id: 'activities_50', name: 'Wellness Pro', emoji: '💪', threshold: 50, type: 'total' },
-    { id: 'activities_100', name: 'Reset Master', emoji: '🎯', threshold: 100, type: 'total' }
+    { id: 'streak_7', name: '7 Day Streak', emoji: '⚡', threshold: 7, type: 'streak' },
+    { id: 'streak_30', name: '30 Day Streak', emoji: '👑', threshold: 30, type: 'streak' },
+    { id: 'streak_100', name: '100 Day Streak', emoji: '🏆', threshold: 100, type: 'streak' },
+    { id: 'activities_10', name: '10 Resets', emoji: '🌟', threshold: 10, type: 'total' },
+    { id: 'activities_50', name: '50 Resets', emoji: '💪', threshold: 50, type: 'total' },
+    { id: 'activities_100', name: '100 Resets', emoji: '🎯', threshold: 100, type: 'total' }
   ];
 
   // MODES will be loaded from window.MODES by modes-loader.js
@@ -115,7 +115,7 @@
           <div class="mode-meta">
             <div class="mode-name">${escapeHtml(m.name)}</div>
             <div class="mode-desc">${escapeHtml(m.altDesc)}</div>
-            <div class="mode-hint">👆 Tap to see activities</div>
+            <div class="mode-hint">Tap to see what you can do</div>
           </div>
         </button>
       `).join('');
@@ -300,7 +300,7 @@
       <div class="achievement-unlock-content">
         <div class="achievement-unlock-emoji">${achievement.emoji}</div>
         <div class="achievement-unlock-text">
-          <div class="achievement-unlock-title">Achievement Unlocked!</div>
+          <div class="achievement-unlock-title">You earned this.</div>
           <div class="achievement-unlock-name">${escapeHtml(achievement.name)}</div>
         </div>
       </div>
@@ -352,7 +352,7 @@
     const bumped = incrementStreakIfNeeded();
     if (modeEntries.length > 0) localStorage.setItem(LAST_MODE_DAY_KEY, today);
 
-    showToast(`${entries.length} activity${entries.length>1?'ies':'y'} recorded`);
+    showToast(`Done. ${entries.length} activit${entries.length>1?'ies':'y'} saved.`);
     createCompletionCelebration(entries.length);
     updateAchievements();
     setTimeout(()=> openHistoryDialog(), 420);
@@ -364,7 +364,7 @@
     celebration.className = 'completion-celebration';
     celebration.innerHTML = `
       <div class="completion-icon">✨</div>
-      <div class="completion-text">Great work!</div>
+      <div class="completion-text">You did it.</div>
     `;
     document.body.appendChild(celebration);
     
@@ -422,7 +422,7 @@
       historyTimeline.innerHTML = history.length ? history.slice().reverse().map(e=>{
         const d = new Date(e.timestamp);
         return `<div class="history-entry" style="border-left-color:${e.modeColor||'#00AFA0'}"><div><strong>${escapeHtml(e.modeName||'Quick Win')}</strong> • ${d.toLocaleString()}<div style="margin-top:6px;color:var(--text-secondary)">${escapeHtml(e.action)}</div>${e.note?`<div style="margin-top:8px;color:var(--text-secondary)">${escapeHtml(e.note)}</div>`:''}</div></div>`;
-      }).join('') : '<div class="empty-history">No reset history yet. Start your first reset!</div>';
+      }).join('') : '<div class="empty-history">No resets yet. Start whenever you\'re ready.</div>';
     }
 
     safeShowDialog(historyDialog);
@@ -569,8 +569,8 @@
         localStorage.removeItem(LAST_MODE_DAY_KEY);
         if (historyDonut) historyDonut.getContext('2d').clearRect(0,0,historyDonut.width,historyDonut.height);
         if (historyStats) historyStats.innerHTML = '';
-        if (historyTimeline) historyTimeline.innerHTML = '<div class="empty-history">History cleared.</div>';
-        showToast('History cleared');
+        if (historyTimeline) historyTimeline.innerHTML = '<div class="empty-history">All clear. Starting fresh.</div>';
+        showToast('All cleared');
       });
     }
   }
@@ -601,11 +601,11 @@
         <li style="text-align: center; padding: 40px 20px;">
           <div style="font-size: 48px; margin-bottom: 16px;">🔒</div>
           <div style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
-            Mode completed for today
+            You've done your mode for today.
           </div>
           <div style="font-size: 14px; color: var(--text-secondary);">
-            Come back tomorrow to continue your streak!<br>
-            Quick Wins are always available.
+            Come back tomorrow to keep your streak going.<br>
+            Quick Wins are always here if you need them.
           </div>
         </li>
       `;
@@ -629,10 +629,10 @@
             <li style="text-align: center; padding: 40px 20px;">
               <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
               <div style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
-                No activities available
+                No activities right now
               </div>
               <div style="font-size: 14px; color: var(--text-secondary);">
-                Please try again later or contact support.
+                Try again in a moment. If this keeps happening, let us know.
               </div>
             </li>
           `;
@@ -924,14 +924,14 @@
           deferredPrompt.prompt();
           const result = await deferredPrompt.userChoice;
           if (result.outcome === 'accepted') {
-            showToast('Thanks for installing!');
+            showToast('Installed. You\'re all set.');
             stickyBtn.classList.remove('show');
           }
           deferredPrompt = null;
         } else if (isAndroid) {
           showAndroidInstructions();
         } else {
-          showToast('Open this site on your phone to install');
+          showToast('Open this on your phone to add it');
         }
       });
     }
@@ -940,7 +940,7 @@
       if (!deferredPrompt) return;
       deferredPrompt.prompt();
       const result = await deferredPrompt.userChoice;
-      if (result.outcome === 'accepted') showToast('Thanks for installing!');
+      if (result.outcome === 'accepted') showToast('Installed. You\'re all set.');
       deferredPrompt = null;
       banner.style.display = 'none';
     });
@@ -951,7 +951,7 @@
     });
     
     window.addEventListener('appinstalled', () => {
-      showToast('The Reset Compass installed successfully!');
+      showToast('Installed. Open from your home screen anytime.');
       banner.style.display = 'none';
       if (stickyBtn) stickyBtn.classList.remove('show');
     });
@@ -963,8 +963,8 @@
     dialog.innerHTML = `
       <div class="dialog-content">
         <button class="dialog-close" aria-label="Close dialog">&times;</button>
-        <h2>📱 Add to Home Screen</h2>
-        <p class="mode-description">Tap the Share button <strong>📤</strong> in your browser, then scroll down and tap <strong>"Add to Home Screen"</strong>.</p>
+        <h2>📱 Add to Your Home Screen</h2>
+        <p class="mode-description">Tap the Share button <strong>📤</strong> in your browser, then tap <strong>"Add to Home Screen"</strong>.</p>
         <div class="dialog-actions">
           <button class="btn-primary dialog-close">Got it</button>
         </div>
@@ -981,7 +981,7 @@
     dialog.innerHTML = `
       <div class="dialog-content">
         <button class="dialog-close" aria-label="Close dialog">&times;</button>
-        <h2>📱 Add to Home Screen</h2>
+        <h2>📱 Add to Your Home Screen</h2>
         <p class="mode-description">Tap the menu button <strong>⋮</strong> in your browser, then tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong>.</p>
         <div class="dialog-actions">
           <button class="btn-primary dialog-close">Got it</button>
@@ -1021,10 +1021,10 @@
         const name = formData.get('name');
         const review = formData.get('review');
         
-        if (!rating){ showToast('Please select a rating'); return; }
-        if (!name || name.trim() === ''){ showToast('Please enter your name'); return; }
-        if (!review || review.trim() === ''){ showToast('Please enter your review'); return; }
-        if (review.trim().length < 10){ showToast('Review must be at least 10 characters'); return; }
+        if (!rating){ showToast('Pick a star rating first'); return; }
+        if (!name || name.trim() === ''){ showToast('Add your name'); return; }
+        if (!review || review.trim() === ''){ showToast('Write something about your experience'); return; }
+        if (review.trim().length < 10){ showToast('Write a bit more (at least 10 characters)'); return; }
         
         const reviewObj = { rating, name: name.trim(), review: review.trim(), date: new Date().toISOString() };
         let reviews = [];
@@ -1037,7 +1037,7 @@
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams(formData).toString()
         }).then(() => {
-          showToast('Thank you for your review!');
+          showToast('Thanks for sharing.');
           reviewForm.reset();
           if (starRating) starRating.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
           renderReviews();
@@ -1057,21 +1057,21 @@
         const feedbackType = formData.get('type');
         const feedbackMessage = formData.get('message');
         
-        if (!feedbackType || feedbackType === ''){ showToast('Please select feedback type'); return; }
-        if (!feedbackMessage || feedbackMessage.trim() === ''){ showToast('Please enter your feedback'); return; }
-        if (feedbackMessage.trim().length < 10){ showToast('Feedback must be at least 10 characters'); return; }
+        if (!feedbackType || feedbackType === ''){ showToast('Pick a feedback type'); return; }
+        if (!feedbackMessage || feedbackMessage.trim() === ''){ showToast('Write your feedback first'); return; }
+        if (feedbackMessage.trim().length < 10){ showToast('Write a bit more (at least 10 characters)'); return; }
         
         fetch('/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams(formData).toString()
         }).then(() => {
-          showToast('Feedback sent successfully!');
+          showToast('Sent. Thanks for letting us know.');
           feedbackForm.reset();
           safeCloseDialog($('#feedbackDialog'));
         }).catch((err) => {
           console.error('Failed to submit feedback:', err);
-          showToast('Failed to send feedback. Please try again.');
+          showToast('Couldn\'t send that. Try again?');
         });
       });
     }
