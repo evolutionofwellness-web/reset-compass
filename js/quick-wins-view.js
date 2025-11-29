@@ -249,7 +249,7 @@
               font-size: 14px;
               color: var(--text-secondary);
             ">
-              <strong style="color: var(--text-primary);">💡 Tip:</strong> Quick Wins have no limit - do as many as you want!
+              <strong style="color: var(--text-primary);">💡</strong> No limit on Quick Wins. Do as many as you need.
             </div>
           </li>
         `;
@@ -313,7 +313,7 @@
         
         // Show toast notification
         if (window.showToast) {
-          window.showToast('Quick Win logged! ⚡');
+          window.showToast('Done.');
         }
       } catch (error) {
         console.error('[QuickWinsView] Error handling done:', error);
@@ -339,7 +339,7 @@
               ${escapeHtml(message)}
             </div>
             <div style="font-size: 14px; color: var(--text-secondary);">
-              Please try again or contact support if the problem persists.
+              Try again in a moment. If this keeps happening, let us know.
             </div>
           </li>
         `;

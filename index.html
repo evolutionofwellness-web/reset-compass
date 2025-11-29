@@ -262,7 +262,7 @@
       </div>
       
       <div class="helpful-tip">
-        💡 Tip: Tap any wedge on the compass below to quickly select how you're feeling
+        💡 Tip: Tap any wedge on the compass to pick how you're feeling
       </div>
 
       <div class="compass-wrap">
@@ -301,14 +301,14 @@
     </section>
 
     <section class="page-section page-section--info" aria-hidden="false">
-      <p class="hero-intro">Tap a wedge on the compass or pick a mode card below. Each mode has activities to help you reset.</p>
+      <p class="hero-intro">Tap where you're at on the compass. Each mode has simple activities to help you feel better.</p>
       <div class="helpful-tip">
-        🎯 Remember: You can complete one mode per day, but Quick Wins have no limit!
+        🎯 One mode per day keeps you on track. Quick Wins? Do as many as you want.
       </div>
     </section>
 
     <section class="page-section page-section--modes" aria-label="Wellness Modes">
-      <h2 class="section-title">Select How You Feel</h2>
+      <h2 class="section-title">How Are You Feeling?</h2>
 
       <div class="mode-grid" id="modesGrid" role="list" aria-live="polite"></div>
       <div class="quick-wins-block" role="region" aria-label="Quick Wins section">
@@ -316,41 +316,41 @@
           <div class="quick-wins-icon">⚡</div>
           <div class="quick-wins-title-section">
             <h3 class="quick-wins-title">Quick Wins</h3>
-            <p class="quick-wins-subtitle">Tiny actions. Instant impact.</p>
+            <p class="quick-wins-subtitle">Small actions. Real results.</p>
           </div>
         </div>
         <p class="quick-wins-description">
-          Feeling stuck? Sometimes all it takes is <strong>one small action</strong> to break the cycle. 
-          Quick Wins are fast activities to shift your energy, lift your mood, or help you refocus <em>right now</em>.
+          Feeling stuck? Sometimes one small action breaks the cycle.
+          Quick Wins are fast activities to shift your energy, lift your mood, or help you refocus right now.
         </p>
         <div class="quick-wins-features">
           <div class="quick-win-feature">
             <span class="feature-icon">🎯</span>
-            <span class="feature-text">Takes less than 2 minutes</span>
+            <span class="feature-text">Under 2 minutes</span>
           </div>
           <div class="quick-win-feature">
             <span class="feature-icon">💫</span>
-            <span class="feature-text">Instant mood boost</span>
+            <span class="feature-text">Feel better fast</span>
           </div>
           <div class="quick-win-feature">
             <span class="feature-icon">♾️</span>
-            <span class="feature-text">Use anytime, no limit</span>
+            <span class="feature-text">No daily limit</span>
           </div>
         </div>
-        <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins" aria-label="Choose Your Quick Win">
+        <button id="quickWinsLink" class="nav-btn quick-wins-cta" data-action="quick-wins" aria-label="Pick a Quick Win">
           <span class="cta-icon" aria-hidden="true">⚡</span>
-          <span class="cta-text">Choose Your Quick Win</span>
+          <span class="cta-text">Pick a Quick Win</span>
           <span class="cta-arrow" aria-hidden="true">→</span>
         </button>
-        <p class="quick-wins-encouragement">You deserve this moment. Take it.</p>
+        <p class="quick-wins-encouragement">You've got this.</p>
       </div>
 
       <div class="rate-cta-card" role="button" tabindex="0" onclick="document.querySelector('[data-action=ratings-reviews]').click()" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); document.querySelector('[data-action=ratings-reviews]').click(); }" aria-label="Rate The Reset Compass">
         <div class="rate-cta-content">
           <div class="rate-cta-icon" aria-hidden="true">⭐</div>
           <div class="rate-cta-text">
-            <h3>Enjoying The Reset Compass?</h3>
-            <p>Rate the app and share your experience!</p>
+            <h3>Like The Reset Compass?</h3>
+            <p>Share what you think. It helps.</p>
           </div>
         </div>
         <button class="rate-cta-btn" type="button" aria-label="Rate Now">Rate Now</button>
@@ -389,7 +389,7 @@
       <div class="mode-actions">
         <h3>Activities</h3>
         <ul id="dialogQuickWins" class="quick-wins-list" role="list"></ul>
-        <p class="mode-note-help" role="note" aria-live="polite">Tap an activity to pick it, then add notes if you want. Tap 'Complete Selected' when ready.</p>
+        <p class="mode-note-help" role="note" aria-live="polite">Tap an activity. Add notes if you want. Tap 'Done' when you're ready.</p>
       </div>
 
       <div class="dialog-actions">
@@ -410,7 +410,7 @@
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
       <h2 id="quickWinsTitle">Quick Wins</h2>
-      <p class="mode-description">Fast actions you can do right now to change your focus, energy, or mood. Tap an activity to pick it.</p>
+      <p class="mode-description">Pick something that feels right. One small action can shift your whole day.</p>
       <ul id="globalQuickWins" class="quick-wins-list" role="list"></ul>
 
       <div class="dialog-actions">
@@ -430,7 +430,7 @@
   <dialog id="historyDialog" class="history-dialog" aria-labelledby="historyDialogTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
-      <h2 id="historyDialogTitle">Your Reset History</h2>
+      <h2 id="historyDialogTitle">Your Progress</h2>
 
       <div id="historyStats" class="history-stats"></div>
       <div class="history-chart-row">
@@ -449,10 +449,10 @@
   <!-- COME BACK DIALOG -->
   <dialog id="comeBackDialog" class="mode-dialog" aria-labelledby="comeBackTitle">
     <div class="dialog-content">
-      <h2 id="comeBackTitle">Nice work!</h2>
-      <p id="comeBackMsg">You've completed a mode today. Come back tomorrow to continue your streak. Quick Wins are still available anytime.</p>
+      <h2 id="comeBackTitle">You did it.</h2>
+      <p id="comeBackMsg">You've done a mode today. Come back tomorrow to keep your streak going. Quick Wins are always here if you need them.</p>
       <div class="dialog-actions">
-        <button class="btn-primary dialog-close">OK</button>
+        <button class="btn-primary dialog-close">Got it</button>
       </div>
     </div>
   </dialog>
@@ -461,8 +461,8 @@
   <dialog id="feedbackDialog" class="mode-dialog" aria-labelledby="feedbackTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
-      <h2 id="feedbackTitle">Send Feedback</h2>
-      <p class="mode-description">Your feedback helps make The Reset Compass better. Share your thoughts, ideas, or report issues.</p>
+      <h2 id="feedbackTitle">Tell Us What You Think</h2>
+      <p class="mode-description">Your feedback helps make this better. What's on your mind?</p>
       
       <form name="feedback" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" class="feedback-form">
         <input type="hidden" name="form-name" value="feedback" />
@@ -508,8 +508,8 @@
   <dialog id="ratingsDialog" class="mode-dialog ratings-dialog" aria-labelledby="ratingsTitle">
     <div class="dialog-content">
       <button class="dialog-close" aria-label="Close dialog">&times;</button>
-      <h2 id="ratingsTitle">⭐ Rate & Review</h2>
-      <p class="mode-description">Share your experience with The Reset Compass. Your review will be visible to other users.</p>
+      <h2 id="ratingsTitle">⭐ Share Your Experience</h2>
+      <p class="mode-description">Tell others what you think. Your review helps people find what works.</p>
       
       <form name="reviews" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" class="review-form" id="reviewForm">
         <input type="hidden" name="form-name" value="reviews" />
@@ -536,7 +536,7 @@
         
         <div class="form-group">
           <label for="reviewText">Your Review *</label>
-          <textarea id="reviewText" name="review" class="form-textarea" rows="4" required placeholder="What do you think about The Reset Compass?"></textarea>
+          <textarea id="reviewText" name="review" class="form-textarea" rows="4" required placeholder="What's been working for you? What could be better?"></textarea>
         </div>
         
         <div class="dialog-actions">
@@ -548,7 +548,7 @@
       <div class="reviews-section">
         <h3>Recent Reviews</h3>
         <div id="reviewsList" class="reviews-list">
-          <p class="no-reviews">No reviews yet. Be the first to review!</p>
+          <p class="no-reviews">No reviews yet. Be the first!</p>
         </div>
       </div>
     </div>
